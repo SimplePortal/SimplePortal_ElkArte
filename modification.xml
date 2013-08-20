@@ -6,7 +6,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -15,7 +15,7 @@
 	<id>[SiNaN]:SimplePortal</id>
 	<version>2.4</version>
 
-	<file name="$boarddir/index.php">
+	<file name="BOARDDIR/index.php">
 		<operation>
 			<search position="replace"><![CDATA[		// Action and board are both empty... BoardIndex!]]></search>
 			<add><![CDATA[		// Go catch it boy! Catch it!
@@ -27,25 +27,25 @@
 		</operation>
 	</file>
 
-	<file name="$sourcedir/BoardIndex.php">
+	<file name="CONTROLLERDIR/BoardIndex.controller.php">
 		<operation error="ignore">
 			<search position="replace"><![CDATA[if (!empty($_GET))]]></search>
 			<add><![CDATA[if (!empty($_GET) && $_GET !== array('action' => 'forum'))]]></add>
 		</operation>
 	</file>
 
-	<file name="$sourcedir/Help.php">
+	<file name="CONTROLLERDIR/Help.controller.php">
 		<operation>
-			<search position="replace"><![CDATA[	// Load the admin help language file and template.
-	loadLanguage('Help');]]></search>
-			<add><![CDATA[	// Load the admin help language file and template.
-	loadLanguage('Help');
-	// Load the Simple Portal Help file.
-	loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));]]></add>
+			<search position="replace"><![CDATA[		// Load the admin help language file and template.
+		loadLanguage('Help');]]></search>
+			<add><![CDATA[		// Load the admin help language file and template.
+		loadLanguage('Help');
+		// Load the Simple Portal Help file.
+		loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));]]></add>
 		</operation>
 	</file>
 
-	<file name="$sourcedir/Load.php">
+	<file name="SOURCEDIR/Load.php">
 		<operation>
 			<search position="replace"><![CDATA[	// Verify the id_theme... no foul play.]]></search>
 			<add><![CDATA[	global $sp_standalone;
@@ -54,7 +54,7 @@
 	if (!isset($_GET['action']) && !isset($_GET['board']) && !isset($_GET['topic']) && ($modSettings['sp_portal_mode'] == 1 || !empty($sp_standalone)) && !empty($modSettings['portaltheme']))
 		$id_theme = (int) $modSettings['portaltheme'];
 
-	// SMF doesn't seem to be liking -1...
+	// Elk doesn't seem to be liking -1...
 	if ($id_theme == -1 && !empty($_SESSION['id_theme']))
 	{
 		unset($_SESSION['id_theme']);
@@ -63,19 +63,9 @@
 
 	// Verify the id_theme... no foul play.]]></add>
 		</operation>
-		<operation>
-			<search position="replace"><![CDATA[	// Wireless mode?  Load up the wireless stuff.]]></search>
-			<add><![CDATA[	// We'll be on the safe side, and load our language here!
-	loadLanguage('SPortal', '', false);
-	$cur_language = isset($user_info['language']) ? $user_info['language'] : $language;
-	if ($cur_language !== 'english')
-		loadLanguage('SPortal', 'english', false);
-
-	// Wireless mode?  Load up the wireless stuff.]]></add>
-		</operation>
 	</file>
 
-	<file name="$sourcedir/ManagePermissions.php">
+	<file name="ADMINDIR/ManagePermissions.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[			'pm_read' => array(false, 'pm', 'use_pm_system'),]]></search>
 			<add><![CDATA[			'pm_read' => array(false, 'pm', 'use_pm_system'),
@@ -101,7 +91,7 @@
 		</operation>
 	</file>
 
-	<file name="$sourcedir/ManageServer.php">
+	<file name="ADMINDIR/ManageServer.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[	loadLanguage('Help');]]></search>
 			<add><![CDATA[	loadLanguage('Help');
@@ -109,7 +99,7 @@
 		</operation>
 	</file>
 
-	<file name="$sourcedir/QueryString.php">
+	<file name="SOURCEDIR/QueryString.php">
 		<operation>
 			<search position="replace"><![CDATA[	// If $scripturl is set to nothing, or the SID is not defined (SSI?) just quit.]]></search>
 			<add><![CDATA[	// It's just a blue dream...
@@ -128,7 +118,7 @@
 		</operation>
 	</file>
 
-	<file name="$sourcedir/Recent.php">
+	<file name="CONTROLLERDIR/Recent.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[				'href' => $scripturl . '#c' . $row['id_cat'],
 				'link' => '<a href="' . $scripturl . '#c' . $row['id_cat'] . '">' . $row['cname'] . '</a>']]></search>
@@ -145,7 +135,7 @@
 		</operation>
 	</file>
 
-	<file name="$sourcedir/Subs.php">
+	<file name="SOURCEDIR/Subs.php">
 		<operation>
 			<search position="replace"><![CDATA[	static $disabled;]]></search>
 			<add><![CDATA[	static $disabled, $default_disabled, $parse_tag_cache;]]></add>
@@ -296,14 +286,14 @@
 		</operation>
 	</file>
 
-	<file name="$sourcedir/Subs-BoardIndex.php">
+	<file name="SUBSDIR/BoardIndex.subs.php">
 		<operation>
 			<search position="replace"><![CDATA[				'href' => $scripturl . '#c' . $row_board['id_cat'],]]></search>
 			<add><![CDATA[				'href' => $scripturl . '?action=forum#c' . $row_board['id_cat'],]]></add>
 		</operation>
 	</file>
 
-	<file name="$sourcedir/Subs-Boards.php">
+	<file name="SUBSDIR/Boards.subs.php">
 		<operation>
 			<search position="replace"><![CDATA[		if (isset($_SESSION['topicseen_cache']))
 			$_SESSION['topicseen_cache'] = array();
@@ -316,7 +306,7 @@
 		</operation>
 	</file>
 
-	<file name="$sourcedir/Who.php">
+	<file name="CONTROLLERDIR/Who.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[	// Actions that require a specific permission level.]]></search>
 			<add><![CDATA[	global $scripturl;
@@ -362,7 +352,7 @@
 		if (!empty($string_ids))
 			$page_where[] = 'namespace IN ({array_string:string_ids})';
 
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT id_page, namespace, title, permission_set, groups_allowed, groups_denied
 			FROM {db_prefix}sp_pages
 			WHERE ' . implode(' OR ', $page_where) . '
@@ -374,7 +364,7 @@
 			)
 		);
 		$page_data = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $db->fetch_assoc($result))
 		{
 			if (!sp_allowed_to('page', $row['id_page'], $row['permission_set'], $row['groups_allowed'], $row['groups_denied']))
 				continue;
@@ -385,7 +375,7 @@
 				'title' => $row['title'],
 			);
 		}
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		if (!empty($page_data))
 		{
