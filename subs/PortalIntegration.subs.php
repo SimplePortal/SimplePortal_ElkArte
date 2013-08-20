@@ -13,6 +13,12 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * integration hook integrate_actions
+ * Called from dispatcher.class, used to add in custom actions
+ *
+ * @param array $actions
+ */
 function sp_integrate_actions(&$actions)
 {
 	global $context;
@@ -24,6 +30,12 @@ function sp_integrate_actions(&$actions)
 	$actions['portal'] = array('PortalMain.php', 'sportal_main');
 }
 
+/**
+ * Admin hook, integrate_admin_areas, called from Admin.php
+ * adds the admin menu
+ *
+ * @param array $admin_areas
+ */
 function sp_integrate_admin_areas(&$admin_areas)
 {
 	global $txt;
@@ -119,4 +131,31 @@ function sp_integrate_admin_areas(&$admin_areas)
 			);
 		}
 	}
+}
+
+/**
+ * Permissions hook, integrate_load_permissions, called from ManagePermissions.php
+ * used to add new permisssions
+ *
+ * @param array $permissionGroups
+ * @param array $permissionList
+ * @param array $leftPermissionGroups
+ * @param array $hiddenPermissions
+ * @param array $relabelPermissions
+ */
+function sp_integrate_load_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
+{
+	global $context;
+
+	$permissionList['membergroup']['sp_admin'] = array(false, 'sp', 'sp');
+	$permissionList['membergroup']['sp_manage_settings'] = array(false, 'sp', 'sp');
+	$permissionList['membergroup']['sp_manage_blocks'] = array(false, 'sp', 'sp');
+	$permissionList['membergroup']['sp_manage_articles'] = array(false, 'sp', 'sp');
+	$permissionList['membergroup']['sp_manage_pages'] = array(false, 'sp', 'sp');
+	$permissionList['membergroup']['sp_manage_shoutbox'] = array(false, 'sp', 'sp');
+	$permissionList['membergroup']['sp_add_article'] = array(false, 'sp', 'sp');
+	$permissionList['membergroup']['sp_auto_article_approval'] = array(false, 'sp', 'sp');
+	$permissionList['membergroup']['sp_remove_article'] = array(false, 'sp', 'sp');
+
+	$permissionGroups['membergroup'][] = 'sp';
 }
