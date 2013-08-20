@@ -13,6 +13,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Entry point for portal configuration
+ */
 function sportal_admin_config_main()
 {
 	global $context, $txt;
@@ -43,6 +46,9 @@ function sportal_admin_config_main()
 	$subActions[$_REQUEST['sa']]();
 }
 
+/**
+ * General settings that control global portal actions
+ */
 function sportal_admin_general_settings($return_config = '')
 {
 	global $context, $scripturl, $txt;
@@ -98,6 +104,9 @@ function sportal_admin_general_settings($return_config = '')
 	prepareDBSettingContext($config_vars);
 }
 
+/**
+ * Settings that control how blocks behave
+ */
 function sportal_admin_block_settings($return_config = '')
 {
 	global $context, $scripturl, $txt;
@@ -168,6 +177,9 @@ function sportal_admin_block_settings($return_config = '')
 	prepareDBSettingContext($config_vars);
 }
 
+/**
+ * Settings to control articles
+ */
 function sportal_admin_article_settings($return_config = '')
 {
 	global $context, $scripturl, $txt;
@@ -198,6 +210,11 @@ function sportal_admin_article_settings($return_config = '')
 	prepareDBSettingContext($config_vars);
 }
 
+/**
+ * Our about page etc.
+ *
+ * @param boolean $in_admin
+ */
 function sportal_information($in_admin = true)
 {
 	global $context, $scripturl, $txt, $sportal_version, $user_profile;

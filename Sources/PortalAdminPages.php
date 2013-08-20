@@ -13,6 +13,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Entry point for pages
+ */
 function sportal_admin_pages_main()
 {
 	global $context, $txt;
@@ -51,6 +54,9 @@ function sportal_admin_pages_main()
 	$subActions[$_REQUEST['sa']]();
 }
 
+/**
+ * Show page listing of all portal pages in the system
+ */
 function sportal_admin_page_list()
 {
 	global $txt, $context, $scripturl;
@@ -194,6 +200,9 @@ function sportal_admin_page_list()
 	$context['page_title'] = $txt['sp_admin_pages_list'];
 }
 
+/**
+ * Interface for editing a page
+ */
 function sportal_admin_page_edit()
 {
 	global $txt, $context, $modSettings, $options;
@@ -567,6 +576,9 @@ function sportal_admin_page_edit()
 	$context['sub_template'] = 'pages_edit';
 }
 
+/**
+ * Update the page status / active on/off
+ */
 function sportal_admin_page_status()
 {
 	$db = database();
@@ -588,6 +600,9 @@ function sportal_admin_page_status()
 	redirectexit('action=admin;area=portalpages');
 }
 
+/**
+ * Delete a page from the system
+ */
 function sportal_admin_page_delete()
 {
 	$db = database();

@@ -13,6 +13,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Load all articles for selection
+ */
 function sportal_articles()
 {
 	global $context, $scripturl, $txt;
@@ -39,6 +42,10 @@ function sportal_articles()
 	$context['sub_template'] = 'view_articles';
 }
 
+/**
+ * Dispaly a chosen article
+ * Update the stats, like #views etc
+ */
 function sportal_article()
 {
 	global $context, $scripturl;

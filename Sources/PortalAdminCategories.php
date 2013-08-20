@@ -13,6 +13,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Entry point for portal categories
+ */
 function sportal_admin_categories_main()
 {
 	global $context, $txt;
@@ -51,6 +54,9 @@ function sportal_admin_categories_main()
 	$sub_actions[$context['sub_action']]();
 }
 
+/**
+ * Show a listing of categories in the system
+ */
 function sportal_admin_category_list()
 {
 	global $context, $scripturl, $txt;
@@ -191,6 +197,9 @@ function sportal_admin_category_list()
 	$context['page_title'] = $txt['sp_admin_categories_list'];
 }
 
+/**
+ * Edit or add a category
+ */
 function sportal_admin_category_edit()
 {
 	global $context, $txt;
@@ -328,6 +337,9 @@ function sportal_admin_category_edit()
 	$context['sub_template'] = 'categories_edit';
 }
 
+/**
+ * Approve categories
+ */
 function sportal_admin_category_status()
 {
 	$db = database();
@@ -349,6 +361,9 @@ function sportal_admin_category_status()
 	redirectexit('action=admin;area=portalcategories');
 }
 
+/**
+ * Delete a category
+ */
 function sportal_admin_category_delete()
 {
 	$db = database();

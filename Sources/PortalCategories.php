@@ -13,6 +13,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Display a list of categories for selection
+ */
 function sportal_categories()
 {
 	global $context, $scripturl, $txt;
@@ -30,6 +33,9 @@ function sportal_categories()
 	$context['sub_template'] = 'view_categories';
 }
 
+/**
+ * View a specific category
+ */
 function sportal_category()
 {
 	global $context, $scripturl;
