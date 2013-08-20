@@ -15,7 +15,9 @@ if (!defined('ELK'))
 
 function sportal_shoutbox()
 {
-	global $smcFunc, $context, $scripturl, $txt, $user_info;
+	global $context, $scripturl, $txt, $user_info;
+
+	$db = database();
 
 	$shoutbox_id = !empty($_REQUEST['shoutbox_id']) ? (int) $_REQUEST['shoutbox_id'] : 0;
 	$request_time = !empty($_REQUEST['time']) ? (int) $_REQUEST['time'] : 0;
@@ -41,7 +43,7 @@ function sportal_shoutbox()
 		{
 			require_once(SOURCEDIR . '/Subs-Post.php');
 
-			$_REQUEST['shout'] = $smcFunc['htmlspecialchars'](trim($_REQUEST['shout']));
+			$_REQUEST['shout'] = Util::htmlspecialchars(trim($_REQUEST['shout']));
 			preparsecode($_REQUEST['shout']);
 
 			if (!empty($_REQUEST['shout']))
@@ -83,7 +85,7 @@ function sportal_shoutbox()
 		return;
 	}
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_shouts
 		WHERE id_shoutbox = {int:current}',
@@ -91,8 +93,8 @@ function sportal_shoutbox()
 			'current' => $shoutbox_id,
 		)
 	);
-	list ($total_shouts) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total_shouts) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	$context['per_page'] = $context['SPortal']['shoutbox']['num_show'];
 	$context['start'] = !empty($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;

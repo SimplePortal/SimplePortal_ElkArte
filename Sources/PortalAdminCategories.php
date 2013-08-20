@@ -53,7 +53,9 @@ function sportal_admin_categories_main()
 
 function sportal_admin_category_list()
 {
-	global $smcFunc, $context, $scripturl, $txt;
+	global $context, $scripturl, $txt;
+
+	$db = database();
 
 	if (!empty($_POST['remove_categories']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 	{
@@ -62,7 +64,7 @@ function sportal_admin_category_list()
 		foreach ($_POST['remove'] as $index => $category_id)
 			$_POST['remove'][(int) $index] = (int) $category_id;
 
-		$smcFunc['db_query']('','
+		$db->query('','
 			DELETE FROM {db_prefix}sp_categories
 			WHERE id_category IN ({array_int:categories})',
 			array(
@@ -70,7 +72,7 @@ function sportal_admin_category_list()
 			)
 		);
 
-		$smcFunc['db_query']('','
+		$db->query('','
 			DELETE FROM {db_prefix}sp_articles
 			WHERE id_category IN ({array_int:categories})',
 			array(
@@ -144,17 +146,17 @@ function sportal_admin_category_list()
 	$context['sort_by'] = $_REQUEST['sort'];
 	$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'down' : 'up';
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_categories'
 	);
-	list ($total_categories) =  $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total_categories) =  $db->fetch_row($request);
+	$db->free_result($request);
 
 	$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=portalcategories;sa=list;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $total_categories, 20);
 	$context['start'] = $_REQUEST['start'];
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT id_category, name, namespace, articles, status
 		FROM {db_prefix}sp_categories
 		ORDER BY {raw:sort}
@@ -166,7 +168,7 @@ function sportal_admin_category_list()
 		)
 	);
 	$context['categories'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$context['categories'][$row['id_category']] = array(
 			'id' => $row['id_category'],
@@ -183,7 +185,7 @@ function sportal_admin_category_list()
 			)
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$context['sub_template'] = 'categories_list';
 	$context['page_title'] = $txt['sp_admin_categories_list'];
@@ -191,7 +193,9 @@ function sportal_admin_category_list()
 
 function sportal_admin_category_edit()
 {
-	global $smcFunc, $context, $modSettings, $options, $txt;
+	global $context, $txt;
+
+	$db = database();
 
 	$context['is_new'] = empty($_REQUEST['category_id']);
 
@@ -199,13 +203,13 @@ function sportal_admin_category_edit()
 	{
 		checkSession();
 
-		if (!isset($_POST['name']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['name'], ENT_QUOTES)) === '')
+		if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			fatal_lang_error('sp_error_category_name_empty', false);
 
-		if (!isset($_POST['namespace']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['namespace'], ENT_QUOTES)) === '')
+		if (!isset($_POST['namespace']) || Util::htmltrim(Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES)) === '')
 			fatal_lang_error('sp_error_category_namespace_empty', false);
 
-		$result = $smcFunc['db_query']('','
+		$result = $db->query('','
 			SELECT id_category
 			FROM {db_prefix}sp_categories
 			WHERE namespace = {string:namespace}
@@ -213,12 +217,12 @@ function sportal_admin_category_edit()
 			LIMIT 1',
 			array(
 				'limit' => 1,
-				'namespace' => $smcFunc['htmlspecialchars']($_POST['namespace'], ENT_QUOTES),
+				'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
 				'current' => (int) $_POST['category_id'],
 			)
 		);
-		list ($has_duplicate) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		list ($has_duplicate) = $db->fetch_row($result);
+		$db->free_result($result);
 
 		if (!empty($has_duplicate))
 			fatal_lang_error('sp_error_category_namespace_duplicate', false);
@@ -262,9 +266,9 @@ function sportal_admin_category_edit()
 
 		$category_info = array(
 			'id' => (int) $_POST['category_id'],
-			'namespace' => $smcFunc['htmlspecialchars']($_POST['namespace'], ENT_QUOTES),
-			'name' => $smcFunc['htmlspecialchars']($_POST['name'], ENT_QUOTES),
-			'description' => $smcFunc['htmlspecialchars']($_POST['description'], ENT_QUOTES),
+			'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
+			'name' => Util::htmlspecialchars($_POST['name'], ENT_QUOTES),
+			'description' => Util::htmlspecialchars($_POST['description'], ENT_QUOTES),
 			'permission_set' => $permission_set,
 			'groups_allowed' => $groups_allowed,
 			'groups_denied' => $groups_denied,
@@ -275,13 +279,13 @@ function sportal_admin_category_edit()
 		{
 			unset($category_info['id']);
 
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}sp_categories',
 				$fields,
 				$category_info,
 				array('id_category')
 			);
-			$category_info['id'] = $smcFunc['db_insert_id']('{db_prefix}sp_categories', 'id_category');
+			$category_info['id'] = $db->insert_id('{db_prefix}sp_categories', 'id_category');
 		}
 		else
 		{
@@ -289,7 +293,7 @@ function sportal_admin_category_edit()
 			foreach ($fields as $name => $type)
 				$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
 
-			$smcFunc['db_query']('','
+			$db->query('','
 				UPDATE {db_prefix}sp_categories
 				SET ' . implode(', ', $update_fields) . '
 				WHERE id_category = {int:id}',
@@ -327,13 +331,13 @@ function sportal_admin_category_edit()
 
 function sportal_admin_category_status()
 {
-	global $smcFunc;
+	$db = database();
 
 	checkSession('get');
 
 	$category_id = !empty($_REQUEST['category_id']) ? (int) $_REQUEST['category_id'] : 0;
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}sp_categories
 		SET status = CASE WHEN status = {int:is_active} THEN 0 ELSE 1 END
 		WHERE id_category = {int:id}',
@@ -348,13 +352,13 @@ function sportal_admin_category_status()
 
 function sportal_admin_category_delete()
 {
-	global $smcFunc;
+	$db = database();
 
 	checkSession('get');
 
 	$category_id = !empty($_REQUEST['category_id']) ? (int) $_REQUEST['category_id'] : 0;
 
-	$smcFunc['db_query']('','
+	$db->query('','
 		DELETE FROM {db_prefix}sp_categories
 		WHERE id_category = {int:id}',
 		array(
@@ -362,7 +366,7 @@ function sportal_admin_category_delete()
 		)
 	);
 
-	$smcFunc['db_query']('','
+	$db->query('','
 		DELETE FROM {db_prefix}sp_articles
 		WHERE id_category = {int:id}',
 		array(

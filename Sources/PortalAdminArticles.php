@@ -53,7 +53,9 @@ function sportal_admin_articles_main()
 
 function sportal_admin_article_list()
 {
-	global $smcFunc, $context, $scripturl, $txt;
+	global $context, $scripturl, $txt;
+
+	$db = database();
 
 	if (!empty($_POST['remove_articles']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 	{
@@ -62,7 +64,7 @@ function sportal_admin_article_list()
 		foreach ($_POST['remove'] as $index => $article_id)
 			$_POST['remove'][(int) $index] = (int) $article_id;
 
-		$smcFunc['db_query']('','
+		$db->query('','
 			DELETE FROM {db_prefix}sp_articles
 			WHERE id_article IN ({array_int:articles})',
 			array(
@@ -163,17 +165,17 @@ function sportal_admin_article_list()
 	$context['sort_by'] = $_REQUEST['sort'];
 	$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'down' : 'up';
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_articles'
 	);
-	list ($total_articles) =  $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total_articles) =  $db->fetch_row($request);
+	$db->free_result($request);
 
 	$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=portalarticles;sa=list;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $total_articles, 20);
 	$context['start'] = $_REQUEST['start'];
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT
 			spa.id_article, spa.id_category, spc.name, spc.namespace AS category_namespace,
 			IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name,
@@ -190,7 +192,7 @@ function sportal_admin_article_list()
 		)
 	);
 	$context['articles'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$context['articles'][$row['id_article']] = array(
 			'id' => $row['id_article'],
@@ -221,7 +223,7 @@ function sportal_admin_article_list()
 			)
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$context['sub_template'] = 'articles_list';
 	$context['page_title'] = $txt['sp_admin_articles_list'];
@@ -229,7 +231,9 @@ function sportal_admin_article_list()
 
 function sportal_admin_article_edit()
 {
-	global $smcFunc, $context, $modSettings, $user_info, $options, $txt;
+	global $context, $modSettings, $user_info, $options, $txt;
+
+	$db = database();
 
 	require_once(SOURCEDIR . '/Subs-Editor.php');
 	require_once(SOURCEDIR . '/Subs-Post.php');
@@ -253,13 +257,13 @@ function sportal_admin_article_edit()
 			$context['article'] = sportal_get_articles($_REQUEST['article_id']);
 		}
 
-		if (!isset($_POST['title']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['title'], ENT_QUOTES)) === '')
+		if (!isset($_POST['title']) || Util::htmltrim(Util::htmlspecialchars($_POST['title'], ENT_QUOTES)) === '')
 			fatal_lang_error('sp_error_article_name_empty', false);
 
-		if (!isset($_POST['namespace']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['namespace'], ENT_QUOTES)) === '')
+		if (!isset($_POST['namespace']) || Util::htmltrim(Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES)) === '')
 			fatal_lang_error('sp_error_article_namespace_empty', false);
 
-		$result = $smcFunc['db_query']('','
+		$result = $db->query('','
 			SELECT id_article
 			FROM {db_prefix}sp_articles
 			WHERE namespace = {string:namespace}
@@ -267,12 +271,12 @@ function sportal_admin_article_edit()
 			LIMIT 1',
 			array(
 				'limit' => 1,
-				'namespace' => $smcFunc['htmlspecialchars']($_POST['namespace'], ENT_QUOTES),
+				'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
 				'current' => (int) $_POST['article_id'],
 			)
 		);
-		list ($has_duplicate) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		list ($has_duplicate) = $db->fetch_row($result);
+		$db->free_result($result);
 
 		if (!empty($has_duplicate))
 			fatal_lang_error('sp_error_article_namespace_duplicate', false);
@@ -327,9 +331,9 @@ function sportal_admin_article_edit()
 		$article_info = array(
 			'id' => (int) $_POST['article_id'],
 			'id_category' => (int) $_POST['category_id'],
-			'namespace' => $smcFunc['htmlspecialchars']($_POST['namespace'], ENT_QUOTES),
-			'title' => $smcFunc['htmlspecialchars']($_POST['title'], ENT_QUOTES),
-			'body' => $smcFunc['htmlspecialchars']($_POST['content'], ENT_QUOTES),
+			'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
+			'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
+			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
 			'type' => $_POST['type'],
 			'permission_set' => $permission_set,
 			'groups_allowed' => $groups_allowed,
@@ -356,13 +360,13 @@ function sportal_admin_article_edit()
 				'date' => time(),
 			));
 
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}sp_articles',
 				$fields,
 				$article_info,
 				array('id_article')
 			);
-			$article_info['id'] = $smcFunc['db_insert_id']('{db_prefix}sp_articles', 'id_article');
+			$article_info['id'] = $db->insert_id('{db_prefix}sp_articles', 'id_article');
 		}
 		else
 		{
@@ -370,7 +374,7 @@ function sportal_admin_article_edit()
 			foreach ($fields as $name => $type)
 				$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
 
-			$smcFunc['db_query']('','
+			$db->query('','
 				UPDATE {db_prefix}sp_articles
 				SET ' . implode(', ', $update_fields) . '
 				WHERE id_article = {int:id}',
@@ -381,7 +385,7 @@ function sportal_admin_article_edit()
 
 		if ($context['is_new'] || $article_info['id_category'] != $context['article']['category']['id'])
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}sp_categories
 				SET articles = articles + 1
 				WHERE id_category = {int:id}',
@@ -392,7 +396,7 @@ function sportal_admin_article_edit()
 
 			if (!$context['is_new'])
 			{
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}sp_categories
 					SET articles = articles - 1
 					WHERE id_category = {int:id}',
@@ -428,8 +432,8 @@ function sportal_admin_article_edit()
 			'id' => $_POST['article_id'],
 			'article_id' => $_POST['namespace'],
 			'category' => sportal_get_categories((int) $_POST['category_id']),
-			'title' => $smcFunc['htmlspecialchars']($_POST['title'], ENT_QUOTES),
-			'body' => $smcFunc['htmlspecialchars']($_POST['content'], ENT_QUOTES),
+			'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
+			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
 			'type' => $_POST['type'],
 			'permission_set' => $permission_set,
 			'groups_allowed' => $groups_allowed,
@@ -498,13 +502,13 @@ function sportal_admin_article_edit()
 
 function sportal_admin_article_status()
 {
-	global $smcFunc;
+	$db = database();
 
 	checkSession('get');
 
 	$article_id = !empty($_REQUEST['article_id']) ? (int) $_REQUEST['article_id'] : 0;
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}sp_articles
 		SET status = CASE WHEN status = {int:is_active} THEN 0 ELSE 1 END
 		WHERE id_article = {int:id}',
@@ -519,14 +523,14 @@ function sportal_admin_article_status()
 
 function sportal_admin_article_delete()
 {
-	global $smcFunc;
+	$db = database();
 
 	checkSession('get');
 
 	$article_id = !empty($_REQUEST['article_id']) ? (int) $_REQUEST['article_id'] : 0;
 	$article_info = sportal_get_articles($article_id);
 
-	$smcFunc['db_query']('','
+	$db->query('','
 		DELETE FROM {db_prefix}sp_articles
 		WHERE id_article = {int:id}',
 		array(
@@ -534,7 +538,7 @@ function sportal_admin_article_delete()
 		)
 	);
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}sp_categories
 		SET articles = articles - 1
 		WHERE id_category = {int:id}',

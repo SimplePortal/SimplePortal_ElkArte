@@ -15,7 +15,7 @@ if (!defined('ELK'))
 
 function sportal_articles()
 {
-	global $smcFunc, $context, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	loadTemplate('PortalArticles');
 
@@ -23,8 +23,8 @@ function sportal_articles()
 
 	foreach ($context['SPortal']['articles'] as $article)
 	{
-		if (($cutoff = $smcFunc['strpos']($article['body'], '[cutoff]')) !== false)
-			$article['body'] = $smcFunc['substr']($article['body'], 0, $cutoff);
+		if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
+			$article['body'] = Util::substr($article['body'], 0, $cutoff);
 
 		$context['SPortal']['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
 		$context['SPortal']['articles'][$article['id']]['date'] = timeformat($article['date']);

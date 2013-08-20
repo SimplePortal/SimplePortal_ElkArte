@@ -164,7 +164,7 @@ $tables = array(
 foreach ($tables as $table => $data)
 	$smcFunc['db_create_table']('{db_prefix}' . $table, $data['columns'], $data['indexes'], array(), 'ignore');
 
-$smcFunc['db_insert']('ignore',
+$db->insert('ignore',
 	'{db_prefix}sp_functions',
 	array('id_function' => 'int', 'function_order' => 'int', 'name' => 'string'),
 	array(
@@ -202,15 +202,15 @@ $smcFunc['db_insert']('ignore',
 	array('id_function')
 );
 
-$result = $smcFunc['db_query']('','
+$result = $db->query('','
 	SELECT id_block
 	FROM {db_prefix}sp_blocks
 	LIMIT 1',
 	array(
 	)
 );
-list ($has_block) = $smcFunc['db_fetch_row']($result);
-$smcFunc['db_free_result']($result);
+list ($has_block) = $db->fetch_row($result);
+$db->free_result($result);
 
 if (empty($has_block))
 {
@@ -235,14 +235,14 @@ if (empty($has_block))
 		'top_boards' => array('label' => 'Top Boards', 'type' => 'sp_topBoards', 'col' => 4, 'row' => 5, 'permission_set' => '3', 'display' => '', 'display_custom' => '', 'style' => ''),
 	);
 
-	$smcFunc['db_insert']('ignore',
+	$db->insert('ignore',
 		'{db_prefix}sp_blocks',
 		array('label' => 'text', 'type' => 'text', 'col' => 'int', 'row' => 'int', 'permission_set' => 'int', 'display' => 'text', 'display_custom' => 'text', 'style' => 'text'),
 		$default_blocks,
 		array('id_block')
 	);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT MIN(id_block) AS id, type
 		FROM {db_prefix}sp_blocks
 		WHERE type IN ({array_string:types})
@@ -252,9 +252,9 @@ if (empty($has_block))
 			'types' => array('sp_html', 'sp_boardNews', 'sp_calendar', 'sp_recent'),
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$block_ids[$row['type']] = $row['id'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$default_parameters = array(
 		array('id_block' => $block_ids['sp_html'], 'variable' => 'content', 'value' => htmlspecialchars($welcome_text)),
@@ -267,7 +267,7 @@ if (empty($has_block))
 		array('id_block' => $block_ids['sp_recent'], 'variable' => 'display', 'value' => 1),
 	);
 
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}sp_parameters',
 		array('id_block' => 'int', 'variable' => 'text', 'value' => 'text'),
 		$default_parameters,

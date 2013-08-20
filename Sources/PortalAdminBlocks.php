@@ -188,7 +188,9 @@ function sportal_admin_block_list()
 // Adding or editing a block.
 function sportal_admin_block_edit()
 {
-	global $txt, $context, $modSettings, $smcFunc, $boarddir, $boards;
+	global $txt, $context, $modSettings, $boarddir, $boards;
+
+	$db = database();
 
 	// Just in case, the admin could be doing something silly like editing a SP block while SP it disabled. ;)
 	require_once(SOURCEDIR . '/PortalBlocks.php');
@@ -289,7 +291,7 @@ function sportal_admin_block_edit()
 						$parameter['value'] = $_POST['parameters'][$name];
 						require_once(SOURCEDIR . '/Subs-Post.php');
 
-						$parameter['value'] = $smcFunc['htmlspecialchars']($parameter['value'], ENT_QUOTES);
+						$parameter['value'] = Util::htmlspecialchars($parameter['value'], ENT_QUOTES);
 						preparsecode($parameter['value']);
 
 						$_POST['parameters'][$name] = $parameter['value'];
@@ -299,7 +301,7 @@ function sportal_admin_block_edit()
 					elseif ($type == 'int' || $type == 'select')
 						$_POST['parameters'][$name] = (int) $_POST['parameters'][$name];
 					elseif ($type == 'text' || $type == 'textarea' || is_array($type))
-						$_POST['parameters'][$name] = $smcFunc['htmlspecialchars']($_POST['parameters'][$name], ENT_QUOTES);
+						$_POST['parameters'][$name] = Util::htmlspecialchars($_POST['parameters'][$name], ENT_QUOTES);
 					elseif ($type == 'check')
 						$_POST['parameters'][$name] = !empty($_POST['parameters'][$name]) ? 1 : 0;
 				}
@@ -324,7 +326,7 @@ function sportal_admin_block_edit()
 
 			if (!empty($_POST['display_actions']))
 				foreach ($_POST['display_actions'] as $action)
-					$display[] = $smcFunc['htmlspecialchars']($action, ENT_QUOTES);
+					$display[] = Util::htmlspecialchars($action, ENT_QUOTES);
 
 			if (!empty($_POST['display_boards']))
 				foreach ($_POST['display_boards'] as $board)
@@ -338,7 +340,7 @@ function sportal_admin_block_edit()
 			{
 				$temp = explode(',', $_POST['display_custom']);
 				foreach ($temp as $action)
-					$custom[] = $smcFunc['htmlspecialchars']($smcFunc['htmltrim']($action), ENT_QUOTES);
+					$custom[] = Util::htmlspecialchars(Util::htmltrim($action), ENT_QUOTES);
 			}
 
 			$display = empty($display) ? '' : implode(',', $display);
@@ -363,7 +365,7 @@ function sportal_admin_block_edit()
 
 		$context['SPortal']['block'] = array(
 			'id' => $_POST['block_id'],
-			'label' => $smcFunc['htmlspecialchars']($_POST['block_name'], ENT_QUOTES),
+			'label' => Util::htmlspecialchars($_POST['block_name'], ENT_QUOTES),
 			'type' => $_POST['block_type'],
 			'type_text' => !empty($txt['sp_function_' . $_POST['block_type'] . '_label']) ? $txt['sp_function_' . $_POST['block_type'] . '_label'] : $txt['sp_function_unknown_label'],
 			'column' => $_POST['block_column'],
@@ -460,25 +462,25 @@ function sportal_admin_block_edit()
 			'who' =>  $txt['who_title'],
 		);
 
-		$request = $smcFunc['db_query']('','
+		$request = $db->query('','
 			SELECT id_board, name
 			FROM {db_prefix}boards
 			ORDER BY name DESC'
 		);
 		$context['display_boards'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$context['display_boards']['b' . $row['id_board']] = $row['name'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
-		$request = $smcFunc['db_query']('','
+		$request = $db->query('','
 			SELECT id_page, title
 			FROM {db_prefix}sp_pages
 			ORDER BY title DESC'
 		);
 		$context['display_pages'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$context['display_pages']['p' . $row['id_page']] = $row['title'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (empty($context['SPortal']['block']['display']))
 			$context['SPortal']['block']['display'] = array('0');
@@ -585,7 +587,7 @@ function sportal_admin_block_edit()
 		if ($_POST['block_type'] == 'sp_php' && !allowedTo('admin_forum'))
 			fatal_lang_error('cannot_admin_forum', false);
 
-		if (!isset($_POST['block_name']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['block_name']), ENT_QUOTES) === '')
+		if (!isset($_POST['block_name']) || Util::htmltrim(Util::htmlspecialchars($_POST['block_name']), ENT_QUOTES) === '')
 			fatal_lang_error('error_sp_name_empty', false);
 
 		if ($_POST['block_type'] == 'sp_php' && !empty($_POST['parameters']['content']) && empty($modSettings['sp_disable_php_validation']))
@@ -615,7 +617,7 @@ function sportal_admin_block_edit()
 			{
 				$row = $row - 1;
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}sp_blocks
 					SET row = row - 1
 					WHERE col = {int:col}
@@ -630,7 +632,7 @@ function sportal_admin_block_edit()
 			}
 			else
 			{
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}sp_blocks
 					SET row = row + 1
 					WHERE col = {int:col}
@@ -648,7 +650,7 @@ function sportal_admin_block_edit()
 			$row = 0;
 		else
 		{
-			$request =  $smcFunc['db_query']('','
+			$request =  $db->query('','
 				SELECT row
 				FROM {db_prefix}sp_blocks
 				WHERE col = {int:col}' . (!empty($_REQUEST['block_id']) ? '
@@ -660,8 +662,8 @@ function sportal_admin_block_edit()
 					'current_id' => $_REQUEST['block_id'],
 				)
 			);
-			list ($row) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($row) = $db->fetch_row($request);
+			$db->free_result($request);
 
 			$row = $row + 1;
 		}
@@ -680,7 +682,7 @@ function sportal_admin_block_edit()
 						$parameter['value'] = $_POST['parameters'][$name];
 						require_once(SOURCEDIR . '/Subs-Post.php');
 						// Prepare the message a bit for some additional testing.
-						$parameter['value'] = $smcFunc['htmlspecialchars']($parameter['value'], ENT_QUOTES);
+						$parameter['value'] = Util::htmlspecialchars($parameter['value'], ENT_QUOTES);
 						preparsecode($parameter['value']);
 						//Store now the correct and fixed value ;)
 						$_POST['parameters'][$name] = $parameter['value'];
@@ -690,7 +692,7 @@ function sportal_admin_block_edit()
 					elseif ($type == 'int' || $type == 'select')
 						$_POST['parameters'][$name] = (int) $_POST['parameters'][$name];
 					elseif ($type == 'text' || $type == 'textarea' || is_array($type))
-						$_POST['parameters'][$name] = $smcFunc['htmlspecialchars']($_POST['parameters'][$name], ENT_QUOTES);
+						$_POST['parameters'][$name] = Util::htmlspecialchars($_POST['parameters'][$name], ENT_QUOTES);
 					elseif ($type == 'check')
 						$_POST['parameters'][$name] = !empty($_POST['parameters'][$name]) ? 1 : 0;
 				}
@@ -735,7 +737,7 @@ function sportal_admin_block_edit()
 
 			if (!empty($_POST['display_actions']))
 				foreach ($_POST['display_actions'] as $action)
-					$display[] = $smcFunc['htmlspecialchars']($action, ENT_QUOTES);
+					$display[] = Util::htmlspecialchars($action, ENT_QUOTES);
 
 			if (!empty($_POST['display_boards']))
 				foreach ($_POST['display_boards'] as $board)
@@ -749,7 +751,7 @@ function sportal_admin_block_edit()
 			{
 				$temp = explode(',', $_POST['display_custom']);
 				foreach ($temp as $action)
-					$custom[] = $smcFunc['htmlspecialchars']($smcFunc['htmltrim']($action), ENT_QUOTES);
+					$custom[] = Util::htmlspecialchars(Util::htmltrim($action), ENT_QUOTES);
 			}
 
 			$display = empty($display) ? '' : implode(',', $display);
@@ -759,14 +761,14 @@ function sportal_admin_block_edit()
 			elseif (!empty($_POST['display_custom']))
 			{
 				if (allowedTo('admin_forum') && substr($_POST['display_custom'], 0, 4) === '$php')
-					$custom = $smcFunc['htmlspecialchars']($_POST['display_custom'], ENT_QUOTES);
+					$custom = Util::htmlspecialchars($_POST['display_custom'], ENT_QUOTES);
 				else
 				{
 					$custom = array();
 					$temp = explode(',', $_POST['display_custom']);
 
 					foreach ($temp as $action)
-						$custom[] = $smcFunc['htmlspecialchars']($action, ENT_QUOTES);
+						$custom[] = Util::htmlspecialchars($action, ENT_QUOTES);
 
 					$custom = empty($custom) ? '' : implode(',', $custom);
 				}
@@ -777,7 +779,7 @@ function sportal_admin_block_edit()
 
 		$blockInfo = array(
 			'id' => (int) $_POST['block_id'],
-			'label' => $smcFunc['htmlspecialchars']($_POST['block_name'], ENT_QUOTES),
+			'label' => Util::htmlspecialchars($_POST['block_name'], ENT_QUOTES),
 			'type' => $_POST['block_type'],
 			'col' => $_POST['block_column'],
 			'row' => $row,
@@ -795,7 +797,7 @@ function sportal_admin_block_edit()
 		{
 			unset($blockInfo['id']);
 
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}sp_blocks',
 				array(
 					'label' => 'string',
@@ -815,7 +817,7 @@ function sportal_admin_block_edit()
 				array('id_block')
 			);
 
-			$blockInfo['id'] = $smcFunc['db_insert_id']('{db_prefix}sp_blocks', 'id_block');
+			$blockInfo['id'] = $db->insert_id('{db_prefix}sp_blocks', 'id_block');
 		}
 		else
 		{
@@ -836,14 +838,14 @@ function sportal_admin_block_edit()
 			else
 				unset($blockInfo['row']);
 
-			$smcFunc['db_query']('','
+			$db->query('','
 				UPDATE {db_prefix}sp_blocks
 				SET ' . implode(', ', $block_fields) . '
 				WHERE id_block = {int:id}',
 				$blockInfo
 			);
 
-			$smcFunc['db_query']('','
+			$db->query('','
 				DELETE FROM {db_prefix}sp_parameters
 				WHERE id_block = {int:id}',
 				array(
@@ -862,7 +864,7 @@ function sportal_admin_block_edit()
 					'value' => $value,
 				);
 
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}sp_parameters',
 				array(
 					'id_block' => 'int',
@@ -881,7 +883,7 @@ function sportal_admin_block_edit()
 // Function for moving a block.
 function sportal_admin_block_move()
 {
-	global $smcFunc;
+	$db = database();
 
 	checkSession('get');
 
@@ -897,7 +899,7 @@ function sportal_admin_block_move()
 
 	if (empty($_REQUEST['row']))
 	{
-		$request =  $smcFunc['db_query']('','
+		$request =  $db->query('','
 			SELECT MAX(row)
 			FROM {db_prefix}sp_blocks
 			WHERE col = {int:target_side}
@@ -907,15 +909,15 @@ function sportal_admin_block_move()
 				'limit' => 1,
 			)
 		);
-		list ($target_row) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($target_row) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		$target_row += 1;
 	}
 	else
 		$target_row = (int) $_REQUEST['row'];
 
-	$request =  $smcFunc['db_query']('','
+	$request =  $db->query('','
 		SELECT col, row
 		FROM {db_prefix}sp_blocks
 		WHERE id_block = {int:block_id}
@@ -925,15 +927,15 @@ function sportal_admin_block_move()
 			'limit' => 1,
 		)
 	);
-	list ($current_side, $current_row) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($current_side, $current_row) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	if ($current_side != $target_side || $current_row + 1 != $target_row)
 	{
 		if ($current_side != $target_side)
 		{
 			$current_row = 100;
-			$smcFunc['db_query']('','
+			$db->query('','
 				UPDATE {db_prefix}sp_blocks
 				SET col = {int:target_side}, row = {int:temp_row}
 				WHERE id_block = {int:block_id}',
@@ -945,7 +947,7 @@ function sportal_admin_block_move()
 			);
 		}
 
-		$smcFunc['db_query']('','
+		$db->query('','
 			UPDATE {db_prefix}sp_blocks
 			SET row = row + 1
 			WHERE col = {int:target_side}
@@ -956,7 +958,7 @@ function sportal_admin_block_move()
 			)
 		);
 
-		$smcFunc['db_query']('','
+		$db->query('','
 			UPDATE {db_prefix}sp_blocks
 			SET row = {int:target_row}
 			WHERE id_block = {int:block_id}',
@@ -976,7 +978,7 @@ function sportal_admin_block_move()
 // Function for deleting a block.
 function sportal_admin_block_delete()
 {
-	global $smcFunc;
+	$db = database();
 
 	// Check if he can?
 	checkSession('get');
@@ -1000,7 +1002,7 @@ function sportal_admin_block_delete()
 	}
 
 	// We don't need it anymore.
-	$smcFunc['db_query']('','
+	$db->query('','
 		DELETE FROM {db_prefix}sp_blocks
 		WHERE id_block = {int:id}',
 		array(
@@ -1008,7 +1010,7 @@ function sportal_admin_block_delete()
 		)
 	);
 
-	$smcFunc['db_query']('','
+	$db->query('','
 		DELETE FROM {db_prefix}sp_parameters
 		WHERE id_block = {int:id}',
 		array(

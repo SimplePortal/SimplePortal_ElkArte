@@ -128,7 +128,9 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 
 function sp_latestMember($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $context, $scripturl, $txt, $color_profile;
+	global $context, $scripturl, $txt, $color_profile;
+
+	$db = database();
 
 	$block_parameters = array(
 		'limit' => 'int',
@@ -139,7 +141,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 
 	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT id_member, real_name, date_registered
 		FROM {db_prefix}members
 		WHERE is_activated = {int:is_activated}
@@ -152,7 +154,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 	);
 	$members = array();
 	$colorids = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row['id_member']))
 			$colorids[$row['id_member']] = $row['id_member'];
@@ -165,7 +167,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 			'date' => timeformat($row['date_registered'], '%d %b'),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($members))
 	{
@@ -280,7 +282,9 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 
 function sp_boardStats($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $scripturl, $modSettings, $txt;
+	global $scripturl, $modSettings, $txt;
+
+	$db = database();
 
 	$block_parameters = array(
 		'averages' => 'check',
@@ -297,7 +301,7 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 
 	if ($averages)
 	{
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT
 				SUM(posts) AS posts, SUM(topics) AS topics, SUM(registers) AS registers,
 				SUM(most_on) AS most_on, MIN(date) AS date, SUM(hits) AS hits
@@ -305,8 +309,8 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 			array(
 			)
 		);
-		$row = $smcFunc['db_fetch_assoc']($result);
-		$smcFunc['db_free_result']($result);
+		$row = $db->fetch_assoc($result);
+		$db->free_result($result);
 
 		$total_days_up = ceil((time() - strtotime($row['date'])) / (60 * 60 * 24));
 
@@ -341,7 +345,9 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 
 function sp_topPoster($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $context, $scripturl, $modSettings, $txt, $color_profile;
+	global $context, $scripturl, $modSettings, $txt, $color_profile;
+
+	$db = database();
 
 	$block_parameters = array(
 		'limit' => 'int',
@@ -371,7 +377,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 
 		$start_time = forum_time(false, $start_time);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				mem.id_member, mem.real_name, COUNT(*) as posts,
 				mem.avatar, a.id_attach, a.attachment_type, a.filename
@@ -391,7 +397,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 	}
 	else
 	{
-		$request = $smcFunc['db_query']('','
+		$request = $db->query('','
 			SELECT
 				m.id_member, m.real_name, m.posts, m.avatar,
 				a.id_attach, a.attachment_type, a.filename
@@ -406,7 +412,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 	}
 	$members = array();
 	$colorids = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row['id_member']))
 			$colorids[$row['id_member']] = $row['id_member'];
@@ -436,7 +442,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 			),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($members))
 	{
@@ -476,8 +482,10 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 function sp_topStatsMember($parameters, $id, $return_parameters = false)
 {
 	global $context, $settings, $txt, $scripturl, $user_info, $user_info, $modSettings, $boards, $color_profile;
-	global $smcFunc, $boarddir, $themedir;
+	global $boarddir, $themedir;
 	static $sp_topStatsSystem;
+
+	$db = database();
 
 	$block_parameters = array(
 		'type' => array(
@@ -777,7 +785,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		$where = "";
 
 	// Okay load the data :D
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			mem.id_member, mem.real_name, mem.avatar,
 			a.id_attach, a.attachment_type, a.filename,
@@ -799,7 +807,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	$colorids = array();
 	$count = 1;
 	$chache_member_ids = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Collect some to cache data =)
 		$chache_member_ids[$row['id_member']] = $row['id_member'];
@@ -848,7 +856,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 			'complete_row' => $row,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($members))
 	{
@@ -978,7 +986,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
 
 function sp_topTopics($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $txt, $scripturl, $user_info, $user_info, $modSettings, $topics;
+	global $txt, $scripturl, $user_info, $user_info, $modSettings, $topics;
 
 	$block_parameters = array(
 		'type' => 'select',
@@ -1016,7 +1024,7 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
 
 function sp_topBoards($parameters, $id, $return_parameters = false)
 {
-	global $context, $settings, $smcFunc, $txt, $scripturl, $user_info, $user_info, $modSettings, $boards;
+	global $context, $settings, $txt, $scripturl, $user_info, $user_info, $modSettings, $boards;
 
 	$block_parameters = array(
 		'limit' => 'int',
@@ -1052,7 +1060,9 @@ function sp_topBoards($parameters, $id, $return_parameters = false)
 
 function sp_showPoll($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $context, $scripturl, $modSettings, $boardurl, $txt;
+	global $context, $scripturl, $modSettings, $boardurl, $txt;
+
+	$db = database();
 
 	$block_parameters = array(
 		'topic' => 'int',
@@ -1077,7 +1087,7 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 
 	if (!empty($type))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT t.id_topic
 			FROM {db_prefix}polls AS p
 				INNER JOIN {db_prefix}topics AS t ON (t.id_poll = p.id_poll' . ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') . ')
@@ -1096,8 +1106,8 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 				'type' => $type == 1 ? 'p.id_poll DESC' : 'RAND()',
 			)
 		);
-		list ($topic) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($topic) = $db->fetch_row($request);
+		$db->free_result($request);
 	}
 
 	if (empty($topic) || $topic < 0)
@@ -1154,7 +1164,9 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 
 function sp_boardNews($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $txt, $settings, $modSettings, $context, $smcFunc, $color_profile;
+	global $scripturl, $txt, $settings, $modSettings, $context, $color_profile;
+
+	$db = database();
 
 	$block_parameters = array(
 		'board' => 'boards',
@@ -1185,7 +1197,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	foreach ($stable_icons as $icon)
 		$icon_sources[$icon] = 'images_url';
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT t.id_first_msg
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -1206,9 +1218,9 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		)
 	);
 	$posts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$posts[] = $row['id_first_msg'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($posts))
 	{
@@ -1227,7 +1239,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		$page_index = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, true);
 	}
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			m.icon, m.subject, m.body, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
 			t.num_replies, t.id_topic, m.id_member, m.smileys_enabled, m.id_msg, t.locked, mem.avatar,
@@ -1247,17 +1259,17 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	);
 	$return = array();
 	$colorids = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$limited = false;
-		if (($cutoff = $smcFunc['strpos']($row['body'], '[cutoff]')) !== false)
+		if (($cutoff = Util::strpos($row['body'], '[cutoff]')) !== false)
 		{
-			$row['body'] = $smcFunc['substr']($row['body'], 0, $cutoff);
+			$row['body'] = Util::substr($row['body'], 0, $cutoff);
 			$limited = true;
 		}
-		elseif (!empty($length) && $smcFunc['strlen']($row['body']) > $length)
+		elseif (!empty($length) && Util::strlen($row['body']) > $length)
 		{
-			$row['body'] = $smcFunc['substr']($row['body'], 0, $length);
+			$row['body'] = Util::substr($row['body'], 0, $length);
 			$limited = true;
 		}
 
@@ -1320,7 +1332,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 			),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($return))
 	{
@@ -1839,7 +1851,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 
 function sp_rssFeed($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $context, $txt;
+	global $context, $txt;
 
 	$block_parameters = array(
 		'url' => 'text',
@@ -1891,7 +1903,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 	}
 
 	$data = str_replace(array("\n", "\r", "\t"), '', $data);
-	$data = preg_replace('~<\!\[CDATA\[(.+?)\]\]>~e' . ($context['utf8'] ? 'u' : ''), '\'#cdata_escape_encode#\' . $smcFunc[\'htmlspecialchars\'](\'$1\')', $data);
+	$data = preg_replace('~<\!\[CDATA\[(.+?)\]\]>~e' . ($context['utf8'] ? 'u' : ''), '\'#cdata_escape_encode#\' . Util::\'htmlspecialchars\'(\'$1\')', $data);
 
 	preg_match_all('~<item>(.+?)</item>~', $data, $items);
 
@@ -1904,8 +1916,8 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 
 		foreach ($match[0] as $tag_id => $dummy)
 		{
-			if ($smcFunc['strpos']($match[2][$tag_id], '#cdata_escape_encode#') === 0)
-				$match[2][$tag_id] = stripslashes(un_htmlspecialchars($smcFunc['substr']($match[2][$tag_id], 21)));
+			if (Util::strpos($match[2][$tag_id], '#cdata_escape_encode#') === 0)
+				$match[2][$tag_id] = stripslashes(un_htmlspecialchars(Util::substr($match[2][$tag_id], 21)));
 
 			$rss[$item_id][strtolower($match[1][$tag_id])] = un_htmlspecialchars($match[2][$tag_id]);
 		}
@@ -1928,7 +1940,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 			'title' => $item['title'],
 			'href' => $item['link'],
 			'link' => $item['title'] == '' ? '' : ($item['link'] == '' ? $item['title'] : '<a href="' . $item['link'] . '" target="_blank" class="new_win">' . $item['title'] . '</a>'),
-			'content' => $limit > 0 && $smcFunc['strlen']($item['description']) > $limit ? $smcFunc['substr']($item['description'], 0, $limit) . '...' : $item['description'],
+			'content' => $limit > 0 && Util::strlen($item['description']) > $limit ? Util::substr($item['description'], 0, $limit) . '...' : $item['description'],
 			'date' => !empty($item['pubdate']) ? timeformat(strtotime($item['pubdate']), '%d %B') : '',
 		);
 	}
@@ -1977,7 +1989,9 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 
 function sp_theme_select($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $context, $modSettings, $user_info, $settings, $language, $txt;
+	global $context, $modSettings, $user_info, $settings, $language, $txt;
+
+	$db = database();
 
 	$block_parameters = array();
 
@@ -1996,7 +2010,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 	$available_themes = array();
 	if (!empty($modSettings['knownThemes']))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_theme, variable, value
 			FROM {db_prefix}themes
 			WHERE variable IN ({string:name}, {string:theme_url}, {string:theme_dir}, {string:images_url})
@@ -2011,7 +2025,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 				'known_themes' => explode(',', $modSettings['knownThemes']),
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (!isset($available_themes[$row['id_theme']]))
 				$available_themes[$row['id_theme']] = array(
@@ -2020,7 +2034,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 				);
 			$available_themes[$row['id_theme']][$row['variable']] = $row['value'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	if (!isset($available_themes[$modSettings['theme_guests']]))
@@ -2056,8 +2070,8 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 		$available_themes[$id_theme]['description'] = $txt['theme_description'];
 
 		$available_themes[$id_theme]['name'] = preg_replace('~\stheme$~i', '', $theme_data['name']);
-		if ($smcFunc['strlen']($available_themes[$id_theme]['name']) > 18)
-			$available_themes[$id_theme]['name'] = $smcFunc['substr']($available_themes[$id_theme]['name'], 0, 18) . '...';
+		if (Util::strlen($available_themes[$id_theme]['name']) > 18)
+			$available_themes[$id_theme]['name'] = Util::substr($available_themes[$id_theme]['name'], 0, 18) . '...';
 	}
 
 	$settings['images_url'] = $current_images_url;
@@ -2119,7 +2133,9 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 
 function sp_staff($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $scripturl, $modSettings, $color_profile;
+	global $scripturl, $modSettings, $color_profile;
+
+	$db = database();
 
 	$block_parameters = array(
 		'lmod' => 'check',
@@ -2132,16 +2148,16 @@ function sp_staff($parameters, $id, $return_parameters = false)
 
 	if (empty($parameters['lmod']))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}moderators AS mods',
 			array(
 			)
 		);
 		$local_mods = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$local_mods[$row['id_member']] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (count($local_mods) > 10)
 			$local_mods = array();
@@ -2155,7 +2171,7 @@ function sp_staff($parameters, $id, $return_parameters = false)
 	$all_staff = array_merge($local_mods, $global_mods, $admins);
 	$all_staff = array_unique($all_staff);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 				m.id_member, m.real_name, m.avatar, mg.group_name,
 				a.id_attach, a.attachment_type, a.filename
@@ -2170,7 +2186,7 @@ function sp_staff($parameters, $id, $return_parameters = false)
 	);
 	$staff_list = array();
 	$colorids = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$colorids[$row['id_member']] = $row['id_member'];
 
@@ -2206,7 +2222,7 @@ function sp_staff($parameters, $id, $return_parameters = false)
 			),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	ksort($staff_list);
 	$staff_count = count($staff_list);
@@ -2243,7 +2259,9 @@ function sp_staff($parameters, $id, $return_parameters = false)
 
 function sp_articles($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $modSettings, $scripturl, $txt, $color_profile;
+	global $modSettings, $scripturl, $txt, $color_profile;
+
+	$db = database();
 
 	$block_parameters = array(
 		'category' => array(0 => $txt['sp_all']),
@@ -2268,7 +2286,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 	$type = empty($parameters['type']) ? 0 : 1;
 	$image = empty($parameters['image']) ? 0 : (int) $parameters['image'];
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT
 			m.id_topic, m.subject, m.poster_name, c.picture, c.name,
 			mem.id_member, mem.real_name, mem.avatar,
@@ -2293,7 +2311,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 	);
 	$articles = array();
 	$colorids = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row['id_member']))
 			$colorids[$row['id_member']] = $row['id_member'];
@@ -2332,7 +2350,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 			),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($articles))
 	{
@@ -2393,7 +2411,9 @@ function sp_articles($parameters, $id, $return_parameters = false)
 
 function sp_shoutbox($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $context, $modSettings, $user_info, $settings, $txt, $scripturl;
+	global $context, $modSettings, $user_info, $settings, $txt, $scripturl;
+
+	$db = database();
 
 	$block_parameters = array(
 		'shoutbox' => array(),
@@ -2404,7 +2424,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 		$shoutboxes = sportal_get_shoutbox();
 		$in_use = array();
 
-		$request = $smcFunc['db_query']('','
+		$request = $db->query('','
 			SELECT id_block, value
 			FROM {db_prefix}sp_parameters
 			WHERE variable = {string:name}',
@@ -2412,10 +2432,10 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 				'name' => 'shoutbox',
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			if (empty($_REQUEST['block_id']) || $_REQUEST['block_id'] != $row['id_block'])
 				$in_use[] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		foreach ($shoutboxes as $shoutbox)
 			if (!in_array($shoutbox['id'], $in_use))
@@ -2449,7 +2469,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 		{
 			require_once(SOURCEDIR . '/Subs-Post.php');
 
-			$_POST['new_shout'] = $smcFunc['htmlspecialchars'](trim($_POST['new_shout']));
+			$_POST['new_shout'] = Util::htmlspecialchars(trim($_POST['new_shout']));
 			preparsecode($_POST['new_shout']);
 
 			if (!empty($_POST['new_shout']))
@@ -2502,7 +2522,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 		{
 			if (($temp = cache_get_data('shoutbox_smileys', 3600)) == null)
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT code, filename, description, smiley_row, hidden
 					FROM {db_prefix}smileys
 					WHERE hidden IN ({array_int:hidden})
@@ -2511,14 +2531,14 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 						'hidden' => array(0, 2),
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					$row['filename'] = htmlspecialchars($row['filename']);
 					$row['description'] = htmlspecialchars($row['description']);
 					$row['code'] = htmlspecialchars($row['code']);
 					$shoutbox['smileys'][empty($row['hidden']) ? 'normal' : 'popup'][] = $row;
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				cache_put_data('shoutbox_smileys', $shoutbox['smileys'], 3600);
 			}
@@ -2565,9 +2585,11 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 
 function sp_gallery($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $context, $modSettings, $scripturl;
+	global $context, $modSettings, $scripturl;
 	global $txt, $settings, $boardurl, $galurl;
 	static $mod, $GD_Installed;
+
+	$db = database();
 
 	$block_parameters = array(
 		'limit' => 'int',
@@ -2625,7 +2647,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 		if (empty($modSettings['gallery_url']))
 			$modSettings['gallery_url'] = $boardurl . '/gallery/';
 
-		$request = $smcFunc['db_query']('','
+		$request = $db->query('','
 			SELECT
 				p.id_picture, p.commenttotal, p.filesize, p.views, p.thumbfilename,
 				p.filename, p.height, p.width, p.title, p.id_member, m.member_name,
@@ -2642,7 +2664,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 			)
 		);
 		$items = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$items[] = array(
 				'id' => $row['id_picture'],
@@ -2656,7 +2678,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 				'src' => $modSettings['gallery_url'] . ($GD_Installed ? $row['thumbfilename'] : $row['filename'] . '" width="120'),
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	if (empty($items))
@@ -2719,7 +2741,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 
 function sp_arcade($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $scripturl, $settings, $txt, $color_profile;
+	global $scripturl, $settings, $txt, $color_profile;
 	static $mod;
 
 	$block_parameters = array(
@@ -2811,9 +2833,11 @@ function sp_arcade($parameters, $id, $return_parameters = false)
 
 function sp_shop($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $scripturl, $txt, $color_profile;
+	global $scripturl, $txt, $color_profile;
 	global $context, $boardurl, $modSettings;
 	static $mod;
+
+	$db = database();
 
 	$block_parameters = array(
 		'style' => 'select',
@@ -2851,7 +2875,7 @@ function sp_shop($parameters, $id, $return_parameters = false)
 
 		if (empty($style))
 		{
-			$request = $smcFunc['db_query']('','
+			$request = $db->query('','
 				SELECT id_member, real_name, {raw:type} AS money
 				FROM {db_prefix}members
 				ORDER BY money DESC
@@ -2863,7 +2887,7 @@ function sp_shop($parameters, $id, $return_parameters = false)
 			);
 			$members = array();
 			$colorids = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (!empty($row['id_member']))
 					$colorids[$row['id_member']] = $row['id_member'];
@@ -2876,7 +2900,7 @@ function sp_shop($parameters, $id, $return_parameters = false)
 					'money' => formatMoney($row['money']),
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (empty($members))
 			{
@@ -2906,7 +2930,7 @@ function sp_shop($parameters, $id, $return_parameters = false)
 		}
 		else
 		{
-			$request = $smcFunc['db_query']('','
+			$request = $db->query('','
 				SELECT id, name, price, image
 				FROM {db_prefix}shop_items
 				WHERE stock > {int:none}
@@ -2919,7 +2943,7 @@ function sp_shop($parameters, $id, $return_parameters = false)
 				)
 			);
 			$items = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				$items[] = array(
 					'id' => $row['id'],
@@ -2930,7 +2954,7 @@ function sp_shop($parameters, $id, $return_parameters = false)
 					'image' => empty($row['image']) ? '' : '<img width="' . $modSettings['shopImageWidth'] . '" height="' . $modSettings['shopImageHeight'] . '" src="' . $boardurl . '/Sources/shop/item_images/' . $row['image'] . '" alt="' . $row['name'] . '" />',
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (empty($items))
 			{
@@ -2966,9 +2990,11 @@ function sp_shop($parameters, $id, $return_parameters = false)
 
 function sp_blog($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $scripturl, $user_info, $modSettings;
+	global $scripturl, $user_info, $modSettings;
 	global $context, $boarddir, $txt, $color_profile;
 	static $mod;
+
+	$db = database();
 
 	$block_parameters = array(
 		'limit' => 'int',
@@ -3001,7 +3027,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 	}
 	elseif ($mod == 'zcommunity')
 	{
-		$request = $smcFunc['db_query']('','
+		$request = $db->query('','
 			SELECT b.blog_id, b.blog_owner, b.member_groups, bs.users_allowed_access, bs.hideBlog AS hidden
 			FROM {db_prefix}blog_blogs AS b
 				LEFT JOIN {db_prefix}blog_settings AS bs ON (bs.blog_id = b.blog_id)',
@@ -3009,7 +3035,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 			)
 		);
 		$visible_blogs = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$can_see_this_blog = false;
 
@@ -3031,7 +3057,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 			if ($can_see_this_blog)
 				$visible_blogs[] = $row['blog_id'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (empty($visible_blogs))
 		{
@@ -3042,7 +3068,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 
 		if (empty($type))
 		{
-			$request = $smcFunc['db_query']('','
+			$request = $db->query('','
 				SELECT t.article_id, t.subject
 				FROM {db_prefix}blog_articles AS t
 					LEFT JOIN {db_prefix}blog_settings AS bs ON (bs.blog_id = t.blog_id)
@@ -3056,7 +3082,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 					'limit' => $limit,
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				$articles[] = array(
 					'id' => $row['article_id'],
@@ -3064,7 +3090,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 					'link' => '<a href="' . $scripturl . '?article=' . $row['article_id'] . '.0">' . $row['subject'] . '</a>',
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (empty($articles))
 			{
@@ -3085,7 +3111,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 		}
 		else
 		{
-			$request = $smcFunc['db_query']('','
+			$request = $db->query('','
 				SELECT
 					b.blog_id, b.name, t.article_id, t.subject, m.id_member, m.real_name,
 					m.avatar, a.id_attach, a.attachment_type, a.filename
@@ -3104,7 +3130,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 			);
 			$blogs = array();
 			$colorids = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (!empty($row['id_member']))
 					$colorids[$row['id_member']] = $row['id_member'];
@@ -3144,7 +3170,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 					),
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (!empty($colorids) && sp_loadColors($colorids) !== false)
 			{
@@ -3176,7 +3202,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 	}
 	elseif ($mod == 'smfblog')
 	{
-		$request = $smcFunc['db_query']('','
+		$request = $db->query('','
 			SELECT b.id_board
 			FROM {db_prefix}boards AS b
 			WHERE {query_see_board}
@@ -3186,9 +3212,9 @@ function sp_blog($parameters, $id, $return_parameters = false)
 			)
 		);
 		$visible_blogs = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$visible_blogs[] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (empty($visible_blogs))
 		{
@@ -3199,7 +3225,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 
 		if (empty($type))
 		{
-			$request = $smcFunc['db_query']('','
+			$request = $db->query('','
 				SELECT t.id_topic, m.subject
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -3214,7 +3240,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 					'limit' => $limit,
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				censorText($row['subject']);
 
@@ -3224,7 +3250,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 					'link' => '<a href="' . $scripturl . '?action=blog;sa=view_post;id=' . $row['id_topic'] . '">' . $row['subject'] . '</a>',
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (empty($articles))
 			{
@@ -3245,7 +3271,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 		}
 		else
 		{
-			$request = $smcFunc['db_query']('','
+			$request = $db->query('','
 				SELECT b.id_board, b.blog_alias, b.name, MAX(t.id_topic) AS id_topic
 				FROM {db_prefix}boards AS b
 					INNER JOIN {db_prefix}topics AS t ON (t.id_board = b.id_board)
@@ -3262,7 +3288,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 				)
 			);
 			$blogs = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				$blogs[$row['id_board']] = array(
 					'id' => $row['id_board'],
@@ -3273,7 +3299,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 				);
 				$articles[] = $row['id_topic'];
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (empty($articles))
 			{
@@ -3282,7 +3308,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 				return;
 			}
 
-			$request = $smcFunc['db_query']('','
+			$request = $db->query('','
 				SELECT
 					t.id_board, t.id_topic, m.subject, mem.id_member, mem.real_name,
 					mem.avatar, a.id_attach, a.attachment_type, a.filename
@@ -3298,7 +3324,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 				)
 			);
 			$colorids = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (!empty($row['id_member']))
 					$colorids[$row['id_member']] = $row['id_member'];
@@ -3336,7 +3362,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 					),
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (!empty($colorids) && sp_loadColors($colorids) !== false)
 			{

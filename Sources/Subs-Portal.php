@@ -254,7 +254,9 @@ function sportal_catch_action()
 // This function, returns all of the information about particular blocks.
 function getBlockInfo($column_id = null, $block_id = null, $state = null, $show = null, $permission = null)
 {
-	global $smcFunc, $context, $settings, $options, $txt;
+	global $context, $settings, $options, $txt;
+
+	$db = database();
 
 	$query = array();
 	$parameters = array();
@@ -274,7 +276,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 		$parameters['state'] = 1;
 	}
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT
 			spb.id_block, spb.label, spb.type, spb.col, spb.row, spb.permission_set,
 			spb.groups_allowed, spb.groups_denied, spb.state, spb.force_view, spb.display,
@@ -287,7 +289,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 	);
 
 	$return = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($show) && !getShowInfo($row['id_block'], $row['display'], $row['display_custom']))
 			continue;
@@ -320,7 +322,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 		if (!empty($row['variable']))
 			$return[$row['id_block']]['parameters'][$row['variable']] = $row['value'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $return;
 }
@@ -328,8 +330,10 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 // Function to get a block's display/show information.
 function getShowInfo($block_id = null, $display = null, $custom = null)
 {
-	global $smcFunc, $context, $modSettings;
+	global $context, $modSettings;
 	static $variables;
+
+	$db = database();
 
 	// Do we have the display info?
 	if ($display === null || $custom === null)
@@ -342,7 +346,7 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 			return false;
 
 		// Get the info.
-		$result = $smcFunc['db_query']('','
+		$result = $db->query('','
 			SELECT display, display_custom
 			FROM {db_prefix}sp_blocks
 			WHERE id_block = {int:id_block}
@@ -351,8 +355,8 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 				'id_block' => $block_id,
 			)
 		);
-		list ($display, $custom) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		list ($display, $custom) = $db->fetch_row($result);
+		$db->free_result($result);
 	}
 
 	if (!empty($_GET['page']) && (empty($context['current_action']) || $context['current_action'] == 'portal'))
@@ -529,8 +533,10 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 
 function sp_allowed_to($type, $id, $set = null, $allowed = null, $denied = null)
 {
-	global $smcFunc, $user_info;
+	global $user_info;
 	static $cache, $types;
+
+	$db = database();
 
 	if (!isset($types))
 	{
@@ -563,7 +569,7 @@ function sp_allowed_to($type, $id, $set = null, $allowed = null, $denied = null)
 
 	if (!isset($set, $allowed, $denied))
 	{
-		$request = $smcFunc['db_query']('','
+		$request = $db->query('','
 			SELECT permission_set, groups_allowed, groups_denied
 			FROM {db_prefix}sp_{raw:table}
 			WHERE {raw:id} = {int:id_item}
@@ -575,8 +581,8 @@ function sp_allowed_to($type, $id, $set = null, $allowed = null, $denied = null)
 				'limit' => 1,
 			)
 		);
-		list ($set, $allowed, $denied) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($set, $allowed, $denied) = $db->fetch_row($request);
+		$db->free_result($request);
 	}
 
 	$result = false;
@@ -780,7 +786,9 @@ function sp_loadCalendarData($type, $low_date, $high_date = false)
 // This is a small script to load colors for SPortal.
 function sp_loadColors($users = array())
 {
-	global $color_profile, $smcFunc, $scripturl, $modSettings;
+	global $color_profile, $scripturl, $modSettings;
+
+	$db = database();
 
 	// This is for later, if you like to disable colors ;)
 	if (!empty($modSettings['sp_disableColor']))
@@ -848,7 +856,7 @@ function sp_loadColors($users = array())
 	// Correct array pointer for the user
 	reset($users);
 	// Load the data.
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT
 			mem.id_member, mem.member_name, mem.real_name, mem.id_group,
 			mg.online_color AS member_group_color, pg.online_color AS post_group_color
@@ -863,7 +871,7 @@ function sp_loadColors($users = array())
 	);
 
 	// Go through each of the users.
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$loaded_ids[] = $row['id_member'];
 		$color_profile[$row['id_member']] = $row;
@@ -872,7 +880,7 @@ function sp_loadColors($users = array())
 		$color_profile[$row['id_member']]['link'] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '"' . (!empty($onlineColor) ? ' style="color: ' . $onlineColor . ';"' : '') . '>' . $row['real_name'] . '</a>';
 		$color_profile[$row['id_member']]['colored_name'] = (!empty($onlineColor) ? '<span style="color: ' . $onlineColor . ';">' : '' ) . $row['real_name'] . (!empty($onlineColor) ? '</span>' : '');
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Return the necessary data.
 	return empty($loaded_ids) ? false : $loaded_ids;
@@ -924,7 +932,6 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 
 function sportal_parse_style($action, $setting = '', $process = false)
 {
-	global $smcFunc;
 	static $process_cache;
 
 	if ($action == 'implode')
@@ -943,7 +950,7 @@ function sportal_parse_style($action, $setting = '', $process = false)
 
 		foreach ($style_parameters as $parameter)
 			if (isset($_POST[$parameter]))
-				$style .= $parameter . '~' . $smcFunc['htmlspecialchars']($smcFunc['htmltrim']($_POST[$parameter]), ENT_QUOTES) . '|';
+				$style .= $parameter . '~' . Util::htmlspecialchars(Util::htmltrim($_POST[$parameter]), ENT_QUOTES) . '|';
 			else
 				$style .= $parameter . '~|';
 
@@ -1010,7 +1017,9 @@ function sportal_parse_style($action, $setting = '', $process = false)
 
 function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title')
 {
-	global $smcFunc, $scripturl;
+	global $scripturl;
+
+	$db = database();
 
 	$query = array();
 	$parameters = array('sort' => $sort);
@@ -1031,7 +1040,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 		$parameters['status'] = 1;
 	}
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT
 			spa.id_article, spa.id_category, spc.name, spc.namespace AS category_namespace,
 			IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name,
@@ -1045,7 +1054,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 		$parameters
 	);
 	$return = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($allowed) && !sp_allowed_to('article', $row['id_article'], $row['permission_set'], $row['groups_allowed'], $row['groups_denied']))
 			continue;
@@ -1079,14 +1088,16 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 			'status' => $row['status'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return !empty($article_id) ? current($return) : $return;
 }
 
 function sportal_get_categories($category_id = null, $active = false, $allowed = false, $sort = 'name')
 {
-	global $smcFunc, $scripturl;
+	global $scripturl;
+
+	$db = database();
 
 	$query = array();
 	$parameters = array('sort' => $sort);
@@ -1107,7 +1118,7 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 		$parameters['status'] = 1;
 	}
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT
 			id_category, namespace, name, description, permission_set,
 			groups_allowed, groups_denied, articles, status
@@ -1117,7 +1128,7 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 		$parameters
 	);
 	$return = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($allowed) && !sp_allowed_to('category', $row['id_category'], $row['permission_set'], $row['groups_allowed'], $row['groups_denied']))
 			continue;
@@ -1136,14 +1147,16 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 			'status' => $row['status'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return !empty($category_id) ? current($return) : $return;
 }
 
 function sportal_get_pages($page_id = null, $active = false, $allowed = false, $sort = 'title')
 {
-	global $smcFunc, $scripturl;
+	global $scripturl;
+
+	$db = database();
 
 	$query = array();
 	$parameters = array('sort' => $sort);
@@ -1164,7 +1177,7 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 		$parameters['status'] = 1;
 	}
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT
 			id_page, namespace, title, body, type, permission_set,
 			groups_allowed, groups_denied, views, style, status
@@ -1174,7 +1187,7 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 		$parameters
 	);
 	$return = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($allowed) && !sp_allowed_to('page', $row['id_page'], $row['permission_set'], $row['groups_allowed'], $row['groups_denied']))
 			continue;
@@ -1195,7 +1208,7 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 			'status' => $row['status'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return !empty($page_id) ? current($return) : $return;
 }
@@ -1219,7 +1232,7 @@ function sportal_parse_page($body, $type)
 
 function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = false)
 {
-	global $smcFunc;
+	$db = database();
 
 	$query = array();
 	$parameters = array();
@@ -1235,7 +1248,7 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 		$parameters['status'] = 1;
 	}
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT
 			id_shoutbox, name, permission_set, groups_allowed, groups_denied,
 			moderator_groups, warning, allowed_bbc, height, num_show, num_max,
@@ -1246,7 +1259,7 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 		$parameters
 	);
 	$return = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($allowed) && !sp_allowed_to('shoutbox', $row['id_shoutbox'], $row['permission_set'], $row['groups_allowed'], $row['groups_denied']))
 			continue;
@@ -1271,14 +1284,16 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 			'last_update' => $row['last_update'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return !empty($shoutbox_id) ? current($return) : $return;
 }
 
 function sportal_get_shouts($shoutbox, $parameters)
 {
-	global $smcFunc, $scripturl, $context, $user_info, $modSettings, $options, $txt;
+	global $scripturl, $context, $user_info, $modSettings, $options, $txt;
+
+	$db = database();
 
 	$shoutbox = !empty($shoutbox) ? (int) $shoutbox : 0;
 	$start = !empty($parameters['start']) ? (int) $parameters['start'] : 0;
@@ -1290,7 +1305,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 
 	if (!empty($start) || !$cache || ($shouts = cache_get_data('shoutbox_shouts-' . $shoutbox, 240)) === null)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				sh.id_shout, sh.body, IFNULL(mem.id_member, 0) AS id_member,
 				IFNULL(mem.real_name, sh.member_name) AS member_name, sh.log_time,
@@ -1309,7 +1324,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 			)
 		);
 		$shouts = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Disable the aeva mod for the shoutbox.
 			$context['aeva_disable'] = true;
@@ -1326,7 +1341,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 				'text' => parse_bbc($row['body'], true, '', $bbc),
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (empty($start) && $cache)
 			cache_put_data('shoutbox_shouts-' . $shoutbox, $shouts, 240);
@@ -1334,7 +1349,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 
 	foreach ($shouts as $shout)
 	{
-		if (preg_match('~^@(.+?): ~' . ($context['utf8'] ? 'u' : ''), $shout['text'], $target) && $smcFunc['strtolower']($target[1]) !== $smcFunc['strtolower']($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
+		if (preg_match('~^@(.+?): ~' . ($context['utf8'] ? 'u' : ''), $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
 		{
 			unset($shouts[$shout['id']]);
 			continue;
@@ -1364,7 +1379,9 @@ function sportal_get_shouts($shoutbox, $parameters)
 
 function sportal_create_shout($shoutbox, $shout)
 {
-	global $smcFunc, $user_info;
+	global $user_info;
+
+	$db = database();
 
 	if ($user_info['is_guest'])
 		return false;
@@ -1375,7 +1392,7 @@ function sportal_create_shout($shoutbox, $shout)
 	if (trim(strip_tags(parse_bbc($shout, false), '<img>')) === '')
 		return false;
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}sp_shouts',
 		array(
 			'id_shoutbox' => 'int',
@@ -1397,7 +1414,7 @@ function sportal_create_shout($shoutbox, $shout)
 	$shoutbox['num_shouts']++;
 	if ($shoutbox['num_shouts'] > $shoutbox['num_max'])
 	{
-		$request = $smcFunc['db_query']('','
+		$request = $db->query('','
 			SELECT id_shout
 			FROM {db_prefix}sp_shouts
 			WHERE id_shoutbox = {int:shoutbox}
@@ -1409,9 +1426,9 @@ function sportal_create_shout($shoutbox, $shout)
 			)
 		);
 		$old_shouts = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$old_shouts[] = $row['id_shout'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		sportal_delete_shout($shoutbox['id'], $old_shouts, true);
 	}
@@ -1421,12 +1438,12 @@ function sportal_create_shout($shoutbox, $shout)
 
 function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
 {
-	global $smcFunc;
+	$db = database();
 
 	if (!is_array($shouts))
 		$shouts = array($shouts);
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}sp_shouts
 		WHERE id_shout IN ({array_int:shouts})',
 		array(
@@ -1439,9 +1456,9 @@ function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
 
 function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}sp_shoutboxes
 		SET last_update = {int:time}' . ($num_shouts === 0 ? '' : ',
 			num_shouts = {raw:shouts}') . '
@@ -1458,7 +1475,9 @@ function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
 
 function sp_prevent_flood($type, $fatal = true)
 {
-	global $smcFunc, $modSettings, $user_info, $txt;
+	global $modSettings, $user_info, $txt;
+
+	$db = database();
 
 	$limits = array(
 		'spsbp' => 2,
@@ -1469,7 +1488,7 @@ function sp_prevent_flood($type, $fatal = true)
 	else
 		$time_limit = 2;
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_floodcontrol
 		WHERE log_time < {int:log_time}
 			AND log_type = {string:log_type}',
@@ -1479,14 +1498,14 @@ function sp_prevent_flood($type, $fatal = true)
 		)
 	);
 
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}log_floodcontrol',
 		array('ip' => 'string-16', 'log_time' => 'int', 'log_type' => 'string'),
 		array($user_info['ip'], time(), $type),
 		array('ip', 'log_type')
 	);
 
-	if ($smcFunc['db_affected_rows']() != 1)
+	if ($db->affected_rows() != 1)
 	{
 		if ($fatal)
 			fatal_lang_error('error_sp_flood_' . $type, false, array($time_limit));

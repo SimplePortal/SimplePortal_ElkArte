@@ -45,9 +45,9 @@ function sportal_admin_state_change()
 
 function getFunctionInfo($function = null)
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT id_function, name
 		FROM {db_prefix}sp_functions' . (!empty($function) ? '
 		WHERE name = {string:function}' : '') . '
@@ -57,7 +57,7 @@ function getFunctionInfo($function = null)
 		)
 	);
 	$return = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['name'] == 'sp_php' && !allowedTo('admin_forum'))
 			continue;
@@ -67,14 +67,14 @@ function getFunctionInfo($function = null)
 			'function' => $row['name'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $return;
 }
 
 function fixColumnRows($column_id = null)
 {
-	global $smcFunc;
+	$db = database();
 
 	$blockList = getBlockInfo($column_id);
 	$blockIds = array();
@@ -88,7 +88,7 @@ function fixColumnRows($column_id = null)
 	{
 		$counter = $counter + 1;
 
-		$smcFunc['db_query']('','
+		$db->query('','
 			UPDATE {db_prefix}sp_blocks
 			SET row = {int:counter}
 			WHERE id_block = {int:block}',
@@ -102,7 +102,7 @@ function fixColumnRows($column_id = null)
 
 function changeState($type = null, $id = null)
 {
-	global $smcFunc;
+	$db = database();
 
 	if ($type == 'block')
 		$query = array(
@@ -128,20 +128,20 @@ function changeState($type = null, $id = null)
 	else
 		return false;
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT {raw:column}
 		FROM {db_prefix}sp_{raw:table}
 		WHERE {raw:query_id} = {int:id}',
 		$query
 	);
 
-	list ($state) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($state) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	$state = (int) $state;
 	$state = $state == 1 ? 0 : 1 ;
 
-	$smcFunc['db_query']('','
+	$db->query('','
 		UPDATE {db_prefix}sp_{raw:table}
 		SET {raw:column} = {int:state}
 		WHERE {raw:query_id} = {int:id}',
@@ -216,7 +216,9 @@ require_once(\'' . $boarddir . '/SSI.php\');
 */
 function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $contextName = 'member_groups', $subContext = 'SPortal')
 {
-	global $context, $smcFunc, $txt;
+	global $context, $txt;
+
+	$db = database();
 
 	// Some additional Language stings are needed
 	loadLanguage('ManageBoards');
@@ -283,7 +285,7 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 	}
 
 	// Load membergroups.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT group_name, id_group, min_posts
 		FROM {db_prefix}membergroups
 		WHERE {raw:show}
@@ -293,7 +295,7 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 			'global_moderator' => 2,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$context[$contextName][(int) $row['id_group']] = array(
 			'id' => $row['id_group'],
@@ -302,12 +304,14 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 			'is_post_group' => $row['min_posts'] != -1,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 }
 
 function sp_load_membergroups()
 {
-	global $smcFunc, $txt;
+	global $txt;
+
+	$db = database();
 
 	loadLanguage('ManageBoards');
 
@@ -316,7 +320,7 @@ function sp_load_membergroups()
 		0 => $txt['parent_members_only'],
 	);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT group_name, id_group, min_posts
 		FROM {db_prefix}membergroups
 		WHERE id_group != {int:moderator_group}
@@ -325,9 +329,9 @@ function sp_load_membergroups()
 			'moderator_group' => 3,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$groups[(int) $row['id_group']] = trim($row['group_name']);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $groups;
 }

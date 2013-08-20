@@ -45,9 +45,11 @@ function sportal_admin_config_main()
 
 function sportal_admin_general_settings($return_config = '')
 {
-	global $smcFunc, $context, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
-	$request = $smcFunc['db_query']('','
+	$db = database();
+
+	$request = $db->query('','
 		SELECT id_theme, value AS name
 		FROM {db_prefix}themes
 		WHERE variable = {string:name}
@@ -59,9 +61,9 @@ function sportal_admin_general_settings($return_config = '')
 		)
 	);
 	$context['SPortal']['themes'] = array('0' => &$txt['portalthemedefault']);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$context['SPortal']['themes'][$row['id_theme']] = $row['name'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$config_vars = array(
 			array('select', 'sp_portal_mode', explode('|', $txt['sp_portal_mode_options'])),

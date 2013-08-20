@@ -32,7 +32,9 @@ function sportal_pages()
 
 function sportal_page()
 {
-	global $smcFunc, $context, $scripturl, $txt;
+	global $context, $scripturl, $txt;
+
+	$db = database();
 
 	loadTemplate('PortalPages');
 
@@ -41,7 +43,7 @@ function sportal_page()
 	if (is_int($page_id))
 		$page_id = (int) $page_id;
 	else
-		$page_id = $smcFunc['htmlspecialchars']($page_id, ENT_QUOTES);
+		$page_id = Util::htmlspecialchars($page_id, ENT_QUOTES);
 
 	$context['SPortal']['page'] = sportal_get_pages($page_id, true, true);
 
@@ -52,7 +54,7 @@ function sportal_page()
 
 	if (empty($_SESSION['last_viewed_page']) || $_SESSION['last_viewed_page'] != $context['SPortal']['page']['id'])
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}sp_pages
 			SET views = views + 1
 			WHERE id_page = {int:current_page}',

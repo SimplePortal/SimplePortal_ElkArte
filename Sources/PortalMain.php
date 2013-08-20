@@ -15,7 +15,7 @@ if (!defined('ELK'))
 
 function sportal_main()
 {
-	global $smcFunc, $context;
+	global $context;
 
 	if (WIRELESS)
 		redirectexit('action=forum');
@@ -23,7 +23,7 @@ function sportal_main()
 	$context['page_title'] = $context['forum_name'];
 
 	if (isset($context['page_title_html_safe']))
-		$context['page_title_html_safe'] = $smcFunc['htmlspecialchars'](un_htmlspecialchars($context['page_title']));
+		$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title']));
 
 	if (!empty($context['standalone']))
 		setupMenuContext();

@@ -53,7 +53,9 @@ function sportal_admin_pages_main()
 
 function sportal_admin_page_list()
 {
-	global $txt, $smcFunc, $context, $scripturl;
+	global $txt, $context, $scripturl;
+
+	$db = database();
 
 	if (!empty($_POST['remove_pages']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 	{
@@ -62,7 +64,7 @@ function sportal_admin_page_list()
 		foreach ($_POST['remove'] as $index => $page_id)
 			$_POST['remove'][(int) $index] = (int) $page_id;
 
-		$smcFunc['db_query']('','
+		$db->query('','
 			DELETE FROM {db_prefix}sp_pages
 			WHERE id_page IN ({array_int:pages})',
 			array(
@@ -145,17 +147,17 @@ function sportal_admin_page_list()
 	$context['sort_by'] = $_REQUEST['sort'];
 	$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'down' : 'up';
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_pages'
 	);
-	list ($total_pages) =  $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total_pages) =  $db->fetch_row($request);
+	$db->free_result($request);
 
 	$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=portalpages;sa=list;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $total_pages, 20);
 	$context['start'] = $_REQUEST['start'];
 
-	$request = $smcFunc['db_query']('','
+	$request = $db->query('','
 		SELECT id_page, namespace, title, type, views, status
 		FROM {db_prefix}sp_pages
 		ORDER BY {raw:sort}
@@ -167,7 +169,7 @@ function sportal_admin_page_list()
 		)
 	);
 	$context['pages'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$context['pages'][$row['id_page']] = array(
 			'id' => $row['id_page'],
@@ -186,7 +188,7 @@ function sportal_admin_page_list()
 			)
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$context['sub_template'] = 'pages_list';
 	$context['page_title'] = $txt['sp_admin_pages_list'];
@@ -194,7 +196,9 @@ function sportal_admin_page_list()
 
 function sportal_admin_page_edit()
 {
-	global $txt, $context, $modSettings, $smcFunc, $options;
+	global $txt, $context, $modSettings, $options;
+
+	$db = database();
 
 	require_once(SOURCEDIR . '/Subs-Editor.php');
 	require_once(SOURCEDIR . '/Subs-Post.php');
@@ -258,13 +262,13 @@ function sportal_admin_page_edit()
 	{
 		checkSession();
 
-		if (!isset($_POST['title']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['title'], ENT_QUOTES)) === '')
+		if (!isset($_POST['title']) || Util::htmltrim(Util::htmlspecialchars($_POST['title'], ENT_QUOTES)) === '')
 			fatal_lang_error('sp_error_page_name_empty', false);
 
-		if (!isset($_POST['namespace']) || $smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['namespace'], ENT_QUOTES)) === '')
+		if (!isset($_POST['namespace']) || Util::htmltrim(Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES)) === '')
 			fatal_lang_error('sp_error_page_namespace_empty', false);
 
-		$result = $smcFunc['db_query']('','
+		$result = $db->query('','
 			SELECT id_page
 			FROM {db_prefix}sp_pages
 			WHERE namespace = {string:namespace}
@@ -272,12 +276,12 @@ function sportal_admin_page_edit()
 			LIMIT 1',
 			array(
 				'limit' => 1,
-				'namespace' => $smcFunc['htmlspecialchars']($_POST['namespace'], ENT_QUOTES),
+				'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
 				'current' => (int) $_POST['page_id'],
 			)
 		);
-		list ($has_duplicate) = $smcFunc['db_fetch_row']($result);
-		$smcFunc['db_free_result']($result);
+		list ($has_duplicate) = $db->fetch_row($result);
+		$db->free_result($result);
 
 		if (!empty($has_duplicate))
 			fatal_lang_error('sp_error_page_namespace_duplicate', false);
@@ -339,9 +343,9 @@ function sportal_admin_page_edit()
 
 		$page_info = array(
 			'id' => (int) $_POST['page_id'],
-			'namespace' => $smcFunc['htmlspecialchars']($_POST['namespace'], ENT_QUOTES),
-			'title' => $smcFunc['htmlspecialchars']($_POST['title'], ENT_QUOTES),
-			'body' => $smcFunc['htmlspecialchars']($_POST['content'], ENT_QUOTES),
+			'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
+			'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
+			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
 			'type' => $_POST['type'],
 			'permission_set' => $permission_set,
 			'groups_allowed' => $groups_allowed,
@@ -357,13 +361,13 @@ function sportal_admin_page_edit()
 		{
 			unset($page_info['id']);
 
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}sp_pages',
 				$fields,
 				$page_info,
 				array('id_page')
 			);
-			$page_info['id'] = $smcFunc['db_insert_id']('{db_prefix}sp_pages', 'id_page');
+			$page_info['id'] = $db->insert_id('{db_prefix}sp_pages', 'id_page');
 		}
 		else
 		{
@@ -371,7 +375,7 @@ function sportal_admin_page_edit()
 			foreach ($fields as $name => $type)
 				$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
 
-			$smcFunc['db_query']('','
+			$db->query('','
 				UPDATE {db_prefix}sp_pages
 				SET ' . implode(', ', $update_fields) . '
 				WHERE id_page = {int:id}',
@@ -460,7 +464,7 @@ function sportal_admin_page_edit()
 
 		foreach ($changes as $id => $data)
 		{
-			$smcFunc['db_query']('','
+			$db->query('','
 				UPDATE {db_prefix}sp_blocks
 				SET
 					display = {string:display},
@@ -498,8 +502,8 @@ function sportal_admin_page_edit()
 		$context['SPortal']['page'] = array(
 			'id' => $_POST['page_id'],
 			'page_id' => $_POST['namespace'],
-			'title' => $smcFunc['htmlspecialchars']($_POST['title'], ENT_QUOTES),
-			'body' => $smcFunc['htmlspecialchars']($_POST['content'], ENT_QUOTES),
+			'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
+			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
 			'type' => $_POST['type'],
 			'permission_set' => $permission_set,
 			'groups_allowed' => $groups_allowed,
@@ -566,13 +570,13 @@ function sportal_admin_page_edit()
 
 function sportal_admin_page_status()
 {
-	global $smcFunc;
+	$db = database();
 
 	checkSession('get');
 
 	$page_id = !empty($_REQUEST['page_id']) ? (int) $_REQUEST['page_id'] : 0;
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}sp_pages
 		SET status = CASE WHEN status = {int:is_active} THEN 0 ELSE 1 END
 		WHERE id_page = {int:id}',
@@ -587,13 +591,13 @@ function sportal_admin_page_status()
 
 function sportal_admin_page_delete()
 {
-	global $smcFunc;
+	$db = database();
 
 	checkSession('get');
 
 	$page_id = !empty($_REQUEST['page_id']) ? (int) $_REQUEST['page_id'] : 0;
 
-	$smcFunc['db_query']('','
+	$db->query('','
 		DELETE FROM {db_prefix}sp_pages
 		WHERE id_page = {int:id}',
 		array(
