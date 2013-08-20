@@ -36,9 +36,9 @@ function sportal_init($standalone = false)
 		if (!isset($settings['sp_images_url']))
 		{
 			if (file_exists($settings['theme_dir'] . '/images/sp'))
-				$settings['sp_images_url'] =  $settings['theme_url'] . '/images/sp';
+				$settings['sp_images_url'] = $settings['theme_url'] . '/images/sp';
 			else
-				$settings['sp_images_url'] =  $settings['default_theme_url'] . '/images/sp';
+				$settings['sp_images_url'] = $settings['default_theme_url'] . '/images/sp';
 		}
 
 		$context['SPortal']['core_compat'] = $settings['name'] == 'Core Theme';
@@ -152,7 +152,7 @@ function sportal_init($standalone = false)
 		$context['SPortal']['blocks'][$block['column']][] = $block;
 	}
 
-	foreach($context['SPortal']['sides'] as $side)
+	foreach ($context['SPortal']['sides'] as $side)
 	{
 		if (empty($context['SPortal']['blocks'][$side['id']]))
 			$context['SPortal']['sides'][$side['id']]['active'] = false;
@@ -276,7 +276,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 		$parameters['state'] = 1;
 	}
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT
 			spb.id_block, spb.label, spb.type, spb.col, spb.row, spb.permission_set,
 			spb.groups_allowed, spb.groups_denied, spb.state, spb.force_view, spb.display,
@@ -284,8 +284,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 		FROM {db_prefix}sp_blocks AS spb
 			LEFT JOIN {db_prefix}sp_parameters AS spp ON (spp.id_block = spb.id_block)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY spb.col, spb.row',
-		$parameters
+		ORDER BY spb.col, spb.row', $parameters
 	);
 
 	$return = array();
@@ -346,7 +345,7 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 			return false;
 
 		// Get the info.
-		$result = $db->query('','
+		$result = $db->query('', '
 			SELECT display, display_custom
 			FROM {db_prefix}sp_blocks
 			WHERE id_block = {int:id_block}
@@ -569,7 +568,7 @@ function sp_allowed_to($type, $id, $set = null, $allowed = null, $denied = null)
 
 	if (!isset($set, $allowed, $denied))
 	{
-		$request = $db->query('','
+		$request = $db->query('', '
 			SELECT permission_set, groups_allowed, groups_denied
 			FROM {db_prefix}sp_{raw:table}
 			WHERE {raw:id} = {int:id_item}
@@ -694,17 +693,17 @@ function sp_query_string($tourniquet)
 
 	return $tourniquet;
 }
-
 /*
-This is a simple function that return nothing if the language file exist and english if it not exists
-This will help to make it possible to load each time the english language!
-*/
+  This is a simple function that return nothing if the language file exist and english if it not exists
+  This will help to make it possible to load each time the english language!
+ */
+
 function sp_languageSelect($template_name)
 {
 	global $user_info, $language, $settings, $context;
 	static $already_loaded = array();
 
-	if(isset($already_loaded[$template_name]))
+	if (isset($already_loaded[$template_name]))
 		return $already_loaded[$template_name];
 
 	$lang = isset($user_info['language']) ? $user_info['language'] : $language;
@@ -740,7 +739,8 @@ function sp_languageSelect($template_name)
 		// Try to find the language file.
 		$allTemplatesExists[$template] = false;
 		$already_loaded[$template] = 'english';
-		foreach ($attempts as $k => $file) {
+		foreach ($attempts as $k => $file)
+		{
 			if (file_exists($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php'))
 			{
 				$already_loaded[$template] = '';
@@ -750,8 +750,8 @@ function sp_languageSelect($template_name)
 		}
 	}
 	//So all need to be true that it work ;)
-	foreach($allTemplatesExists as $exist)
-		if(!$exist)
+	foreach ($allTemplatesExists as $exist)
+		if (!$exist)
 		{
 			$already_loaded[$template_name] = 'english';
 			return 'english';
@@ -766,7 +766,7 @@ function sp_loadCalendarData($type, $low_date, $high_date = false)
 {
 	static $loaded;
 
-	if(!isset($loaded))
+	if (!isset($loaded))
 	{
 		require_once(SOURCEDIR . '/Subs-Calendar.php');
 
@@ -804,12 +804,12 @@ function sp_loadColors($users = array())
 		$colorData = load_onlineColors($users);
 
 		// This happen only on not existing Members... but given ids...
-		if(empty($colorData))
+		if (empty($colorData))
 			return false;
 
 		$loaded_ids = array_keys($colorData);
 
-		foreach($loaded_ids as $id)
+		foreach ($loaded_ids as $id)
 		{
 			if (!empty($id) && !isset($color_profile[$id]['link']))
 			{
@@ -824,7 +824,7 @@ function sp_loadColors($users = array())
 	$users = !is_array($users) ? array($users) : array_unique($users);
 
 	//Check up the array :)
-	foreach($users as $k => $u)
+	foreach ($users as $k => $u)
 	{
 		$u = (int) $u;
 
@@ -856,16 +856,16 @@ function sp_loadColors($users = array())
 	// Correct array pointer for the user
 	reset($users);
 	// Load the data.
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT
 			mem.id_member, mem.member_name, mem.real_name, mem.id_group,
 			mg.online_color AS member_group_color, pg.online_color AS post_group_color
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}membergroups AS pg ON (pg.id_group = mem.id_post_group)
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)
-		WHERE mem.id_member '.((count($users) == 1) ? '= {int:current}' : 'IN ({array_int:users})'),
+		WHERE mem.id_member ' . ((count($users) == 1) ? '= {int:current}' : 'IN ({array_int:users})'),
 		array(
-			'users'	=> $users,
+			'users' => $users,
 			'current' => (int) current($users),
 		)
 	);
@@ -909,8 +909,8 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 		);
 	}
 
-	if (!isset($randomizer)	|| $randomizer > 7)
-		$randomizer	= 0;
+	if (!isset($randomizer) || $randomizer > 7)
+		$randomizer = 0;
 	$randomizer++;
 
 	if (empty($alt) && isset($default_alt[$name]))
@@ -1040,7 +1040,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 		$parameters['status'] = 1;
 	}
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT
 			spa.id_article, spa.id_category, spc.name, spc.namespace AS category_namespace,
 			IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name,
@@ -1050,8 +1050,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spa.id_member)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY {raw:sort}',
-		$parameters
+		ORDER BY {raw:sort}', $parameters
 	);
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
@@ -1118,14 +1117,13 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 		$parameters['status'] = 1;
 	}
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT
 			id_category, namespace, name, description, permission_set,
 			groups_allowed, groups_denied, articles, status
 		FROM {db_prefix}sp_categories' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY {raw:sort}',
-		$parameters
+		ORDER BY {raw:sort}', $parameters
 	);
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
@@ -1177,14 +1175,13 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 		$parameters['status'] = 1;
 	}
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT
 			id_page, namespace, title, body, type, permission_set,
 			groups_allowed, groups_denied, views, style, status
 		FROM {db_prefix}sp_pages' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY {raw:sort}',
-		$parameters
+		ORDER BY {raw:sort}', $parameters
 	);
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
@@ -1248,15 +1245,14 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 		$parameters['status'] = 1;
 	}
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT
 			id_shoutbox, name, permission_set, groups_allowed, groups_denied,
 			moderator_groups, warning, allowed_bbc, height, num_show, num_max,
 			refresh, reverse, caching, status, num_shouts, last_update
 		FROM {db_prefix}sp_shoutboxes' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY name',
-		$parameters
+		ORDER BY name', $parameters
 	);
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
@@ -1392,29 +1388,17 @@ function sportal_create_shout($shoutbox, $shout)
 	if (trim(strip_tags(parse_bbc($shout, false), '<img>')) === '')
 		return false;
 
-	$db->insert('',
-		'{db_prefix}sp_shouts',
-		array(
-			'id_shoutbox' => 'int',
-			'id_member' => 'int',
-			'member_name' => 'string',
-			'log_time' => 'int',
-			'body' => 'string',
-		),
-		array(
-			$shoutbox['id'],
-			$user_info['id'],
-			$user_info['name'],
-			time(),
-			$shout,
-		),
+	$db->insert('', '
+		{db_prefix}sp_shouts',
+		array('id_shoutbox' => 'int', 'id_member' => 'int', 'member_name' => 'string', 'log_time' => 'int', 'body' => 'string',),
+		array($shoutbox['id'], $user_info['id'], $user_info['name'], time(), $shout, ),
 		array('id_shout')
 	);
 
 	$shoutbox['num_shouts']++;
 	if ($shoutbox['num_shouts'] > $shoutbox['num_max'])
 	{
-		$request = $db->query('','
+		$request = $db->query('', '
 			SELECT id_shout
 			FROM {db_prefix}sp_shouts
 			WHERE id_shoutbox = {int:shoutbox}
@@ -1498,8 +1482,8 @@ function sp_prevent_flood($type, $fatal = true)
 		)
 	);
 
-	$db->insert('replace',
-		'{db_prefix}log_floodcontrol',
+	$db->insert('replace', '
+		{db_prefix}log_floodcontrol',
 		array('ip' => 'string-16', 'log_time' => 'int', 'log_type' => 'string'),
 		array($user_info['ip'], time(), $type),
 		array('ip', 'log_type')

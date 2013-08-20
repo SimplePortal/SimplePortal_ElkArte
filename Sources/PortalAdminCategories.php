@@ -64,7 +64,7 @@ function sportal_admin_category_list()
 		foreach ($_POST['remove'] as $index => $category_id)
 			$_POST['remove'][(int) $index] = (int) $category_id;
 
-		$db->query('','
+		$db->query('', '
 			DELETE FROM {db_prefix}sp_categories
 			WHERE id_category IN ({array_int:categories})',
 			array(
@@ -72,7 +72,7 @@ function sportal_admin_category_list()
 			)
 		);
 
-		$db->query('','
+		$db->query('', '
 			DELETE FROM {db_prefix}sp_articles
 			WHERE id_category IN ({array_int:categories})',
 			array(
@@ -82,15 +82,15 @@ function sportal_admin_category_list()
 	}
 
 	$sort_methods = array(
-		'name' =>  array(
+		'name' => array(
 			'down' => 'name ASC',
 			'up' => 'name DESC'
 		),
-		'namespace' =>  array(
+		'namespace' => array(
 			'down' => 'namespace ASC',
 			'up' => 'namespace DESC'
 		),
-		'articles' =>  array(
+		'articles' => array(
 			'down' => 'articles ASC',
 			'up' => 'articles DESC'
 		),
@@ -146,17 +146,17 @@ function sportal_admin_category_list()
 	$context['sort_by'] = $_REQUEST['sort'];
 	$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'down' : 'up';
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_categories'
 	);
-	list ($total_categories) =  $db->fetch_row($request);
+	list ($total_categories) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=portalcategories;sa=list;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $total_categories, 20);
 	$context['start'] = $_REQUEST['start'];
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT id_category, name, namespace, articles, status
 		FROM {db_prefix}sp_categories
 		ORDER BY {raw:sort}
@@ -209,7 +209,7 @@ function sportal_admin_category_edit()
 		if (!isset($_POST['namespace']) || Util::htmltrim(Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES)) === '')
 			fatal_lang_error('sp_error_category_namespace_empty', false);
 
-		$result = $db->query('','
+		$result = $db->query('', '
 			SELECT id_category
 			FROM {db_prefix}sp_categories
 			WHERE namespace = {string:namespace}
@@ -279,8 +279,8 @@ function sportal_admin_category_edit()
 		{
 			unset($category_info['id']);
 
-			$db->insert('',
-				'{db_prefix}sp_categories',
+			$db->insert('', '
+				{db_prefix}sp_categories',
 				$fields,
 				$category_info,
 				array('id_category')
@@ -293,11 +293,10 @@ function sportal_admin_category_edit()
 			foreach ($fields as $name => $type)
 				$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
 
-			$db->query('','
+			$db->query('', '
 				UPDATE {db_prefix}sp_categories
 				SET ' . implode(', ', $update_fields) . '
-				WHERE id_category = {int:id}',
-				$category_info
+				WHERE id_category = {int:id}', $category_info
 			);
 		}
 
@@ -358,7 +357,7 @@ function sportal_admin_category_delete()
 
 	$category_id = !empty($_REQUEST['category_id']) ? (int) $_REQUEST['category_id'] : 0;
 
-	$db->query('','
+	$db->query('', '
 		DELETE FROM {db_prefix}sp_categories
 		WHERE id_category = {int:id}',
 		array(
@@ -366,7 +365,7 @@ function sportal_admin_category_delete()
 		)
 	);
 
-	$db->query('','
+	$db->query('', '
 		DELETE FROM {db_prefix}sp_articles
 		WHERE id_category = {int:id}',
 		array(

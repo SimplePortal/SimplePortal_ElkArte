@@ -28,16 +28,16 @@ function sportal_admin_state_change()
 
 	changeState($_REQUEST['type'], $id);
 
-	if($_REQUEST['type'] == 'block')
+	if ($_REQUEST['type'] == 'block')
 	{
 		$sides = array(1 => 'left', 2 => 'top', 3 => 'bottom', 4 => 'right');
 		$list = !empty($_GET['redirect']) && isset($sides[$_GET['redirect']]) ? $sides[$_GET['redirect']] : 'list';
 
 		redirectexit('action=admin;area=portalblocks;sa=' . $list);
 	}
-	elseif($_REQUEST['type'] == 'category')
+	elseif ($_REQUEST['type'] == 'category')
 		redirectexit('action=admin;area=portalarticles;sa=categories');
-	elseif($_REQUEST['type'] == 'article')
+	elseif ($_REQUEST['type'] == 'article')
 		redirectexit('action=admin;area=portalarticles;sa=articles');
 	else
 		redirectexit('action=admin;area=portalconfig');
@@ -47,7 +47,7 @@ function getFunctionInfo($function = null)
 {
 	$db = database();
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT id_function, name
 		FROM {db_prefix}sp_functions' . (!empty($function) ? '
 		WHERE name = {string:function}' : '') . '
@@ -79,7 +79,7 @@ function fixColumnRows($column_id = null)
 	$blockList = getBlockInfo($column_id);
 	$blockIds = array();
 
-	foreach($blockList as $block)
+	foreach ($blockList as $block)
 		$blockIds[] = $block['id'];
 
 	$counter = 0;
@@ -88,7 +88,7 @@ function fixColumnRows($column_id = null)
 	{
 		$counter = $counter + 1;
 
-		$db->query('','
+		$db->query('', '
 			UPDATE {db_prefix}sp_blocks
 			SET row = {int:counter}
 			WHERE id_block = {int:block}',
@@ -128,20 +128,19 @@ function changeState($type = null, $id = null)
 	else
 		return false;
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT {raw:column}
 		FROM {db_prefix}sp_{raw:table}
-		WHERE {raw:query_id} = {int:id}',
-		$query
+		WHERE {raw:query_id} = {int:id}', $query
 	);
 
 	list ($state) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$state = (int) $state;
-	$state = $state == 1 ? 0 : 1 ;
+	$state = $state == 1 ? 0 : 1;
 
-	$db->query('','
+	$db->query('', '
 		UPDATE {db_prefix}sp_{raw:table}
 		SET {raw:column} = {int:state}
 		WHERE {raw:query_id} = {int:id}',
@@ -201,19 +200,19 @@ require_once(\'' . $boarddir . '/SSI.php\');
 
 	return $error;
 }
-
 /*
-	void sp_loadMemberGroups(Array $selectedGroups = array, Array $removeGroups = array(), string $show = 'normal', string $contextName = 'member_groups')
-	This will file the $context['member_groups'] to the given options
-	$selectedGroups means all groups who should be shown as selcted, if you like to check all than insert an 'all'
-		You can also Give the function a string with '2,3,4'
-	$removeGroups this group id should not shown in the list
-	$show have follow options
-		'normal' => will show all groups, and add a guest and regular member (Standard)
-		'post' => will load only post groups
-		'master' => will load only not postbased groups
-	$contextName where the datas should stored in the $context.
-*/
+  void sp_loadMemberGroups(Array $selectedGroups = array, Array $removeGroups = array(), string $show = 'normal', string $contextName = 'member_groups')
+  This will file the $context['member_groups'] to the given options
+  $selectedGroups means all groups who should be shown as selcted, if you like to check all than insert an 'all'
+  You can also Give the function a string with '2,3,4'
+  $removeGroups this group id should not shown in the list
+  $show have follow options
+  'normal' => will show all groups, and add a guest and regular member (Standard)
+  'post' => will load only post groups
+  'master' => will load only not postbased groups
+  $contextName where the datas should stored in the $context.
+ */
+
 function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $contextName = 'member_groups', $subContext = 'SPortal')
 {
 	global $context, $txt;

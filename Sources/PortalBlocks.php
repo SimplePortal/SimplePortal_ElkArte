@@ -141,7 +141,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 
 	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT id_member, real_name, date_registered
 		FROM {db_prefix}members
 		WHERE is_activated = {int:is_activated}
@@ -371,7 +371,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 			$start_time = mktime(0, 0, 0, date("n"), date("j"), date("Y")) - (date("N") * 3600 * 24);
 		elseif ($type == 3)
 		{
-			$months = array( 1 => 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+			$months = array(1 => 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 			$start_time = mktime(0, 0, 0, date("n"), date("j"), date("Y")) - (3600 * 24 * $months[(int) date("m", time())]);
 		}
 
@@ -397,7 +397,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 	}
 	else
 	{
-		$request = $db->query('','
+		$request = $db->query('', '
 			SELECT
 				m.id_member, m.real_name, m.posts, m.avatar,
 				a.id_attach, a.attachment_type, a.filename
@@ -516,32 +516,32 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	if (empty($sp_topStatsSystem))
 	{
 		/*
-			The system setup array, order depend on the $txt array of the select
-			name
-				It's for better knowing what this option can do.
-			mod_id
-				Only as information
-			field
-				The members field that should be loaded
-				Please don't forget to add mem. before the field names
-				(That what is after the SELECT Statment)
-			order
-				What is the field name i need to be sort after
-			where
-				Here you can add additional where statments :)
-			output_text
-				What should be outputed after the avatar and nickname
-				For example if you field is karmaGood
-				'output' => $txt['karma'] . '%karmaGood%';
-			output_function
-				With this you can add to the $row of the query some infomartions.
-			reverse
-				On true it change the reverse cause, if not set it will be false :)
-			enabled
-				true = mod exists or is possible to use :D
+		  The system setup array, order depend on the $txt array of the select
+		  name
+		  It's for better knowing what this option can do.
+		  mod_id
+		  Only as information
+		  field
+		  The members field that should be loaded
+		  Please don't forget to add mem. before the field names
+		  (That what is after the SELECT Statment)
+		  order
+		  What is the field name i need to be sort after
+		  where
+		  Here you can add additional where statments :)
+		  output_text
+		  What should be outputed after the avatar and nickname
+		  For example if you field is karmaGood
+		  'output' => $txt['karma'] . '%karmaGood%';
+		  output_function
+		  With this you can add to the $row of the query some infomartions.
+		  reverse
+		  On true it change the reverse cause, if not set it will be false :)
+		  enabled
+		  true = mod exists or is possible to use :D
 
-			'error_msg' => $txt['my_error_msg'];; You can insert here what kind of error message should appear if the modification not exists =D
-		*/
+		  'error_msg' => $txt['my_error_msg'];; You can insert here what kind of error message should appear if the modification not exists =D
+		 */
 		$sp_topStatsSystem = array(
 			'0' => array(
 				'name' => 'Total time logged in',
@@ -570,7 +570,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 				'name' => 'Posts',
 				'field' => 'mem.posts',
 				'order' => 'mem.posts',
-				'output_text' => ' %posts% '. $txt['posts'],
+				'output_text' => ' %posts% ' . $txt['posts'],
 				'enabled' => true,
 			),
 			'2' => array(
@@ -763,7 +763,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	if (empty($modSettings['sp_disableChache']) && !empty($modSettings[$chache_id]))
 	{
 		$data = explode(';', $modSettings[$chache_id]);
-		if($data[0] == $type && $data[1] == $limit && !empty($data[2]) == $sort_asc && $data[3] > time() - 300) // 5 Minute cache
+		if ($data[0] == $type && $data[1] == $limit && !empty($data[2]) == $sort_asc && $data[3] > time() - 300) // 5 Minute cache
 			$where[] = 'mem.id_member IN (' . $data[4] . ')';
 		else
 			unset($modSettings[$chache_id]);
@@ -794,14 +794,15 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
 		{raw:where}
 		ORDER BY {raw:order} {raw:sort}
-		LIMIT {int:limit}', array(
+		LIMIT {int:limit}',
+		array(
 			'limit' => $context['common_stats']['total_members'] > 100 ? ($limit + 5) : $limit, // Prevent delete of user if the cache is avaible :D
 			'field' => $current_system['field'],
 			'where' => $where,
 			'order' => $current_system['order'],
 			'sort' => ($sort_asc ? 'ASC' : 'DESC'),
-			)
-		);
+		)
+	);
 
 	$members = array();
 	$colorids = array();
@@ -811,7 +812,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	{
 		// Collect some to cache data =)
 		$chache_member_ids[$row['id_member']] = $row['id_member'];
-		if($count++ > $limit)
+		if ($count++ > $limit)
 			continue;
 
 		$colorids[$row['id_member']] = $row['id_member'];
@@ -872,7 +873,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		updateSettings(array($chache_id => implode(';', $toCache)));
 	}
 	// One time error, if this happen the chache need an update (Next reload is mystical fixed)
-	elseif(!empty($modSettings[$chache_id]))
+	elseif (!empty($modSettings[$chache_id]))
 		updateSettings(array($chache_id => '0;0;0;1000;0'));
 
 	if (!empty($colorids) && sp_loadColors($colorids) !== false)
@@ -887,10 +888,10 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	echo '
 								<table class="sp_fullwidth">';
 
-	if($enable_label)
+	if ($enable_label)
 		echo '
 									<tr>
-										<td class="sp_top_poster sp_center" colspan="2"><strong>', $list_label,'</strong></td>
+										<td class="sp_top_poster sp_center" colspan="2"><strong>', $list_label, '</strong></td>
 									</tr>';
 
 	foreach ($members as $member)
@@ -907,7 +908,6 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	}
 	echo '
 								</table>';
-
 }
 
 function sp_recent($parameters, $id, $return_parameters = false)
@@ -1380,7 +1380,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 							</tr>
 							<tr>
 								<td class="windowbg2" colspan="2">
-									<div class="sp_right sp_regular_padding">', $news['link'], ' ',  $news['new_comment'], '</div>
+									<div class="sp_right sp_regular_padding">', $news['link'], ' ', $news['new_comment'], '</div>
 								</td>
 							</tr>
 						</table>
@@ -1411,7 +1411,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 
 			echo '
 							<div class="post"><hr />', $news['body'], '</div>
-							<div class="sp_right">', $news['link'], ' ',  $news['new_comment'], '</div>
+							<div class="sp_right">', $news['link'], ' ', $news['new_comment'], '</div>
 						</div>
 						<span class="botslice"><span></span></span>
 					</div>';
@@ -1505,7 +1505,7 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
 
 	foreach ($items as $item)
 	{
-	  echo !$direction ? '
+		echo!$direction ? '
 									<tr>' : '', '
 										<td>
 											<div class="sp_image smalltext">', ($showLink ? '
@@ -1651,37 +1651,37 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 			echo '
 								<ul class="sp_list smalltext" id="sp_calendar_', $day['day'], '" ', !$day['is_today'] ? ' style="display: none;"' : '', '>';
 
-		if (!empty($day['holidays']))
-		{
+			if (!empty($day['holidays']))
+			{
 				echo '
-									<li class="sp_center"><strong>- ', $txt['sp_calendar_holidays'] ,' -</strong></li>';
+									<li class="sp_center"><strong>- ', $txt['sp_calendar_holidays'], ' -</strong></li>';
 
-			foreach ($day['holidays'] as $key => $holiday)
-				echo '
-									<li class="sp_list_indent">', sp_embed_image('holiday'), ' ', $holiday ,'</li>';
-		}
+				foreach ($day['holidays'] as $key => $holiday)
+					echo '
+									<li class="sp_list_indent">', sp_embed_image('holiday'), ' ', $holiday, '</li>';
+			}
 
-		if (!empty($day['birthdays']))
-		{
+			if (!empty($day['birthdays']))
+			{
 				echo '
-									<li class="sp_center"><strong>- ', $txt['sp_calendar_birthdays'] ,' -</strong></li>';
+									<li class="sp_center"><strong>- ', $txt['sp_calendar_birthdays'], ' -</strong></li>';
 
-			foreach ($day['birthdays'] as $member)
-				echo '
+				foreach ($day['birthdays'] as $member)
+					echo '
 									<li class="sp_list_indent">', sp_embed_image('birthday'), ' <a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a></li>';
-		}
+			}
 
-		if (!empty($day['events']))
-		{
+			if (!empty($day['events']))
+			{
 				echo '
-									<li class="sp_center"><strong>- ', $txt['sp_calendar_events'] ,' -</strong></li>';
+									<li class="sp_center"><strong>- ', $txt['sp_calendar_events'], ' -</strong></li>';
 
-			foreach ($day['events'] as $event)
-				echo '
+				foreach ($day['events'] as $event)
+					echo '
 									<li class="sp_list_indent">', sp_embed_image('event'), ' ', $event['link'], '</li>';
-		}
+			}
 
-		echo '
+			echo '
 								</ul>';
 		}
 	}
@@ -1798,18 +1798,18 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 		{
 			if ($show_titles)
 				echo '
-									<li><strong>', $txt['sp_calendar_holidays'] ,'</strong></li>';
+									<li><strong>', $txt['sp_calendar_holidays'], '</strong></li>';
 
 			foreach ($calendar_array['todayHolidays'] as $key => $holiday)
 				echo '
-									<li>', sp_embed_image('holiday'), ' ', $holiday ,'</li>';
+									<li>', sp_embed_image('holiday'), ' ', $holiday, '</li>';
 		}
 
 		if (!empty($calendar_array['todayBirthdays']))
 		{
 			if ($show_titles)
 				echo '
-									<li><strong>', $txt['sp_calendar_birthdays'] ,'</strong></li>';
+									<li><strong>', $txt['sp_calendar_birthdays'], '</strong></li>';
 
 			foreach ($calendar_array['todayBirthdays'] as $member)
 				echo '
@@ -1820,7 +1820,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 		{
 			if ($show_titles)
 				echo '
-									<li><strong>', $txt['sp_calendar_events'] ,'</strong></li>';
+									<li><strong>', $txt['sp_calendar_events'], '</strong></li>';
 
 			foreach ($calendar_array['todayEvents'] as $event)
 				echo '
@@ -1831,14 +1831,14 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 		{
 			if ($show_titles)
 				echo '
-									<li><strong>', $txt['sp_calendar_upcomingEvents'] ,'</strong></li>';
+									<li><strong>', $txt['sp_calendar_upcomingEvents'], '</strong></li>';
 
-			foreach($calendar_array['futureEvents'] as $startdate => $events)
+			foreach ($calendar_array['futureEvents'] as $startdate => $events)
 			{
 				list($year, $month, $day) = explode('-', $startdate);
 				$currentDay = $day . ' ' . $txt['months_short'][(int) $month];
 
-				foreach($events as $event)
+				foreach ($events as $event)
 					echo '
 									<li>', sp_embed_image('event'), ' ', $event['link'], ' - ', $currentDay, '</li>';
 			}
@@ -1963,7 +1963,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 		foreach ($items as $item)
 		{
 			if ($show_title && !empty($item['link']))
-			echo '
+				echo '
 										<li class="sp_list_top">', sp_embed_image('post'), ' <strong>', $item['link'], '</strong>', ($show_date && !empty($item['date']) ? ' - ' . $item['date'] : ''), '</li>';
 			echo '
 										<li', empty($item['is_last']) ? ' class="sp_list_divider"' : '', '>', $item['content'], '</li>';
@@ -2122,7 +2122,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 		echo '
 									sp_ts_thumbs[', $id, '] = "', $theme_data['thumbnail_href'], '";';
 
-		echo '
+	echo '
 									function sp_theme_select(obj)
 									{
 										var id = obj.options[obj.selectedIndex].value;
@@ -2286,7 +2286,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 	$type = empty($parameters['type']) ? 0 : 1;
 	$image = empty($parameters['image']) ? 0 : (int) $parameters['image'];
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT
 			m.id_topic, m.subject, m.poster_name, c.picture, c.name,
 			mem.id_member, mem.real_name, mem.avatar,
@@ -2424,7 +2424,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 		$shoutboxes = sportal_get_shoutbox();
 		$in_use = array();
 
-		$request = $db->query('','
+		$request = $db->query('', '
 			SELECT id_block, value
 			FROM {db_prefix}sp_parameters
 			WHERE variable = {string:name}',
@@ -2647,7 +2647,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 		if (empty($modSettings['gallery_url']))
 			$modSettings['gallery_url'] = $boardurl . '/gallery/';
 
-		$request = $db->query('','
+		$request = $db->query('', '
 			SELECT
 				p.id_picture, p.commenttotal, p.filesize, p.views, p.thumbfilename,
 				p.filename, p.height, p.width, p.title, p.id_member, m.member_name,
@@ -2694,7 +2694,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 
 	foreach ($items as $item)
 	{
-	  echo !$direction ? '
+		echo!$direction ? '
 									<tr>' : '', '
 										<td>
 											<div class="sp_image smalltext">';
@@ -2707,7 +2707,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 												', $txt['aeva_views'], ': ', $item['views'], '<br />
 												', $txt['aeva_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
 												', $txt['aeva_in_album'], ': <a href="', $galurl, 'sa=album;id=', $item['id_album'], '">', $item['album_name'], '</a>', $item['is_new'] ?
-												'<br /><img alt="" src="' . $settings['images_url'] . '/' . $context['user']['language'] . '/new.gif" border="0" />' : '';
+					'<br /><img alt="" src="' . $settings['images_url'] . '/' . $context['user']['language'] . '/new.gif" border="0" />' : '';
 		}
 		elseif ($mod == 'smf_media_gallery')
 		{
@@ -2717,7 +2717,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 												', $txt['mgallery_views'], ': ', $item['views'], '<br />
 												', $txt['mgallery_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
 												', $txt['mgallery_in_album'], ': <a href="', $galurl, 'sa=album;id=', $item['id_album'], '">', $item['album_name'], '</a>', $item['is_new'] ?
-												'<br /><img alt="" src="' . $settings['images_url'] . '/' . $context['user']['language'] . '/new.gif" border="0" />' : '';
+					'<br /><img alt="" src="' . $settings['images_url'] . '/' . $context['user']['language'] . '/new.gif" border="0" />' : '';
 		}
 		elseif ($mod == 'smf_gallery')
 		{
@@ -2875,7 +2875,7 @@ function sp_shop($parameters, $id, $return_parameters = false)
 
 		if (empty($style))
 		{
-			$request = $db->query('','
+			$request = $db->query('', '
 				SELECT id_member, real_name, {raw:type} AS money
 				FROM {db_prefix}members
 				ORDER BY money DESC
@@ -2930,7 +2930,7 @@ function sp_shop($parameters, $id, $return_parameters = false)
 		}
 		else
 		{
-			$request = $db->query('','
+			$request = $db->query('', '
 				SELECT id, name, price, image
 				FROM {db_prefix}shop_items
 				WHERE stock > {int:none}
@@ -3027,7 +3027,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 	}
 	elseif ($mod == 'zcommunity')
 	{
-		$request = $db->query('','
+		$request = $db->query('', '
 			SELECT b.blog_id, b.blog_owner, b.member_groups, bs.users_allowed_access, bs.hideBlog AS hidden
 			FROM {db_prefix}blog_blogs AS b
 				LEFT JOIN {db_prefix}blog_settings AS bs ON (bs.blog_id = b.blog_id)',
@@ -3068,7 +3068,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 
 		if (empty($type))
 		{
-			$request = $db->query('','
+			$request = $db->query('', '
 				SELECT t.article_id, t.subject
 				FROM {db_prefix}blog_articles AS t
 					LEFT JOIN {db_prefix}blog_settings AS bs ON (bs.blog_id = t.blog_id)
@@ -3111,7 +3111,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 		}
 		else
 		{
-			$request = $db->query('','
+			$request = $db->query('', '
 				SELECT
 					b.blog_id, b.name, t.article_id, t.subject, m.id_member, m.real_name,
 					m.avatar, a.id_attach, a.attachment_type, a.filename
@@ -3202,7 +3202,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 	}
 	elseif ($mod == 'smfblog')
 	{
-		$request = $db->query('','
+		$request = $db->query('', '
 			SELECT b.id_board
 			FROM {db_prefix}boards AS b
 			WHERE {query_see_board}
@@ -3225,7 +3225,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 
 		if (empty($type))
 		{
-			$request = $db->query('','
+			$request = $db->query('', '
 				SELECT t.id_topic, m.subject
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -3271,7 +3271,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 		}
 		else
 		{
-			$request = $db->query('','
+			$request = $db->query('', '
 				SELECT b.id_board, b.blog_alias, b.name, MAX(t.id_topic) AS id_topic
 				FROM {db_prefix}boards AS b
 					INNER JOIN {db_prefix}topics AS t ON (t.id_board = b.id_board)
@@ -3308,7 +3308,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 				return;
 			}
 
-			$request = $db->query('','
+			$request = $db->query('', '
 				SELECT
 					t.id_board, t.id_topic, m.subject, mem.id_member, mem.real_name,
 					mem.avatar, a.id_attach, a.attachment_type, a.filename
@@ -3419,11 +3419,11 @@ function sp_menu($parameters, $id, $return_parameters = false)
 			echo '
 										<ul class="sp_list">';
 
-		foreach ($button['sub_buttons'] as $sub_button)
-			echo '
+			foreach ($button['sub_buttons'] as $sub_button)
+				echo '
 											<li class="sp_list_indent">', sp_embed_image('dot'), ' <a title="', $sub_button['title'], '" href="', $sub_button['href'], '">', $sub_button['title'], '</a></li>';
 
-		echo '
+			echo '
 										</ul>';
 		}
 

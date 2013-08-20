@@ -66,7 +66,7 @@ function sportal_admin_shoutbox_list()
 		foreach ($_POST['remove'] as $index => $page_id)
 			$_POST['remove'][(int) $index] = (int) $page_id;
 
-		$db->query('','
+		$db->query('', '
 			DELETE FROM {db_prefix}sp_shoutboxes
 			WHERE id_shoutbox IN ({array_int:shoutbox})',
 			array(
@@ -74,7 +74,7 @@ function sportal_admin_shoutbox_list()
 			)
 		);
 
-		$db->query('','
+		$db->query('', '
 			DELETE FROM {db_prefix}sp_shouts
 			WHERE id_shoutbox IN ({array_int:shoutbox})',
 			array(
@@ -84,7 +84,7 @@ function sportal_admin_shoutbox_list()
 	}
 
 	$sort_methods = array(
-		'name' =>  array(
+		'name' => array(
 			'down' => 'name ASC',
 			'up' => 'name DESC'
 		),
@@ -148,17 +148,17 @@ function sportal_admin_shoutbox_list()
 	$context['sort_by'] = $_REQUEST['sort'];
 	$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'down' : 'up';
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_shoutboxes'
 	);
-	list ($total_shoutbox) =  $db->fetch_row($request);
+	list ($total_shoutbox) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=portalshoutbox;sa=list;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $total_shoutbox, 20);
 	$context['start'] = $_REQUEST['start'];
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT id_shoutbox, name, caching, status, num_shouts
 		FROM {db_prefix}sp_shoutboxes
 		ORDER BY id_shoutbox, {raw:sort}
@@ -207,7 +207,7 @@ function sportal_admin_shoutbox_edit()
 		if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			fatal_lang_error('sp_error_shoutbox_name_empty', false);
 
-		$result = $db->query('','
+		$result = $db->query('', '
 			SELECT id_shoutbox
 			FROM {db_prefix}sp_shoutboxes
 			WHERE name = {string:name}
@@ -305,8 +305,8 @@ function sportal_admin_shoutbox_edit()
 		{
 			unset($shoutbox_info['id']);
 
-			$db->insert('',
-				'{db_prefix}sp_shoutboxes',
+			$db->insert('', '
+				{db_prefix}sp_shoutboxes',
 				$fields,
 				$shoutbox_info,
 				array('id_shoutbox')
@@ -319,11 +319,10 @@ function sportal_admin_shoutbox_edit()
 			foreach ($fields as $name => $type)
 				$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
 
-			$db->query('','
+			$db->query('', '
 				UPDATE {db_prefix}sp_shoutboxes
 				SET ' . implode(', ', $update_fields) . '
-				WHERE id_shoutbox = {int:id}',
-				$shoutbox_info
+				WHERE id_shoutbox = {int:id}', $shoutbox_info
 			);
 		}
 
@@ -447,7 +446,7 @@ function sportal_admin_shoutbox_prune()
 						'limit' => 1,
 					)
 				);
-				list ($member_id) =  $db->fetch_row($request);
+				list ($member_id) = $db->fetch_row($request);
 				$db->free_result($request);
 
 				if (!empty($member_id))
@@ -459,10 +458,9 @@ function sportal_admin_shoutbox_prune()
 
 			if ($_POST['type'] == 'all' || count($where) > 1)
 			{
-				$db->query('','
+				$db->query('', '
 					DELETE FROM {db_prefix}sp_shouts
-					WHERE ' . implode(' AND ', $where),
-					$parameters
+					WHERE ' . implode(' AND ', $where), $parameters
 				);
 
 				if ($_POST['type'] != 'all')
@@ -477,13 +475,13 @@ function sportal_admin_shoutbox_prune()
 							'limit' => 1,
 						)
 					);
-					list ($total_shouts) =  $db->fetch_row($request);
+					list ($total_shouts) = $db->fetch_row($request);
 					$db->free_result($request);
 				}
 				else
 					$total_shouts = 0;
 
-				$db->query('','
+				$db->query('', '
 					UPDATE {db_prefix}sp_shoutboxes
 					SET num_shouts = {int:total_shouts}
 					WHERE id_shoutbox = {int:shoutbox_id}',
@@ -512,7 +510,7 @@ function sportal_admin_shoutbox_delete()
 
 	$shoutbox_id = !empty($_REQUEST['shoutbox_id']) ? (int) $_REQUEST['shoutbox_id'] : 0;
 
-	$db->query('','
+	$db->query('', '
 		DELETE FROM {db_prefix}sp_shoutboxes
 		WHERE id_shoutbox = {int:id}',
 		array(
@@ -520,7 +518,7 @@ function sportal_admin_shoutbox_delete()
 		)
 	);
 
-	$db->query('','
+	$db->query('', '
 		DELETE FROM {db_prefix}sp_shouts
 		WHERE id_shoutbox = {int:id}',
 		array(

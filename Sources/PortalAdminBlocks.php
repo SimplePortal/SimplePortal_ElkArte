@@ -127,12 +127,12 @@ function sportal_admin_block_list()
 
 	$sides = array('header', 'left', 'top', 'bottom', 'right', 'footer');
 	// Are we viewing any of the sub lists for an individual side?
-	if(in_array($context['sub_action'], $sides))
+	if (in_array($context['sub_action'], $sides))
 	{
 		// Remove any sides that we don't need to show. ;)
-		foreach($sides as $side)
+		foreach ($sides as $side)
 		{
-			if($context['sub_action'] != $side)
+			if ($context['sub_action'] != $side)
 				unset($context['sides'][$side]);
 		}
 		$context['sp_blocks_single_side_list'] = true;
@@ -157,7 +157,7 @@ function sportal_admin_block_list()
 	);
 
 	// Get the block info for each side.
-	foreach($context['sides'] as $side_id => $side)
+	foreach ($context['sides'] as $side_id => $side)
 	{
 		$context['blocks'][$side['name']] = getBlockInfo($side['id']);
 		foreach ($context['blocks'][$side['name']] as $block_id => $block)
@@ -167,7 +167,7 @@ function sportal_admin_block_list()
 				'state_icon' => empty($block['state']) ? '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';type=block;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('deactive', $txt['sp-blocksActivate']) . '</a>' : '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';type=block;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('active', $txt['sp-blocksDeactivate']) . '</a>',
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=edit;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'move' => '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=select;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('move', $txt['sp-adminColumnMove']) . '</a>',
-				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=delete;block_id=' . $block['id'] . ';col=' . $block['column'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\''.$txt['sp-deleteblock'].'\');">' . sp_embed_image('delete') . '</a>',
+				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=delete;block_id=' . $block['id'] . ';col=' . $block['column'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp-deleteblock'] . '\');">' . sp_embed_image('delete') . '</a>',
 			);
 
 			if ($context['block_move'])
@@ -256,7 +256,7 @@ function sportal_admin_block_edit()
 			'display_custom' => '',
 			'style' => '',
 			'parameters' => !empty($start_parameters) ? $start_parameters : array(),
-			'options'=> $_POST['selected_type'][0](array(), false, true),
+			'options' => $_POST['selected_type'][0](array(), false, true),
 			'list_blocks' => !empty($_POST['block_column']) ? getBlockInfo($_POST['block_column']) : array(),
 		);
 	}
@@ -266,7 +266,7 @@ function sportal_admin_block_edit()
 		$context['SPortal']['block'] = current(getBlockInfo(null, $_REQUEST['block_id']));
 
 		$context['SPortal']['block'] += array(
-			'options'=> $context['SPortal']['block']['type'](array(), false, true),
+			'options' => $context['SPortal']['block']['type'](array(), false, true),
 			'list_blocks' => getBlockInfo($context['SPortal']['block']['column']),
 		);
 	}
@@ -379,7 +379,7 @@ function sportal_admin_block_edit()
 			'display_custom' => $custom,
 			'style' => sportal_parse_style('implode'),
 			'parameters' => !empty($_POST['parameters']) ? $_POST['parameters'] : array(),
-			'options'=> $_POST['block_type'](array(), false, true),
+			'options' => $_POST['block_type'](array(), false, true),
 			'list_blocks' => getBlockInfo($_POST['block_column']),
 			'collapsed' => false,
 		);
@@ -450,19 +450,19 @@ function sportal_admin_block_edit()
 			'profile' => $txt['profile'],
 			'pm' => $txt['pm_short'],
 			'calendar' => $txt['calendar'],
-			'admin' =>  $txt['admin'],
-			'login' =>  $txt['login'],
-			'register' =>  $txt['register'],
-			'post' =>  $txt['post'],
-			'stats' =>  $txt['forum_stats'],
-			'search' =>  $txt['search'],
-			'mlist' =>  $txt['members_list'],
-			'moderate' =>  $txt['moderate'],
-			'help' =>  $txt['help'],
-			'who' =>  $txt['who_title'],
+			'admin' => $txt['admin'],
+			'login' => $txt['login'],
+			'register' => $txt['register'],
+			'post' => $txt['post'],
+			'stats' => $txt['forum_stats'],
+			'search' => $txt['search'],
+			'mlist' => $txt['members_list'],
+			'moderate' => $txt['moderate'],
+			'help' => $txt['help'],
+			'who' => $txt['who_title'],
 		);
 
-		$request = $db->query('','
+		$request = $db->query('', '
 			SELECT id_board, name
 			FROM {db_prefix}boards
 			ORDER BY name DESC'
@@ -472,7 +472,7 @@ function sportal_admin_block_edit()
 			$context['display_boards']['b' . $row['id_board']] = $row['name'];
 		$db->free_result($request);
 
-		$request = $db->query('','
+		$request = $db->query('', '
 			SELECT id_page, title
 			FROM {db_prefix}sp_pages
 			ORDER BY title DESC'
@@ -503,14 +503,14 @@ function sportal_admin_block_edit()
 			{
 				if (empty($boards))
 				{
-					require_once(SOURCEDIR.'/Subs-Boards.php');
+					require_once(SOURCEDIR . '/Subs-Boards.php');
 					getBoardTree();
 				}
 
 				// Merge the array ;). (Only in 2.0 needed)
-				if(!isset($context['SPortal']['block']['parameters'][$name]))
+				if (!isset($context['SPortal']['block']['parameters'][$name]))
 					$context['SPortal']['block']['parameters'][$name] = array();
-				elseif(!empty($context['SPortal']['block']['parameters'][$name]) && is_array($context['SPortal']['block']['parameters'][$name]))
+				elseif (!empty($context['SPortal']['block']['parameters'][$name]) && is_array($context['SPortal']['block']['parameters'][$name]))
 					$context['SPortal']['block']['parameters'][$name] = implode('|', $context['SPortal']['block']['parameters'][$name]);
 
 				$context['SPortal']['block']['board_options'][$name] = array();
@@ -535,10 +535,10 @@ function sportal_admin_block_edit()
 			elseif ($type == 'bbc')
 			{
 				// SMF support only one bbc correct, multiple bbc do not work at the moment
-				if(!$firstBBCFound)
+				if (!$firstBBCFound)
 				{
 					$firstBBCFound = true;
-				 // Start SMF BBC Sytem :)
+					// Start SMF BBC Sytem :)
 					require_once(SOURCEDIR . '/Subs-Editor.php');
 					// Prepare the output :D
 					$form_message = !empty($context['SPortal']['block']['parameters'][$name]) ? $context['SPortal']['block']['parameters'][$name] : '';
@@ -558,7 +558,7 @@ function sportal_admin_block_edit()
 
 					// Prepare the data before i want them inside the textarea
 					$form_message = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
-					$context['SPortal']['bbc'] = 'bbc_'.$name;
+					$context['SPortal']['bbc'] = 'bbc_' . $name;
 					$message_data = array(
 						'id' => $context['SPortal']['bbc'],
 						'width' => '95%',
@@ -650,7 +650,7 @@ function sportal_admin_block_edit()
 			$row = 0;
 		else
 		{
-			$request =  $db->query('','
+			$request = $db->query('', '
 				SELECT row
 				FROM {db_prefix}sp_blocks
 				WHERE col = {int:col}' . (!empty($_REQUEST['block_id']) ? '
@@ -797,22 +797,11 @@ function sportal_admin_block_edit()
 		{
 			unset($blockInfo['id']);
 
-			$db->insert('',
-				'{db_prefix}sp_blocks',
-				array(
-					'label' => 'string',
-					'type' => 'string',
-					'col' => 'int',
-					'row' => 'int',
-					'permission_set' => 'int',
-					'groups_allowed' => 'string',
-					'groups_denied' => 'string',
-					'state' => 'int',
-					'force_view' => 'int',
-					'display' => 'string',
-					'display_custom' => 'string',
-					'style' => 'string',
-				),
+			$db->insert('', '
+				{db_prefix}sp_blocks',
+				array('label' => 'string', 'type' => 'string', 'col' => 'int', 'row' => 'int', 'permission_set' => 'int',
+					'groups_allowed' => 'string', 'groups_denied' => 'string', 'state' => 'int', 'force_view' => 'int',
+					'display' => 'string', 'display_custom' => 'string', 'style' => 'string',),
 				$blockInfo,
 				array('id_block')
 			);
@@ -838,14 +827,13 @@ function sportal_admin_block_edit()
 			else
 				unset($blockInfo['row']);
 
-			$db->query('','
+			$db->query('', '
 				UPDATE {db_prefix}sp_blocks
 				SET ' . implode(', ', $block_fields) . '
-				WHERE id_block = {int:id}',
-				$blockInfo
+				WHERE id_block = {int:id}', $blockInfo
 			);
 
-			$db->query('','
+			$db->query('', '
 				DELETE FROM {db_prefix}sp_parameters
 				WHERE id_block = {int:id}',
 				array(
@@ -864,13 +852,9 @@ function sportal_admin_block_edit()
 					'value' => $value,
 				);
 
-			$db->insert('',
-				'{db_prefix}sp_parameters',
-				array(
-					'id_block' => 'int',
-					'variable' => 'string',
-					'value' => 'string',
-				),
+			$db->insert('', '
+				{db_prefix}sp_parameters',
+				array('id_block' => 'int', 'variable' => 'string', 'value' => 'string',),
 				$parameters,
 				array()
 			);
@@ -899,7 +883,7 @@ function sportal_admin_block_move()
 
 	if (empty($_REQUEST['row']))
 	{
-		$request =  $db->query('','
+		$request = $db->query('', '
 			SELECT MAX(row)
 			FROM {db_prefix}sp_blocks
 			WHERE col = {int:target_side}
@@ -917,7 +901,7 @@ function sportal_admin_block_move()
 	else
 		$target_row = (int) $_REQUEST['row'];
 
-	$request =  $db->query('','
+	$request = $db->query('', '
 		SELECT col, row
 		FROM {db_prefix}sp_blocks
 		WHERE id_block = {int:block_id}
@@ -935,7 +919,7 @@ function sportal_admin_block_move()
 		if ($current_side != $target_side)
 		{
 			$current_row = 100;
-			$db->query('','
+			$db->query('', '
 				UPDATE {db_prefix}sp_blocks
 				SET col = {int:target_side}, row = {int:temp_row}
 				WHERE id_block = {int:block_id}',
@@ -947,7 +931,7 @@ function sportal_admin_block_move()
 			);
 		}
 
-		$db->query('','
+		$db->query('', '
 			UPDATE {db_prefix}sp_blocks
 			SET row = row + 1
 			WHERE col = {int:target_side}
@@ -958,7 +942,7 @@ function sportal_admin_block_move()
 			)
 		);
 
-		$db->query('','
+		$db->query('', '
 			UPDATE {db_prefix}sp_blocks
 			SET row = {int:target_row}
 			WHERE id_block = {int:block_id}',
@@ -987,22 +971,22 @@ function sportal_admin_block_delete()
 	$_REQUEST['block_id'] = (int) $_REQUEST['block_id'];
 
 	// Do we have that?
-	if(empty($_REQUEST['block_id']))
+	if (empty($_REQUEST['block_id']))
 		fatal_lang_error('error_sp_id_empty', false);
 
 	// Make sure column ID is an integer too.
 	$_REQUEST['col'] = (int) $_REQUEST['col'];
 
 	// Only Admins can Remove PHP Blocks
-	if(!allowedTo('admin_forum'))
+	if (!allowedTo('admin_forum'))
 	{
 		$context['SPortal']['block'] = current(getBlockInfo(null, $_REQUEST['block_id']));
-		if($context['SPortal']['block']['type'] == 'sp_php' && !allowedTo('admin_forum'))
+		if ($context['SPortal']['block']['type'] == 'sp_php' && !allowedTo('admin_forum'))
 			fatal_lang_error('cannot_admin_forum', false);
 	}
 
 	// We don't need it anymore.
-	$db->query('','
+	$db->query('', '
 		DELETE FROM {db_prefix}sp_blocks
 		WHERE id_block = {int:id}',
 		array(
@@ -1010,7 +994,7 @@ function sportal_admin_block_delete()
 		)
 	);
 
-	$db->query('','
+	$db->query('', '
 		DELETE FROM {db_prefix}sp_parameters
 		WHERE id_block = {int:id}',
 		array(

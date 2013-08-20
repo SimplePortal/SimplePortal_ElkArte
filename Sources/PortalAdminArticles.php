@@ -64,7 +64,7 @@ function sportal_admin_article_list()
 		foreach ($_POST['remove'] as $index => $article_id)
 			$_POST['remove'][(int) $index] = (int) $article_id;
 
-		$db->query('','
+		$db->query('', '
 			DELETE FROM {db_prefix}sp_articles
 			WHERE id_article IN ({array_int:articles})',
 			array(
@@ -74,15 +74,15 @@ function sportal_admin_article_list()
 	}
 
 	$sort_methods = array(
-		'title' =>  array(
+		'title' => array(
 			'down' => 'spa.title ASC',
 			'up' => 'spa.title DESC'
 		),
-		'namespace' =>  array(
+		'namespace' => array(
 			'down' => 'article_namespace ASC',
 			'up' => 'article_namespace DESC'
 		),
-		'category' =>  array(
+		'category' => array(
 			'down' => 'spc.name ASC',
 			'up' => 'spc.name DESC'
 		),
@@ -165,17 +165,17 @@ function sportal_admin_article_list()
 	$context['sort_by'] = $_REQUEST['sort'];
 	$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'down' : 'up';
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_articles'
 	);
-	list ($total_articles) =  $db->fetch_row($request);
+	list ($total_articles) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=portalarticles;sa=list;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $total_articles, 20);
 	$context['start'] = $_REQUEST['start'];
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT
 			spa.id_article, spa.id_category, spc.name, spc.namespace AS category_namespace,
 			IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name,
@@ -213,7 +213,7 @@ function sportal_admin_article_list()
 				'link' => $row['id_author'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>') : $row['author_name'],
 			),
 			'type' => $row['type'],
-			'type_text' => $txt['sp_articles_type_'. $row['type']],
+			'type_text' => $txt['sp_articles_type_' . $row['type']],
 			'date' => timeformat($row['date']),
 			'status' => $row['status'],
 			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
@@ -263,7 +263,7 @@ function sportal_admin_article_edit()
 		if (!isset($_POST['namespace']) || Util::htmltrim(Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES)) === '')
 			fatal_lang_error('sp_error_article_namespace_empty', false);
 
-		$result = $db->query('','
+		$result = $db->query('', '
 			SELECT id_article
 			FROM {db_prefix}sp_articles
 			WHERE namespace = {string:namespace}
@@ -360,8 +360,8 @@ function sportal_admin_article_edit()
 				'date' => time(),
 			));
 
-			$db->insert('',
-				'{db_prefix}sp_articles',
+			$db->insert('', '
+				{db_prefix}sp_articles',
 				$fields,
 				$article_info,
 				array('id_article')
@@ -374,14 +374,15 @@ function sportal_admin_article_edit()
 			foreach ($fields as $name => $type)
 				$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
 
-			$db->query('','
+			$db->query('', '
 				UPDATE {db_prefix}sp_articles
 				SET ' . implode(', ', $update_fields) . '
 				WHERE id_article = {int:id}',
-				$article_info
+				array (
+					'id' => $article_info['id'],
+				)
 			);
 		}
-
 
 		if ($context['is_new'] || $article_info['id_category'] != $context['article']['category']['id'])
 		{
@@ -530,7 +531,7 @@ function sportal_admin_article_delete()
 	$article_id = !empty($_REQUEST['article_id']) ? (int) $_REQUEST['article_id'] : 0;
 	$article_info = sportal_get_articles($article_id);
 
-	$db->query('','
+	$db->query('', '
 		DELETE FROM {db_prefix}sp_articles
 		WHERE id_article = {int:id}',
 		array(

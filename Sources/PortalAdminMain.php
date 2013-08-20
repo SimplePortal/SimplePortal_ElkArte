@@ -49,7 +49,7 @@ function sportal_admin_general_settings($return_config = '')
 
 	$db = database();
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT id_theme, value AS name
 		FROM {db_prefix}themes
 		WHERE variable = {string:name}
@@ -66,17 +66,17 @@ function sportal_admin_general_settings($return_config = '')
 	$db->free_result($request);
 
 	$config_vars = array(
-			array('select', 'sp_portal_mode', explode('|', $txt['sp_portal_mode_options'])),
-			array('check', 'sp_maintenance'),
-			array('text', 'sp_standalone_url'),
+		array('select', 'sp_portal_mode', explode('|', $txt['sp_portal_mode_options'])),
+		array('check', 'sp_maintenance'),
+		array('text', 'sp_standalone_url'),
 		'',
-			array('select', 'portaltheme', $context['SPortal']['themes']),
-			array('check', 'sp_disableColor'),
-			array('check', 'sp_disableForumRedirect'),
-			array('check', 'sp_disable_random_bullets'),
-			array('check', 'sp_disable_php_validation'),
-			array('check', 'sp_disable_side_collapse'),
-			array('check', 'sp_resize_images'),
+		array('select', 'portaltheme', $context['SPortal']['themes']),
+		array('check', 'sp_disableColor'),
+		array('check', 'sp_disableForumRedirect'),
+		array('check', 'sp_disable_random_bullets'),
+		array('check', 'sp_disable_php_validation'),
+		array('check', 'sp_disable_side_collapse'),
+		array('check', 'sp_resize_images'),
 	);
 
 	if ($return_config)
@@ -103,13 +103,13 @@ function sportal_admin_block_settings($return_config = '')
 	global $context, $scripturl, $txt;
 
 	$config_vars = array(
-			array('check', 'showleft'),
-			array('check', 'showright'),
-			array('text', 'leftwidth'),
-			array('text', 'rightwidth'),
+		array('check', 'showleft'),
+		array('check', 'showright'),
+		array('text', 'leftwidth'),
+		array('text', 'rightwidth'),
 		'',
-			array('check', 'sp_enableIntegration'),
-			array('multicheck', 'sp_IntegrationHide', 'subsettings' => array('sp_adminIntegrationHide' => $txt['admin'], 'sp_profileIntegrationHide' => $txt['profile'], 'sp_pmIntegrationHide' => $txt['personal_messages'], 'sp_mlistIntegrationHide' => $txt['members_title'], 'sp_searchIntegrationHide' => $txt['search'], 'sp_calendarIntegrationHide' => $txt['calendar'], 'sp_moderateIntegrationHide' => $txt['moderate'])),
+		array('check', 'sp_enableIntegration'),
+		array('multicheck', 'sp_IntegrationHide', 'subsettings' => array('sp_adminIntegrationHide' => $txt['admin'], 'sp_profileIntegrationHide' => $txt['profile'], 'sp_pmIntegrationHide' => $txt['personal_messages'], 'sp_mlistIntegrationHide' => $txt['members_title'], 'sp_searchIntegrationHide' => $txt['search'], 'sp_calendarIntegrationHide' => $txt['calendar'], 'sp_moderateIntegrationHide' => $txt['moderate'])),
 	);
 
 	if ($return_config)
@@ -145,8 +145,7 @@ function sportal_admin_block_settings($return_config = '')
 
 		unset($config_vars[7]);
 		$config_vars = array_merge(
-			$config_vars,
-			array(
+			$config_vars, array(
 				array('check', 'sp_adminIntegrationHide'),
 				array('check', 'sp_profileIntegrationHide'),
 				array('check', 'sp_pmIntegrationHide'),
@@ -174,10 +173,10 @@ function sportal_admin_article_settings($return_config = '')
 	global $context, $scripturl, $txt;
 
 	$config_vars = array(
-			array('check', 'articleactive'),
-			array('int', 'articleperpage'),
-			array('int', 'articlelength'),
-			array('check', 'articleavatar'),
+		array('check', 'articleactive'),
+		array('int', 'articleperpage'),
+		array('int', 'articlelength'),
+		array('check', 'articleavatar'),
 	);
 
 	if ($return_config)

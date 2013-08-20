@@ -64,7 +64,7 @@ function sportal_admin_page_list()
 		foreach ($_POST['remove'] as $index => $page_id)
 			$_POST['remove'][(int) $index] = (int) $page_id;
 
-		$db->query('','
+		$db->query('', '
 			DELETE FROM {db_prefix}sp_pages
 			WHERE id_page IN ({array_int:pages})',
 			array(
@@ -74,11 +74,11 @@ function sportal_admin_page_list()
 	}
 
 	$sort_methods = array(
-		'title' =>  array(
+		'title' => array(
 			'down' => 'title ASC',
 			'up' => 'title DESC'
 		),
-		'namespace' =>  array(
+		'namespace' => array(
 			'down' => 'namespace ASC',
 			'up' => 'namespace DESC'
 		),
@@ -147,17 +147,17 @@ function sportal_admin_page_list()
 	$context['sort_by'] = $_REQUEST['sort'];
 	$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'down' : 'up';
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_pages'
 	);
-	list ($total_pages) =  $db->fetch_row($request);
+	list ($total_pages) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=portalpages;sa=list;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $total_pages, 20);
 	$context['start'] = $_REQUEST['start'];
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT id_page, namespace, title, type, views, status
 		FROM {db_prefix}sp_pages
 		ORDER BY {raw:sort}
@@ -178,7 +178,7 @@ function sportal_admin_page_list()
 			'href' => $scripturl . '?page=' . $row['namespace'],
 			'link' => '<a href="' . $scripturl . '?page=' . $row['namespace'] . '">' . $row['title'] . '</a>',
 			'type' => $row['type'],
-			'type_text' => $txt['sp_pages_type_'. $row['type']],
+			'type_text' => $txt['sp_pages_type_' . $row['type']],
 			'views' => $row['views'],
 			'status' => $row['status'],
 			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=status;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_pages_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
@@ -268,7 +268,7 @@ function sportal_admin_page_edit()
 		if (!isset($_POST['namespace']) || Util::htmltrim(Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES)) === '')
 			fatal_lang_error('sp_error_page_namespace_empty', false);
 
-		$result = $db->query('','
+		$result = $db->query('', '
 			SELECT id_page
 			FROM {db_prefix}sp_pages
 			WHERE namespace = {string:namespace}
@@ -361,8 +361,8 @@ function sportal_admin_page_edit()
 		{
 			unset($page_info['id']);
 
-			$db->insert('',
-				'{db_prefix}sp_pages',
+			$db->insert('', '
+				{db_prefix}sp_pages',
 				$fields,
 				$page_info,
 				array('id_page')
@@ -375,11 +375,10 @@ function sportal_admin_page_edit()
 			foreach ($fields as $name => $type)
 				$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
 
-			$db->query('','
+			$db->query('', '
 				UPDATE {db_prefix}sp_pages
 				SET ' . implode(', ', $update_fields) . '
-				WHERE id_page = {int:id}',
-				$page_info
+				WHERE id_page = {int:id}', $page_info
 			);
 		}
 
@@ -464,7 +463,7 @@ function sportal_admin_page_edit()
 
 		foreach ($changes as $id => $data)
 		{
-			$db->query('','
+			$db->query('', '
 				UPDATE {db_prefix}sp_blocks
 				SET
 					display = {string:display},
@@ -597,7 +596,7 @@ function sportal_admin_page_delete()
 
 	$page_id = !empty($_REQUEST['page_id']) ? (int) $_REQUEST['page_id'] : 0;
 
-	$db->query('','
+	$db->query('', '
 		DELETE FROM {db_prefix}sp_pages
 		WHERE id_page = {int:id}',
 		array(
