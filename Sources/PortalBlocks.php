@@ -128,7 +128,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 
 function sp_latestMember($parameters, $id, $return_parameters = false)
 {
-	global $context, $scripturl, $txt, $color_profile;
+	global $scripturl, $txt, $color_profile;
 
 	$db = database();
 
@@ -345,7 +345,7 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 
 function sp_topPoster($parameters, $id, $return_parameters = false)
 {
-	global $context, $scripturl, $modSettings, $txt, $color_profile;
+	global $scripturl, $modSettings, $txt, $color_profile;
 
 	$db = database();
 
@@ -481,8 +481,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 
 function sp_topStatsMember($parameters, $id, $return_parameters = false)
 {
-	global $context, $settings, $txt, $scripturl, $user_info, $user_info, $modSettings, $boards, $color_profile;
-	global $themedir;
+	global $context, $settings, $txt, $scripturl, $user_info, $user_info, $modSettings, $color_profile;
 	static $sp_topStatsSystem;
 
 	$db = database();
@@ -986,7 +985,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
 
 function sp_topTopics($parameters, $id, $return_parameters = false)
 {
-	global $txt, $scripturl, $user_info, $user_info, $modSettings, $topics;
+	global $txt, $user_info, $user_info, $topics;
 
 	$block_parameters = array(
 		'type' => 'select',
@@ -1024,7 +1023,7 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
 
 function sp_topBoards($parameters, $id, $return_parameters = false)
 {
-	global $context, $settings, $txt, $scripturl, $user_info, $user_info, $modSettings, $boards;
+	global $txt, $user_info, $user_info, $boards;
 
 	$block_parameters = array(
 		'limit' => 'int',
@@ -1560,7 +1559,7 @@ function sp_attachmentRecent($parameters, $id, $return_parameters = false)
 
 function sp_calendar($parameters, $id, $return_parameters = false)
 {
-	global $context, $modSettings, $options, $scripturl, $txt;
+	global $modSettings, $options, $scripturl, $txt;
 
 	$block_parameters = array(
 		'events' => 'check',
@@ -1704,7 +1703,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 
 function sp_calendarInformation($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $modSettings, $txt;
+	global $scripturl, $txt;
 
 	$block_parameters = array(
 		'events' => 'check',
@@ -2741,7 +2740,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 
 function sp_arcade($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $settings, $txt, $color_profile;
+	global $settings, $txt;
 	static $mod;
 
 	$block_parameters = array(

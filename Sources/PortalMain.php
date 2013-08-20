@@ -48,7 +48,7 @@ function sportal_main()
 
 function sportal_index()
 {
-	global $smcFunc, $context, $scripturl, $txt;
+	global $smcFunc, $context;
 
 	$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC');
 

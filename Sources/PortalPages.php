@@ -32,7 +32,7 @@ function sportal_pages()
 
 function sportal_page()
 {
-	global $context, $scripturl, $txt;
+	global $context, $scripturl;
 
 	$db = database();
 

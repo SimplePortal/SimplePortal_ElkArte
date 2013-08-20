@@ -15,7 +15,7 @@ if (!defined('ELK'))
 
 function sportal_admin_shoutbox_main()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	if (!allowedTo('sp_admin'))
 		isAllowedTo('sp_manage_shoutbox');

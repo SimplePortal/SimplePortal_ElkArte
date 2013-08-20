@@ -15,7 +15,7 @@ if (!defined('ELK'))
 
 function sportal_shoutbox()
 {
-	global $context, $scripturl, $txt, $user_info;
+	global $context, $scripturl, $user_info;
 
 	$db = database();
 

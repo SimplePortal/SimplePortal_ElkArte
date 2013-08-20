@@ -34,5 +34,3 @@ foreach ($hooks as $hook => $functions)
 
 if (ELK == 'SSI')
 	echo 'Integration changes were carried out successfully.';
-
-?>

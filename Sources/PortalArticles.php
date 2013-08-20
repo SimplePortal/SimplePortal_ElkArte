@@ -41,7 +41,7 @@ function sportal_articles()
 
 function sportal_article()
 {
-	global $context, $scripturl, $txt;
+	global $context, $scripturl;
 
 	$db = database();
 

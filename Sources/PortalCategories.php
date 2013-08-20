@@ -32,7 +32,7 @@ function sportal_categories()
 
 function sportal_category()
 {
-	global $context, $scripturl, $txt;
+	global $context, $scripturl;
 
 	loadTemplate('PortalCategories');
 

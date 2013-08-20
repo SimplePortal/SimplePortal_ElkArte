@@ -15,7 +15,7 @@ if (!defined('ELK'))
 
 function sportal_init($standalone = false)
 {
-	global $context, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $modSettings;
 	global $settings, $options, $maintenance, $sportal_version;
 
 	$sportal_version = '2.4';
@@ -264,7 +264,7 @@ function sportal_catch_action()
 // This function, returns all of the information about particular blocks.
 function getBlockInfo($column_id = null, $block_id = null, $state = null, $show = null, $permission = null)
 {
-	global $context, $settings, $options, $txt;
+	global $context, $options, $txt;
 
 	$db = database();
 
@@ -710,7 +710,7 @@ function sp_query_string($tourniquet)
 
 function sp_languageSelect($template_name)
 {
-	global $user_info, $language, $settings, $context;
+	global $user_info, $language, $settings;
 	static $already_loaded = array();
 
 	if (isset($already_loaded[$template_name]))
@@ -899,7 +899,7 @@ function sp_loadColors($users = array())
 function sp_embed_image($name, $alt = '', $width = null, $height = null, $title = true, $id = null)
 {
 	global $modSettings, $settings, $txt;
-	static $default_alt, $randomizer, $randomizer2;
+	static $default_alt, $randomizer;
 
 	if (!isset($default_alt))
 	{
