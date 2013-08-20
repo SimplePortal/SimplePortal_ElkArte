@@ -43,7 +43,7 @@ function sp_integrate_admin_areas(&$admin_areas)
 				'areas' => array(
 					'portalconfig' => array(
 						'label' => $txt['sp-adminConfiguration'],
-						'file' => 'PortalAdminMain.php',
+						'file' => 'ADMINDIR/PortalAdminMain.php',
 						'function' => 'sportal_admin_config_main',
 						'icon' => 'configuration.png',
 						'permission' => array('sp_admin', 'sp_manage_settings'),
@@ -56,7 +56,7 @@ function sp_integrate_admin_areas(&$admin_areas)
 					),
 					'portalblocks' => array(
 						'label' => $txt['sp-blocksBlocks'],
-						'file' => 'PortalAdminBlocks.php',
+						'file' => 'ADMINDIR/PortalAdminBlocks.php',
 						'function' => 'sportal_admin_blocks_main',
 						'icon' => 'blocks.png',
 						'permission' => array('sp_admin', 'sp_manage_blocks'),
@@ -73,7 +73,7 @@ function sp_integrate_admin_areas(&$admin_areas)
 					),
 					'portalarticles' => array(
 						'label' => $txt['sp_admin_articles_title'],
-						'file' => 'PortalAdminArticles.php',
+						'file' => 'ADMINDIR/PortalAdminArticles.php',
 						'function' => 'sportal_admin_articles_main',
 						'icon' => 'articles.png',
 						'permission' => array('sp_admin', 'sp_manage_articles'),
@@ -84,7 +84,7 @@ function sp_integrate_admin_areas(&$admin_areas)
 					),
 					'portalcategories' => array(
 						'label' => $txt['sp_admin_categories_title'],
-						'file' => 'PortalAdminCategories.php',
+						'file' => 'ADMINDIR/PortalAdminCategories.php',
 						'function' => 'sportal_admin_categories_main',
 						'icon' => 'categories.png',
 						'permission' => array('sp_admin', 'sp_manage_articles'),
@@ -95,7 +95,7 @@ function sp_integrate_admin_areas(&$admin_areas)
 					),
 					'portalpages' => array(
 						'label' => $txt['sp_admin_pages_title'],
-						'file' => 'PortalAdminPages.php',
+						'file' => 'ADMINDIR/PortalAdminPages.php',
 						'function' => 'sportal_admin_pages_main',
 						'icon' => 'pages.png',
 						'permission' => array('sp_admin', 'sp_manage_pages'),
@@ -106,7 +106,7 @@ function sp_integrate_admin_areas(&$admin_areas)
 					),
 					'portalshoutbox' => array(
 						'label' => $txt['sp_admin_shoutbox_title'],
-						'file' => 'PortalAdminShoutbox.php',
+						'file' => 'ADMINDIR/PortalAdminShoutbox.php',
 						'function' => 'sportal_admin_shoutbox_main',
 						'icon' => 'shoutbox.png',
 						'permission' => array('sp_admin', 'sp_manage_shoutbox'),

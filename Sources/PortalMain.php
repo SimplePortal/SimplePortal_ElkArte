@@ -68,7 +68,7 @@ function sportal_credits()
 {
 	global $context, $txt;
 
-	require_once(SOURCEDIR . '/PortalAdminMain.php');
+	require_once(ADMINDIR . '/PortalAdminMain.php');
 	loadLanguage('SPortalAdmin', sp_languageSelect('SPortalAdmin'));
 
 	sportal_information(false);

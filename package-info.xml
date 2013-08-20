@@ -20,7 +20,9 @@
 		<readme type="inline">This will install SimplePortal 2.4 for Elkarte.</readme>
 		<modification>modification.xml</modification>
 		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
-		<require-dir name="Sources" destination="BOARDDIR" />
+		<require-dir name="sources" destination="BOARDDIR" />
+		<require-dir name="admin" destination="BOARDDIR" />
+		<require-dir name="subs" destination="BOARDDIR" />
 		<require-dir name="Themes" destination="BOARDDIR" />
 		<database>database.php</database>
 		<hook hook="integrate_theme_include" file="LANGUAGEDIR/SPortal.english.php" />
@@ -42,14 +44,14 @@
 		<remove-file name="SOURCEDIR/PortalMain.php" />
 		<remove-file name="SOURCEDIR/PortalPages.php" />
 		<remove-file name="SOURCEDIR/PortalShoutbox.php" />
-		<remove-file name="SOURCEDIR/PortalAdminArticles.php" />
-		<remove-file name="SOURCEDIR/PortalAdminBlocks.php" />
-		<remove-file name="SOURCEDIR/PortalAdminMain.php" />
-		<remove-file name="SOURCEDIR/PortalAdminPages.php" />
-		<remove-file name="SOURCEDIR/PortalAdminShoutbox.php" />
-		<remove-file name="SOURCEDIR/Subs-Portal.php" />
-		<remove-file name="SOURCEDIR/Subs-PortalIntegration.php" />
-		<remove-file name="SOURCEDIR/Subs-PortalAdmin.php" />
+		<remove-file name="ADMINDIR/PortalAdminArticles.php" />
+		<remove-file name="ADMINDIR/PortalAdminBlocks.php" />
+		<remove-file name="ADMINDIR/PortalAdminMain.php" />
+		<remove-file name="ADMINDIR/PortalAdminPages.php" />
+		<remove-file name="ADMINDIR/PortalAdminShoutbox.php" />
+		<remove-file name="SUBSDIR/Portal.subs.php" />
+		<remove-file name="SUBSDIR/PortalIntegration.subs.php" />
+		<remove-file name="SUBSDIR/PortalAdmin.subs.php" />
 		<remove-file name="$themedir/Portal.template.php" />
 		<remove-file name="$themedir/PortalArticles.template.php" />
 		<remove-file name="$themedir/PortalPages.template.php" />
