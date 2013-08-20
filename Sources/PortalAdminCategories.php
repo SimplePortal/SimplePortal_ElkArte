@@ -5,7 +5,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -372,5 +372,3 @@ function sportal_admin_category_delete()
 
 	redirectexit('action=admin;area=portalcategories');
 }
-
-?>

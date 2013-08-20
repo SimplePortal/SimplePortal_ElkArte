@@ -5,7 +5,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -72,5 +72,3 @@ function sportal_page()
 	$context['page_title'] = $context['SPortal']['page']['title'];
 	$context['sub_template'] = 'view_page';
 }
-
-?>

@@ -5,7 +5,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -331,5 +331,3 @@ function sp_load_membergroups()
 
 	return $groups;
 }
-
-?>

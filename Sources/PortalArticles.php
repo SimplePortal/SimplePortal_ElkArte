@@ -5,7 +5,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -38,5 +38,3 @@ function sportal_articles()
 	$context['page_title'] = $txt['sp-articles'];
 	$context['sub_template'] = 'view_articles';
 }
-
-?>
