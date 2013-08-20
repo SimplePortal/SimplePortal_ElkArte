@@ -5,18 +5,18 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
 
-if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('SMF'))
+if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
 {
 	$_GET['debug'] = 'Blue Dream!';
 	require_once(dirname(__FILE__) . '/SSI.php');
 }
 elseif (!defined('ELK'))
-	die('<b>Error:</b> Cannot install - please verify you put this in the same place as SMF\'s index.php.');
+	die('<b>Error:</b> Cannot install - please verify you put this in the same place as ELK\'s index.php.');
 
 global $context;
 
@@ -32,7 +32,7 @@ foreach ($hooks as $hook => $functions)
 	foreach ($functions as $function)
 		$integration_function($hook, $function);
 
-if (SMF == 'SSI')
+if (ELK == 'SSI')
 	echo 'Integration changes were carried out successfully.';
 
 ?>

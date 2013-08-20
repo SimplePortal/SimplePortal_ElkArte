@@ -5,20 +5,20 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
 
-if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('SMF'))
+if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
 {
 	$_GET['debug'] = 'Blue Dream!';
 	require_once(dirname(__FILE__) . '/SSI.php');
 }
 elseif (!defined('ELK'))
-	die('<b>Error:</b> Cannot install - please verify you put this in the same place as SMF\'s index.php.');
+	die('<b>Error:</b> Cannot install - please verify you put this in the same place as ELK\'s index.php.');
 
-global $smcFunc, $db_prefix, $modSettings, SOURCEDIR, BOARDDIR, $settings, $db_package_log, $package_cache;
+global $smcFunc, $db_prefix, $modSettings, $settings, $db_package_log, $package_cache;
 
 if (!array_key_exists('db_add_column', $smcFunc))
 	db_extend('packages');
@@ -215,7 +215,7 @@ $db->free_result($result);
 if (empty($has_block))
 {
 	$welcome_text = '<h2 style="text-align: center;">Welcome to SimplePortal!</h2>
-<p>SimplePortal is one of several portal mods for Simple Machines Forum (SMF). Although always developing, SimplePortal is produced with the user in mind first. User feedback is the number one method of growth for SimplePortal, and our users are always finding ways for SimplePortal to grow. SimplePortal stays competative with other portal software by adding numerous user-requested features such as articles, block types and the ability to completely customize the portal page.</p>
+<p>SimplePortal is one of several portal mods for Elkarte. Although always developing, SimplePortal is produced with the user in mind first. User feedback is the number one method of growth for SimplePortal, and our users are always finding ways for SimplePortal to grow. SimplePortal stays competative with other portal software by adding numerous user-requested features such as articles, block types and the ability to completely customize the portal page.</p>
 <p>All this and SimplePortal has remained Simple! SimplePortal is built for simplicity and ease of use; ensuring the average forum administrator can install SimplePortal, configure a few settings, and show off the brand new portal to the users in minutes. Confusing menus, undesired pre-loaded blocks and settings that cannot be found are all avoided as much as possible. Because when it comes down to it, SimplePortal is YOUR portal, and should reflect your taste as much as possible.</p>';
 
 	$default_blocks = array(
@@ -315,7 +315,5 @@ elseif (file_exists($standalone_file))
 	}
 }
 
-if (SMF == 'SSI')
+if (ELK == 'SSI')
 	echo 'Database changes were carried out successfully.';
-
-?>

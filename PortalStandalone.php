@@ -5,7 +5,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -20,7 +20,7 @@ if (!file_exists($forum_dir . '/index.php'))
 
 $data = substr(file_get_contents($forum_dir . '/index.php'), 0, 4096);
 if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $data, $match))
-	$forum_version = 'SMF ' . $match[1];
+	$forum_version = 'ElkArte ' . $match[1];
 
 require_once($forum_dir . '/SSI.php');
 require_once(SOURCEDIR . '/PortalMain.php');

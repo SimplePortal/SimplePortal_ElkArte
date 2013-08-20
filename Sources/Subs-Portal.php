@@ -62,7 +62,7 @@ function sportal_init($standalone = false)
 	{
 		require_once(SOURCEDIR . '/PortalBlocks.php');
 
-		if (SMF != 'SSI')
+		if (ELK != 'SSI')
 			require_once(BOARDDIR . '/SSI.php');
 
 		loadTemplate('Portal');
@@ -186,10 +186,10 @@ function sportal_init_headers()
 			document.cookie = "sp_block_" + id + "=" + (mode ? 0 : 1);';
 	else
 		$context['html_headers'] .= '
-			smf_setThemeOption("sp_block_" + id, mode ? 0 : 1, null, "' . $context['session_id'] . '", "' . $context['session_var'] . '");';
+			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null, "' . $context['session_id'] . '", "' . $context['session_var'] . '");';
 
 	$context['html_headers'] .= '
-			document.getElementById("sp_collapse_" + id).src = smf_images_url + (mode ? "/collapse.gif" : "/expand.gif");
+			document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/collapse.gif" : "/expand.gif");
 			document.getElementById("sp_block_" + id).style.display = mode ? "" : "none";
 		}';
 
@@ -203,7 +203,7 @@ function sportal_init_headers()
 			sp_sides[4] = "sp_right";
 			mode = document.getElementById(sp_sides[id]).style.display == "" ? 0 : 1;' . ($context['user']['is_guest'] ? '
 			document.cookie = sp_sides[id] + "=" + (mode ? 0 : 1);' : '
-			smf_setThemeOption(sp_sides[id], mode ? 0 : 1, null, "' . $context['session_id'] . '");') . '
+			elk_setThemeOption(sp_sides[id], mode ? 0 : 1, null, "' . $context['session_id'] . '");') . '
 			document.getElementById("sp_collapse_side" + id).src = sp_images_url + (mode ? "/collapse.png" : "/expand.png");
 			document.getElementById(sp_sides[id]).style.display = mode ? "" : "none";' . ($context['browser']['is_ie8'] ? '
 			document.getElementById("sp_center").style.width = "100%";' : '') . '
@@ -377,7 +377,7 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 	$board = !empty($context['current_board']) ? 'b' . $context['current_board'] : '';
 	$topic = !empty($context['current_topic']) ? 't' . $context['current_topic'] : '';
 	$page = !empty($page_info['id']) ? 'p' . $page_info['id'] : '';
-	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && SMF != 'SSI' && $modSettings['sp_portal_mode'] == 1) || !empty($context['standalone']) ? true : false;
+	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && ELK != 'SSI' && $modSettings['sp_portal_mode'] == 1) || !empty($context['standalone']) ? true : false;
 
 	// Will hopefully get larger in the future.
 	$portal_actions = array(
@@ -677,7 +677,7 @@ function sp_query_string($tourniquet)
 
 	$fix = str_replace('{version}', $sportal_version, '<a href="http://www.simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-2012, SimplePortal</a>');
 
-	if ((SMF == 'SSI' && empty($context['standalone'])) || empty($context['template_layers']) || WIRELESS || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
+	if ((ELK == 'SSI' && empty($context['standalone'])) || empty($context['template_layers']) || WIRELESS || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
 		return $tourniquet;
 
 	$finds = array(

@@ -423,7 +423,7 @@ function sportal_admin_block_edit()
 		function sp_collapseObject(id)
 		{
 			mode = document.getElementById("sp_object_" + id).style.display == "" ? 0 : 1;
-			document.getElementById("sp_collapse_" + id).src = smf_images_url + (mode ? "/collapse.gif" : "/expand.gif");
+			document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/collapse.gif" : "/expand.gif");
 			document.getElementById("sp_object_" + id).style.display = mode ? "" : "none";
 		}
 	// ]]></script>';
@@ -494,7 +494,7 @@ function sportal_admin_block_edit()
 
 		$context['SPortal']['block']['style'] = sportal_parse_style('explode', $context['SPortal']['block']['style'], !empty($context['SPortal']['preview']));
 
-		// Prepare the Textcontent for BBC, only the first bbc will be correct detected! (SMF Support only 1 per page with the standard function)
+		// Prepare the Textcontent for BBC, only the first bbc will be correct detected!
 		$firstBBCFound = false;
 		foreach ($context['SPortal']['block']['options'] as $name => $type)
 		{
@@ -531,14 +531,14 @@ function sportal_admin_block_edit()
 					);
 				}
 			}
-			// Prepare the Textcontent for BBC, only the first bbc will be correct detected! (SMF Support only 1 per page with the standard function)
+			// Prepare the Textcontent for BBC, only the first bbc will be correct detected!
 			elseif ($type == 'bbc')
 			{
-				// SMF support only one bbc correct, multiple bbc do not work at the moment
+				// ELK support only one bbc correct, multiple bbc do not work at the moment
 				if (!$firstBBCFound)
 				{
 					$firstBBCFound = true;
-					// Start SMF BBC Sytem :)
+					// Start Elk BBC Sytem :)
 					require_once(SOURCEDIR . '/Subs-Editor.php');
 					// Prepare the output :D
 					$form_message = !empty($context['SPortal']['block']['parameters'][$name]) ? $context['SPortal']['block']['parameters'][$name] : '';
@@ -567,7 +567,7 @@ function sportal_admin_block_edit()
 						'form' => 'sp_block',
 					);
 
-					// Run the SMF bbc editor rutine
+					// Run the ELK bbc editor rutine
 					create_control_richedit($message_data);
 
 					// Store the updated data on the parameters
@@ -676,7 +676,7 @@ function sportal_admin_block_edit()
 			{
 				if (isset($_POST['parameters'][$name]))
 				{
-					// Prepare BBC Content for SMF 2 special case =D
+					// Prepare BBC Content for ELK 2 special case =D
 					if ($type == 'bbc')
 					{
 						$parameter['value'] = $_POST['parameters'][$name];

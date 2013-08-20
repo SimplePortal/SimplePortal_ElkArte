@@ -5,7 +5,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -121,7 +121,7 @@ function template_shoutbox_embed($shoutbox)
 		foreach ($shoutbox['smileys']['normal'] as $smiley)
 			echo '
 				<a href="javascript:void(0);" onclick="replaceText(\' ', $smiley['code'], '\', document.getElementById(\'new_shout_', $shoutbox['id'], '\')); return false;"><img src="', $settings['smileys_url'], '/', $smiley['filename'], '" alt="', $smiley['description'], '" title="', $smiley['description'], '" /></a>';
-			
+
 			if (!empty($shoutbox['smileys']['popup']))
 				echo '
 					<a onclick="sp_showMoreSmileys(\'', $shoutbox['id'], '\', \'', $txt['more_smileys_title'], '\', \'', $txt['more_smileys_pick'], '\', \'', $txt['more_smileys_close_window'], '\', \'', $settings['theme_url'], '\', \'', $settings['smileys_url'], '\'); return false;" href="javascript:void(0);">[', $txt['more_smileys'], ']</a>';
@@ -185,7 +185,7 @@ function template_shoutbox_embed($shoutbox)
 	if ($shoutbox['reverse'])
 		echo '
 		var objDiv = document.getElementById("shouts_', $shoutbox['id'], '");
-		objDiv.scrollTop = objDiv.scrollHeight;'; 
+		objDiv.scrollTop = objDiv.scrollHeight;';
 
 	if (!empty($shoutbox['refresh']))
 		echo '
@@ -214,7 +214,7 @@ function template_shoutbox_embed($shoutbox)
 				echo ',';
 		}
 		echo ']';
-		
+
 		echo '
 		if (sp_moreSmileysTemplate == undefined)
 		{
@@ -252,7 +252,7 @@ function template_shoutbox_xml()
 	global $context, $txt;
 
 	echo '<', '?xml version="1.0" encoding="', $context['character_set'], '"?', '>
-<smf>
+<elk>
 	<shoutbox>', $context['SPortal']['shoutbox']['id'], '</shoutbox>';
 
 	if ($context['SPortal']['updated'])
@@ -280,7 +280,7 @@ function template_shoutbox_xml()
 	<updated>0</updated>';
 
 	echo '
-</smf>';
+</elk>';
 }
 
 ?>
