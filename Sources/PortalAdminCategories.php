@@ -15,12 +15,12 @@ if (!defined('ELK'))
 
 function sportal_admin_categories_main()
 {
-	global $context, $sourcedir, $txt;
+	global $context, $txt;
 
 	if (!allowedTo('sp_admin'))
 		isAllowedTo('sp_manage_articles');
 
-	require_once($sourcedir . '/Subs-PortalAdmin.php');
+	require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
 
 	loadTemplate('PortalAdminCategories');
 
@@ -191,7 +191,7 @@ function sportal_admin_category_list()
 
 function sportal_admin_category_edit()
 {
-	global $smcFunc, $context, $sourcedir, $modSettings, $options, $txt;
+	global $smcFunc, $context, $modSettings, $options, $txt;
 
 	$context['is_new'] = empty($_REQUEST['category_id']);
 

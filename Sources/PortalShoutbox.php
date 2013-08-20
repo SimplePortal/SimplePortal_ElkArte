@@ -15,7 +15,7 @@ if (!defined('ELK'))
 
 function sportal_shoutbox()
 {
-	global $smcFunc, $context, $scripturl, $txt, $sourcedir, $user_info;
+	global $smcFunc, $context, $scripturl, $txt, $user_info;
 
 	$shoutbox_id = !empty($_REQUEST['shoutbox_id']) ? (int) $_REQUEST['shoutbox_id'] : 0;
 	$request_time = !empty($_REQUEST['time']) ? (int) $_REQUEST['time'] : 0;
@@ -39,7 +39,7 @@ function sportal_shoutbox()
 
 		if (!($flood = sp_prevent_flood('spsbp', false)))
 		{
-			require_once($sourcedir . '/Subs-Post.php');
+			require_once(SOURCEDIR . '/Subs-Post.php');
 
 			$_REQUEST['shout'] = $smcFunc['htmlspecialchars'](trim($_REQUEST['shout']));
 			preparsecode($_REQUEST['shout']);

@@ -15,13 +15,13 @@ if (!defined('ELK'))
 
 function sportal_admin_config_main()
 {
-	global $sourcedir, $context, $txt;
+	global $context, $txt;
 
 	if (!allowedTo('sp_admin'))
 		isAllowedTo('sp_manage_settings');
 
-	require_once($sourcedir . '/Subs-PortalAdmin.php');
-	require_once($sourcedir . '/ManageServer.php');
+	require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
+	require_once(SOURCEDIR . '/ManageServer.php');
 
 	loadTemplate('PortalAdmin');
 
@@ -199,7 +199,7 @@ function sportal_admin_article_settings($return_config = '')
 
 function sportal_information($in_admin = true)
 {
-	global $context, $scripturl, $txt, $sourcedir, $sportal_version, $user_profile;
+	global $context, $scripturl, $txt, $sportal_version, $user_profile;
 
 	$context['sp_credits'] = array(
 		array(
@@ -305,7 +305,7 @@ function sportal_information($in_admin = true)
 		$context['sp_version'] = $sportal_version;
 		$context['sp_managers'] = array();
 
-		require_once($sourcedir . '/Subs-Members.php');
+		require_once(SOURCEDIR . '/Subs-Members.php');
 		$manager_ids = loadMemberData(membersAllowedTo('sp_admin'), false, 'minimal');
 
 		if ($manager_ids)

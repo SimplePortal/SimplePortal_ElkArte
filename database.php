@@ -18,7 +18,7 @@ if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('SMF'))
 elseif (!defined('ELK'))
 	die('<b>Error:</b> Cannot install - please verify you put this in the same place as SMF\'s index.php.');
 
-global $smcFunc, $db_prefix, $modSettings, $sourcedir, $boarddir, $settings, $db_package_log, $package_cache;
+global $smcFunc, $db_prefix, $modSettings, SOURCEDIR, $boarddir, $settings, $db_package_log, $package_cache;
 
 if (!array_key_exists('db_add_column', $smcFunc))
 	db_extend('packages');

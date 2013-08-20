@@ -15,12 +15,12 @@ if (!defined('ELK'))
 
 function sportal_admin_pages_main()
 {
-	global $context, $txt, $scripturl, $sourcedir;
+	global $context, $txt, $scripturl;
 
 	if (!allowedTo('sp_admin'))
 		isAllowedTo('sp_manage_pages');
 
-	require_once($sourcedir . '/Subs-PortalAdmin.php');
+	require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
 
 	loadTemplate('PortalAdminPages');
 
@@ -194,10 +194,10 @@ function sportal_admin_page_list()
 
 function sportal_admin_page_edit()
 {
-	global $txt, $context, $modSettings, $smcFunc, $sourcedir, $options;
+	global $txt, $context, $modSettings, $smcFunc, $options;
 
-	require_once($sourcedir . '/Subs-Editor.php');
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once(SOURCEDIR . '/Subs-Editor.php');
+	require_once(SOURCEDIR . '/Subs-Post.php');
 
 	$context['SPortal']['is_new'] = empty($_REQUEST['page_id']);
 

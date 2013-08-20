@@ -15,12 +15,12 @@ if (!defined('ELK'))
 
 function sportal_admin_articles_main()
 {
-	global $context, $sourcedir, $txt;
+	global $context, $txt;
 
 	if (!allowedTo('sp_admin'))
 		isAllowedTo('sp_manage_articles');
 
-	require_once($sourcedir . '/Subs-PortalAdmin.php');
+	require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
 
 	loadTemplate('PortalAdminArticles');
 
@@ -229,10 +229,10 @@ function sportal_admin_article_list()
 
 function sportal_admin_article_edit()
 {
-	global $smcFunc, $context, $sourcedir, $modSettings, $user_info, $options, $txt;
+	global $smcFunc, $context, $modSettings, $user_info, $options, $txt;
 
-	require_once($sourcedir . '/Subs-Editor.php');
-	require_once($sourcedir . '/Subs-Post.php');
+	require_once(SOURCEDIR . '/Subs-Editor.php');
+	require_once(SOURCEDIR . '/Subs-Post.php');
 
 	$context['is_new'] = empty($_REQUEST['article_id']);
 

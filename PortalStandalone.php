@@ -23,7 +23,7 @@ if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $data, $match))
 	$forum_version = 'SMF ' . $match[1];
 
 require_once($forum_dir . '/SSI.php');
-require_once($sourcedir . '/PortalMain.php');
+require_once(SOURCEDIR . '/PortalMain.php');
 
 if (WIRELESS)
 	redirectexit();

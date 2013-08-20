@@ -15,7 +15,7 @@ if (!defined('ELK'))
 
 function sportal_init($standalone = false)
 {
-	global $context, $sourcedir, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $modSettings, $txt;
 	global $settings, $options, $boarddir, $maintenance, $sportal_version;
 
 	$sportal_version = '2.4';
@@ -60,7 +60,7 @@ function sportal_init($standalone = false)
 
 	if (!$standalone)
 	{
-		require_once($sourcedir . '/PortalBlocks.php');
+		require_once(SOURCEDIR . '/PortalBlocks.php');
 
 		if (SMF != 'SSI')
 			require_once($boarddir . '/SSI.php');
@@ -229,7 +229,7 @@ function sportal_init_headers()
 
 function sportal_catch_action()
 {
-	global $sourcedir, $modSettings, $board, $topic, $context;
+	global $modSettings, $board, $topic, $context;
 
 	if (isset($_GET['about:sinan']))
 		return 'BookOfSinan';
@@ -238,12 +238,12 @@ function sportal_catch_action()
 	{
 		if (empty($board) && empty($topic) && empty($_GET['page']) && $modSettings['sp_portal_mode'] == 1)
 		{
-			require_once($sourcedir . '/PortalMain.php');
+			require_once(SOURCEDIR . '/PortalMain.php');
 			return 'sportal_main';
 		}
 		elseif (empty($board) && empty($topic) && !empty($_GET['page']))
 		{
-			require_once($sourcedir . '/PortalPages.php');
+			require_once(SOURCEDIR . '/PortalPages.php');
 			return 'sportal_page';
 		}
 	}
@@ -696,7 +696,6 @@ This will help to make it possible to load each time the english language!
 function sp_languageSelect($template_name)
 {
 	global $user_info, $language, $settings, $context;
-	global $sourcedir;
 	static $already_loaded = array();
 
 	if(isset($already_loaded[$template_name]))
@@ -707,7 +706,7 @@ function sp_languageSelect($template_name)
 	// Make sure we have $settings - if not we're in trouble and need to find it!
 	if (empty($settings['default_theme_dir']))
 	{
-		require_once($sourcedir . '/ScheduledTasks.php');
+		require_once(SOURCEDIR . '/ScheduledTasks.php');
 		loadEssentialThemeData();
 	}
 
@@ -759,12 +758,11 @@ function sp_languageSelect($template_name)
 
 function sp_loadCalendarData($type, $low_date, $high_date = false)
 {
-	global $sourcedir;
 	static $loaded;
 
 	if(!isset($loaded))
 	{
-		require_once($sourcedir . '/Subs-Calendar.php');
+		require_once(SOURCEDIR . '/Subs-Calendar.php');
 
 		$loaded = array(
 			'getEvents' => 'getEventRange',

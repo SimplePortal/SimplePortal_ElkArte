@@ -21,7 +21,7 @@ elseif (!defined('ELK'))
 global $context;
 
 $hooks = array(
-	'integrate_pre_include' => array('$sourcedir/Subs-PortalIntegration.php', '$sourcedir/Subs-Portal.php'),
+	'integrate_pre_include' => array('SOURCEDIR/Subs-PortalIntegration.php', 'SOURCEDIR/Subs-Portal.php'),
 	'integrate_load_theme' => array('sportal_init'),
 	'integrate_actions' => array('sp_integrate_actions'),
 	'integrate_admin_areas' => array('sp_integrate_admin_areas'),

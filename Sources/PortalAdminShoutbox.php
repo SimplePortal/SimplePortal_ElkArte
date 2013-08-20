@@ -15,12 +15,12 @@ if (!defined('ELK'))
 
 function sportal_admin_shoutbox_main()
 {
-	global $context, $txt, $scripturl, $sourcedir;
+	global $context, $txt, $scripturl;
 
 	if (!allowedTo('sp_admin'))
 		isAllowedTo('sp_manage_shoutbox');
 
-	require_once($sourcedir . '/Subs-PortalAdmin.php');
+	require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
 
 	loadTemplate('PortalAdminShoutbox');
 

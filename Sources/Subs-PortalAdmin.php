@@ -157,7 +157,7 @@ function changeState($type = null, $id = null)
 
 function sp_validate_php($code)
 {
-	global $boardurl, $boarddir, $sourcedir, $modSettings;
+	global $boardurl, $boarddir, $modSettings;
 
 	$id = time();
 	$token = md5(mt_rand() . session_id() . (string) microtime() . $modSettings['rand_seed']);
@@ -170,7 +170,7 @@ function sp_validate_php($code)
 	if (substr($code, -2) == '?>')
 		$code = substr($code, 0, -2);
 
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once(SOURCEDIR . '/Subs-Package.php');
 
 	$content = '<?php
 

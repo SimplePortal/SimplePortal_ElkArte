@@ -15,7 +15,7 @@ if (!defined('ELK'))
 
 function sportal_main()
 {
-	global $smcFunc, $context, $sourcedir;
+	global $smcFunc, $context;
 
 	if (WIRELESS)
 		redirectexit('action=forum');
@@ -40,16 +40,16 @@ function sportal_main()
 		$_REQUEST['sa'] = 'articles';
 
 	if (!empty($actions[$_REQUEST['sa']][0]))
-		require_once($sourcedir . '/' . $actions[$_REQUEST['sa']][0]);
+		require_once(SOURCEDIR . '/' . $actions[$_REQUEST['sa']][0]);
 
 	$actions[$_REQUEST['sa']][1]();
 }
 
 function sportal_credits()
 {
-	global $sourcedir, $context, $txt;
+	global $context, $txt;
 
-	require_once($sourcedir . '/PortalAdminMain.php');
+	require_once(SOURCEDIR . '/PortalAdminMain.php');
 	loadLanguage('SPortalAdmin', sp_languageSelect('SPortalAdmin'));
 
 	sportal_information(false);

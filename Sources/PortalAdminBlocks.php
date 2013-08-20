@@ -15,12 +15,12 @@ if (!defined('ELK'))
 
 function sportal_admin_blocks_main()
 {
-	global $context, $txt, $scripturl, $sourcedir;
+	global $context, $txt, $scripturl;
 
 	if (!allowedTo('sp_admin'))
 		isAllowedTo('sp_manage_blocks');
 
-	require_once($sourcedir . '/Subs-PortalAdmin.php');
+	require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
 
 	loadTemplate('PortalAdminBlocks');
 
@@ -188,10 +188,10 @@ function sportal_admin_block_list()
 // Adding or editing a block.
 function sportal_admin_block_edit()
 {
-	global $txt, $context, $modSettings, $smcFunc, $sourcedir, $boarddir, $boards;
+	global $txt, $context, $modSettings, $smcFunc, $boarddir, $boards;
 
 	// Just in case, the admin could be doing something silly like editing a SP block while SP it disabled. ;)
-	require_once($sourcedir . '/PortalBlocks.php');
+	require_once(SOURCEDIR . '/PortalBlocks.php');
 
 	$context['SPortal']['is_new'] = empty($_REQUEST['block_id']);
 
@@ -202,7 +202,7 @@ function sportal_admin_block_edit()
 		// If we came from WYSIWYG then turn it back into BBC regardless.
 		if (!empty($_REQUEST['bbc_' . $_POST['bbc_name'] . '_mode']) && isset($_POST['parameters'][$_POST['bbc_name']]))
 		{
-			require_once($sourcedir . '/Subs-Editor.php');
+			require_once(SOURCEDIR . '/Subs-Editor.php');
 			$_POST['parameters'][$_POST['bbc_name']] = html_to_bbc($_POST['parameters'][$_POST['bbc_name']]);
 			// We need to unhtml it now as it gets done shortly.
 			$_POST['parameters'][$_POST['bbc_name']] = un_htmlspecialchars($_POST['parameters'][$_POST['bbc_name']]);
@@ -287,7 +287,7 @@ function sportal_admin_block_edit()
 					if ($type == 'bbc')
 					{
 						$parameter['value'] = $_POST['parameters'][$name];
-						require_once($sourcedir . '/Subs-Post.php');
+						require_once(SOURCEDIR . '/Subs-Post.php');
 
 						$parameter['value'] = $smcFunc['htmlspecialchars']($parameter['value'], ENT_QUOTES);
 						preparsecode($parameter['value']);
@@ -501,7 +501,7 @@ function sportal_admin_block_edit()
 			{
 				if (empty($boards))
 				{
-					require_once($sourcedir.'/Subs-Boards.php');
+					require_once(SOURCEDIR.'/Subs-Boards.php');
 					getBoardTree();
 				}
 
@@ -537,7 +537,7 @@ function sportal_admin_block_edit()
 				{
 					$firstBBCFound = true;
 				 // Start SMF BBC Sytem :)
-					require_once($sourcedir . '/Subs-Editor.php');
+					require_once(SOURCEDIR . '/Subs-Editor.php');
 					// Prepare the output :D
 					$form_message = !empty($context['SPortal']['block']['parameters'][$name]) ? $context['SPortal']['block']['parameters'][$name] : '';
 					// But if it's in HTML world, turn them into htmlspecialchar's so they can be edited!
@@ -678,7 +678,7 @@ function sportal_admin_block_edit()
 					if ($type == 'bbc')
 					{
 						$parameter['value'] = $_POST['parameters'][$name];
-						require_once($sourcedir . '/Subs-Post.php');
+						require_once(SOURCEDIR . '/Subs-Post.php');
 						// Prepare the message a bit for some additional testing.
 						$parameter['value'] = $smcFunc['htmlspecialchars']($parameter['value'], ENT_QUOTES);
 						preparsecode($parameter['value']);

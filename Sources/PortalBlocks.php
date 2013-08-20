@@ -196,7 +196,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 
 function sp_whosOnline($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $sourcedir, $modSettings, $txt;
+	global $scripturl, $modSettings, $txt;
 
 	$block_parameters = array(
 		'online_today' => 'check'
@@ -245,9 +245,9 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 								<div class="sp_fullwidth sp_center">', $txt['error_sp_no_online'], '</div>';
 	}
 
-	if ($online_today && file_exists($sourcedir . '/Subs-MembersOnlineToday.php'))
+	if ($online_today && file_exists(SOURCEDIR . '/Subs-MembersOnlineToday.php'))
 	{
-		require_once($sourcedir . '/Subs-MembersOnlineToday.php');
+		require_once(SOURCEDIR . '/Subs-MembersOnlineToday.php');
 
 		$membersOnlineTodayOptions = array(
 			'sort' => 'login_time',
@@ -476,7 +476,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 function sp_topStatsMember($parameters, $id, $return_parameters = false)
 {
 	global $context, $settings, $txt, $scripturl, $user_info, $user_info, $modSettings, $boards, $color_profile;
-	global $smcFunc, $sourcedir, $boarddir, $themedir;
+	global $smcFunc, $boarddir, $themedir;
 	static $sp_topStatsSystem;
 
 	$block_parameters = array(
@@ -604,7 +604,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 				'field' => 'mem.thank_you_post_made, mem.thank_you_post_became',
 				'order' => 'mem.thank_you_post_made',
 				'output_text' => '%thank_you_post_made% ' . (!empty($txt['thank_you_post_made_display']) ? $txt['thank_you_post_thx_display'] . ' ' . $txt['thank_you_post_made_display'] : ''),
-				'enabled' => file_exists($sourcedir . '/ThankYouPost.php'),
+				'enabled' => file_exists(SOURCEDIR . '/ThankYouPost.php'),
 				'error_msg' => $txt['sp_thankomatic_no_exist'],
 			),
 			'6' => array(
@@ -613,7 +613,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 				'field' => 'mem.thank_you_post_made, mem.thank_you_post_became',
 				'order' => 'mem.thank_you_post_became',
 				'output_text' => '%thank_you_post_became% ' . (!empty($txt['thank_you_post_became_display']) ? $txt['thank_you_post_thx_display'] . ' ' . $txt['thank_you_post_became_display'] : ''),
-				'enabled' => file_exists($sourcedir . '/ThankYouPost.php'),
+				'enabled' => file_exists(SOURCEDIR . '/ThankYouPost.php'),
 				'error_msg' => $txt['sp_thankomatic_no_exist'],
 			),
 			'10' => array(
@@ -677,7 +677,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 				'field' => 'mem.cash, mem.purchHis, mem.tradeHis',
 				'order' => 'mem.cash',
 				'output_text' => (!empty($modSettings['shopprefix']) ? $modSettings['shopprefix'] : '') . '%cash%' . (!empty($modSettings['shopsurfix']) ? $modSettings['shopsurfix'] : ''),
-				'enabled' => file_exists($sourcedir . 'shop2/Shop.php'),
+				'enabled' => file_exists(SOURCEDIR . 'shop2/Shop.php'),
 				'error_msg' => $txt['sp_sashop_no_exist'],
 			),
 			'sa_shop_trades' => array(
@@ -686,7 +686,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 				'field' => 'mem.cash, mem.purchHis, mem.tradeHis',
 				'order' => 'mem.tradeHis',
 				'output_text' => '%tradeHis%',
-				'enabled' => file_exists($sourcedir . 'shop2/Shop.php') && !empty($modSettings['shop_Enable_Stats']),
+				'enabled' => file_exists(SOURCEDIR . 'shop2/Shop.php') && !empty($modSettings['shop_Enable_Stats']),
 				'error_msg' => $txt['sp_sashop_no_exist'],
 			),
 			'sa_shop_purchase' => array(
@@ -695,7 +695,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 				'field' => 'mem.cash, mem.purchHis, mem.tradeHis',
 				'order' => 'mem.purchHis',
 				'output_text' => '%purchHis%',
-				'enabled' => file_exists($sourcedir . 'shop2/Shop.php') && !empty($modSettings['shop_Enable_Stats']),
+				'enabled' => file_exists(SOURCEDIR . 'shop2/Shop.php') && !empty($modSettings['shop_Enable_Stats']),
 				'error_msg' => $txt['sp_sashop_no_exist'],
 			),
 			'casino' => array(
@@ -704,7 +704,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 				'field' => 'mem.cash',
 				'order' => 'mem.cash',
 				'output_text' => '%cash%',
-				'enabled' => file_exists($sourcedir . 'casino/Casino.php'),
+				'enabled' => file_exists(SOURCEDIR . 'casino/Casino.php'),
 				'error_msg' => $txt['sp_sashop_no_exist'],
 			),
 		);
@@ -1548,7 +1548,7 @@ function sp_attachmentRecent($parameters, $id, $return_parameters = false)
 
 function sp_calendar($parameters, $id, $return_parameters = false)
 {
-	global $context, $sourcedir, $modSettings, $options, $scripturl, $txt;
+	global $context, $modSettings, $options, $scripturl, $txt;
 
 	$block_parameters = array(
 		'events' => 'check',
@@ -1559,7 +1559,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $block_parameters;
 
-	require_once($sourcedir . '/Subs-Calendar.php');
+	require_once(SOURCEDIR . '/Subs-Calendar.php');
 	$today = getTodayInfo();
 
 	$curPage = array(
@@ -1839,7 +1839,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 
 function sp_rssFeed($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $sourcedir, $context, $txt;
+	global $smcFunc, $context, $txt;
 
 	$block_parameters = array(
 		'url' => 'text',
@@ -1872,7 +1872,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 
 	$rss = array();
 
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once(SOURCEDIR . '/Subs-Package.php');
 	$data = fetch_web_data($feed);
 
 	if (function_exists('mb_convert_encoding'))
@@ -2119,7 +2119,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 
 function sp_staff($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $sourcedir, $scripturl, $modSettings, $color_profile;
+	global $smcFunc, $scripturl, $modSettings, $color_profile;
 
 	$block_parameters = array(
 		'lmod' => 'check',
@@ -2128,7 +2128,7 @@ function sp_staff($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $block_parameters;
 
-	require_once($sourcedir . '/Subs-Members.php');
+	require_once(SOURCEDIR . '/Subs-Members.php');
 
 	if (empty($parameters['lmod']))
 	{
@@ -2243,7 +2243,7 @@ function sp_staff($parameters, $id, $return_parameters = false)
 
 function sp_articles($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $sourcedir, $modSettings, $scripturl, $txt, $color_profile;
+	global $smcFunc, $modSettings, $scripturl, $txt, $color_profile;
 
 	$block_parameters = array(
 		'category' => array(0 => $txt['sp_all']),
@@ -2254,7 +2254,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 
 	if ($return_parameters)
 	{
-		require_once($sourcedir . '/Subs-PortalAdmin.php');
+		require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
 
 		$categories = getCategoryInfo();
 		foreach ($categories as $category)
@@ -2393,7 +2393,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 
 function sp_shoutbox($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $context, $sourcedir, $modSettings, $user_info, $settings, $txt, $scripturl;
+	global $smcFunc, $context, $modSettings, $user_info, $settings, $txt, $scripturl;
 
 	$block_parameters = array(
 		'shoutbox' => array(),
@@ -2447,7 +2447,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 
 		if (!($flood = sp_prevent_flood('spsbp', false)))
 		{
-			require_once($sourcedir . '/Subs-Post.php');
+			require_once(SOURCEDIR . '/Subs-Post.php');
 
 			$_POST['new_shout'] = $smcFunc['htmlspecialchars'](trim($_POST['new_shout']));
 			preparsecode($_POST['new_shout']);
@@ -2566,7 +2566,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 function sp_gallery($parameters, $id, $return_parameters = false)
 {
 	global $smcFunc, $context, $modSettings, $scripturl;
-	global $sourcedir, $txt, $settings, $boardurl, $galurl;
+	global $txt, $settings, $boardurl, $galurl;
 	static $mod, $GD_Installed;
 
 	$block_parameters = array(
@@ -2584,11 +2584,11 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 
 	if (!isset($mod))
 	{
-		if (file_exists($sourcedir . '/Aeva-Media.php'))
+		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
 			$mod = 'aeva_media';
-		elseif (file_exists($sourcedir . '/MGallery.php'))
+		elseif (file_exists(SOURCEDIR . '/MGallery.php'))
 			$mod = 'smf_media_gallery';
-		elseif (file_exists($sourcedir . '/Gallery.php') || file_exists($sourcedir . '/Gallery2.php'))
+		elseif (file_exists(SOURCEDIR . '/Gallery.php') || file_exists(SOURCEDIR . '/Gallery2.php'))
 			$mod = 'smf_gallery';
 		else
 			$mod = '';
@@ -2602,13 +2602,13 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 	}
 	elseif ($mod == 'aeva_media')
 	{
-		require_once($sourcedir . '/Aeva-Subs.php');
+		require_once(SOURCEDIR . '/Aeva-Subs.php');
 
 		$items = aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC');
 	}
 	elseif ($mod == 'smf_media_gallery')
 	{
-		require_once($sourcedir . '/Subs-MGallery.php');
+		require_once(SOURCEDIR . '/Subs-MGallery.php');
 
 		loadMGal_Settings();
 		loadLanguage('MGallery', sp_languageSelect('MGallery'));
@@ -2719,7 +2719,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 
 function sp_arcade($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $sourcedir, $scripturl, $settings, $txt, $color_profile;
+	global $smcFunc, $scripturl, $settings, $txt, $color_profile;
 	static $mod;
 
 	$block_parameters = array(
@@ -2735,7 +2735,7 @@ function sp_arcade($parameters, $id, $return_parameters = false)
 
 	if (!isset($mod))
 	{
-		if (file_exists($sourcedir . '/Arcade.php'))
+		if (file_exists(SOURCEDIR . '/Arcade.php'))
 			$mod = 'smf_arcade';
 		else
 			$mod = '';
@@ -2749,8 +2749,8 @@ function sp_arcade($parameters, $id, $return_parameters = false)
 	}
 	elseif ($mod == 'smf_arcade')
 	{
-		require_once($sourcedir . '/ArcadeStats.php');
-		require_once($sourcedir . '/Subs-Arcade.php');
+		require_once(SOURCEDIR . '/ArcadeStats.php');
+		require_once(SOURCEDIR . '/Subs-Arcade.php');
 		loadLanguage('Arcade');
 
 		if (empty($type))
@@ -2811,7 +2811,7 @@ function sp_arcade($parameters, $id, $return_parameters = false)
 
 function sp_shop($parameters, $id, $return_parameters = false)
 {
-	global $smcFunc, $sourcedir, $scripturl, $txt, $color_profile;
+	global $smcFunc, $scripturl, $txt, $color_profile;
 	global $context, $boardurl, $modSettings;
 	static $mod;
 
@@ -2832,7 +2832,7 @@ function sp_shop($parameters, $id, $return_parameters = false)
 
 	if (!isset($mod))
 	{
-		if (file_exists($sourcedir . '/shop'))
+		if (file_exists(SOURCEDIR . '/shop'))
 			$mod = 'smf_shop';
 		else
 			$mod = '';
@@ -2846,7 +2846,7 @@ function sp_shop($parameters, $id, $return_parameters = false)
 	}
 	elseif ($mod == 'smf_shop')
 	{
-		require_once($sourcedir . '/shop/Shop-Subs.php');
+		require_once(SOURCEDIR . '/shop/Shop-Subs.php');
 		loadLanguage('Shop');
 
 		if (empty($style))
@@ -2967,7 +2967,7 @@ function sp_shop($parameters, $id, $return_parameters = false)
 function sp_blog($parameters, $id, $return_parameters = false)
 {
 	global $smcFunc, $scripturl, $user_info, $modSettings;
-	global $context, $boarddir, $sourcedir, $txt, $color_profile;
+	global $context, $boarddir, $txt, $color_profile;
 	static $mod;
 
 	$block_parameters = array(
@@ -2987,7 +2987,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 	{
 		if (file_exists($boarddir . '/zCommunity'))
 			$mod = 'zcommunity';
-		elseif (file_exists($sourcedir . '/Blog.php'))
+		elseif (file_exists(SOURCEDIR . '/Blog.php'))
 			$mod = 'smfblog';
 		else
 			$mod = '';
