@@ -482,7 +482,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 function sp_topStatsMember($parameters, $id, $return_parameters = false)
 {
 	global $context, $settings, $txt, $scripturl, $user_info, $user_info, $modSettings, $boards, $color_profile;
-	global $boarddir, $themedir;
+	global $themedir;
 	static $sp_topStatsSystem;
 
 	$db = database();
@@ -1457,7 +1457,7 @@ function sp_news($parameters, $id, $return_parameters = false)
 
 function sp_attachmentImage($parameters, $id, $return_parameters = false)
 {
-	global $boarddir, $txt, $color_profile;
+	global $txt, $color_profile;
 
 	$block_parameters = array(
 		'limit' => 'int',
@@ -2991,7 +2991,7 @@ function sp_shop($parameters, $id, $return_parameters = false)
 function sp_blog($parameters, $id, $return_parameters = false)
 {
 	global $scripturl, $user_info, $modSettings;
-	global $context, $boarddir, $txt, $color_profile;
+	global $context, $txt, $color_profile;
 	static $mod;
 
 	$db = database();
@@ -3011,7 +3011,7 @@ function sp_blog($parameters, $id, $return_parameters = false)
 
 	if (!isset($mod))
 	{
-		if (file_exists($boarddir . '/zCommunity'))
+		if (file_exists(BOARDDIR . '/zCommunity'))
 			$mod = 'zcommunity';
 		elseif (file_exists(SOURCEDIR . '/Blog.php'))
 			$mod = 'smfblog';

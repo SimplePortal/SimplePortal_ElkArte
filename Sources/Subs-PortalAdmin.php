@@ -156,7 +156,7 @@ function changeState($type = null, $id = null)
 
 function sp_validate_php($code)
 {
-	global $boardurl, $boarddir, $modSettings;
+	global $boardurl, $modSettings;
 
 	$id = time();
 	$token = md5(mt_rand() . session_id() . (string) microtime() . $modSettings['rand_seed']);
@@ -176,17 +176,17 @@ function sp_validate_php($code)
 if (empty($_GET[\'token\']) || $_GET[\'token\'] !== \'' . $token . '\')
 	exit();
 
-require_once(\'' . $boarddir . '/SSI.php\');
+require_once(\'' . BOARDDIR . '/SSI.php\');
 
 ' . $code . '
 
 ?>';
 
-	$fp = fopen($boarddir . '/' . $filename, 'w');
+	$fp = fopen(BOARDDIR . '/' . $filename, 'w');
 	fwrite($fp, $content);
 	fclose($fp);
 
-	if (!file_exists($boarddir . '/' . $filename))
+	if (!file_exists(BOARDDIR . '/' . $filename))
 		return false;
 
 	$result = fetch_web_data($boardurl . '/' . $filename . '?token=' . $token);
@@ -196,7 +196,7 @@ require_once(\'' . $boarddir . '/SSI.php\');
 	elseif (preg_match('~ <b>(\d+)</b><br( /)?' . '>$~i', $result) != 0)
 		$error = 'syntax';
 
-	unlink($boarddir . '/' . $filename);
+	unlink(BOARDDIR . '/' . $filename);
 
 	return $error;
 }

@@ -16,7 +16,7 @@ if (!defined('ELK'))
 function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $txt;
-	global $settings, $options, $boarddir, $maintenance, $sportal_version;
+	global $settings, $options, $maintenance, $sportal_version;
 
 	$sportal_version = '2.4';
 
@@ -63,7 +63,7 @@ function sportal_init($standalone = false)
 		require_once(SOURCEDIR . '/PortalBlocks.php');
 
 		if (SMF != 'SSI')
-			require_once($boarddir . '/SSI.php');
+			require_once(BOARDDIR . '/SSI.php');
 
 		loadTemplate('Portal');
 		loadLanguage('SPortal', sp_languageSelect('SPortal'));

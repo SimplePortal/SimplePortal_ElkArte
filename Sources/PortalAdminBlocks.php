@@ -188,7 +188,7 @@ function sportal_admin_block_list()
 // Adding or editing a block.
 function sportal_admin_block_edit()
 {
-	global $txt, $context, $modSettings, $boarddir, $boards;
+	global $txt, $context, $modSettings, $boards;
 
 	$db = database();
 
@@ -274,7 +274,7 @@ function sportal_admin_block_edit()
 	if (!empty($_POST['preview_block']))
 	{
 		// Just in case, the admin could be doing something silly like editing a SP block while SP it disabled. ;)
-		require_once($boarddir . '/SSI.php');
+		require_once(BOARDDIR . '/SSI.php');
 		sportal_init_headers();
 		loadTemplate('Portal');
 

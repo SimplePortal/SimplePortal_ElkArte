@@ -18,7 +18,7 @@ if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('SMF'))
 elseif (!defined('ELK'))
 	die('<b>Error:</b> Cannot install - please verify you put this in the same place as SMF\'s index.php.');
 
-global $smcFunc, $db_prefix, $modSettings, SOURCEDIR, $boarddir, $settings, $db_package_log, $package_cache;
+global $smcFunc, $db_prefix, $modSettings, SOURCEDIR, BOARDDIR, $settings, $db_package_log, $package_cache;
 
 if (!array_key_exists('db_add_column', $smcFunc))
 	db_extend('packages');
@@ -301,16 +301,16 @@ $db_package_log = array();
 foreach ($tables as $table_name => $null)
 	$db_package_log[] = array('remove_table', $db_prefix . $table_name);
 
-$standalone_file = $boarddir . '/PortalStandalone.php';
+$standalone_file = BOARDDIR . '/PortalStandalone.php';
 if (isset($package_cache[$standalone_file]))
-	$package_cache[$standalone_file] = str_replace('full/path/to/forum', $boarddir, $package_cache[$standalone_file]);
+	$package_cache[$standalone_file] = str_replace('full/path/to/forum', BOARDDIR, $package_cache[$standalone_file]);
 elseif (file_exists($standalone_file))
 {
 	$current_data = file_get_contents($standalone_file);
 	if (strpos($current_data, 'full/path/to/forum') !== false)
 	{
 		$fp = fopen($standalone_file, 'w+');
-		fwrite($fp, str_replace('full/path/to/forum', $boarddir, $current_data));
+		fwrite($fp, str_replace('full/path/to/forum', BOARDDIR, $current_data));
 		fclose($fp);
 	}
 }
