@@ -18,10 +18,10 @@ if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
 elseif (!defined('ELK'))
 	die('<b>Error:</b> Cannot install - please verify you put this in the same place as ELK\'s index.php.');
 
-global $smcFunc, $db_prefix, $modSettings, $settings, $db_package_log, $package_cache;
+global $smcFunc, $db_prefix, $modSettings, $db_package_log, $package_cache;
 
-if (!array_key_exists('db_add_column', $smcFunc))
-	db_extend('packages');
+$db = database();
+$db_table = db_table();
 
 $tables = array(
 	'sp_articles' => array(
@@ -162,7 +162,7 @@ $tables = array(
 );
 
 foreach ($tables as $table => $data)
-	$smcFunc['db_create_table']('{db_prefix}' . $table, $data['columns'], $data['indexes'], array(), 'ignore');
+	$db_table->create_table('{db_prefix}' . $table, $data['columns'], $data['indexes'], array(), 'ignore');
 
 $db->insert('ignore',
 	'{db_prefix}sp_functions',

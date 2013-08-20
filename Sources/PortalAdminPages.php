@@ -23,7 +23,7 @@ function sportal_admin_pages_main()
 	if (!allowedTo('sp_admin'))
 		isAllowedTo('sp_manage_pages');
 
-	require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
+	require_once(SUBSDIR . '/PortalAdmin.subs.php');
 
 	loadTemplate('PortalAdminPages');
 
@@ -209,8 +209,8 @@ function sportal_admin_page_edit()
 
 	$db = database();
 
-	require_once(SOURCEDIR . '/Subs-Editor.php');
-	require_once(SOURCEDIR . '/Subs-Post.php');
+	require_once(SUBSDIR . '/Editor.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	$context['SPortal']['is_new'] = empty($_REQUEST['page_id']);
 

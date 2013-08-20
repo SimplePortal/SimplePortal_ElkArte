@@ -169,7 +169,7 @@ function sp_validate_php($code)
 	if (substr($code, -2) == '?>')
 		$code = substr($code, 0, -2);
 
-	require_once(SOURCEDIR . '/Subs-Package.php');
+	require_once(SUBSDIR . '/Package.subs.php');
 
 	$content = '<?php
 

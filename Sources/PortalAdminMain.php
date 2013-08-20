@@ -23,8 +23,8 @@ function sportal_admin_config_main()
 	if (!allowedTo('sp_admin'))
 		isAllowedTo('sp_manage_settings');
 
-	require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
-	require_once(SOURCEDIR . '/ManageServer.php');
+	require_once(SUBSDIR . '/PortalAdmin.subs.php');
+	require_once(CONTROLLERDIR . '/ManageServer.controller.php');
 
 	loadTemplate('PortalAdmin');
 
@@ -323,7 +323,7 @@ function sportal_information($in_admin = true)
 		$context['sp_version'] = $sportal_version;
 		$context['sp_managers'] = array();
 
-		require_once(SOURCEDIR . '/Subs-Members.php');
+		require_once(SUBSDIR . '/Members.subs.php');
 		$manager_ids = loadMemberData(membersAllowedTo('sp_admin'), false, 'minimal');
 
 		if ($manager_ids)

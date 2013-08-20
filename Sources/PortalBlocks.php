@@ -1570,7 +1570,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $block_parameters;
 
-	require_once(SOURCEDIR . '/Subs-Calendar.php');
+	require_once(SUBSDIR . '/Calendar.subs.php');
 	$today = getTodayInfo();
 
 	$curPage = array(
@@ -1883,7 +1883,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 
 	$rss = array();
 
-	require_once(SOURCEDIR . '/Subs-Package.php');
+	require_once(SUBSDIR . '/Package.subs.php');
 	$data = fetch_web_data($feed);
 
 	if (function_exists('mb_convert_encoding'))
@@ -2143,7 +2143,7 @@ function sp_staff($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $block_parameters;
 
-	require_once(SOURCEDIR . '/Subs-Members.php');
+	require_once(SUBSDIR . '/Members.subs.php');
 
 	if (empty($parameters['lmod']))
 	{
@@ -2271,7 +2271,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 
 	if ($return_parameters)
 	{
-		require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
+		require_once(SUBSDIR . '/PortalAdmin.subs.php');
 
 		$categories = getCategoryInfo();
 		foreach ($categories as $category)
@@ -2466,7 +2466,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 
 		if (!($flood = sp_prevent_flood('spsbp', false)))
 		{
-			require_once(SOURCEDIR . '/Subs-Post.php');
+			require_once(SUBSDIR . '/Post.subs.php');
 
 			$_POST['new_shout'] = Util::htmlspecialchars(trim($_POST['new_shout']));
 			preparsecode($_POST['new_shout']);

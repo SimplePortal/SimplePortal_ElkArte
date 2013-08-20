@@ -778,7 +778,7 @@ function sp_loadCalendarData($type, $low_date, $high_date = false)
 
 	if (!isset($loaded))
 	{
-		require_once(SOURCEDIR . '/Subs-Calendar.php');
+		require_once(SUBSDIR . '/Calendar.subs.php');
 
 		$loaded = array(
 			'getEvents' => 'getEventRange',

@@ -20,7 +20,7 @@ function sportal_admin_shoutbox_main()
 	if (!allowedTo('sp_admin'))
 		isAllowedTo('sp_manage_shoutbox');
 
-	require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
+	require_once(SUBSDIR . '/PortalAdmin.subs.php');
 
 	loadTemplate('PortalAdminShoutbox');
 

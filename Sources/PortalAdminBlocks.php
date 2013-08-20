@@ -23,7 +23,7 @@ function sportal_admin_blocks_main()
 	if (!allowedTo('sp_admin'))
 		isAllowedTo('sp_manage_blocks');
 
-	require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
+	require_once(SUBSDIR . '/PortalAdmin.subs.php');
 
 	loadTemplate('PortalAdminBlocks');
 
@@ -213,7 +213,7 @@ function sportal_admin_block_edit()
 		// If we came from WYSIWYG then turn it back into BBC regardless.
 		if (!empty($_REQUEST['bbc_' . $_POST['bbc_name'] . '_mode']) && isset($_POST['parameters'][$_POST['bbc_name']]))
 		{
-			require_once(SOURCEDIR . '/Subs-Editor.php');
+			require_once(SUBSDIR . '/Editor.subs.php');
 			$_POST['parameters'][$_POST['bbc_name']] = html_to_bbc($_POST['parameters'][$_POST['bbc_name']]);
 
 			// We need to unhtml it now as it gets done shortly.
@@ -300,7 +300,7 @@ function sportal_admin_block_edit()
 					if ($type == 'bbc')
 					{
 						$parameter['value'] = $_POST['parameters'][$name];
-						require_once(SOURCEDIR . '/Subs-Post.php');
+						require_once(SUBSDIR . '/Post.subs.php');
 
 						$parameter['value'] = Util::htmlspecialchars($parameter['value'], ENT_QUOTES);
 						preparsecode($parameter['value']);
@@ -512,7 +512,7 @@ function sportal_admin_block_edit()
 			{
 				if (empty($boards))
 				{
-					require_once(SOURCEDIR . '/Subs-Boards.php');
+					require_once(SUBSDIR . '/Boards.subs.php');
 					getBoardTree();
 				}
 

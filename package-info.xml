@@ -6,7 +6,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -19,18 +19,24 @@
 	<install for="1.0 Alpha - 1.0.99">
 		<readme type="inline">This will install SimplePortal 2.4 for Elkarte.</readme>
 		<modification>modification.xml</modification>
-		<require-file name="PortalStandalone.php" destination="$boarddir" />
-		<require-dir name="Sources" destination="$boarddir" />
-		<require-dir name="Themes" destination="$boarddir" />
+		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
+		<require-dir name="Sources" destination="BOARDDIR" />
+		<require-dir name="Themes" destination="BOARDDIR" />
 		<database>database.php</database>
-		<code>integration.php</code>
+		<hook hook="integrate_theme_include" file="LANGUAGEDIR/SPortal.english.php" />
+		<hook hook="integrate_load_theme" function="sportal_init" file="SUBSDIR/Portal.subs.php" />
+		<hook hook="integrate_actions" function="sp_integrate_actions" file="SUBSDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_admin_areas" function="sp_integrate_admin_areas" file="SUBSDIR/PortalIntegration.subs.php"/>
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
 	<uninstall for="1.0 - 1.0.99">
 		<readme type="inline">This will uninstall SimplePortal 2.4 for Elkarte.</readme>
-		<code>integration.php</code>
+		<hook reverse="true" hook="integrate_theme_include" file="LANGUAGEDIR/SPortal.english.php" />
+		<hook reverse="true" hook="integrate_load_theme" function="sportal_init" />
+		<hook reverse="true" hook="integrate_actions" function="sp_integrate_actions" />
+		<hook reverse="true" hook="integrate_admin_areas" function="sp_integrate_admin_areas" />
 		<modification reverse="true">modification.xml</modification>
-		<remove-file name="$boarddir/PortalStandalone.php" />
+		<remove-file name="BOARDDIR/PortalStandalone.php" />
 		<remove-file name="SOURCEDIR/PortalArticles.php" />
 		<remove-file name="SOURCEDIR/PortalBlocks.php" />
 		<remove-file name="SOURCEDIR/PortalMain.php" />

@@ -23,7 +23,7 @@ function sportal_admin_categories_main()
 	if (!allowedTo('sp_admin'))
 		isAllowedTo('sp_manage_articles');
 
-	require_once(SOURCEDIR . '/Subs-PortalAdmin.php');
+	require_once(SUBSDIR . '/PortalAdmin.subs.php');
 
 	loadTemplate('PortalAdminCategories');
 
