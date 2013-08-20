@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<!DOCTYPE modification SYSTEM "http://www.elkarte.net/site/modification">
 <!--
 /**
  * @package SimplePortal
@@ -11,7 +11,7 @@
  * @version 2.4
  */
 -->
-<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+<modification xmlns="http://www.elkarte.net/site/modification" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
 	<version>2.4</version>
 

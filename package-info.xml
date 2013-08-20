@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+<!DOCTYPE package-info SYSTEM "http://www.elkarte.net/site/package-info">
 <!--
 /**
  * @package SimplePortal
@@ -11,13 +11,13 @@
  * @version 2.4
  */
 -->
-<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+<package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
 	<name>SimplePortal</name>
 	<version>2.4</version>
 	<type>modification</type>
-	<install for="2.0 - 2.99.99">
-		<readme type="inline">This will install SimplePortal 2.4 for SMF.</readme>
+	<install for="1.0 Alpha - 1.0.99">
+		<readme type="inline">This will install SimplePortal 2.4 for Elkarte.</readme>
 		<modification>modification.xml</modification>
 		<require-file name="PortalStandalone.php" destination="$boarddir" />
 		<require-dir name="Sources" destination="$boarddir" />
@@ -26,23 +26,24 @@
 		<code>integration.php</code>
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
-	<uninstall for="2.0 - 2.99.99">
-		<readme type="inline">This will uninstall SimplePortal 2.4 for SMF.</readme>
+	<uninstall for="1.0 - 1.0.99">
+		<readme type="inline">This will uninstall SimplePortal 2.4 for Elkarte.</readme>
+		<code>integration.php</code>
 		<modification reverse="true">modification.xml</modification>
 		<remove-file name="$boarddir/PortalStandalone.php" />
-		<remove-file name="$sourcedir/PortalArticles.php" />
-		<remove-file name="$sourcedir/PortalBlocks.php" />
-		<remove-file name="$sourcedir/PortalMain.php" />
-		<remove-file name="$sourcedir/PortalPages.php" />
-		<remove-file name="$sourcedir/PortalShoutbox.php" />
-		<remove-file name="$sourcedir/PortalAdminArticles.php" />
-		<remove-file name="$sourcedir/PortalAdminBlocks.php" />
-		<remove-file name="$sourcedir/PortalAdminMain.php" />
-		<remove-file name="$sourcedir/PortalAdminPages.php" />
-		<remove-file name="$sourcedir/PortalAdminShoutbox.php" />
-		<remove-file name="$sourcedir/Subs-Portal.php" />
-		<remove-file name="$sourcedir/Subs-PortalIntegration.php" />
-		<remove-file name="$sourcedir/Subs-PortalAdmin.php" />
+		<remove-file name="SOURCEDIR/PortalArticles.php" />
+		<remove-file name="SOURCEDIR/PortalBlocks.php" />
+		<remove-file name="SOURCEDIR/PortalMain.php" />
+		<remove-file name="SOURCEDIR/PortalPages.php" />
+		<remove-file name="SOURCEDIR/PortalShoutbox.php" />
+		<remove-file name="SOURCEDIR/PortalAdminArticles.php" />
+		<remove-file name="SOURCEDIR/PortalAdminBlocks.php" />
+		<remove-file name="SOURCEDIR/PortalAdminMain.php" />
+		<remove-file name="SOURCEDIR/PortalAdminPages.php" />
+		<remove-file name="SOURCEDIR/PortalAdminShoutbox.php" />
+		<remove-file name="SOURCEDIR/Subs-Portal.php" />
+		<remove-file name="SOURCEDIR/Subs-PortalIntegration.php" />
+		<remove-file name="SOURCEDIR/Subs-PortalAdmin.php" />
 		<remove-file name="$themedir/Portal.template.php" />
 		<remove-file name="$themedir/PortalArticles.template.php" />
 		<remove-file name="$themedir/PortalPages.template.php" />
@@ -52,12 +53,12 @@
 		<remove-file name="$themedir/PortalAdminBlocks.template.php" />
 		<remove-file name="$themedir/PortalAdminPages.template.php" />
 		<remove-file name="$themedir/PortalAdminShoutbox.template.php" />
-		<remove-file name="$languagedir/SPortal.english.php" />
-		<remove-file name="$languagedir/SPortal.english-utf8.php" />
-		<remove-file name="$languagedir/SPortalAdmin.english.php" />
-		<remove-file name="$languagedir/SPortalAdmin.english-utf8.php" />
-		<remove-file name="$languagedir/SPortalHelp.english.php" />
-		<remove-file name="$languagedir/SPortalHelp.english-utf8.php" />
+		<remove-file name="LANGUAGEDIR/SPortal.english.php" />
+		<remove-file name="LANGUAGEDIR/SPortal.english-utf8.php" />
+		<remove-file name="LANGUAGEDIR/SPortalAdmin.english.php" />
+		<remove-file name="LANGUAGEDIR/SPortalAdmin.english-utf8.php" />
+		<remove-file name="LANGUAGEDIR/SPortalHelp.english.php" />
+		<remove-file name="LANGUAGEDIR/SPortalHelp.english-utf8.php" />
 		<remove-dir name="$imagesdir/sp" />
 		<remove-file name="$imagesdir/admin/configuration.png" />
 		<remove-file name="$imagesdir/admin/articles.png" />
@@ -68,6 +69,5 @@
 		<remove-file name="$themedir/css/portal.css" />
 		<remove-file name="$themedir/css/portal_rtl.css" />
 		<remove-file name="$themedir/scripts/portal.js" />
-		<code>integration.php</code>
 	</uninstall>
 </package-info>
