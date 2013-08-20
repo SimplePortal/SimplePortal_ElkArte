@@ -13,6 +13,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Entry point for blocks
+ */
 function sportal_admin_blocks_main()
 {
 	global $context, $txt;
@@ -78,7 +81,9 @@ function sportal_admin_blocks_main()
 	$subActions[$_REQUEST['sa']]();
 }
 
-// Show the Block List.
+/**
+ * Show the Block List.
+ */
 function sportal_admin_block_list()
 {
 	global $txt, $context, $scripturl;
@@ -126,6 +131,7 @@ function sportal_admin_block_list()
 	$context['block_move'] = isset($_GET['sa']) && $_GET['sa'] == 'select' && !empty($_GET['block_id']) ? (int) $_GET['block_id'] : 0;
 
 	$sides = array('header', 'left', 'top', 'bottom', 'right', 'footer');
+
 	// Are we viewing any of the sub lists for an individual side?
 	if (in_array($context['sub_action'], $sides))
 	{
@@ -185,7 +191,9 @@ function sportal_admin_block_list()
 	$context['page_title'] = $txt['sp-adminBlockListName'];
 }
 
-// Adding or editing a block.
+/**
+ * Adding or editing a block.
+ */
 function sportal_admin_block_edit()
 {
 	global $txt, $context, $modSettings, $boards;
@@ -201,13 +209,16 @@ function sportal_admin_block_edit()
 	if (!empty($_POST['bbc_name']))
 	{
 		$_POST['parameters'][$_POST['bbc_name']] = !empty($_POST[$_POST['bbc_parameter']]) ? $_POST[$_POST['bbc_parameter']] : '';
+
 		// If we came from WYSIWYG then turn it back into BBC regardless.
 		if (!empty($_REQUEST['bbc_' . $_POST['bbc_name'] . '_mode']) && isset($_POST['parameters'][$_POST['bbc_name']]))
 		{
 			require_once(SOURCEDIR . '/Subs-Editor.php');
 			$_POST['parameters'][$_POST['bbc_name']] = html_to_bbc($_POST['parameters'][$_POST['bbc_name']]);
+
 			// We need to unhtml it now as it gets done shortly.
 			$_POST['parameters'][$_POST['bbc_name']] = un_htmlspecialchars($_POST['parameters'][$_POST['bbc_name']]);
+
 			// We need this for everything else.
 			$_POST['parameters'][$_POST['bbc_name']] = $_POST['parameters'][$_POST['bbc_name']];
 		}
@@ -418,15 +429,13 @@ function sportal_admin_block_edit()
 		if ($context['SPortal']['block']['type'] == 'sp_php' && !allowedTo('admin_forum'))
 			fatal_lang_error('cannot_admin_forum', false);
 
-		$context['html_headers'] .= '
-	<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
+		addInlineJavascript('
 		function sp_collapseObject(id)
 		{
 			mode = document.getElementById("sp_object_" + id).style.display == "" ? 0 : 1;
-			document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/collapse.gif" : "/expand.gif");
+			document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/collapse.png" : "/expand.png");
 			document.getElementById("sp_object_" + id).style.display = mode ? "" : "none";
-		}
-	// ]]></script>';
+		}');
 
 		loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
 
@@ -521,7 +530,8 @@ function sportal_admin_block_edit()
 				// Create the list for this Item
 				foreach ($boards as $board)
 				{
-					if (!empty($board['redirect'])) // Ignore the redirected boards :)
+					// Ignore the redirected boards :)
+					if (!empty($board['redirect']))
 						continue;
 
 					$context['SPortal']['block']['board_options'][$name][$board['id']] = array(
@@ -538,10 +548,13 @@ function sportal_admin_block_edit()
 				if (!$firstBBCFound)
 				{
 					$firstBBCFound = true;
+
 					// Start Elk BBC Sytem :)
-					require_once(SOURCEDIR . '/Subs-Editor.php');
+					require_once(SUBSDIR . '/Editor.subs.php');
+
 					// Prepare the output :D
 					$form_message = !empty($context['SPortal']['block']['parameters'][$name]) ? $context['SPortal']['block']['parameters'][$name] : '';
+
 					// But if it's in HTML world, turn them into htmlspecialchar's so they can be edited!
 					if (strpos($form_message, '[html]') !== false)
 					{
@@ -680,11 +693,13 @@ function sportal_admin_block_edit()
 					if ($type == 'bbc')
 					{
 						$parameter['value'] = $_POST['parameters'][$name];
-						require_once(SOURCEDIR . '/Subs-Post.php');
+						require_once(SUBSDIR . '/Post.subs.php');
+
 						// Prepare the message a bit for some additional testing.
 						$parameter['value'] = Util::htmlspecialchars($parameter['value'], ENT_QUOTES);
 						preparsecode($parameter['value']);
-						//Store now the correct and fixed value ;)
+
+						// Store now the correct and fixed value ;)
 						$_POST['parameters'][$name] = $parameter['value'];
 					}
 					elseif ($type == 'boards' || $type == 'board_select')
@@ -864,7 +879,9 @@ function sportal_admin_block_edit()
 	}
 }
 
-// Function for moving a block.
+/**
+ * Function for moving a block.
+ */
 function sportal_admin_block_move()
 {
 	$db = database();
@@ -959,7 +976,9 @@ function sportal_admin_block_move()
 	redirectexit('action=admin;area=portalblocks');
 }
 
-// Function for deleting a block.
+/**
+ * Function for deleting a block.
+ */
 function sportal_admin_block_delete()
 {
 	$db = database();

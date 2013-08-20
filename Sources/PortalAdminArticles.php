@@ -13,6 +13,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Entry point for articles
+ */
 function sportal_admin_articles_main()
 {
 	global $context, $txt;
@@ -51,6 +54,10 @@ function sportal_admin_articles_main()
 	$sub_actions[$context['sub_action']]();
 }
 
+/**
+ * Show a listing of all the articles in the system
+ * @todo createList perhaps?
+ */
 function sportal_admin_article_list()
 {
 	global $context, $scripturl, $txt;
@@ -229,14 +236,17 @@ function sportal_admin_article_list()
 	$context['page_title'] = $txt['sp_admin_articles_list'];
 }
 
+/**
+ * Edit an article
+ */
 function sportal_admin_article_edit()
 {
 	global $context, $modSettings, $user_info, $options, $txt;
 
 	$db = database();
 
-	require_once(SOURCEDIR . '/Subs-Editor.php');
-	require_once(SOURCEDIR . '/Subs-Post.php');
+	require_once(SUBSDIR . '/Editor.subs.php');
+	require_once(SUBSDIR . '/Post.subs.php');
 
 	$context['is_new'] = empty($_REQUEST['article_id']);
 
@@ -446,7 +456,7 @@ function sportal_admin_article_edit()
 			'id' => $_POST['article_id'],
 			'article_id' => $_POST['namespace'],
 			'category' => sportal_get_categories((int) $_POST['category_id']),
-			'author' => $author, 
+			'author' => $author,
 			'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
 			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
 			'type' => $_POST['type'],
@@ -516,6 +526,9 @@ function sportal_admin_article_edit()
 	$context['sub_template'] = 'articles_edit';
 }
 
+/**
+ * Update an articles status
+ */
 function sportal_admin_article_status()
 {
 	$db = database();
@@ -537,6 +550,9 @@ function sportal_admin_article_status()
 	redirectexit('action=admin;area=portalarticles');
 }
 
+/**
+ * Remove an article from the system
+ */
 function sportal_admin_article_delete()
 {
 	$db = database();
