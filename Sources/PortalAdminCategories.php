@@ -10,8 +10,8 @@
  * @version 2.4
  */
 
-if (!defined('SMF'))
-	die('Hacking attempt...');
+if (!defined('ELK'))
+	die('No access...');
 
 function sportal_admin_categories_main()
 {
