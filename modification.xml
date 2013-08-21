@@ -262,21 +262,21 @@
 
 	<file name="SUBSDIR/BoardIndex.subs.php">
 		<operation>
-			<search position="replace"><![CDATA[				'href' => $scripturl . '#c' . $row_board['id_cat'],]]></search>
-			<add><![CDATA[				'href' => $scripturl . '?action=forum#c' . $row_board['id_cat'],]]></add>
+			<search position="replace"><![CDATA[					'href' => $scripturl . '#c' . $row_board['id_cat'],]]></search>
+			<add><![CDATA[					'href' => $scripturl . '#forumc' . $row_board['id_cat'],]]></add>
 		</operation>
 	</file>
 
-	<file name="SUBSDIR/Boards.subs.php">
+	<file name="CONTROLLERDIR/Markasread.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[		if (isset($_SESSION['topicseen_cache']))
 			$_SESSION['topicseen_cache'] = array();
 
-		redirectexit();]]></search>
+		return '';]]></search>
 			<add><![CDATA[		if (isset($_SESSION['topicseen_cache']))
 			$_SESSION['topicseen_cache'] = array();
 
-		redirectexit('action=forum');]]></add>
+		return 'action=forum';]]></add>
 		</operation>
 	</file>
 
