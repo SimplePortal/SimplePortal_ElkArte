@@ -231,9 +231,6 @@ function sportal_catch_action()
 {
 	global $modSettings, $board, $topic, $context;
 
-	if (isset($_GET['about:sinan']))
-		return 'BookOfSinan';
-
 	if (empty($context['disable_sp']))
 	{
 		if (empty($board) && empty($topic) && empty($_GET['page']) && empty($_GET['article']) && empty($_GET['category']) && $modSettings['sp_portal_mode'] == 1)
@@ -626,49 +623,6 @@ function sp_allowed_to($type, $id, $set = null, $allowed = null, $denied = null)
 	}
 
 	return $result;
-}
-
-function BookOfSinan()
-{
-	global $context, $scripturl;
-
-	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>
-	<head>
-		<title>The Book of Sinan, ', @$_GET['verse'] == '3:17' ? '3:17' : '1:15', '</title>
-		<style type="text/css">
-			em
-			{
-				font-size: 1.3em;
-				line-height: 0;
-			}
-		</style>
-		<meta name="robots" content="noindex" />
-	</head>
-	<body style="background-color: #161F4E; color: #FFFFFF; font-style: italic; font-family: serif;">
-		<div style="margin-top: 12%; font-size: 1.1em; line-height: 1.4; text-align: center;">';
-	if (@$_GET['verse'] == '3:17')
-		echo '
-			...And suddenly the <em id="dream" name="Blue Dream">dream</em> was over. Whether this was an <em>end</em> or a new <em>start</em>, however, was a <em id="mystery" name="MysteriousGate">mystery</em> to all...
-		</div>';
-	else
-		echo '
-			...It all started with a noob. He united <em>simplicity</em> with <em>power</em>, and achieved the <em>ultimate power of simplicity</em>.<br />This power lead him to the domination of World of <em>Blocks</em>...
-		</div>';
-	echo '
-		<div style="margin-top: 2ex; font-size: 2em; text-align: right;">';
-	if (@$_GET['verse'] == '3:17')
-		echo '
-			from <span style="font-family: Georgia, serif;"><strong><a href="http://www.bluedream.info/aboutsinan.php" style="color: white; text-decoration: none; cursor: text;">The Book of Sinan</a></strong>, 3:17</span>';
-	else
-		echo '
-			from <span style="font-family: Georgia, serif;"><strong><a href="', $scripturl, '?about:sinan;verse=3:17" style="color: white; text-decoration: none; cursor: text;">The Book of Sinan</a></strong>, 1:15</span>';
-	echo '
-		</div>
-	</body>
-</html>';
-
-	obExit(false);
 }
 
 function sp_query_string($tourniquet)
