@@ -5,7 +5,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -29,7 +29,7 @@ function template_shoutbox_list()
 		if ($column['selected'])
 			echo '
 						<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' width="' . $column['width'] . '"' : '', '>
-							<a href="', $column['href'], '">', $column['label'], '&nbsp;<img src="', $settings['images_url'], '/sort_', $context['sort_direction'], '.gif" alt="" /></a>
+							<a href="', $column['href'], '">', $column['label'], '&nbsp;<img src="', $settings['images_url'], '/sort_', $context['sort_direction'], '.png" alt="" /></a>
 						</th>';
 		elseif ($column['sortable'])
 			echo '
@@ -50,7 +50,7 @@ function template_shoutbox_list()
 					</tr>
 				</thead>
 				<tbody>';
-	
+
 	if (empty($context['shoutboxes']))
 	{
 		echo '
@@ -109,7 +109,7 @@ function template_shoutbox_edit()
 							<input type="text" name="name" id="shoutbox_name" value="', $context['SPortal']['shoutbox']['name'], '" class="input_text" />
 						</dd>
 						<dt>
-							<a href="', $scripturl, '?action=helpadmin;help=sp_permissions" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" class="icon" /></a>
+							<a href="', $scripturl, '?action=helpadmin;help=sp_permissions" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
 							<label for="shoutbox_permission_set">', $txt['sp_admin_shoutbox_col_permissions'], ':</label>
 						</dt>
 						<dd>
@@ -179,14 +179,14 @@ function template_shoutbox_edit()
 							// ]]></script>
 						</dd>
 						<dt>
-							<a href="', $scripturl, '?action=helpadmin;help=sp-shoutboxesWarning" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" class="icon" /></a>
+							<a href="', $scripturl, '?action=helpadmin;help=sp-shoutboxesWarning" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
 							<label for="shoutbox_warning">', $txt['sp_admin_shoutbox_col_warning'], ':</label>
 						</dt>
 						<dd>
 							<input type="text" name="warning" id="shoutbox_warning" value="', $context['SPortal']['shoutbox']['warning'], '" size="25" class="input_text" />
 						</dd>
 						<dt>
-							<a href="', $scripturl, '?action=helpadmin;help=sp-shoutboxesBBC" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" class="icon" /></a>
+							<a href="', $scripturl, '?action=helpadmin;help=sp-shoutboxesBBC" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
 							<label for="shoutbox_bbc">', $txt['sp_admin_shoutbox_col_bbc'], ':</label>
 						</dt>
 						<dd>

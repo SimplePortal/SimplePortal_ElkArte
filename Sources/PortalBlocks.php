@@ -640,7 +640,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 						$description = $descriptions[$bars - 1];
 
 						for($i = 0; $i < $bars; $i++)
-							$rep_bars .= \'<img src=\"\' . $settings["images_url"] . "/karmaGood_" . ($i < ($modSettings["karmaSuperBar"] - 1) ? "basic" : "super") . \'.gif" title="\' . $row["realName"] . " " . $description . \'" alt="\' . $row["realName"] . " " . $description . \'" />\';
+							$rep_bars .= \'<img src=\"\' . $settings["images_url"] . "/karmaGood_" . ($i < ($modSettings["karmaSuperBar"] - 1) ? "basic" : "super") . \'.png" title="\' . $row["realName"] . " " . $description . \'" alt="\' . $row["realName"] . " " . $description . \'" />\';
 
 						$row += array(
 							"reputation_bars" => $rep_bars,
@@ -648,7 +648,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 						);
 				'),
 				'output_text' => (!empty($txt['karma_power']) ? $txt['karma_power'] : '') . ': %amount%<br />%reputation_bars%',
-				'enabled' => !empty($modSettings['karma_enabled']) && file_exists($settings['images_url'] . '/karmaBad_basic.gif'),
+				'enabled' => !empty($modSettings['karma_enabled']) && file_exists($settings['images_url'] . '/karmaBad_basic.png'),
 				'error_msg' => $txt['sp_reputation_no_exist'],
 			),
 			'11' => array(
@@ -667,7 +667,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 						$description = $descriptions[$bars - 1];
 
 						for($i = 0; $i < $bars; $i++)
-							$rep_bars .= \'<img src=\"\' . $settings["images_url"] . "/karmaGood_" . ($i < ($modSettings["karmaSuperBar"] - 1) ? "basic" : "super") . \'.gif" title="\' . $row["realName"] . " " . $modSettings["karmaNegativeDescription"] . \'" alt="\' . $row["realName"] . " " . $modSettings["karmaNegativeDescription"] . \'" />\';
+							$rep_bars .= \'<img src=\"\' . $settings["images_url"] . "/karmaGood_" . ($i < ($modSettings["karmaSuperBar"] - 1) ? "basic" : "super") . \'.png" title="\' . $row["realName"] . " " . $modSettings["karmaNegativeDescription"] . \'" alt="\' . $row["realName"] . " " . $modSettings["karmaNegativeDescription"] . \'" />\';
 
 						$row += array(
 							"reputation_bars" => $rep_bars,
@@ -675,7 +675,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 						);
 				'),
 				'output_text' => (!empty($txt['karma_power']) ? $txt['karma_power'] : '') . ': %amount%<br />%reputation_bars%',
-				'enabled' => !empty($modSettings['karma_enabled']) && file_exists($settings['images_url'] . '/karmaBad_basic.gif'),
+				'enabled' => !empty($modSettings['karma_enabled']) && file_exists($settings['images_url'] . '/karmaBad_basic.png'),
 				'error_msg' => $txt['sp_reputation_no_exist'],
 			),
 			'sa_shop_money' => array(
@@ -956,7 +956,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
 	{
 		foreach ($items as $key => $item)
 			echo '
-								<a href="', $item['href'], '">', $item['subject'], '</a> <span class="smalltext">', $txt['by'], ' ', $item['poster']['link'], $item['new'] ? '' : ' <a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new" rel="nofollow"><img src="' . $settings['lang_images_url'] . '/new.gif" alt="' . $txt['new'] . '" border="0" /></a>', '<br />[', $item['time'], ']</span><br />', empty($item['is_last']) ? '<hr />' : '';
+								<a href="', $item['href'], '">', $item['subject'], '</a> <span class="smalltext">', $txt['by'], ' ', $item['poster']['link'], $item['new'] ? '' : ' <a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>', '<br />[', $item['time'], ']</span><br />', empty($item['is_last']) ? '<hr />' : '';
 	}
 	elseif ($display == 'full')
 	{
@@ -971,7 +971,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
 										</td>
 										<td class="sp_recent_subject">
 											<a href="', $item['href'], '">', $item['subject'], '</a>
-											', $item['new'] ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><img src="' . $settings['images_url'] . '/' . $context['user']['language'] . '/new.gif" alt="' . $txt['new'] . '" border="0" /></a>', '<br />[', $item['board']['link'], ']
+											', $item['new'] ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>', '<br />[', $item['board']['link'], ']
 										</td>
 										<td class="sp_recent_info sp_right">
 											', $item['poster']['link'], '<br />', $item['time'], '
@@ -1290,7 +1290,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		}
 
 		if (empty($modSettings['messageIconChecks_disable']) && !isset($icon_sources[$row['icon']]))
-			$icon_sources[$row['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['icon'] . '.gif') ? 'images_url' : 'default_images_url';
+			$icon_sources[$row['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['icon'] . '.png') ? 'images_url' : 'default_images_url';
 
 		censorText($row['subject']);
 		censorText($row['body']);
@@ -1304,7 +1304,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		$return[] = array(
 			'id' => $row['id_topic'],
 			'message_id' => $row['id_msg'],
-			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.gif" align="middle" alt="' . $row['icon'] . '" border="0" />',
+			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" align="middle" alt="' . $row['icon'] . '" border="0" />',
 			'subject' => $row['subject'],
 			'time' => timeformat($row['poster_time']),
 			'views' => $row['num_views'],
@@ -2061,7 +2061,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 			include($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php');
 		else
 		{
-			$txt['theme_thumbnail_href'] = $theme_data['images_url'] . '/thumbnail.gif';
+			$txt['theme_thumbnail_href'] = $theme_data['images_url'] . '/thumbnail.png';
 			$txt['theme_description'] = '';
 		}
 
@@ -2651,7 +2651,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 												', $txt['aeva_views'], ': ', $item['views'], '<br />
 												', $txt['aeva_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
 												', $txt['aeva_in_album'], ': <a href="', $galurl, 'sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>', $item['is_new'] ?
-					'<br /><img alt="" src="' . $settings['images_url'] . '/' . $context['user']['language'] . '/new.gif" border="0" />' : '';
+					'<br /><span class="new_posts">' . $txt['new'] . '</span>' : '';
 		}
 
 		echo '

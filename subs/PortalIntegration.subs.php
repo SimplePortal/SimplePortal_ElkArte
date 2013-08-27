@@ -145,8 +145,6 @@ function sp_integrate_admin_areas(&$admin_areas)
  */
 function sp_integrate_load_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
 {
-	global $context;
-
 	$permissionList['membergroup']['sp_admin'] = array(false, 'sp', 'sp');
 	$permissionList['membergroup']['sp_manage_settings'] = array(false, 'sp', 'sp');
 	$permissionList['membergroup']['sp_manage_blocks'] = array(false, 'sp', 'sp');

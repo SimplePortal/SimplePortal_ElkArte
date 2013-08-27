@@ -5,7 +5,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -29,7 +29,7 @@ function template_pages_list()
 		if ($column['selected'])
 			echo '
 						<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' width="' . $column['width'] . '"' : '', '>
-							<a href="', $column['href'], '">', $column['label'], '&nbsp;<img src="', $settings['images_url'], '/sort_', $context['sort_direction'], '.gif" alt="" /></a>
+							<a href="', $column['href'], '">', $column['label'], '&nbsp;<img src="', $settings['images_url'], '/sort_', $context['sort_direction'], '.png" alt="" /></a>
 						</th>';
 		elseif ($column['sortable'])
 			echo '
@@ -50,7 +50,7 @@ function template_pages_list()
 					</tr>
 				</thead>
 				<tbody>';
-	
+
 	if (empty($context['pages']))
 	{
 		echo '
@@ -141,7 +141,7 @@ function template_pages_edit()
 							</select>
 						</dd>
 						<dt>
-							<a href="', $scripturl, '?action=helpadmin;help=sp_permissions" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" class="icon" /></a>
+							<a href="', $scripturl, '?action=helpadmin;help=sp_permissions" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
 							<label for="page_permission_set">', $txt['sp_admin_pages_col_permissions'], ':</label>
 						</dt>
 						<dd>

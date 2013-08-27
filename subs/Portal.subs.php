@@ -189,7 +189,7 @@ function sportal_init_headers()
 			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null, "' . $context['session_id'] . '", "' . $context['session_var'] . '");';
 
 	$context['html_headers'] .= '
-			document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/collapse.gif" : "/expand.gif");
+			document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/collapse.png" : "/expand.png");
 			document.getElementById("sp_block_" + id).style.display = mode ? "" : "none";
 		}';
 
@@ -1381,7 +1381,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 			'delete_link_js' => $can_delete ? '<a href="' . $scripturl . '?action=portal;sa=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="sp_delete_shout(' . $shoutbox . ', ' . $shout['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false;">' . sp_embed_image('delete_small') . '</a> ' : '',
 		);
 
-		$shouts[$shout['id']]['text'] = str_replace(':jade:', '<img src="http://www.simpleportal.net/sp/cheerleader.gif" alt="Jade!" />', $shouts[$shout['id']]['text']);
+		$shouts[$shout['id']]['text'] = str_replace(':jade:', '<img src="http://www.simpleportal.net/sp/cheerleader.png" alt="Jade!" />', $shouts[$shout['id']]['text']);
 		$shouts[$shout['id']]['time'] = timeformat($shouts[$shout['id']]['time']);
 		$shouts[$shout['id']]['text'] = preg_replace('~(</?)div([^<]*>)~', '$1span$2', $shouts[$shout['id']]['text']);
 		$shouts[$shout['id']]['text'] = preg_replace('~<a([^>]+>)([^<]+)</a>~', '<a$1' . $txt['sp_link'] . '</a>', $shouts[$shout['id']]['text']);
