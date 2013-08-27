@@ -153,11 +153,10 @@ function sp_integrate_load_permissions(&$permissionGroups, &$permissionList, &$l
 	$permissionList['membergroup']['sp_manage_articles'] = array(false, 'sp', 'sp');
 	$permissionList['membergroup']['sp_manage_pages'] = array(false, 'sp', 'sp');
 	$permissionList['membergroup']['sp_manage_shoutbox'] = array(false, 'sp', 'sp');
-	$permissionList['membergroup']['sp_add_article'] = array(false, 'sp', 'sp');
-	$permissionList['membergroup']['sp_auto_article_approval'] = array(false, 'sp', 'sp');
-	$permissionList['membergroup']['sp_remove_article'] = array(false, 'sp', 'sp');
 
 	$permissionGroups['membergroup'][] = 'sp';
+
+	$leftPermissionGroups[] = 'sp';
 }
 
 function sp_integrate_whos_online($actions)
@@ -236,6 +235,6 @@ function sp_integrate_whos_online($actions)
 			}
 		}
 	}
-	
+
 	return $data;
 }

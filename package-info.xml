@@ -25,6 +25,7 @@
 		<require-dir name="subs" destination="BOARDDIR" />
 		<require-dir name="Themes" destination="BOARDDIR" />
 		<database>database.php</database>
+		<code>settings.php</code>
 		<hook hook="integrate_theme_include" file="LANGUAGEDIR/SPortal.english.php" />
 		<hook hook="integrate_load_theme" function="sportal_init" file="SUBSDIR/Portal.subs.php" />
 		<hook hook="integrate_actions" function="sp_integrate_actions" file="SUBSDIR/PortalIntegration.subs.php" />
