@@ -15,33 +15,10 @@
 	<id>[SiNaN]:SimplePortal</id>
 	<version>2.4</version>
 
-	<file name="BOARDDIR/index.php">
-		<operation>
-			<search position="replace"><![CDATA[		// Action and board are both empty... BoardIndex!]]></search>
-			<add><![CDATA[		// Go catch it boy! Catch it!
-		$sp_action = sportal_catch_action();
-		if ($sp_action)
-			return $sp_action;
-
-		// Action and board are both empty... BoardIndex!]]></add>
-		</operation>
-	</file>
-
 	<file name="CONTROLLERDIR/BoardIndex.controller.php">
 		<operation error="ignore">
 			<search position="replace"><![CDATA[if (!empty($_GET))]]></search>
 			<add><![CDATA[if (!empty($_GET) && $_GET !== array('action' => 'forum'))]]></add>
-		</operation>
-	</file>
-
-	<file name="CONTROLLERDIR/Help.controller.php">
-		<operation>
-			<search position="replace"><![CDATA[		// Load the admin help language file and template.
-		loadLanguage('Help');]]></search>
-			<add><![CDATA[		// Load the admin help language file and template.
-		loadLanguage('Help');
-		// Load the Simple Portal Help file.
-		loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));]]></add>
 		</operation>
 	</file>
 
@@ -54,22 +31,15 @@
 	if (!isset($_GET['action']) && !isset($_GET['board']) && !isset($_GET['topic']) && ($modSettings['sp_portal_mode'] == 1 || !empty($sp_standalone)) && !empty($modSettings['portaltheme']))
 		$id_theme = (int) $modSettings['portaltheme'];
 
-	// Elk doesn't seem to be liking -1...
-	if ($id_theme == -1 && !empty($_SESSION['id_theme']))
-	{
-		unset($_SESSION['id_theme']);
-		$id_theme = $modSettings['theme_guests'];
-	}
-
 	// Verify the id_theme... no foul play.]]></add>
 		</operation>
 	</file>
 
-	<file name="ADMINDIR/ManageServer.controller.php">
+	<file name="SUBSDIR/Settings.class.php">
 		<operation>
-			<search position="replace"><![CDATA[	loadLanguage('Help');]]></search>
-			<add><![CDATA[	loadLanguage('Help');
-	loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));]]></add>
+			<search position="replace"><![CDATA[		loadLanguage('Help');]]></search>
+			<add><![CDATA[	 loadLanguage('Help');
+		loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));]]></add>
 		</operation>
 	</file>
 

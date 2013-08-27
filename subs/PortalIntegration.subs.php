@@ -157,6 +157,12 @@ function sp_integrate_load_permissions(&$permissionGroups, &$permissionList, &$l
 	$leftPermissionGroups[] = 'sp';
 }
 
+/**
+ * Whos online hook, integrate_whos_online, called from who.subs
+ * translates custom actions to allow show what area a user is in
+ *
+ * @param type $actions
+ */
 function sp_integrate_whos_online($actions)
 {
 	global $scripturl, $modSettings, $txt;
@@ -235,4 +241,63 @@ function sp_integrate_whos_online($actions)
 	}
 
 	return $data;
+}
+
+/**
+ * Frontpage hook, integrate_frontpage, called from the dispatcher,
+ * used to replace the default action with a new one
+ *
+ * @param array $default_action
+ */
+function sp_integrate_frontpage($default_action)
+{
+	global $modSettings, $context;
+
+	// Portal is active
+	if (empty($context['disable_sp']))
+	{
+		$file = null;
+		$function = null;
+
+		// Any actions we need to handle with the portal, set up the action here.
+		if (empty($_GET['page']) && empty($_GET['article']) && empty($_GET['category']) && $modSettings['sp_portal_mode'] == 1)
+		{
+			$file = SOURCEDIR . '/PortalMain.php';
+			$function = 'sportal_main';
+		}
+		elseif (!empty($_GET['page']))
+		{
+			$file = SOURCEDIR . '/PortalPages.php';
+			$function = 'sportal_page';
+		}
+		elseif (!empty($_GET['article']))
+		{
+			$file = $sourcedir . '/PortalArticles.php';
+			$function = 'sportal_article';
+		}
+		elseif (!empty($_GET['category']))
+		{
+			$file = $sourcedir . '/PortalCategories.php';
+			$function = 'sportal_category';
+		}
+
+		// Something portal-ish, then set the new action
+		if (isset($file, $function))
+		{
+			$default_action = array(
+				'file' => $file,
+				'function' => $function
+			);
+		}
+	}
+
+	return;
+}
+
+function sp_integrate_quickhelp()
+{
+	require_once (SUBSDIR . '/Portal.subs.php');
+
+	// Load the Simple Portal Help file.
+	loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
 }

@@ -227,37 +227,6 @@ function sportal_init_headers()
 	$initialized = true;
 }
 
-function sportal_catch_action()
-{
-	global $modSettings, $board, $topic, $context;
-
-	if (empty($context['disable_sp']))
-	{
-		if (empty($board) && empty($topic) && empty($_GET['page']) && empty($_GET['article']) && empty($_GET['category']) && $modSettings['sp_portal_mode'] == 1)
-		{
-			require_once(SOURCEDIR . '/PortalMain.php');
-			return 'sportal_main';
-		}
-		elseif (empty($board) && empty($topic) && !empty($_GET['page']))
-		{
-			require_once(SOURCEDIR . '/PortalPages.php');
-			return 'sportal_page';
-		}
-		elseif (empty($board) && empty($topic) && !empty($_GET['article']))
-		{
-			require_once($sourcedir . '/PortalArticles.php');
-			return 'sportal_article';
-		}
-		elseif (empty($board) && empty($topic) && !empty($_GET['category']))
-		{
-			require_once($sourcedir . '/PortalCategories.php');
-			return 'sportal_category';
-		}
-	}
-
-	return false;
-}
-
 // This function, returns all of the information about particular blocks.
 function getBlockInfo($column_id = null, $block_id = null, $state = null, $show = null, $permission = null)
 {
