@@ -47,11 +47,12 @@
 		<remove-file name="SOURCEDIR/PortalMain.php" />
 		<remove-file name="SOURCEDIR/PortalPages.php" />
 		<remove-file name="SOURCEDIR/PortalShoutbox.php" />
-		<remove-file name="ADMINDIR/PortalAdminArticles.php" />
-		<remove-file name="ADMINDIR/PortalAdminBlocks.php" />
-		<remove-file name="ADMINDIR/PortalAdminMain.php" />
-		<remove-file name="ADMINDIR/PortalAdminPages.php" />
-		<remove-file name="ADMINDIR/PortalAdminShoutbox.php" />
+		<remove-file name="ADMINDIR/PortalAdminArticles.controller.php" />
+		<remove-file name="ADMINDIR/PortalAdminBlocks.controller.php" />
+		<remove-file name="ADMINDIR/PortalAdminCategories.controller.php" />
+		<remove-file name="ADMINDIR/PortalAdminMain.controller.php" />
+		<remove-file name="ADMINDIR/PortalAdminPages.controller.php" />
+		<remove-file name="ADMINDIR/PortalAdminShoutbox.controller.php" />
 		<remove-file name="SUBSDIR/Portal.subs.php" />
 		<remove-file name="SUBSDIR/PortalIntegration.subs.php" />
 		<remove-file name="SUBSDIR/PortalAdmin.subs.php" />
