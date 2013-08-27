@@ -2607,10 +2607,6 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 	{
 		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
 			$mod = 'aeva_media';
-		elseif (file_exists(SOURCEDIR . '/MGallery.php'))
-			$mod = 'smf_media_gallery';
-		elseif (file_exists(SOURCEDIR . '/Gallery.php') || file_exists(SOURCEDIR . '/Gallery2.php'))
-			$mod = 'smf_gallery';
 		else
 			$mod = '';
 	}
@@ -2627,58 +2623,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 
 		$items = aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC');
 	}
-	elseif ($mod == 'smf_media_gallery')
-	{
-		require_once(SOURCEDIR . '/Subs-MGallery.php');
 
-		loadMGal_Settings();
-		loadLanguage('MGallery', sp_languageSelect('MGallery'));
-
-		$items = getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC');
-	}
-	elseif ($mod == 'smf_gallery')
-	{
-		loadLanguage('Gallery', sp_languageSelect('Gallery'));
-
-		if (!isset($GD_Installed))
-			$GD_Installed = function_exists('imagecreate');
-
-		if (empty($modSettings['gallery_url']))
-			$modSettings['gallery_url'] = $boardurl . '/gallery/';
-
-		$request = $db->query('', '
-			SELECT
-				p.id_picture, p.commenttotal, p.filesize, p.views, p.thumbfilename,
-				p.filename, p.height, p.width, p.title, p.id_member, m.member_name,
-				m.real_name, p.date, p.description
-			FROM {db_prefix}gallery_pic AS p
-				LEFT JOIN {db_prefix}members AS m ON (m.id_member = p.id_member)
-			WHERE p.approved = {int:is_approved}
-			ORDER BY {raw:type}
-			LIMIT {int:limit}',
-			array(
-				'is_approved' => 1,
-				'type' => $type ? 'RAND()' : 'p.id_picture DESC',
-				'limit' => $limit,
-			)
-		);
-		$items = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$items[] = array(
-				'id' => $row['id_picture'],
-				'title' => $row['title'],
-				'views' => $row['views'],
-				'poster_id' => $row['id_member'],
-				'poster_name' => $row['real_name'],
-				'poster_link' => empty($row['id_member']) ? $txt['gallery_guest'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-				'thumbfilename' => $row['thumbfilename'],
-				'filename' => $row['filename'],
-				'src' => $modSettings['gallery_url'] . ($GD_Installed ? $row['thumbfilename'] : $row['filename'] . '" width="120'),
-			);
-		}
-		$db->free_result($request);
-	}
 
 	if (empty($items))
 	{
@@ -2701,30 +2646,12 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 		if ($mod == 'aeva_media')
 		{
 			echo '
-												<a href="', $galurl, 'sa=item;id=', $item['id'], '">', $item['title'], '</a><br />
-												<a href="', $galurl, 'sa=item;id=', $item['id'], '"><img src="', $galurl, 'sa=media;id=', $item['id'], ';thumb" alt="" /></a><br />
+												<a href="', $galurl, 'sa=item;in=', $item['id'], '">', $item['title'], '</a><br />
+												<a href="', $galurl, 'sa=item;in=', $item['id'], '"><img src="', $galurl, 'sa=media;in=', $item['id'], ';thumb" alt="" /></a><br />
 												', $txt['aeva_views'], ': ', $item['views'], '<br />
 												', $txt['aeva_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
-												', $txt['aeva_in_album'], ': <a href="', $galurl, 'sa=album;id=', $item['id_album'], '">', $item['album_name'], '</a>', $item['is_new'] ?
+												', $txt['aeva_in_album'], ': <a href="', $galurl, 'sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>', $item['is_new'] ?
 					'<br /><img alt="" src="' . $settings['images_url'] . '/' . $context['user']['language'] . '/new.gif" border="0" />' : '';
-		}
-		elseif ($mod == 'smf_media_gallery')
-		{
-			echo '
-												<a href="', $galurl, 'sa=item;id=', $item['id'], '">', $item['title'], '</a><br />
-												<a href="', $galurl, 'sa=item;id=', $item['id'], '"><img src="', $galurl, 'sa=media;id=', $item['id'], ';thumb" alt="" /></a><br />
-												', $txt['mgallery_views'], ': ', $item['views'], '<br />
-												', $txt['mgallery_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
-												', $txt['mgallery_in_album'], ': <a href="', $galurl, 'sa=album;id=', $item['id_album'], '">', $item['album_name'], '</a>', $item['is_new'] ?
-					'<br /><img alt="" src="' . $settings['images_url'] . '/' . $context['user']['language'] . '/new.gif" border="0" />' : '';
-		}
-		elseif ($mod == 'smf_gallery')
-		{
-			echo '
-												<a href="', $scripturl, '?action=gallery;sa=view;id=', $item['id'], '">', $item['title'], '</a><br />
-												<a href="', $scripturl, '?action=gallery;sa=view;id=', $item['id'], '"><img src="', $item['src'], '" alt="" /></a><br />
-												', $txt['gallery_text_views'], $item['views'], '<br />
-												', $txt['gallery_text_by'], ' ', $item['poster_link'], '<br />';
 		}
 
 		echo '
