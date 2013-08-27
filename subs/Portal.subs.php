@@ -164,7 +164,9 @@ function sportal_init($standalone = false)
 		$context['template_layers'][] = 'portal';
 }
 
-// Deals with the initialization of SimplePortal headers.
+/**
+ * Deals with the initialization of SimplePortal headers.
+ */
 function sportal_init_headers()
 {
 	global $context, $settings, $modSettings;
@@ -227,7 +229,15 @@ function sportal_init_headers()
 	$initialized = true;
 }
 
-// This function, returns all of the information about particular blocks.
+/**
+ * This function, returns all of the information about particular blocks.
+ *
+ * @param int $column_id
+ * @param int $block_id
+ * @param boolean $state
+ * @param boolean $show
+ * @param boolean $permission
+ */
 function getBlockInfo($column_id = null, $block_id = null, $state = null, $show = null, $permission = null)
 {
 	global $context, $options, $txt;
@@ -302,7 +312,13 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 	return $return;
 }
 
-// Function to get a block's display/show information.
+/**
+ * Function to get a block's display/show information.
+ *
+ * @param int $block_id
+ * @param string $display
+ * @param string $custom
+ */
 function getShowInfo($block_id = null, $display = null, $custom = null)
 {
 	global $context, $modSettings;
@@ -594,43 +610,12 @@ function sp_allowed_to($type, $id, $set = null, $allowed = null, $denied = null)
 	return $result;
 }
 
-function sp_query_string($tourniquet)
-{
-	global $sportal_version, $context, $modSettings;
-
-	$fix = str_replace('{version}', $sportal_version, '<a href="http://www.simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-2012, SimplePortal</a>');
-
-	if ((ELK == 'SSI' && empty($context['standalone'])) || empty($context['template_layers']) || WIRELESS || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
-		return $tourniquet;
-
-	$finds = array(
-		', Simple Machines LLC</a>',
-		', <a href="http://www.simplemachines.org" title="Simple Machines" target="_blank" class="new_win">Simple Machines</a>',
-		'class="copywrite"',
-		'class="copyright"',
-	);
-	$replaces = array(
-		', Simple Machines LLC</a><br />' . $fix,
-		', <a href="http://www.simplemachines.org" title="Simple Machines" target="_blank" class="new_win">Simple Machines</a><br />' . $fix,
-		'class="copywrite" style="line-height: 1em;"',
-		'class="copyright" style="line-height: 1.5em;"',
-	);
-
-	$tourniquet = str_replace($finds, $replaces, $tourniquet);
-
-	if (strpos($tourniquet, $fix) === false)
-	{
-		$fix = '<div style="text-align: center; width: 100%; font-size: x-small; margin-bottom: 5px;">' . $fix . '</div></body></html>';
-		$tourniquet = preg_replace('~</body>\s*</html>~', $fix, $tourniquet);
-	}
-
-	return $tourniquet;
-}
-/*
-  This is a simple function that return nothing if the language file exist and english if it not exists
-  This will help to make it possible to load each time the english language!
+/**
+ * This is a simple function that return nothing if the language file exist and english if it does not exist
+ * This will help to make it possible to load each time the english language!
+ *
+ * @param string $template_name
  */
-
 function sp_languageSelect($template_name)
 {
 	global $user_info, $language, $settings;
@@ -682,7 +667,8 @@ function sp_languageSelect($template_name)
 			}
 		}
 	}
-	//So all need to be true that it work ;)
+
+	// So all need to be true that it work ;)
 	foreach ($allTemplatesExists as $exist)
 		if (!$exist)
 		{
@@ -690,7 +676,7 @@ function sp_languageSelect($template_name)
 			return 'english';
 		}
 
-	//Everthing is fine, let's go back :D
+	// Everthing is fine, let's go back :D
 	$already_loaded[$template_name] = '';
 	return '';
 }
@@ -716,7 +702,11 @@ function sp_loadCalendarData($type, $low_date, $high_date = false)
 		return array();
 }
 
-// This is a small script to load colors for SPortal.
+/**
+ * This is a small script to load colors for SPortal.
+ *
+ * @param array $users
+ */
 function sp_loadColors($users = array())
 {
 	global $color_profile, $scripturl, $modSettings;
