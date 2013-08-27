@@ -249,7 +249,7 @@ function sp_integrate_whos_online($actions)
  *
  * @param array $default_action
  */
-function sp_integrate_frontpage($default_action)
+function sp_integrate_frontpage(&$default_action)
 {
 	global $modSettings, $context;
 
@@ -294,10 +294,49 @@ function sp_integrate_frontpage($default_action)
 	return;
 }
 
+/**
+ * Help hook, integrate_quickhelp, called from help.controller.php
+ * Used to add in additional help lanaguages for use in the admin quickhelp
+ */
 function sp_integrate_quickhelp()
 {
 	require_once (SUBSDIR . '/Portal.subs.php');
 
 	// Load the Simple Portal Help file.
 	loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
+}
+
+/**
+ * Integration hook integrate_buffer, called from Subs.php
+ * Used to modify the output buffer before its sent
+ *
+ * @param string $tourniquet
+ */
+function sp_integrate_buffer($tourniquet)
+{
+	global $sportal_version, $context, $modSettings;
+
+	$fix = str_replace('{version}', $sportal_version, '<a href="http://www.simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-2013, SimplePortal</a>');
+
+	if ((ELK == 'SSI' && empty($context['standalone'])) || empty($context['template_layers']) || WIRELESS || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
+		return $tourniquet;
+
+	// Append our cp notice at the end of the line
+	$finds = array(
+		'ElkArte &copy; 2013</a>',
+	);
+	$replaces = array(
+		'ElkArte &copy; 2013</a>' . $fix,
+	);
+
+	$tourniquet = str_replace($finds, $replaces, $tourniquet);
+
+	// Can't find it for some reason so we add it at the end
+	if (strpos($tourniquet, $fix) === false)
+	{
+		$fix = '<div style="text-align: center; width: 100%; font-size: x-small; margin-bottom: 5px;">' . $fix . '</div></body></html>';
+		$tourniquet = preg_replace('~</body>\s*</html>~', $fix, $tourniquet);
+	}
+
+	return $tourniquet;
 }
