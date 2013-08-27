@@ -167,10 +167,6 @@ $helptxt['sp_param_sp_articles_image'] = 'Enables a category image, avatar, or n
 $helptxt['sp_param_sp_gallery_limit'] = 'How many items to display.';
 $helptxt['sp_param_sp_gallery_type'] = 'Displays random or the latest gallery items.';
 $helptxt['sp_param_sp_gallery_direction'] = 'Gallery images can be aligned horizontally or vertically.';
-$helptxt['sp_param_sp_arcade_limit'] = 'How many items to display.';
-$helptxt['sp_param_sp_arcade_type'] = 'Displays the arcades most played games, best players, or longest champions.';
 $helptxt['sp_param_sp_html_content'] = 'Enter the custom HTML content in this box.';
 $helptxt['sp_param_sp_bbc_content'] = 'Enter the custom BBC content in this box.';
 $helptxt['sp_param_sp_php_content'] = 'Enter the custom PHP content in this box.';
-
-?>
