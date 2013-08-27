@@ -5,7 +5,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -173,9 +173,6 @@ $helptxt['sp_param_sp_shop_style'] = 'Displays the richest members or shop items
 $helptxt['sp_param_sp_shop_limit'] = 'How many items to display.';
 $helptxt['sp_param_sp_shop_type'] = 'Displays the members total money, pocketed money, or money in the bank.';
 $helptxt['sp_param_sp_shop_sort'] = 'Displays random or recently added items.';
-$helptxt['sp_param_sp_blog_limit'] = 'How many items to display.';
-$helptxt['sp_param_sp_blog_type'] = 'Displays articles or blogs.';
-$helptxt['sp_param_sp_blog_sort'] = 'Displays blogs randomly or by the latest blogs updated.';
 $helptxt['sp_param_sp_html_content'] = 'Enter the custom HTML content in this box.';
 $helptxt['sp_param_sp_bbc_content'] = 'Enter the custom BBC content in this box.';
 $helptxt['sp_param_sp_php_content'] = 'Enter the custom PHP content in this box.';
