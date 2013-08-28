@@ -175,7 +175,7 @@ $tables = array(
 );
 
 foreach ($tables as $table => $data)
-	$db_table->create_table('{db_prefix}' . $table, $data['columns'], $data['indexes'], array(), 'ignore');
+	$db_table->db_create_table('{db_prefix}' . $table, $data['columns'], $data['indexes'], array(), 'ignore');
 
 $db->insert('ignore',
 	'{db_prefix}sp_functions',
