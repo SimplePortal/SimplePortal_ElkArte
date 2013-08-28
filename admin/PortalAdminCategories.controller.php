@@ -40,8 +40,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		);
 
 		// Default to list the categories
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($sub_actions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
-		$context['sub_action'] = $_REQUEST['sa'];
+		$subAction = isset($_REQUEST['sa']) && isset($sub_actions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
+		$context['sub_action'] = $subAction;
 
 		// Set up the tabs
 		$context[$context['admin_menu_name']]['tab_data'] = array(

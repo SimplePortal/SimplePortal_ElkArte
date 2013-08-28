@@ -13,7 +13,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class ManagePortalAdmin_Controller extends Action_Controller
+class ManagePortalConfig_Controller extends Action_Controller
 {
 	/**
 	 * Main dispatcher.
@@ -29,7 +29,7 @@ class ManagePortalAdmin_Controller extends Action_Controller
 
 		// Some helpful friends
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
-		require_once(CONTROLLERDIR . '/ManageServer.controller.php');
+		require_once(ADMINDIR . '/ManageServer.controller.php');
 		loadTemplate('PortalAdmin');
 
 		$subActions = array(
@@ -40,7 +40,7 @@ class ManagePortalAdmin_Controller extends Action_Controller
 		);
 
 		// Set the default to the information tab
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'information';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'information';
 
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['sp-adminConfiguration'],

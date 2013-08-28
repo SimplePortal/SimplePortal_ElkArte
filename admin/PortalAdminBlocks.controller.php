@@ -47,8 +47,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		);
 
 		// The default action will show the block list
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
-		$context['sub_action'] = $_REQUEST['sa'];
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
+		$context['sub_action'] = $subAction;
 
 		// Tabs for the menu
 		$context[$context['admin_menu_name']]['tab_data'] = array(

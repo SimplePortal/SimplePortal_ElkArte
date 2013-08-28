@@ -40,8 +40,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 		);
 
 		// By default we want to list the articles
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($sub_actions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
-		$context['sub_action'] = $_REQUEST['sa'];
+		$subAction = isset($_REQUEST['sa']) && isset($sub_actions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
+		$context['sub_action'] = $subAction;
 
 		// Set up the tab data
 		$context[$context['admin_menu_name']]['tab_data'] = array(

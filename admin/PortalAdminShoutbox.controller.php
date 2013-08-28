@@ -13,7 +13,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class ManagePortalPages_Controller extends Action_Controller
+class ManagePortalShoutbox_Controller extends Action_Controller
 {
 	/**
 	 * Main dispatcher.
@@ -42,8 +42,8 @@ class ManagePortalPages_Controller extends Action_Controller
 		);
 
 		// Default action to list if none or no valid option is given
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
-		$context['sub_action'] = $_REQUEST['sa'];
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
+		$context['sub_action'] = $subAction;
 
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['sp_admin_shoutbox_title'],
