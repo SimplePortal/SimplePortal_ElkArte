@@ -57,6 +57,7 @@
 		<remove-file name="SOURCEDIR/PortalMain.php" />
 		<remove-file name="SOURCEDIR/PortalPages.php" />
 		<remove-file name="SOURCEDIR/PortalShoutbox.php" />
+		<remove-file name="SOURCEDIR/PortalCategories.php" />
 		<remove-file name="ADMINDIR/PortalAdminArticles.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminBlocks.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminCategories.controller.php" />
