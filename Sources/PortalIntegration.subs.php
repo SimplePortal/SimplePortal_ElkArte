@@ -31,7 +31,7 @@ function sp_integrate_actions(&$actions)
 }
 
 /**
- * Admin hook, integrate_admin_areas, called from Admin.php
+ * Admin hook, integrate_admin_areas, called from Menu.subs
  * adds the admin menu
  *
  * @param array $admin_areas
@@ -39,6 +39,9 @@ function sp_integrate_actions(&$actions)
 function sp_integrate_admin_areas(&$admin_areas)
 {
 	global $txt;
+
+	loadLanguage('SPortalAdmin');
+	loadLanguage('SPortal');
 
 	$temp = $admin_areas;
 	$admin_areas = array();
@@ -175,6 +178,7 @@ function sp_integrate_whos_online($actions)
 
 	$db = database();
 	$data = null;
+	loadLanguage('SPortal');
 
 	// This may miss if its needed for the first action ... need to improve the hook or find another location
 	if ($modSettings['sp_portal_mode'] == 1)
