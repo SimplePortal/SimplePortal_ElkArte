@@ -13,6 +13,10 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * SimplePortal Blocks Administation controller class.
+ * This class handles the adding/editing/listing of blocks
+ */
 class ManagePortalBlocks_Controller extends Action_Controller
 {
 	/**
@@ -29,6 +33,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 		// We'll need the utility functions from here.
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
+		require_once(SUBSDIR . '/Portal.subs.php');
 		loadTemplate('PortalAdminBlocks');
 
 		$subActions = array(

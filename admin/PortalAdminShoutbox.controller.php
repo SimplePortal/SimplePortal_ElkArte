@@ -13,6 +13,10 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * SimplePortal Shoutbox Administation controller class.
+ * This class handles the administration of the shoutbox
+ */
 class ManagePortalShoutbox_Controller extends Action_Controller
 {
 	/**
@@ -29,6 +33,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 		// Some help will be needed
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
+		require_once(SUBSDIR . '/Portal.subs.php');
 		loadTemplate('PortalAdminShoutbox');
 
 		$subActions = array(
@@ -41,7 +46,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			'blockredirect' => array($this, 'action_sportal_admin_shoutbox_block_redirect'),
 		);
 
-		// Default action to list if none or no valid option is given
+		// Default the action to list if none or no valid option is given
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
 		$context['sub_action'] = $subAction;
 

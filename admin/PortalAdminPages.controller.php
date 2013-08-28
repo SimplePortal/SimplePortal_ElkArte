@@ -13,6 +13,10 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * SimplePortal Page Administation controller class.
+ * This class handles the adding/editing/listing of pages
+ */
 class ManagePortalPages_Controller extends Action_Controller
 {
 	/**
@@ -29,6 +33,7 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		// Can't do much without our little buddys
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
+		require_once(SUBSDIR . '/Portal.subs.php');
 		loadTemplate('PortalAdminPages');
 
 		$subActions = array(
@@ -208,7 +213,7 @@ class ManagePortalPages_Controller extends Action_Controller
 	}
 
 	/**
-	 * Interface for editing a page
+	 * Interface for adding/editing a page
 	 */
 	public function action_sportal_admin_page_edit()
 	{
@@ -289,7 +294,7 @@ class ManagePortalPages_Controller extends Action_Controller
 				FROM {db_prefix}sp_pages
 				WHERE namespace = {string:namespace}
 					AND id_page != {int:current}
-				LIMIT 1',
+				LIMIT (int:limit}',
 				array(
 					'limit' => 1,
 					'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),

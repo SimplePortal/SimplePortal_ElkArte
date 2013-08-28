@@ -13,7 +13,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class ManagePortalBlocks_Controller extends Action_Controller
+/**
+ * SimplePortal Category Administation controller class.
+ * This class handles the adding/editing/listing of categories
+ */
+class ManagePortalCategories_Controller extends Action_Controller
 {
 	/**
 	 * Main dispatcher.
@@ -29,9 +33,10 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 		// We'll need the utility functions from here.
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
+		require_once(SUBSDIR . '/Portal.subs.php');
 		loadTemplate('PortalAdminCategories');
 
-		$sub_actions = array(
+		$subActions = array(
 			'list' => array($this, 'action_sportal_admin_category_list'),
 			'add' => array($this, 'action_sportal_admin_category_edit'),
 			'edit' => array($this, 'action_sportal_admin_category_edit'),
@@ -40,7 +45,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		);
 
 		// Default to list the categories
-		$subAction = isset($_REQUEST['sa']) && isset($sub_actions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
 		$context['sub_action'] = $subAction;
 
 		// Set up the tabs

@@ -13,6 +13,10 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * SimplePortal Article Administation controller class.
+ * This class handles the adding/editing/listing of articles
+ */
 class ManagePortalArticles_Controller extends Action_Controller
 {
 	/**
@@ -29,9 +33,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		// We'll need the utility functions from here.
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
+		require_once(SUBSDIR . '/Portal.subs.php');
 		loadTemplate('PortalAdminArticles');
 
-		$sub_actions = array(
+		$subActions = array(
 			'list' => array($this, 'action_sportal_admin_article_list'),
 			'add' => array($this, 'action_sportal_admin_article_edit'),
 			'edit' => array($this, 'action_sportal_admin_article_edit'),
@@ -40,7 +45,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		);
 
 		// By default we want to list the articles
-		$subAction = isset($_REQUEST['sa']) && isset($sub_actions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
 		$context['sub_action'] = $subAction;
 
 		// Set up the tab data
@@ -245,7 +250,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 	}
 
 	/**
-	 * Edit an article
+	 * Edits an existing or adds a new article to the system
+	 * Handles the previewing of an article
 	 */
 	public function action_sportal_admin_article_edit()
 	{
@@ -258,6 +264,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		$context['is_new'] = empty($_REQUEST['article_id']);
 
+		// @todo we don't have html_to_bbc anylonger
 		if (!empty($_REQUEST['content_mode']) && $_POST['type'] == 'bbc')
 		{
 			$_REQUEST['content'] = html_to_bbc($_REQUEST['content']);

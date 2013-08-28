@@ -13,6 +13,10 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * SimplePortal Configuration controller class.
+ * This class handles the first general, blocks and articles configuration screens
+ */
 class ManagePortalConfig_Controller extends Action_Controller
 {
 	/**
@@ -36,17 +40,19 @@ class ManagePortalConfig_Controller extends Action_Controller
 	/**
 	 * Main dispatcher.
 	 * This function checks permissions and passes control through.
+	 * If the passed section is not found it shows the information page.
 	 */
 	public function action_index()
 	{
 		global $context, $txt;
 
-		// You need to be an admin or have manage setting to change anything
+		// You need to be an admin or have manage setting permissions to change anything
 		if (!allowedTo('sp_admin'))
 			isAllowedTo('sp_manage_settings');
 
 		// Some helpful friends
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
+		require_once(SUBSDIR . '/Portal.subs.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
 		loadTemplate('PortalAdmin');
 
@@ -152,8 +158,6 @@ class ManagePortalConfig_Controller extends Action_Controller
 
 	/**
 	 * Settings that control how blocks behave
-	 *
-	 * @param boolean $return_config
 	 */
 	public function action_sportal_admin_block_settings()
 	{
@@ -415,8 +419,10 @@ class ManagePortalConfig_Controller extends Action_Controller
 			$manager_ids = loadMemberData(membersAllowedTo('sp_admin'), false, 'minimal');
 
 			if ($manager_ids)
+			{
 				foreach ($manager_ids as $member)
 					$context['sp_managers'][] = '<a href="' . $scripturl . '?action=profile;u=' . $user_profile[$member]['id_member'] . '">' . $user_profile[$member]['real_name'] . '</a>';
+			}
 		}
 
 		$context['sub_template'] = 'information';
