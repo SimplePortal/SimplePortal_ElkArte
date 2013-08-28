@@ -27,15 +27,15 @@
 		<database>database.php</database>
 		<code>settings.php</code>
 		<hook hook="integrate_theme_include" file="LANGUAGEDIR/SPortal.english.php" />
-		<hook hook="integrate_load_theme" function="sportal_init" file="SUBSDIR/Portal.subs.php" />
-		<hook hook="integrate_actions" function="sp_integrate_actions" file="SUBSDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_admin_areas" function="sp_integrate_admin_areas" file="SUBSDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_load_permissions" function="sp_integrate_load_permissions" file="SUBSDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_whos_online" function="sp_integrate_whos_online" file="SUBSDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_frontpage" function="sp_integrate_frontpage" file="SUBSDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_quickhelp" function="sp_integrate_quickhelp" file="SUBSDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_buffer" function="sp_integrate_exit" file="SUBSDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SUBSDIR/PortalIntegration.subs.php"/>
+		<hook hook="integrate_load_theme" function="sportal_init" file="SOURCEDIR/Portal.subs.php" />
+		<hook hook="integrate_actions" function="sp_integrate_actions" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_admin_areas" function="sp_integrate_admin_areas" file="SOURCEDIR/PortalIntegration.subs.php"/>
+		<hook hook="integrate_load_permissions" function="sp_integrate_load_permissions" file="SOURCEDIR/PortalIntegration.subs.php"/>
+		<hook hook="integrate_whos_online" function="sp_integrate_whos_online" file="SOURCEDIR/PortalIntegration.subs.php"/>
+		<hook hook="integrate_frontpage" function="sp_integrate_frontpage" file="SOURCEDIR/PortalIntegration.subs.php"/>
+		<hook hook="integrate_quickhelp" function="sp_integrate_quickhelp" file="SOURCEDIR/PortalIntegration.subs.php"/>
+		<hook hook="integrate_buffer" function="sp_integrate_exit" file="SOURCEDIR/PortalIntegration.subs.php"/>
+		<hook hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SOURCEDIR/PortalIntegration.subs.php"/>
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
 	<uninstall for="1.0 Alpha - 1.0.99">
@@ -64,7 +64,7 @@
 		<remove-file name="ADMINDIR/PortalAdminPages.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminShoutbox.controller.php" />
 		<remove-file name="SUBSDIR/Portal.subs.php" />
-		<remove-file name="SUBSDIR/PortalIntegration.subs.php" />
+		<remove-file name="SOURCEDIR/PortalIntegration.subs.php" />
 		<remove-file name="SUBSDIR/PortalAdmin.subs.php" />
 		<remove-file name="$themedir/Portal.template.php" />
 		<remove-file name="$themedir/PortalArticles.template.php" />
@@ -76,11 +76,8 @@
 		<remove-file name="$themedir/PortalAdminPages.template.php" />
 		<remove-file name="$themedir/PortalAdminShoutbox.template.php" />
 		<remove-file name="LANGUAGEDIR/SPortal.english.php" />
-		<remove-file name="LANGUAGEDIR/SPortal.english-utf8.php" />
 		<remove-file name="LANGUAGEDIR/SPortalAdmin.english.php" />
-		<remove-file name="LANGUAGEDIR/SPortalAdmin.english-utf8.php" />
 		<remove-file name="LANGUAGEDIR/SPortalHelp.english.php" />
-		<remove-file name="LANGUAGEDIR/SPortalHelp.english-utf8.php" />
 		<remove-dir name="$imagesdir/sp" />
 		<remove-file name="$imagesdir/admin/configuration.png" />
 		<remove-file name="$imagesdir/admin/articles.png" />

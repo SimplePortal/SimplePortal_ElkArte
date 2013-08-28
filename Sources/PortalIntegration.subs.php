@@ -55,8 +55,9 @@ function sp_integrate_admin_areas(&$admin_areas)
 				'areas' => array(
 					'portalconfig' => array(
 						'label' => $txt['sp-adminConfiguration'],
-						'file' => 'ADMINDIR/PortalAdminMain.php',
-						'function' => 'sportal_admin_config_main',
+						'file' => 'PortalAdminMain.controller.php',
+						'controller' => 'ManagePortalConfig_Controller',
+						'function' => 'action_index',
 						'icon' => 'configuration.png',
 						'permission' => array('sp_admin', 'sp_manage_settings'),
 						'subsections' => array(
@@ -68,8 +69,9 @@ function sp_integrate_admin_areas(&$admin_areas)
 					),
 					'portalblocks' => array(
 						'label' => $txt['sp-blocksBlocks'],
-						'file' => 'ADMINDIR/PortalAdminBlocks.php',
-						'function' => 'sportal_admin_blocks_main',
+						'file' => 'PortalAdminBlocks.controller.php',
+						'controller' => 'ManagePortalBlocks_Controller',
+						'function' => 'action_index',
 						'icon' => 'blocks.png',
 						'permission' => array('sp_admin', 'sp_manage_blocks'),
 						'subsections' => array(
@@ -85,8 +87,9 @@ function sp_integrate_admin_areas(&$admin_areas)
 					),
 					'portalarticles' => array(
 						'label' => $txt['sp_admin_articles_title'],
-						'file' => 'ADMINDIR/PortalAdminArticles.php',
-						'function' => 'sportal_admin_articles_main',
+						'file' => 'PortalAdminArticles.controller.php',
+						'controller' => 'ManagePortalArticles_Controller',
+						'function' => 'action_index',
 						'icon' => 'articles.png',
 						'permission' => array('sp_admin', 'sp_manage_articles'),
 						'subsections' => array(
@@ -96,8 +99,9 @@ function sp_integrate_admin_areas(&$admin_areas)
 					),
 					'portalcategories' => array(
 						'label' => $txt['sp_admin_categories_title'],
-						'file' => 'ADMINDIR/PortalAdminCategories.php',
-						'function' => 'sportal_admin_categories_main',
+						'file' => 'PortalAdminCategories.controller.php',
+						'controller' => 'ManagePortalCategories_Controller',
+						'function' => 'action_index',
 						'icon' => 'categories.png',
 						'permission' => array('sp_admin', 'sp_manage_articles'),
 						'subsections' => array(
@@ -107,8 +111,9 @@ function sp_integrate_admin_areas(&$admin_areas)
 					),
 					'portalpages' => array(
 						'label' => $txt['sp_admin_pages_title'],
-						'file' => 'ADMINDIR/PortalAdminPages.php',
-						'function' => 'sportal_admin_pages_main',
+						'file' => 'PortalAdminPages.controller.php',
+						'controller' => 'ManagePortalPages_Controller',
+						'function' => 'action_index',
 						'icon' => 'pages.png',
 						'permission' => array('sp_admin', 'sp_manage_pages'),
 						'subsections' => array(
@@ -118,8 +123,9 @@ function sp_integrate_admin_areas(&$admin_areas)
 					),
 					'portalshoutbox' => array(
 						'label' => $txt['sp_admin_shoutbox_title'],
-						'file' => 'ADMINDIR/PortalAdminShoutbox.php',
-						'function' => 'sportal_admin_shoutbox_main',
+						'file' => 'PortalAdminShoutbox.controller.php',
+						'controller' => 'ManagePortalShoutbox_Controller',
+						'function' => 'action_index',
 						'icon' => 'shoutbox.png',
 						'permission' => array('sp_admin', 'sp_manage_shoutbox'),
 						'subsections' => array(
