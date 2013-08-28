@@ -340,3 +340,68 @@ function sp_integrate_buffer($tourniquet)
 
 	return $tourniquet;
 }
+
+/**
+ * Menu Button hook, integrate_menu_buttons, called from subs.php
+ * used to add top menu buttons
+ *
+ * @param array $buttons
+ */
+function sp_integrate_menu_buttons(&$buttons)
+{
+	global $txt, $scripturl, $modSettings;
+
+	loadLanguage('SPortal');
+
+	// Where do we want to place our button
+	$insert_after = 'home';
+	$counter = 0;
+
+	// find the location in the buttons array
+	foreach ($buttons as $area => $dummy)
+	{
+		if (++$counter && $area == $insert_after)
+			break;
+	}
+
+	// Define the new menu item(s)
+	sp_array_insert($buttons, 'home', array(
+		'forum' => array(
+			'title' => empty($txt['sp-forum']) ? 'Forum' : $txt['sp-forum'],
+			'href' => $scripturl . ($modSettings['sp_portal_mode'] == 1 && empty($context['disable_sp']) ? '?action=forum' : ''),
+			'show' => in_array($modSettings['sp_portal_mode'], array(1, 3)) && empty($context['disable_sp']),
+			'sub_buttons' => array(
+			),
+		),
+	), 'after');
+}
+
+/**
+ * Helper function to insert a menu
+ *
+ * @param array $input the array we will insert to
+ * @param string $key the key in the array
+ * @param array $insert the data to add before or after the above key
+ * @param string $where adding before or after
+ * @param bool $strict
+ */
+function sp_array_insert(&$input, $key, $insert, $where = 'before', $strict = false)
+{
+	$position = array_search($key, array_keys($input), $strict);
+
+	// If the key is not found, just insert it at the end
+	if ($position === false)
+	{
+		$input = array_merge($input, $insert);
+		return;
+	}
+
+	if ($where === 'after')
+		$position += 1;
+
+	// Insert as first
+	if ($position === 0)
+		$input = array_merge($insert, $input);
+	else
+		$input = array_merge(array_slice($input, 0, $position), $insert, array_slice($input, $position));
+}

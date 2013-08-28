@@ -35,6 +35,7 @@
 		<hook hook="integrate_frontpage" function="sp_integrate_frontpage" file="SUBSDIR/PortalIntegration.subs.php"/>
 		<hook hook="integrate_quickhelp" function="sp_integrate_quickhelp" file="SUBSDIR/PortalIntegration.subs.php"/>
 		<hook hook="integrate_exit" function="sp_integrate_exit" file="SUBSDIR/PortalIntegration.subs.php"/>
+		<hook hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SUBSDIR/PortalIntegration.subs.php"/>
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
 	<uninstall for="1.0 - 1.0.99">
@@ -48,6 +49,7 @@
 		<hook reverse="true" hook="integrate_frontpage" function="sp_integrate_frontpage" />
 		<hook reverse="true" hook="integrate_quickhelp" function="sp_integrate_quickhelp" />
 		<hook reverse="true" hook="integrate_exit" function="sp_integrate_exit" />
+		<hook reverse="true" hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" />
 		<modification reverse="true">modification.xml</modification>
 		<remove-file name="BOARDDIR/PortalStandalone.php" />
 		<remove-file name="SOURCEDIR/PortalArticles.php" />
