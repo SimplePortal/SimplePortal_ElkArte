@@ -21,8 +21,8 @@
 		<modification>modification.xml</modification>
 		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
 		<require-dir name="sources" destination="BOARDDIR" />
-		<require-dir name="admin" destination="BOARDDIR" />
-		<require-dir name="subs" destination="BOARDDIR" />
+		<require-dir name="admin" destination="SOURCEDIR" />
+		<require-dir name="subs" destination="SOURCEDIR" />
 		<require-dir name="themes" destination="BOARDDIR" />
 		<database>database.php</database>
 		<code>settings.php</code>
@@ -34,11 +34,11 @@
 		<hook hook="integrate_whos_online" function="sp_integrate_whos_online" file="SUBSDIR/PortalIntegration.subs.php"/>
 		<hook hook="integrate_frontpage" function="sp_integrate_frontpage" file="SUBSDIR/PortalIntegration.subs.php"/>
 		<hook hook="integrate_quickhelp" function="sp_integrate_quickhelp" file="SUBSDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_exit" function="sp_integrate_exit" file="SUBSDIR/PortalIntegration.subs.php"/>
+		<hook hook="integrate_buffer" function="sp_integrate_exit" file="SUBSDIR/PortalIntegration.subs.php"/>
 		<hook hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SUBSDIR/PortalIntegration.subs.php"/>
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
-	<uninstall for="1.0 - 1.0.99">
+	<uninstall for="1.0 Alpha - 1.0.99">
 		<readme type="inline">This will uninstall SimplePortal 2.4 for Elkarte.</readme>
 		<hook reverse="true" hook="integrate_theme_include" file="LANGUAGEDIR/SPortal.english.php" />
 		<hook reverse="true" hook="integrate_load_theme" function="sportal_init" />
@@ -48,7 +48,7 @@
 		<hook reverse="true" hook="integrate_whos_online" function="sp_integrate_whos_online" />
 		<hook reverse="true" hook="integrate_frontpage" function="sp_integrate_frontpage" />
 		<hook reverse="true" hook="integrate_quickhelp" function="sp_integrate_quickhelp" />
-		<hook reverse="true" hook="integrate_exit" function="sp_integrate_exit" />
+		<hook reverse="true" hook="integrate_buffer" function="sp_integrate_exit" />
 		<hook reverse="true" hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" />
 		<modification reverse="true">modification.xml</modification>
 		<remove-file name="BOARDDIR/PortalStandalone.php" />
