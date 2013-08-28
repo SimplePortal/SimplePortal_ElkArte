@@ -16,6 +16,24 @@ if (!defined('ELK'))
 class ManagePortalConfig_Controller extends Action_Controller
 {
 	/**
+	 * General settings form
+	 * @var Settings_Form
+	 */
+	protected $_generalSettingsForm;
+
+	/**
+	 * Block settings form
+	 * @var Settings_Form
+	 */
+	protected $_blockSettingsForm;
+
+	/**
+	 * Article settings form
+	 * @var Settings_Form
+	 */
+	protected $_articleSettingsForm;
+
+	/**
 	 * Main dispatcher.
 	 * This function checks permissions and passes control through.
 	 */
@@ -56,10 +74,8 @@ class ManagePortalConfig_Controller extends Action_Controller
 
 	/**
 	 * General settings that control global portal actions
-	 *
-	 * @param boolean $return_config
 	 */
-	public function action_sportal_admin_general_settings($return_config = false)
+	public function action_sportal_admin_general_settings()
 	{
 		global $context, $scripturl, $txt;
 
@@ -81,6 +97,42 @@ class ManagePortalConfig_Controller extends Action_Controller
 			$context['SPortal']['themes'][$row['id_theme']] = $row['name'];
 		$db->free_result($request);
 
+		// initialize the form
+		$this->_initGeneralSettingsForm();
+		$config_vars = $this->_generalSettingsForm->settings();
+
+		// These are very likely to come in handy! (i.e. without them we're doomed!)
+		require_once(ADMINDIR . '/ManagePermissions.controller.php');
+		require_once(ADMINDIR . '/ManageServer.controller.php');
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		if (isset($_GET['save']))
+		{
+			checkSession();
+
+			Settings_Form::save_db($config_vars);
+			redirectexit('action=admin;area=portalconfig;sa=generalsettings');
+		}
+
+		$context['post_url'] = $scripturl . '?action=admin;area=portalconfig;sa=generalsettings;save';
+		$context['settings_title'] = $txt['sp-adminGeneralSettingsName'];
+		$context['page_title'] = $txt['sp-adminGeneralSettingsName'];
+		$context['sub_template'] = 'general_settings';
+
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initialize General Settings Form.
+	 * Retrieve and return the general portal settings.
+	 */
+	private function _initGeneralSettingsForm()
+	{
+		global $txt, $context;
+
+		// instantiate the form
+		$this->_generalSettingsForm = new Settings_Form();
+
 		$config_vars = array(
 			array('select', 'sp_portal_mode', explode('|', $txt['sp_portal_mode_options'])),
 			array('check', 'sp_maintenance'),
@@ -95,23 +147,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 			array('check', 'sp_resize_images'),
 		);
 
-		if ($return_config)
-			return $config_vars;
-
-		if (isset($_GET['save']))
-		{
-			checkSession();
-
-			saveDBSettings($config_vars);
-			redirectexit('action=admin;area=portalconfig;sa=generalsettings');
-		}
-
-		$context['post_url'] = $scripturl . '?action=admin;area=portalconfig;sa=generalsettings;save';
-		$context['settings_title'] = $txt['sp-adminGeneralSettingsName'];
-		$context['page_title'] = $txt['sp-adminGeneralSettingsName'];
-		$context['sub_template'] = 'general_settings';
-
-		prepareDBSettingContext($config_vars);
+		return $this->_generalSettingsForm->settings($config_vars);
 	}
 
 	/**
@@ -119,22 +155,18 @@ class ManagePortalConfig_Controller extends Action_Controller
 	 *
 	 * @param boolean $return_config
 	 */
-	public function action_sportal_admin_block_settings($return_config = false)
+	public function action_sportal_admin_block_settings()
 	{
 		global $context, $scripturl, $txt;
 
-		$config_vars = array(
-			array('check', 'showleft'),
-			array('check', 'showright'),
-			array('text', 'leftwidth'),
-			array('text', 'rightwidth'),
-			'',
-			array('check', 'sp_enableIntegration'),
-			array('multicheck', 'sp_IntegrationHide', 'subsettings' => array('sp_adminIntegrationHide' => $txt['admin'], 'sp_profileIntegrationHide' => $txt['profile'], 'sp_pmIntegrationHide' => $txt['personal_messages'], 'sp_mlistIntegrationHide' => $txt['members_title'], 'sp_searchIntegrationHide' => $txt['search'], 'sp_calendarIntegrationHide' => $txt['calendar'], 'sp_moderateIntegrationHide' => $txt['moderate'])),
-		);
+		// initialize the form
+		$this->_initBlockSettingsForm();
+		$config_vars = $this->_blockSettingsForm->settings();
 
-		if ($return_config)
-			return $config_vars;
+		// These are very likely to come in handy! (i.e. without them we're doomed!)
+		require_once(ADMINDIR . '/ManagePermissions.controller.php');
+		require_once(ADMINDIR . '/ManageServer.controller.php');
+		require_once(SUBSDIR . '/Settings.class.php');
 
 		if (isset($_GET['save']))
 		{
@@ -177,7 +209,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 				)
 			);
 
-			saveDBSettings($config_vars);
+			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=portalconfig;sa=blocksettings');
 		}
 
@@ -186,17 +218,75 @@ class ManagePortalConfig_Controller extends Action_Controller
 		$context['page_title'] = $txt['sp-adminBlockSettingsName'];
 		$context['sub_template'] = 'general_settings';
 
-		prepareDBSettingContext($config_vars);
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initialize Block Settings Form.
+	 * Retrieve and return the general portal settings.
+	 */
+	private function _initBlockSettingsForm()
+	{
+		global $txt;
+
+		// instantiate the block form
+		$this->_blockSettingsForm = new Settings_Form();
+
+		$config_vars = array(
+			array('check', 'showleft'),
+			array('check', 'showright'),
+			array('text', 'leftwidth'),
+			array('text', 'rightwidth'),
+			'',
+			array('check', 'sp_enableIntegration'),
+			array('multicheck', 'sp_IntegrationHide', 'subsettings' => array('sp_adminIntegrationHide' => $txt['admin'], 'sp_profileIntegrationHide' => $txt['profile'], 'sp_pmIntegrationHide' => $txt['personal_messages'], 'sp_mlistIntegrationHide' => $txt['members_title'], 'sp_searchIntegrationHide' => $txt['search'], 'sp_calendarIntegrationHide' => $txt['calendar'], 'sp_moderateIntegrationHide' => $txt['moderate'])),
+		);
+
+		return $this->_blockSettingsForm->settings($config_vars);
 	}
 
 	/**
 	 * Settings to control articles
-	 *
-	 * @param boolean $return_config
 	 */
-	public function action_sportal_admin_article_settings($return_config = false)
+	public function action_sportal_admin_article_settings()
 	{
 		global $context, $scripturl, $txt;
+
+		// initialize the form
+		$this->_initArticleSettingsForm();
+		$config_vars = $this->_articleSettingsForm->settings();
+
+		// These are very likely to come in handy! (i.e. without them we're doomed!)
+		require_once(ADMINDIR . '/ManagePermissions.controller.php');
+		require_once(ADMINDIR . '/ManageServer.controller.php');
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// Save away
+		if (isset($_GET['save']))
+		{
+			checkSession();
+
+			Settings_Form::save_db($config_vars);
+			redirectexit('action=admin;area=portalconfig;sa=articlesettings');
+		}
+
+		// Show the form
+		$context['post_url'] = $scripturl . '?action=admin;area=portalconfig;sa=articlesettings;save';
+		$context['settings_title'] = $txt['sp-adminArticleSettingsName'];
+		$context['page_title'] = $txt['sp-adminArticleSettingsName'];
+		$context['sub_template'] = 'general_settings';
+
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initialize Article Settings Form.
+	 * Retrieve and return the general portal settings.
+	 */
+	private function _initArticleSettingsForm()
+	{
+		// instantiate the article form
+		$this->_articleSettingsForm = new Settings_Form();
 
 		$config_vars = array(
 			array('check', 'articleactive'),
@@ -205,23 +295,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 			array('check', 'articleavatar'),
 		);
 
-		if ($return_config)
-			return $config_vars;
-
-		if (isset($_GET['save']))
-		{
-			checkSession();
-
-			saveDBSettings($config_vars);
-			redirectexit('action=admin;area=portalconfig;sa=articlesettings');
-		}
-
-		$context['post_url'] = $scripturl . '?action=admin;area=portalconfig;sa=articlesettings;save';
-		$context['settings_title'] = $txt['sp-adminArticleSettingsName'];
-		$context['page_title'] = $txt['sp-adminArticleSettingsName'];
-		$context['sub_template'] = 'general_settings';
-
-		prepareDBSettingContext($config_vars);
+		return $this->_articleSettingsForm->settings($config_vars);
 	}
 
 	/**
