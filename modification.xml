@@ -35,14 +35,6 @@
 		</operation>
 	</file>
 
-	<file name="SUBSDIR/Settings.class.php">
-		<operation>
-			<search position="replace"><![CDATA[		loadLanguage('Help');]]></search>
-			<add><![CDATA[	 loadLanguage('Help');
-		loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));]]></add>
-		</operation>
-	</file>
-
 	<file name="SOURCEDIR/QueryString.php">
 		<operation>
 			<search position="replace"><![CDATA[\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic]]></search>
