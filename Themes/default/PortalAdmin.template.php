@@ -16,7 +16,7 @@ function template_general_settings()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
+		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
 
 	if (isset($context['settings_title']))
 		echo '
@@ -28,7 +28,7 @@ function template_general_settings()
 
 	if (!empty($context['settings_message']))
 		echo '
-			<div class="information">', $context['settings_message'], '</div>';
+			<div class="infobox">', $context['settings_message'], '</div>';
 
 	$is_open = false;
 	foreach ($context['config_vars'] as $config_var)
@@ -41,7 +41,6 @@ function template_general_settings()
 				echo '
 					</dl>
 				</div>
-				<span class="botslice"><span></span></span>
 			</div>';
 			}
 
@@ -71,7 +70,6 @@ function template_general_settings()
 			$is_open = true;
 			echo '
 			<div class="windowbg2">
-				<span class="topslice"><span></span></span>
 				<div class="content">
 					<dl class="settings">';
 		}
@@ -105,7 +103,7 @@ function template_general_settings()
 
 				echo '
 							<dd', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>',
-								$config_var['preinput'];
+				$config_var['preinput'];
 
 				if ($config_var['type'] == 'check')
 					echo '
@@ -129,7 +127,7 @@ function template_general_settings()
 					echo $config_var['var_message'];
 				elseif ($config_var['type'] == 'multicheck')
 				{
-					foreach($config_var['subsettings'] as $name => $title)
+					foreach ($config_var['subsettings'] as $name => $title)
 					{
 						echo '
 								<input type="hidden" name="', $name, '" value="0" /><input type="checkbox" name="', $name, '" id="', $name, '" ', (!empty($modSettings[$name]) ? ' checked="checked"' : ''), ' class="input_check" />
@@ -165,21 +163,17 @@ function template_general_settings()
 
 	if (empty($context['settings_save_dont_show']))
 		echo '
-						<p>
-							<input type="submit" value="', $txt['save'], '"', (!empty($context['save_disabled']) ? ' disabled="disabled"' : ''), (!empty($context['settings_save_onclick']) ? ' onclick="' . $context['settings_save_onclick'] . '"' : ''), ' class="button_submit" />
-						</p>';
+						<input type="submit" value="', $txt['save'], '"', (!empty($context['save_disabled']) ? ' disabled="disabled"' : ''), (!empty($context['settings_save_onclick']) ? ' onclick="' . $context['settings_save_onclick'] . '"' : ''), ' class="right_submit" />';
 
 	if ($is_open)
 		echo '
 					</div>
-				<span class="botslice"><span></span></span>
 			</div>';
 
 	echo '
-		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
-	</div>
-	<br class="clear" />';
+	</div>';
 }
 
 function template_information()
@@ -197,11 +191,9 @@ function template_information()
 				</h3>
 			</div>
 			<div class="windowbg2">
-				<span class="topslice"><span></span></span>
 				<div class="sp_content_padding">
 					<div id="spAnnouncements" style="">', $txt['sp-info_no_live'], '</div>
 				</div>
-				<span class="botslice"><span></span></span>
 			</div>
 		</div>
 		<div id="sp_general_info" class="sp_float_right">
@@ -211,7 +203,6 @@ function template_information()
 				</h3>
 			</div>
 			<div class="windowbg2">
-				<span class="topslice"><span></span></span>
 				<div class="sp_content_padding">
 					<strong>', $txt['sp-info_versions'], ':</strong><br />
 					', $txt['sp-info_your_version'], ':
@@ -221,7 +212,6 @@ function template_information()
 					<strong>', $txt['sp-info_managers'], ':</strong>
 					', implode(', ', $context['sp_managers']), '
 				</div>
-				<span class="botslice"><span></span></span>
 			</div>
 		</div>
 	</div>
@@ -269,7 +259,7 @@ function template_information()
 			spSetAnnouncements();
 			spCurrentVersion();
 		}
-		', $context['SPortal']['core_compat'] == 'old' ? 'add_load_event(func);' : 'addLoadEvent(func);','
+		', $context['SPortal']['core_compat'] == 'old' ? 'add_load_event(func);' : 'addLoadEvent(func);', '
 	// ]]></script>';
 	}
 
@@ -280,14 +270,13 @@ function template_information()
 		</h3>
 	</div>
 	<div class="windowbg2">
-		<span class="topslice"><span></span></span>
-			<div class="sp_content_padding" id="sp_credits">';
+		<div class="sp_content_padding" id="sp_credits">';
 
 	foreach ($context['sp_credits'] as $section)
 	{
 		if (isset($section['pretext']))
 			echo '
-				<p>', $section['pretext'], '</p>';
+			<p>', $section['pretext'], '</p>';
 
 		foreach ($section['groups'] as $group)
 		{
@@ -295,28 +284,25 @@ function template_information()
 				continue;
 
 			echo '
-				<p>';
+			<p>';
 
 			if (isset($group['title']))
 				echo '
-					<strong>', $group['title'], ':</strong> ';
+				<strong>', $group['title'], ':</strong> ';
 
 			echo implode(', ', $group['members']), '
-				</p>';
+			</p>';
 		}
 
 
 		if (isset($section['posttext']))
 			echo '
-				<p>', $section['posttext'], '</p>';
+			<p>', $section['posttext'], '</p>';
 	}
 
 	echo '
-				<hr />
-				<p>', sprintf($txt['sp-info_contribute'], 'http://www.simpleportal.net/index.php?page=contribute'), '</p>
-			</div>
-		<span class="botslice"><span></span></span>
+			<hr />
+			<p>', sprintf($txt['sp-info_contribute'], 'http://www.simpleportal.net/index.php?page=contribute'), '</p>
+		</div>
 	</div>';
 }
-
-?>
