@@ -397,6 +397,11 @@ function sp_load_category($start, $items_per_page, $sort)
 	return $categories;
 }
 
+/**
+ * Removes a category or group of categories by id
+ *
+ * @param array $category_ids
+ */
 function sp_delete_categories($category_ids = array())
 {
 	$db = database();
@@ -414,6 +419,26 @@ function sp_delete_categories($category_ids = array())
 		WHERE id_category IN ({array_int:categories})',
 		array(
 			'categories' => $category_id,
+		)
+	);
+}
+
+/**
+ * Switches the active state of a category from active <-> inactive
+ *
+ * @param int $category_id
+ */
+function sp_category_update($category_id)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}sp_categories
+		SET status = CASE WHEN status = {int:is_active} THEN 0 ELSE 1 END
+		WHERE id_category = {int:id}',
+		array(
+			'is_active' => 1,
+			'id' => $category_id,
 		)
 	);
 }

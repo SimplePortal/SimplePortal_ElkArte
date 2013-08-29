@@ -149,11 +149,23 @@ class ManagePortalCategories_Controller extends Action_Controller
 							'format' => '<a href="?action=admin;area=portalcategories;sa=edit;category_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>&nbsp;
 								<a href="?action=admin;area=portalcategories;sa=delete;category_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_categories_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
-								'category_id' => true,
+								'id' => true,
 							),
 						),
 						'class' => "centertext",
-						'style' => "width: 10%",
+						'style' => "width: 40px",
+					),
+				),
+				'check' => array(
+					'header' => array(
+						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
+						'),
+						'class' => 'centertext',
 					),
 				),
 			),
@@ -342,31 +354,19 @@ class ManagePortalCategories_Controller extends Action_Controller
 		}
 
 		$context['category']['groups'] = sp_load_membergroups();
-
 		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_categories_add'] : $txt['sp_admin_categories_edit'];
 		$context['sub_template'] = 'categories_edit';
 	}
 
 	/**
-	 * Approve categories
+	 * Switch the active status of a category
 	 */
 	public function action_sportal_admin_category_status()
 	{
-		$db = database();
-
 		checkSession('get');
 
 		$category_id = !empty($_REQUEST['category_id']) ? (int) $_REQUEST['category_id'] : 0;
-
-		$db->query('', '
-			UPDATE {db_prefix}sp_categories
-			SET status = CASE WHEN status = {int:is_active} THEN 0 ELSE 1 END
-			WHERE id_category = {int:id}',
-			array(
-				'is_active' => 1,
-				'id' => $category_id,
-			)
-		);
+		sp_category_update($category_id);
 
 		redirectexit('action=admin;area=portalcategories');
 	}
