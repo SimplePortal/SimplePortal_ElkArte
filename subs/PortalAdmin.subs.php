@@ -334,3 +334,86 @@ function sp_load_membergroups()
 
 	return $groups;
 }
+
+/**
+ * Returns the total count of categories in the system
+ */
+function sp_category_count()
+{
+	$db = database();
+	$total_categories = 0;
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}sp_categories'
+	);
+	list ($total_categories) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_categories;
+}
+
+/**
+ * Loads all of the categorys in the system
+ * Returns an indexed array of the categories
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ */
+function sp_load_category($start, $items_per_page, $sort)
+{
+	global $scripturl, $txt;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_category, name, namespace, articles, status
+		FROM {db_prefix}sp_categories
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:limit}',
+		array(
+			'sort' => $sort,
+			'start' => $start,
+			'limit' => $items_per_page,
+		)
+	);
+	$categories = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$categories[$row['id_category']] = array(
+			'id' => $row['id_category'],
+			'category_id' => $row['namespace'],
+			'name' => $row['name'],
+			'href' => $scripturl . '?category=' . $row['namespace'],
+			'link' => '<a href="' . $scripturl . '?category=' . $row['namespace'] . '">' . $row['name'] . '</a>',
+			'articles' => $row['articles'],
+			'status' => $row['status'],
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalcategories;sa=status;category_id=' . $row['id_category'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_categories_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
+		);
+	}
+	$db->free_result($request);
+
+	return $categories;
+}
+
+function sp_delete_categories($category_ids = array())
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_categories
+		WHERE id_category IN ({array_int:categories})',
+		array(
+			'categories' => $category_ids,
+		)
+	);
+
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_articles
+		WHERE id_category IN ({array_int:categories})',
+		array(
+			'categories' => $category_id,
+		)
+	);
+}

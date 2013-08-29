@@ -37,7 +37,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 		loadTemplate('PortalAdminCategories');
 
 		$subActions = array(
-			'list' => array($this, 'action_sportal_admin_category_list'),
+			'list' => array($this, 'action_list_categories'),
 			'add' => array($this, 'action_sportal_admin_category_edit'),
 			'edit' => array($this, 'action_sportal_admin_category_edit'),
 			'status' => array($this, 'action_sportal_admin_category_status'),
@@ -70,144 +70,141 @@ class ManagePortalCategories_Controller extends Action_Controller
 	/**
 	 * Show a listing of categories in the system
 	 */
-	public function action_sportal_admin_category_list()
+	public function action_list_categories()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $scripturl, $txt, $modSettings;
 
-		$db = database();
-
-		if (!empty($_POST['remove_categories']) && !empty($_POST['remove']) && is_array($_POST['remove']))
-		{
-			checkSession();
-
-			foreach ($_POST['remove'] as $index => $category_id)
-				$_POST['remove'][(int) $index] = (int) $category_id;
-
-			$db->query('', '
-				DELETE FROM {db_prefix}sp_categories
-				WHERE id_category IN ({array_int:categories})',
+		// build the listoption array to display the categories
+		$listOptions = array(
+			'id' => 'portal_categories',
+			'title' => $txt['sp_admin_categories_list'],
+			'items_per_page' => $modSettings['defaultMaxMessages'],
+			'no_items_label' => $txt['error_sp_no_categories'],
+			'base_href' => $scripturl . '?action=admin;area=portalcategories;sa=list;',
+			'default_sort_col' => 'name',
+			'get_items' => array(
+				'function' => array($this, 'list_spLoadCategories'),
+			),
+			'get_count' => array(
+				'function' => array($this, 'list_spCategoryCount'),
+			),
+			'columns' => array(
+				'name' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_categories_col_name'],
+					),
+					'data' => array(
+						'db' => 'name',
+					),
+					'sort' => array(
+						'default' => 'name',
+						'reverse' => 'name DESC',
+					),
+				),
+				'namespace' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_categories_col_namespace'],
+					),
+					'data' => array(
+						'db' => 'namespace',
+					),
+					'sort' => array(
+						'default' => 'namespace',
+						'reverse' => 'namespace DESC',
+					),
+				),
+				'articles' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_categories_col_articles'],
+					),
+					'data' => array(
+						'db' => 'articles',
+					),
+					'sort' => array(
+						'default' => 'articles',
+						'reverse' => 'articles DESC',
+					),
+				),
+				'status' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_categories_col_status'],
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'db' => 'status_image',
+						'class' => "centertext",
+					),
+					'sort' => array(
+						'default' => 'status',
+						'reverse' => 'status DESC',
+					),
+				),
+				'action' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_categories_col_actions'],
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'sprintf' => array(
+							'format' => '<a href="?action=admin;area=portalcategories;sa=edit;category_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>&nbsp;
+								<a href="?action=admin;area=portalcategories;sa=delete;category_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_categories_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+							'params' => array(
+								'category_id' => true,
+							),
+						),
+						'class' => "centertext",
+						'style' => "width: 10%",
+					),
+				),
+			),
+			'form' => array(
+				'href' => $scripturl . '?action=admin;area=portalcategories;sa=remove',
+				'include_sort' => true,
+				'include_start' => true,
+				'hidden_fields' => array(
+					$context['session_var'] => $context['session_id'],
+				),
+			),
+			'additional_rows' => array(
 				array(
-					'categories' => $_POST['remove'],
-				)
-			);
-
-			$db->query('', '
-				DELETE FROM {db_prefix}sp_articles
-				WHERE id_category IN ({array_int:categories})',
-				array(
-					'categories' => $_POST['remove'],
-				)
-			);
-		}
-
-		$sort_methods = array(
-			'name' => array(
-				'down' => 'name ASC',
-				'up' => 'name DESC'
-			),
-			'namespace' => array(
-				'down' => 'namespace ASC',
-				'up' => 'namespace DESC'
-			),
-			'articles' => array(
-				'down' => 'articles ASC',
-				'up' => 'articles DESC'
-			),
-			'status' => array(
-				'down' => 'status ASC',
-				'up' => 'status DESC'
+					'position' => 'below_table_data',
+					'value' => '<input type="submit" name="addfilter" value="' . $txt['sp_admin_categories_remove'] . '" class="right_submit" />',
+				),
 			),
 		);
 
-		$context['columns'] = array(
-			'name' => array(
-				'width' => '40%',
-				'label' => $txt['sp_admin_categories_col_name'],
-				'class' => 'first_th',
-				'sortable' => true
-			),
-			'namespace' => array(
-				'width' => '30%',
-				'label' => $txt['sp_admin_categories_col_namespace'],
-				'sortable' => true
-			),
-			'articles' => array(
-				'width' => '10%',
-				'label' => $txt['sp_admin_categories_col_articles'],
-				'sortable' => true
-			),
-			'status' => array(
-				'width' => '10%',
-				'label' => $txt['sp_admin_categories_col_status'],
-				'sortable' => true
-			),
-			'actions' => array(
-				'width' => '10%',
-				'label' => $txt['sp_admin_categories_col_actions'],
-				'sortable' => false
-			),
-		);
+		// Set the context values
+		$context['page_title'] = $txt['sp_admin_categories_title'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'portal_categories';
 
-		if (!isset($_REQUEST['sort']) || !isset($sort_methods[$_REQUEST['sort']]))
-			$_REQUEST['sort'] = 'name';
+		// Create the list.
+		require_once(SUBSDIR . '/List.subs.php');
+		createList($listOptions);
+	}
 
-		foreach ($context['columns'] as $col => $dummy)
-		{
-			$context['columns'][$col]['selected'] = $col == $_REQUEST['sort'];
-			$context['columns'][$col]['href'] = $scripturl . '?action=admin;area=portalcategories;sa=list;sort=' . $col;
+	/**
+	 * Callback for createList(),
+	 * Returns the number of categories in the system
+	 *
+	 * @param int $messageID
+	 */
+	public function list_spCategoryCount()
+	{
+	   return sp_category_count();
+	}
 
-			if (!isset($_REQUEST['desc']) && $col == $_REQUEST['sort'])
-				$context['columns'][$col]['href'] .= ';desc';
-
-			$context['columns'][$col]['link'] = '<a href="' . $context['columns'][$col]['href'] . '">' . $context['columns'][$col]['label'] . '</a>';
-		}
-
-		$context['sort_by'] = $_REQUEST['sort'];
-		$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'down' : 'up';
-
-		$request = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}sp_categories'
-		);
-		list ($total_categories) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=portalcategories;sa=list;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $total_categories, 20);
-		$context['start'] = $_REQUEST['start'];
-
-		$request = $db->query('', '
-			SELECT id_category, name, namespace, articles, status
-			FROM {db_prefix}sp_categories
-			ORDER BY {raw:sort}
-			LIMIT {int:start}, {int:limit}',
-			array(
-				'sort' => $sort_methods[$_REQUEST['sort']][$context['sort_direction']],
-				'start' => $context['start'],
-				'limit' => 20,
-			)
-		);
-		$context['categories'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$context['categories'][$row['id_category']] = array(
-				'id' => $row['id_category'],
-				'category_id' => $row['namespace'],
-				'name' => $row['name'],
-				'href' => $scripturl . '?category=' . $row['namespace'],
-				'link' => '<a href="' . $scripturl . '?category=' . $row['namespace'] . '">' . $row['name'] . '</a>',
-				'articles' => $row['articles'],
-				'status' => $row['status'],
-				'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalcategories;sa=status;category_id=' . $row['id_category'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_categories_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
-				'actions' => array(
-					'edit' => '<a href="' . $scripturl . '?action=admin;area=portalcategories;sa=edit;category_id=' . $row['id_category'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
-					'delete' => '<a href="' . $scripturl . '?action=admin;area=portalcategories;sa=delete;category_id=' . $row['id_category'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_categories_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
-				)
-			);
-		}
-		$db->free_result($request);
-
-		$context['sub_template'] = 'categories_list';
-		$context['page_title'] = $txt['sp_admin_categories_list'];
+	/**
+	 * Callback for createList()
+	 * Returns an array of categories
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 */
+	public function list_spLoadCategories($start, $items_per_page, $sort)
+	{
+		return sp_load_category($start, $items_per_page, $sort);
 	}
 
 	/**
@@ -375,31 +372,29 @@ class ManagePortalCategories_Controller extends Action_Controller
 	}
 
 	/**
-	 * Delete a category
+	 * Delete a category or group of categories by id
 	 */
 	public function action_sportal_admin_category_delete()
 	{
-		$db = database();
+		$category_ids = array();
 
-		checkSession('get');
+		// Retreive the cat ids to remove
+		if (!empty($_POST['remove_categories']) && !empty($_POST['remove']) && is_array($_POST['remove']))
+		{
+			checkSession();
 
-		$category_id = !empty($_REQUEST['category_id']) ? (int) $_REQUEST['category_id'] : 0;
+			foreach ($_POST['remove'] as $index => $category_id)
+				$category_ids[] = (int) $category_id;
+		}
+		elseif (!empty($_REQUEST['category_id']))
+		{
+			checkSession('get');
+			$category_ids[] = (int) $_REQUEST['category_id'];
+		}
 
-		$db->query('', '
-			DELETE FROM {db_prefix}sp_categories
-			WHERE id_category = {int:id}',
-			array(
-				'id' => $category_id,
-			)
-		);
-
-		$db->query('', '
-			DELETE FROM {db_prefix}sp_articles
-			WHERE id_category = {int:id}',
-			array(
-				'id' => $category_id,
-			)
-		);
+		// If we have some to remove
+		if (!empty($category_ids))
+			sp_delete_categories($category_ids);
 
 		redirectexit('action=admin;area=portalcategories');
 	}
