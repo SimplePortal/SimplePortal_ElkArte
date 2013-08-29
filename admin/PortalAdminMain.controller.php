@@ -54,7 +54,6 @@ class ManagePortalConfig_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
 		require_once(SUBSDIR . '/Portal.subs.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
-		loadTemplate('PortalAdmin');
 
 		$subActions = array(
 			'information' => array($this, 'action_sportal_information'),
@@ -123,7 +122,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=portalconfig;sa=generalsettings;save';
 		$context['settings_title'] = $txt['sp-adminGeneralSettingsName'];
 		$context['page_title'] = $txt['sp-adminGeneralSettingsName'];
-		$context['sub_template'] = 'general_settings';
+		$context['sub_template'] = 'show_settings';
 
 		Settings_Form::prepare_db($config_vars);
 	}
@@ -220,7 +219,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=portalconfig;sa=blocksettings;save';
 		$context['settings_title'] = $txt['sp-adminBlockSettingsName'];
 		$context['page_title'] = $txt['sp-adminBlockSettingsName'];
-		$context['sub_template'] = 'general_settings';
+		$context['sub_template'] = 'show_settings';
 
 		Settings_Form::prepare_db($config_vars);
 	}
@@ -278,7 +277,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=portalconfig;sa=articlesettings;save';
 		$context['settings_title'] = $txt['sp-adminArticleSettingsName'];
 		$context['page_title'] = $txt['sp-adminArticleSettingsName'];
-		$context['sub_template'] = 'general_settings';
+		$context['sub_template'] = 'show_settings';
 
 		Settings_Form::prepare_db($config_vars);
 	}
@@ -310,6 +309,8 @@ class ManagePortalConfig_Controller extends Action_Controller
 	public function action_sportal_information($in_admin = true)
 	{
 		global $context, $scripturl, $txt, $sportal_version, $user_profile;
+
+		loadTemplate('PortalAdmin');
 
 		$context['sp_credits'] = array(
 			array(
@@ -404,8 +405,6 @@ class ManagePortalConfig_Controller extends Action_Controller
 
 		if (!$in_admin)
 		{
-			loadTemplate('PortalAdmin');
-
 			$context['robot_no_index'] = true;
 			$context['in_admin'] = false;
 		}
