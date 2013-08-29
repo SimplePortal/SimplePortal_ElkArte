@@ -26,13 +26,11 @@ function template_portal_index()
 			</h3>
 		</div>
 		<div class="windowbg2">
-			<span class="topslice"><span></span></span>
 			<div class="sp_content_padding">
 				<span>', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '</span>
 				<p>', $article['preview'], '<a href="', $article['href'], '">...</a></p>
 				<span>', sprintf($article['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['views']) ,', ', sprintf($article['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '</span>
 			</div>
-			<span class="botslice"><span></span></span>
 		</div>';
 	}
 
@@ -131,6 +129,7 @@ function template_portal_below()
 		echo '
 			</td>';
 	}
+
 	echo '
 		</tr>
 	</table>';
@@ -249,12 +248,6 @@ function template_block_curve($block)
 	echo '
 		<div', empty($block['style']['body']['class']) ? '' : ' class="' . $block['style']['body']['class'] . '"', '>';
 
-	if (empty($block['style']['no_body']))
-	{
-		echo '
-			<span class="topslice"><span></span></span>';
-	}
-
 	echo '
 			<div class="', $block['type'] != 'sp_menu' ? 'sp_block' : 'sp_content_padding', '"', !empty($block['style']['body']['style']) ? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
 
@@ -262,12 +255,6 @@ function template_block_curve($block)
 
 	echo '
 			</div>';
-
-	if (empty($block['style']['no_body']))
-	{
-		echo '
-			<span class="botslice"><span></span></span>';
-	}
 
 	echo '
 		</div>';
@@ -281,5 +268,3 @@ function template_block_curve($block)
 	echo '
 	</div>';
 }
-
-?>
