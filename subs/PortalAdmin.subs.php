@@ -338,7 +338,7 @@ function sp_load_membergroups()
 /**
  * Returns the total count of categories in the system
  */
-function sp_category_count()
+function sp_count_categories()
 {
 	$db = database();
 	$total_categories = 0;
@@ -361,7 +361,7 @@ function sp_category_count()
  * @param int $items_per_page
  * @param string $sort
  */
-function sp_load_category($start, $items_per_page, $sort)
+function sp_load_categories($start, $items_per_page, $sort)
 {
 	global $scripturl, $txt;
 
@@ -439,6 +439,130 @@ function sp_category_update($category_id)
 		array(
 			'is_active' => 1,
 			'id' => $category_id,
+		)
+	);
+}
+
+/**
+ * Updates the total articles in a category
+ *
+ * @param int $category_id
+ */
+function sp_category_update_total($category_id)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}sp_categories
+		SET articles = articles - 1
+		WHERE id_category = {int:id}',
+		array(
+			'id' => $category_id,
+		)
+	);
+}
+
+/**
+ * Returns the total count of articles in the system
+ */
+function sp_count_articles()
+{
+	$db = database();
+	$total_articles = 0;
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}sp_articles'
+	);
+	list ($total_articles) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_articles;
+}
+
+/**
+ * Loads all of the articles in the system
+ * Returns an indexed array of the articles
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ */
+function sp_load_articles($start, $items_per_page, $sort)
+{
+	global $scripturl, $txt;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT
+			spa.id_article, spa.id_category, spc.name, spc.namespace AS category_namespace,
+			IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name,
+			spa.namespace AS article_namespace, spa.title, spa.type, spa.date, spa.status
+		FROM {db_prefix}sp_articles AS spa
+			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
+			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spa.id_member)
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:limit}',
+		array(
+			'sort' => $sort,
+			'start' => $start,
+			'limit' => $items_per_page,
+		)
+	);
+	$articles = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$articles[$row['id_article']] = array(
+			'id' => $row['id_article'],
+			'article_id' => $row['article_namespace'],
+			'title' => $row['title'],
+			'href' => $scripturl . '?article=' . $row['article_namespace'],
+			'link' => '<a href="' . $scripturl . '?article=' . $row['article_namespace'] . '">' . $row['title'] . '</a>',
+			'category_name' => $row['name'],
+			'author_name' => $row['author_name'],
+			'category' => array(
+				'id' => $row['id_category'],
+				'name' => $row['name'],
+				'href' => $scripturl . '?category=' . $row['category_namespace'],
+				'link' => '<a href="' . $scripturl . '?category=' . $row['category_namespace'] . '">' . $row['name'] . '</a>',
+			),
+			'author' => array(
+				'id' => $row['id_author'],
+				'name' => $row['author_name'],
+				'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
+				'link' => $row['id_author'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>') : $row['author_name'],
+			),
+			'type' => $row['type'],
+			'type_text' => $txt['sp_articles_type_' . $row['type']],
+			'date' => standardTime($row['date']),
+			'status' => $row['status'],
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
+			'actions' => array(
+				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=edit;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
+				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=delete;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_articles_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
+			)
+		);
+	}
+	$db->free_result($request);
+
+	return $articles;
+}
+
+/**
+ * Removes a category or group of articles by id
+ *
+ * @param array $article_ids
+ */
+function sp_delete_articles($article_ids = array())
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_articles
+		WHERE id_article = {array_int:id}',
+		array(
+			'id' => $article_ids,
 		)
 	);
 }

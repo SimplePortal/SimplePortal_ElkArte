@@ -27,7 +27,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		// You need to be an admin or have manage permissions to change article settings
+		// You need to be an admin or have manage article permissions
 		if (!allowedTo('sp_admin'))
 			isAllowedTo('sp_manage_articles');
 
@@ -68,185 +68,191 @@ class ManagePortalArticles_Controller extends Action_Controller
 	}
 
 	/**
-	 * Show a listing of all the articles in the system
-	 * @todo createList perhaps?
+	 * Show a listing of articles in the system
 	 */
 	public function action_sportal_admin_article_list()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $scripturl, $txt, $modSettings;
 
-		$db = database();
-
-		if (!empty($_POST['remove_articles']) && !empty($_POST['remove']) && is_array($_POST['remove']))
-		{
-			checkSession();
-
-			foreach ($_POST['remove'] as $index => $article_id)
-				$_POST['remove'][(int) $index] = (int) $article_id;
-
-			$db->query('', '
-				DELETE FROM {db_prefix}sp_articles
-				WHERE id_article IN ({array_int:articles})',
-				array(
-					'articles' => $_POST['remove'],
-				)
-			);
-		}
-
-		$sort_methods = array(
-			'title' => array(
-				'down' => 'spa.title ASC',
-				'up' => 'spa.title DESC'
+		// build the listoption array to display the categories
+		$listOptions = array(
+			'id' => 'portal_articles',
+			'title' => $txt['sp_admin_articles_list'],
+			'items_per_page' => $modSettings['defaultMaxMessages'],
+			'no_items_label' => $txt['error_sp_no_articles'],
+			'base_href' => $scripturl . '?action=admin;area=portalarticles;sa=list;',
+			'default_sort_col' => 'title',
+			'get_items' => array(
+				'function' => array($this, 'list_spLoadArticles'),
 			),
-			'namespace' => array(
-				'down' => 'article_namespace ASC',
-				'up' => 'article_namespace DESC'
+			'get_count' => array(
+				'function' => array($this, 'list_spCountArticles'),
 			),
-			'category' => array(
-				'down' => 'spc.name ASC',
-				'up' => 'spc.name DESC'
-			),
-			'author' => array(
-				'down' => 'author_name ASC',
-				'up' => 'author_name DESC'
-			),
-			'type' => array(
-				'down' => 'spa.type ASC',
-				'up' => 'spa.type DESC'
-			),
-			'date' => array(
-				'down' => 'spa.date ASC',
-				'up' => 'spa.date DESC'
-			),
-			'status' => array(
-				'down' => 'spa.status ASC',
-				'up' => 'spa.status DESC'
-			),
-		);
-
-		$context['columns'] = array(
-			'title' => array(
-				'width' => '22%',
-				'label' => $txt['sp_admin_articles_col_title'],
-				'class' => 'first_th',
-				'sortable' => true
-			),
-			'namespace' => array(
-				'width' => '14%',
-				'label' => $txt['sp_admin_articles_col_namespace'],
-				'sortable' => true
-			),
-			'category' => array(
-				'width' => '10%',
-				'label' => $txt['sp_admin_articles_col_category'],
-				'sortable' => true
-			),
-			'author' => array(
-				'width' => '10%',
-				'label' => $txt['sp_admin_articles_col_author'],
-				'sortable' => true
-			),
-			'type' => array(
-				'width' => '8%',
-				'label' => $txt['sp_admin_articles_col_type'],
-				'sortable' => true
-			),
-			'date' => array(
-				'width' => '19%',
-				'label' => $txt['sp_admin_articles_col_date'],
-				'sortable' => true
-			),
-			'status' => array(
-				'width' => '6%',
-				'label' => $txt['sp_admin_articles_col_status'],
-				'sortable' => true
-			),
-			'actions' => array(
-				'width' => '10%',
-				'label' => $txt['sp_admin_articles_col_actions'],
-				'sortable' => false
-			),
-		);
-
-		if (!isset($_REQUEST['sort']) || !isset($sort_methods[$_REQUEST['sort']]))
-			$_REQUEST['sort'] = 'title';
-
-		foreach ($context['columns'] as $col => $dummy)
-		{
-			$context['columns'][$col]['selected'] = $col == $_REQUEST['sort'];
-			$context['columns'][$col]['href'] = $scripturl . '?action=admin;area=portalarticles;sa=list;sort=' . $col;
-
-			if (!isset($_REQUEST['desc']) && $col == $_REQUEST['sort'])
-				$context['columns'][$col]['href'] .= ';desc';
-
-			$context['columns'][$col]['link'] = '<a href="' . $context['columns'][$col]['href'] . '">' . $context['columns'][$col]['label'] . '</a>';
-		}
-
-		$context['sort_by'] = $_REQUEST['sort'];
-		$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'down' : 'up';
-
-		$request = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}sp_articles'
-		);
-		list ($total_articles) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=portalarticles;sa=list;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $total_articles, 20);
-		$context['start'] = $_REQUEST['start'];
-
-		$request = $db->query('', '
-			SELECT
-				spa.id_article, spa.id_category, spc.name, spc.namespace AS category_namespace,
-				IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name,
-				spa.namespace AS article_namespace, spa.title, spa.type, spa.date, spa.status
-			FROM {db_prefix}sp_articles AS spa
-				INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
-				LEFT JOIN {db_prefix}members AS m ON (m.id_member = spa.id_member)
-			ORDER BY {raw:sort}
-			LIMIT {int:start}, {int:limit}',
-			array(
-				'sort' => $sort_methods[$_REQUEST['sort']][$context['sort_direction']],
-				'start' => $context['start'],
-				'limit' => 20,
-			)
-		);
-		$context['articles'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$context['articles'][$row['id_article']] = array(
-				'id' => $row['id_article'],
-				'article_id' => $row['article_namespace'],
-				'title' => $row['title'],
-				'href' => $scripturl . '?article=' . $row['article_namespace'],
-				'link' => '<a href="' . $scripturl . '?article=' . $row['article_namespace'] . '">' . $row['title'] . '</a>',
+			'columns' => array(
+				'title' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_articles_col_title'],
+					),
+					'data' => array(
+						'db' => 'title',
+					),
+					'sort' => array(
+						'default' => 'title',
+						'reverse' => 'title DESC',
+					),
+				),
+				'namespace' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_articles_col_namespace'],
+					),
+					'data' => array(
+						'db' => 'article_id',
+					),
+					'sort' => array(
+						'default' => 'article_namespace',
+						'reverse' => 'article_namespace DESC',
+					),
+				),
 				'category' => array(
-					'id' => $row['id_category'],
-					'name' => $row['name'],
-					'href' => $scripturl . '?category=' . $row['category_namespace'],
-					'link' => '<a href="' . $scripturl . '?category=' . $row['category_namespace'] . '">' . $row['name'] . '</a>',
+					'header' => array(
+						'value' => $txt['sp_admin_articles_col_category'],
+					),
+					'data' => array(
+						'db' => 'category_name',
+					),
+					'sort' => array(
+						'default' => 'name',
+						'reverse' => 'name DESC',
+					),
 				),
 				'author' => array(
-					'id' => $row['id_author'],
-					'name' => $row['author_name'],
-					'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
-					'link' => $row['id_author'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>') : $row['author_name'],
+					'header' => array(
+						'value' => $txt['sp_admin_articles_col_author'],
+					),
+					'data' => array(
+						'db' => 'author_name',
+					),
+					'sort' => array(
+						'default' => 'author_name',
+						'reverse' => 'author_name DESC',
+					),
 				),
-				'type' => $row['type'],
-				'type_text' => $txt['sp_articles_type_' . $row['type']],
-				'date' => timeformat($row['date']),
-				'status' => $row['status'],
-				'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
-				'actions' => array(
-					'edit' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=edit;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
-					'delete' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=delete;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_articles_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
-				)
-			);
-		}
-		$db->free_result($request);
+				'type' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_articles_col_type'],
+					),
+					'data' => array(
+						'db' => 'type',
+					),
+					'sort' => array(
+						'default' => 'type',
+						'reverse' => 'type DESC',
+					),
+				),
+				'date' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_articles_col_date'],
+					),
+					'data' => array(
+						'db' => 'date',
+					),
+					'sort' => array(
+						'default' => 'date',
+						'reverse' => 'date DESC',
+					),
+				),
+				'status' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_articles_col_status'],
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'db' => 'status_image',
+						'class' => 'centertext',
+					),
+					'sort' => array(
+						'default' => 'status',
+						'reverse' => 'status DESC',
+					),
+				),
+				'action' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_articles_col_actions'],
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'sprintf' => array(
+							'format' => '<a href="?action=admin;area=portalarticles;sa=edit;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>&nbsp;
+								<a href="?action=admin;area=portalarticles;sa=delete;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_categories_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+							'params' => array(
+								'id' => true,
+							),
+						),
+						'class' => "centertext",
+						'style' => "width: 40px",
+					),
+				),
+				'check' => array(
+					'header' => array(
+						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
+						'),
+						'class' => 'centertext',
+					),
+				),
+			),
+			'form' => array(
+				'href' => $scripturl . '?action=admin;area=portalcategories;sa=remove',
+				'include_sort' => true,
+				'include_start' => true,
+				'hidden_fields' => array(
+					$context['session_var'] => $context['session_id'],
+				),
+			),
+			'additional_rows' => array(
+				array(
+					'position' => 'below_table_data',
+					'value' => '<input type="submit" name="remove_articles" value="' . $txt['sp_admin_articles_remove'] . '" class="right_submit" />',
+				),
+			),
+		);
 
-		$context['sub_template'] = 'articles_list';
-		$context['page_title'] = $txt['sp_admin_articles_list'];
+		// Set the context values
+		$context['page_title'] = $txt['sp_admin_articles_title'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'portal_articles';
+
+		// Create the list.
+		require_once(SUBSDIR . '/List.subs.php');
+		createList($listOptions);
+	}
+
+	/**
+	 * Callback for createList(),
+	 * Returns the number of articles in the system
+	 *
+	 * @param int $messageID
+	 */
+	public function list_spCountArticles()
+	{
+	   return sp_count_articles();
+	}
+
+	/**
+	 * Callback for createList()
+	 * Returns an array of articles
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 */
+	public function list_spLoadArticles($start, $items_per_page, $sort)
+	{
+		return sp_load_articles($start, $items_per_page, $sort);
 	}
 
 	/**
@@ -570,29 +576,34 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 */
 	public function action_sportal_admin_article_delete()
 	{
-		$db = database();
+		$article_ids = array();
 
-		checkSession('get');
+		// Get the article id's to remove
+		if (!empty($_POST['remove_articles']) && !empty($_POST['remove']) && is_array($_POST['remove']))
+		{
+			checkSession();
 
-		$article_id = !empty($_REQUEST['article_id']) ? (int) $_REQUEST['article_id'] : 0;
-		$article_info = sportal_get_articles($article_id);
+			foreach ($_POST['remove'] as $index => $article_id)
+				$article_ids[(int) $index] = (int) $article_id;
+		}
+		elseif (!empty($_REQUEST['article_id']))
+		{
+			checkSession('get');
+			$article_ids[] = (int) $_REQUEST['article_id'];
+		}
 
-		$db->query('', '
-			DELETE FROM {db_prefix}sp_articles
-			WHERE id_article = {int:id}',
-			array(
-				'id' => $article_id,
-			)
-		);
+		// If we have some to remove ....
+		if (!empty($article_ids))
+		{
+			sp_delete_articles($article_ids);
 
-		$db->query('', '
-			UPDATE {db_prefix}sp_categories
-			SET articles = articles - 1
-			WHERE id_category = {int:id}',
-			array(
-				'id' => $article_info['category']['id'],
-			)
-		);
+			// @todo batch for this?
+			foreach ($article_ids as $index => $article_id)
+			{
+				$article_info = sportal_get_articles($article_id);
+				sp_category_update_total($article_info['category']['id']);
+			}
+		}
 
 		redirectexit('action=admin;area=portalarticles');
 	}

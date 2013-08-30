@@ -10,88 +10,9 @@
  * @version 2.4
  */
 
-function template_articles_list()
-{
-	global $context, $scripturl, $settings, $txt;
-
-	echo '
-	<div id="sp_manage_articles">
-		<form action="', $scripturl, '?action=admin;area=portalarticles;sa=list" method="post" accept-charset="', $context['character_set'], '" onsubmit="return confirm(\'', $txt['sp_articles_remove_confirm'], '\');">
-			<div class="sp_align_left pagesection">
-				', $txt['pages'], ': ', $context['page_index'], '
-			</div>
-			<table class="table_grid" cellspacing="0" width="100%">
-				<thead>
-					<tr class="catbg">';
-
-	foreach ($context['columns'] as $column)
-	{
-		if ($column['selected'])
-			echo '
-						<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' width="' . $column['width'] . '"' : '', '>
-							<a href="', $column['href'], '">', $column['label'], '&nbsp;<img src="', $settings['images_url'], '/sort_', $context['sort_direction'], '.png" alt="" /></a>
-						</th>';
-		elseif ($column['sortable'])
-			echo '
-						<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' width="' . $column['width'] . '"' : '', '>
-							', $column['link'], '
-						</th>';
-		else
-			echo '
-						<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' width="' . $column['width'] . '"' : '', '>
-							', $column['label'], '
-						</th>';
-	}
-
-	echo '
-						<th scope="col" class="last_th">
-							<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />
-						</th>
-					</tr>
-				</thead>
-				<tbody>';
-
-	if (empty($context['articles']))
-	{
-		echo '
-					<tr class="windowbg2">
-						<td class="sp_center" colspan="', count($context['columns']) + 1, '">', $txt['error_sp_no_articles'], '</td>
-					</tr>';
-	}
-
-	foreach ($context['articles'] as $article)
-	{
-		echo '
-					<tr class="windowbg2">
-						<td class="sp_left">', $article['link'], '</td>
-						<td class="sp_center">', $article['article_id'], '</td>
-						<td class="sp_center">', $article['category']['link'], '</td>
-						<td class="sp_center">', $article['author']['link'], '</td>
-						<td class="sp_center">', $article['type_text'], '</td>
-						<td class="sp_center">', $article['date'], '</td>
-						<td class="sp_center">', $article['status_image'], '</td>
-						<td class="sp_center">', implode('&nbsp;', $article['actions']), '</td>
-						<td class="sp_center"><input type="checkbox" name="remove[]" value="', $article['id'], '" class="input_check" /></td>
-					</tr>';
-	}
-
-	echo '
-				</tbody>
-			</table>
-			<div class="sp_align_left pagesection">
-				<div class="sp_float_right">
-					<input type="submit" name="remove_articles" value="', $txt['sp_admin_articles_remove'], '" class="button_submit" />
-				</div>
-				', $txt['pages'], ': ', $context['page_index'], '
-			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-		</form>
-	</div>';
-}
-
 function template_articles_edit()
 {
-	global $context, $scripturl, $settings, $txt, $helptxt;
+	global $context, $scripturl, $settings, $txt;
 
 	if (!empty($context['preview']))
 	{
@@ -106,14 +27,13 @@ function template_articles_edit()
 
 	echo '
 	<div id="sp_edit_article">
-		<form action="', $scripturl, '?action=admin;area=portalarticles;sa=edit" method="post" accept-charset="', $context['character_set'], '" onsubmit="submitonce(this);">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalarticles;sa=edit" method="post" accept-charset="', $context['character_set'], '" onsubmit="submitonce(this);">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					', $txt['sp_admin_articles_general'], '
 				</h3>
 			</div>
-			<div class="windowbg2">
-				<span class="topslice"><span></span></span>
+			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">
 						<dt>
@@ -156,7 +76,7 @@ function template_articles_edit()
 							</select>
 						</dd>
 						<dt>
-							<a href="', $scripturl, '?action=helpadmin;help=sp_permissions" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
+							<a href="', $scripturl, '?action=quickhelp;help=sp_permissions" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
 							<label for="article_permission_set">', $txt['sp_admin_articles_col_permissions'], ':</label>
 						</dt>
 						<dd>
@@ -219,12 +139,10 @@ function template_articles_edit()
 						<div id="sp_rich_smileys"', $context['article']['type'] != 'bbc' ? ' style="display: none;"' : '', '></div>
 						<div>', template_control_richedit($context['post_box_name'], 'sp_rich_smileys', 'sp_rich_bbc'), '</div>
 					</div>
-					<div class="sp_button_container">
-						<input type="submit" name="preview" value="', $txt['sp_admin_articles_preview'], '" class="button_submit" /> <input type="submit" name="submit" value="', $context['page_title'], '" class="button_submit" />
-					</div>
 				</div>
-				<span class="botslice"><span></span></span>
 			</div>
+			<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
+			<input type="submit" name="preview" value="', $txt['sp_admin_articles_preview'], '" class="right_submit" />
 			<input type="hidden" name="article_id" value="', $context['article']['id'], '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
@@ -258,5 +176,3 @@ function template_articles_edit()
 		}
 	// ]]></script>';
 }
-
-?>
