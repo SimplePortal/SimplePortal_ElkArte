@@ -1902,7 +1902,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 	}
 
 	$data = str_replace(array("\n", "\r", "\t"), '', $data);
-	$data = preg_replace('~<\!\[CDATA\[(.+?)\]\]>~e' . ($context['utf8'] ? 'u' : ''), '\'#cdata_escape_encode#\' . Util::\'htmlspecialchars\'(\'$1\')', $data);
+	$data = preg_replace('~<\!\[CDATA\[(.+?)\]\]>~eu', '\'#cdata_escape_encode#\' . Util::\'htmlspecialchars\'(\'$1\')', $data);
 
 	preg_match_all('~<item>(.+?)</item>~', $data, $items);
 

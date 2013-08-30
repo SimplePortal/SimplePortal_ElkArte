@@ -16,7 +16,7 @@ function template_pages_list()
 
 	echo '
 	<div id="sp_manage_pages">
-		<form action="', $scripturl, '?action=admin;area=portalpages;sa=list" method="post" accept-charset="', $context['character_set'], '" onsubmit="return confirm(\'', $txt['sp_pages_remove_confirm'], '\');">
+		<form action="', $scripturl, '?action=admin;area=portalpages;sa=list" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['sp_pages_remove_confirm'], '\');">
 			<div class="sp_align_left pagesection">
 				', $txt['pages'], ': ', $context['page_index'], '
 			</div>
@@ -104,7 +104,7 @@ function template_pages_edit()
 
 	echo '
 	<div id="sp_edit_page">
-		<form action="', $scripturl, '?action=admin;area=portalpages;sa=edit" method="post" accept-charset="', $context['character_set'], '" onsubmit="submitonce(this);">
+		<form action="', $scripturl, '?action=admin;area=portalpages;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					', $txt['sp_admin_pages_general'], '

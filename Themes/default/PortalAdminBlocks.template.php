@@ -111,7 +111,7 @@ function template_block_edit()
 
 	echo '
 	<div id="sp_edit_block">
-		<form name="sp_edit_block_form" id="sp_edit_block_form" action="', $scripturl, '?action=admin;area=portalblocks;sa=edit" method="post" accept-charset="', $context['character_set'], '" onsubmit="submitonce(this);">
+		<form name="sp_edit_block_form" id="sp_edit_block_form" action="', $scripturl, '?action=admin;area=portalblocks;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					<a href="', $scripturl, '?action=helpadmin;help=sp-blocks', $context['SPortal']['is_new'] ? 'Add' : 'Edit', '" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
@@ -528,7 +528,7 @@ function template_block_select_type()
 				', $txt['sp-blocksSelectType'], '
 			</h3>
 		</div>
-		<form action="', $scripturl, '?action=admin;area=portalblocks;sa=add" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=admin;area=portalblocks;sa=add" method="post" accept-charset="UTF-8">
 			<table>
 				<tr>';
 

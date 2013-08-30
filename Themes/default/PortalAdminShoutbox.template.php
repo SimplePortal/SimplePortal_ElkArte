@@ -16,7 +16,7 @@ function template_shoutbox_list()
 
 	echo '
 	<div id="sp_manage_shoutboxes">
-		<form action="', $scripturl, '?action=admin;area=portalshoutbox;sa=list" method="post" accept-charset="', $context['character_set'], '" onsubmit="return confirm(\'', $txt['sp_shoutbox_remove_confirm'], '\');">
+		<form action="', $scripturl, '?action=admin;area=portalshoutbox;sa=list" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['sp_shoutbox_remove_confirm'], '\');">
 			<div class="sp_align_left pagesection">
 				', $txt['pages'], ': ', $context['page_index'], '
 			</div>
@@ -92,7 +92,7 @@ function template_shoutbox_edit()
 
 	echo '
 	<div id="sp_edit_shoutbox">
-		<form action="', $scripturl, '?action=admin;area=portalshoutbox;sa=edit" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=admin;area=portalshoutbox;sa=edit" method="post" accept-charset="UTF-8">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					', $context['page_title'], '
@@ -271,7 +271,7 @@ function template_shoutbox_prune()
 
 	echo '
 	<div id="sp_prune_shoutbox">
-		<form action="', $scripturl, '?action=admin;area=portalshoutbox;sa=prune" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $scripturl, '?action=admin;area=portalshoutbox;sa=prune" method="post" accept-charset="UTF-8">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					', $context['page_title'], '

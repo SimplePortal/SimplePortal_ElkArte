@@ -129,7 +129,7 @@ function template_view_article()
 			<div class="windowbg2">
 				<span class="topslice"><span></span></span>
 				<div class="sp_content_padding">
-					<form action="', $context['article']['href'], '" method="post" accept-charset="', $context['character_set'], '">
+					<form action="', $context['article']['href'], '" method="post" accept-charset="UTF-8">
 						<textarea name="body" rows="5" cols="50" style="', $context['browser']['is_ie8'] ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 99%', ';">', !empty($context['article']['comment']['body']) ? $context['article']['comment']['body'] : '', '</textarea>
 						<div class="sp_center">
 							<input type="submit" name="submit" value="', !empty($context['article']['comment']) ? $txt['sp_modify'] : $txt['sp_submit'], '" class="button_submit" />

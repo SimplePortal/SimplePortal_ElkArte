@@ -1410,7 +1410,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 
 	foreach ($shouts as $shout)
 	{
-		if (preg_match('~^@(.+?): ~' . ($context['utf8'] ? 'u' : ''), $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
+		if (preg_match('~^@(.+?): ~u', $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
 		{
 			unset($shouts[$shout['id']]);
 			continue;

@@ -27,7 +27,7 @@ function template_articles_edit()
 
 	echo '
 	<div id="sp_edit_article">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalarticles;sa=edit" method="post" accept-charset="', $context['character_set'], '" onsubmit="submitonce(this);">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalarticles;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					', $txt['sp_admin_articles_general'], '
