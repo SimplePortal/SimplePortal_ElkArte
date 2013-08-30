@@ -37,7 +37,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 		loadTemplate('PortalAdminCategories');
 
 		$subActions = array(
-			'list' => array($this, 'action_list_categories'),
+			'list' => array($this, 'action_sportal_admin_category_list'),
 			'add' => array($this, 'action_sportal_admin_category_edit'),
 			'edit' => array($this, 'action_sportal_admin_category_edit'),
 			'status' => array($this, 'action_sportal_admin_category_status'),
@@ -70,7 +70,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 	/**
 	 * Show a listing of categories in the system
 	 */
-	public function action_list_categories()
+	public function action_sportal_admin_category_list()
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
@@ -86,7 +86,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 				'function' => array($this, 'list_spLoadCategories'),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_spCategoryCount'),
+				'function' => array($this, 'list_spCountCategories'),
 			),
 			'columns' => array(
 				'name' => array(
@@ -180,7 +180,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="addfilter" value="' . $txt['sp_admin_categories_remove'] . '" class="right_submit" />',
+					'value' => '<input type="submit" name="remove_categories" value="' . $txt['sp_admin_categories_remove'] . '" class="right_submit" />',
 				),
 			),
 		);
@@ -201,9 +201,9 @@ class ManagePortalCategories_Controller extends Action_Controller
 	 *
 	 * @param int $messageID
 	 */
-	public function list_spCategoryCount()
+	public function list_spCountCategories()
 	{
-	   return sp_category_count();
+	   return sp_count_categories();
 	}
 
 	/**
@@ -216,7 +216,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 	 */
 	public function list_spLoadCategories($start, $items_per_page, $sort)
 	{
-		return sp_load_category($start, $items_per_page, $sort);
+		return sp_load_categories($start, $items_per_page, $sort);
 	}
 
 	/**
@@ -384,7 +384,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 			checkSession();
 
 			foreach ($_POST['remove'] as $index => $category_id)
-				$category_ids[] = (int) $category_id;
+				$category_ids[(int) $index] = (int) $category_id;
 		}
 		elseif (!empty($_REQUEST['category_id']))
 		{
