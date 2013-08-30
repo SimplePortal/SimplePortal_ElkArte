@@ -147,7 +147,7 @@ function template_articles_edit()
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
 	</div>
-	<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
+	<script type="text/javascript"><!-- // --><![CDATA[
 		sp_update_permissions();
 
 		function sp_update_editor()

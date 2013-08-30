@@ -104,7 +104,7 @@ function template_categories_edit()
 			</div>
 		</form>
 	</div>
-	<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
+	<script type="text/javascript"><!-- // --><![CDATA[
 		sp_update_permissions();
 
 		function sp_update_permissions()

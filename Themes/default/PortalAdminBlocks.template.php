@@ -487,7 +487,7 @@ function template_block_edit()
 		}
 
 		echo '
-					<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
+					<script type="text/javascript"><!-- // --><![CDATA[
 						document.getElementById("title_default_class").disabled = document.getElementById("no_title").checked;
 						document.getElementById("title_custom_class").disabled = document.getElementById("no_title").checked;
 						document.getElementById("title_custom_style").disabled = document.getElementById("no_title").checked;
@@ -504,7 +504,7 @@ function template_block_edit()
 	echo '
 		</form>
 	</div>
-	<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
+	<script type="text/javascript"><!-- // --><![CDATA[
 		sp_update_permissions();
 
 		function sp_update_permissions()
