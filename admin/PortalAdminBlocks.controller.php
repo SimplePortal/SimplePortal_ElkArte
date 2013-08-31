@@ -27,7 +27,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		// You need to be an admin or have manage permissions to change article settings
+		// You need to be an admin or have block permissions
 		if (!allowedTo('sp_admin'))
 			isAllowedTo('sp_manage_blocks');
 
@@ -171,7 +171,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			'action' => array(
 				'width' => '20%',
 				'label' => $txt['sp-adminColumnAction'],
-				'class' => 'last_th',
+				'class' => 'centertext last_th',
 			),
 		);
 
@@ -184,9 +184,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				$context['sides'][$side_id]['last'] = $block_id;
 				$context['blocks'][$side['name']][$block_id]['actions'] = array(
 					'state_icon' => empty($block['state']) ? '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';type=block;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('deactive', $txt['sp-blocksActivate']) . '</a>' : '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';type=block;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('active', $txt['sp-blocksDeactivate']) . '</a>',
-					'edit' => '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=edit;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
-					'move' => '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=select;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('move', $txt['sp-adminColumnMove']) . '</a>',
-					'delete' => '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=delete;block_id=' . $block['id'] . ';col=' . $block['column'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp-deleteblock'] . '\');">' . sp_embed_image('delete') . '</a>',
+					'edit' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=edit;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
+					'move' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=select;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('move', $txt['sp-adminColumnMove']) . '</a>',
+					'delete' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=delete;block_id=' . $block['id'] . ';col=' . $block['column'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp-deleteblock'] . '\');">' . sp_embed_image('delete') . '</a>',
 				);
 
 				if ($context['block_move'])
@@ -446,7 +446,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			function sp_collapseObject(id)
 			{
 				mode = document.getElementById("sp_object_" + id).style.display == "" ? 0 : 1;
-				document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/collapse.png" : "/expand.png");
+				document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/selected.png" : "/selected_open.png");
 				document.getElementById("sp_object_" + id).style.display = mode ? "" : "none";
 			}');
 
@@ -1039,5 +1039,12 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 		// Return back to the block list.
 		redirectexit('action=admin;area=portalblocks');
+	}
+
+	/**
+	 * Pass this off to the state change function
+	 */
+	public function action_sportal_admin_state_change() {
+		sportal_admin_state_change();
 	}
 }

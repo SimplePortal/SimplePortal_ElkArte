@@ -12,7 +12,8 @@
 
 /**
  * Show the list of availalbe blocks in the sytem
- * Breaks them down by area they are placed
+ * If no area is provided will show all areas with available blocks in each
+ * otherwise will just show the chosen area
  */
 function template_block_list()
 {
@@ -27,6 +28,7 @@ function template_block_list()
 			<p>', $context['move_title'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=portalblocks">', $txt['sp-blocks_cancel_moving'], '</a>', '</p>
 		</div>';
 
+	// Show each portal area with the blocks in each one
 	foreach($context['sides'] as $id => $side)
 	{
 		echo '
@@ -45,7 +47,7 @@ function template_block_list()
 
 		if ($context['block_move'])
 			echo '
-				<th scope="col" class="first_th" width="5%">', $txt['sp-adminColumnMove'], '</th>';
+					<th scope="col" class="first_th" width="5%">', $txt['sp-adminColumnMove'], '</th>';
 
 		foreach ($context['columns'] as $column)
 			echo '
@@ -60,7 +62,7 @@ function template_block_list()
 		{
 			echo '
 				<tr class="windowbg">
-					<td class="sp_center" colspan="4">', $txt['error_sp_no_block'], '</td>
+					<td class="sp_center noticebox" colspan="4">', $txt['error_sp_no_block'], '</td>
 				</tr>';
 		}
 
@@ -540,6 +542,9 @@ function template_block_edit()
 	// ]]></script>';
 }
 
+/**
+ * Used to select one of our predefined blocks for use in the portal
+ */
 function template_block_select_type()
 {
 	global $context, $scripturl, $settings, $txt;
@@ -548,11 +553,13 @@ function template_block_select_type()
 	<div id="sp_select_block_type">
 		<div class="cat_bar">
 			<h3 class="catbg">
-				<a href="', $scripturl, '?action=helpadmin;help=sp-blocksSelectType" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
+				<a href="', $scripturl, '?action=quickhelp;help=sp-blocksSelectType" onclick="return reqOverlayDiv(this.href);" class="help">
+					<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
+				</a>
 				', $txt['sp-blocksSelectType'], '
 			</h3>
 		</div>
-		<form action="', $scripturl, '?action=admin;area=portalblocks;sa=add" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalblocks;sa=add" method="post" accept-charset="UTF-8">
 			<table>
 				<tr>';
 
@@ -579,9 +586,9 @@ function template_block_select_type()
 	echo '
 				</tr>
 			</table>
-			<div class="windowbg2">
+			<div class="windowbg">
 				<div class="sp_center">
-					<input type="submit" name="select_type" value="', $txt['sp-blocksSelectType'], '" class="button_submit" />
+					<input type="submit" name="select_type" value="', $txt['sp-blocksSelectType'], '" class="right_submit" />
 				</div>
 			</div>';
 
@@ -594,5 +601,3 @@ function template_block_select_type()
 		</form>
 	</div>';
 }
-
-?>
