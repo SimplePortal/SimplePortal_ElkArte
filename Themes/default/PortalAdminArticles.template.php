@@ -10,10 +10,14 @@
  * @version 2.4
  */
 
+/**
+ * Used to add or edit an article
+ */
 function template_articles_edit()
 {
 	global $context, $scripturl, $settings, $txt;
 
+	// Taking a peek before you publish?
 	if (!empty($context['preview']))
 	{
 		echo '
@@ -30,7 +34,7 @@ function template_articles_edit()
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalarticles;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
 			<div class="cat_bar">
 				<h3 class="catbg">
-					', $txt['sp_admin_articles_general'], '
+					', $context['is_new'] ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'], '
 				</h3>
 			</div>
 			<div class="windowbg">

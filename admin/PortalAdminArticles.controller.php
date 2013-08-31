@@ -206,7 +206,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=portalcategories;sa=remove',
+				'href' => $scripturl . '?action=admin;area=portalarticles;sa=remove',
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
