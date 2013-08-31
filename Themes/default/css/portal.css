@@ -344,7 +344,6 @@ input.shoutbox_input {
 	margin-bottom: 0.8em;
 }
 #sp_select_block_type {
-	width: 80%;
 	margin: 0 auto;
 }
 #sp_select_block_type div.sp_content_padding {
@@ -364,7 +363,6 @@ input.shoutbox_input {
 	vertical-align: top;
 }
 #sp_edit_block {
-	width: 70%;
 	margin: 0 auto;
 }
 #sp_edit_block #sp_display_advanced {
@@ -384,7 +382,6 @@ input.shoutbox_input {
 	margin: 0.4em 0;
 }
 #sp_edit_article {
-	width: 70%;
 	margin: 0 auto;
 }
 
@@ -399,7 +396,6 @@ input.shoutbox_input {
 	margin: 0.4em 0;
 }
 #sp_edit_page {
-	width: 70%;
 	margin: 0 auto;
 }
 

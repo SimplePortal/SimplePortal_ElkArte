@@ -550,7 +550,7 @@ function sp_load_articles($start, $items_per_page, $sort)
 }
 
 /**
- * Removes a category or group of articles by id
+ * Removes a article or group of articles by id's
  *
  * @param array $article_ids
  */
@@ -563,6 +563,92 @@ function sp_delete_articles($article_ids = array())
 		WHERE id_article = {array_int:id}',
 		array(
 			'id' => $article_ids,
+		)
+	);
+}
+
+/**
+ * Returns the total count of pages in the system
+ */
+function sp_count_pages()
+{
+	$db = database();
+	$total_pages = 0;
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}sp_pages'
+	);
+	list ($total_pages) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_pages;
+}
+
+/**
+ * Loads all of the pages in the system
+ * Returns an indexed array of the pages
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ */
+function sp_load_pages($start, $items_per_page, $sort)
+{
+	global $scripturl, $txt, $context;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_page, namespace, title, type, views, status
+		FROM {db_prefix}sp_pages
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:limit}',
+		array(
+			'sort' => $sort,
+			'start' => $start,
+			'limit' => $items_per_page,
+		)
+	);
+	$pages = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$pages[$row['id_page']] = array(
+			'id' => $row['id_page'],
+			'page_id' => $row['namespace'],
+			'title' => $row['title'],
+			'href' => $scripturl . '?page=' . $row['namespace'],
+			'link' => '<a href="' . $scripturl . '?page=' . $row['namespace'] . '">' . $row['title'] . '</a>',
+			'type' => $row['type'],
+			'type_text' => $txt['sp_pages_type_' . $row['type']],
+			'views' => $row['views'],
+			'status' => $row['status'],
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=status;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_pages_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
+			'actions' => array(
+				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=edit;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
+				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=delete;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_pages_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
+			)
+		);
+	}
+	$db->free_result($request);
+
+	return $pages;
+}
+
+/**
+ * Removes a page or group of pages by id
+ *
+ * @param array $article_ids
+ */
+function sp_delete_pages($page_ids = array())
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_pages
+		WHERE id_page IN ({array_int:pages})',
+		array(
+			'pages' => $page_ids,
 		)
 	);
 }

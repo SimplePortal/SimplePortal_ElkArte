@@ -10,87 +10,11 @@
  * @version 2.4
  */
 
-function template_pages_list()
-{
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
-
-	echo '
-	<div id="sp_manage_pages">
-		<form action="', $scripturl, '?action=admin;area=portalpages;sa=list" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['sp_pages_remove_confirm'], '\');">
-			<div class="sp_align_left pagesection">
-				', $txt['pages'], ': ', $context['page_index'], '
-			</div>
-			<table class="table_grid" cellspacing="0" width="100%">
-				<thead>
-					<tr class="catbg">';
-
-	foreach ($context['columns'] as $column)
-	{
-		if ($column['selected'])
-			echo '
-						<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' width="' . $column['width'] . '"' : '', '>
-							<a href="', $column['href'], '">', $column['label'], '&nbsp;<img src="', $settings['images_url'], '/sort_', $context['sort_direction'], '.png" alt="" /></a>
-						</th>';
-		elseif ($column['sortable'])
-			echo '
-						<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' width="' . $column['width'] . '"' : '', '>
-							', $column['link'], '
-						</th>';
-		else
-			echo '
-						<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' width="' . $column['width'] . '"' : '', '>
-							', $column['label'], '
-						</th>';
-	}
-
-	echo '
-						<th scope="col" class="last_th">
-							<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />
-						</th>
-					</tr>
-				</thead>
-				<tbody>';
-
-	if (empty($context['pages']))
-	{
-		echo '
-					<tr class="windowbg2">
-						<td class="sp_center" colspan="', count($context['columns']) + 1, '">', $txt['error_sp_no_pages'], '</td>
-					</tr>';
-	}
-
-	foreach ($context['pages'] as $page)
-	{
-		echo '
-					<tr class="windowbg2">
-						<td class="sp_left">', $page['link'], '</td>
-						<td class="sp_center">', $page['page_id'], '</td>
-						<td class="sp_center">', $page['type_text'], '</td>
-						<td class="sp_center">', $page['views'], '</td>
-						<td class="sp_center">', $page['status_image'], '</td>
-						<td class="sp_center">', implode('&nbsp;', $page['actions']), '</td>
-						<td class="sp_center"><input type="checkbox" name="remove[]" value="', $page['id'], '" class="input_check" /></td>
-					</tr>';
-	}
-
-	echo '
-				</tbody>
-			</table>
-			<div class="sp_align_left pagesection">
-				<div class="sp_float_right">
-					<input type="submit" name="remove_pages" value="', $txt['sp_admin_pages_remove'], '" class="button_submit" />
-				</div>
-				', $txt['pages'], ': ', $context['page_index'], '
-			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-		</form>
-	</div>';
-}
-
 function template_pages_edit()
 {
-	global $context, $settings, $options, $scripturl, $txt, $helptxt, $modSettings;
+	global $context, $settings, $scripturl, $txt;
 
+	// Reviewing the page before submitting?
 	if (!empty($context['SPortal']['preview']))
 	{
 		echo '
@@ -102,23 +26,23 @@ function template_pages_edit()
 	</div>';
 	}
 
+	// Adding or editing a page
 	echo '
 	<div id="sp_edit_page">
-		<form action="', $scripturl, '?action=admin;area=portalpages;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalpages;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
 			<div class="cat_bar">
 				<h3 class="catbg">
-					', $txt['sp_admin_pages_general'], '
+					', $context['SPortal']['is_new'] ? $txt['sp_admin_pages_add'] : $txt['sp_admin_pages_edit'], '
 				</h3>
 			</div>
-			<div class="windowbg2">
-				<span class="topslice"><span></span></span>
+			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">
 						<dt>
 							<label for="page_title">', $txt['sp_admin_pages_col_title'], ':</label>
 						</dt>
 						<dd>
-						<input type="text" name="title" id="page_title" value="', $context['SPortal']['page']['title'], '" class="input_text" />
+							<input type="text" name="title" id="page_title" value="', $context['SPortal']['page']['title'], '" class="input_text" />
 						</dd>
 						<dt>
 							<label for="page_namespace">', $txt['sp_admin_pages_col_namespace'], ':</label>
@@ -231,11 +155,9 @@ function template_pages_edit()
 						<div id="sp_rich_smileys"', $context['SPortal']['page']['type'] != 'bbc' ? ' style="display: none;"' : '', '></div>
 						<div>', template_control_richedit($context['post_box_name'], 'sp_rich_smileys', 'sp_rich_bbc'), '</div>
 					</div>
-					<div class="sp_button_container">
-						<input type="submit" name="preview" value="', $txt['sp_admin_pages_preview'], '" class="button_submit" /> <input type="submit" name="submit" value="', $context['page_title'], '" class="button_submit" />
-					</div>
+					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
+					<input type="submit" name="preview" value="', $txt['sp_admin_pages_preview'], '" class="right_submit" />
 				</div>
-				<span class="botslice"><span></span></span>
 			</div>';
 
 	$style_sections = array('title' => 'left', 'body' => 'right');
@@ -253,7 +175,6 @@ function template_pages_edit()
 				</h3>
 			</div>
 			<div class="windowbg2">
-				<span class="topslice"><span></span></span>
 				<div class="sp_content_padding">';
 
 	foreach ($style_sections as $section => $float)
@@ -300,11 +221,9 @@ function template_pages_edit()
 	}
 
 	echo '
-					<div class="sp_button_container">
-						<input type="submit" name="preview" value="', $txt['sp_admin_pages_preview'], '" class="button_submit" /> <input type="submit" name="submit" value="', $context['page_title'], '" class="button_submit" />
-					</div>
+					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
+					<input type="submit" name="preview" value="', $txt['sp_admin_pages_preview'], '" class="right_submit" />
 				</div>
-				<span class="botslice"><span></span></span>
 			</div>
 			<input type="hidden" name="page_id" value="', $context['SPortal']['page']['id'], '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -344,5 +263,3 @@ function template_pages_edit()
 		}
 	// ]]></script>';
 }
-
-?>

@@ -69,147 +69,168 @@ class ManagePortalPages_Controller extends Action_Controller
 	/**
 	 * Show page listing of all portal pages in the system
 	 */
+	/**
+	 * Show a listing of articles in the system
+	 */
 	public function action_sportal_admin_page_list()
 	{
-		global $txt, $context, $scripturl;
+		global $context, $scripturl, $txt, $modSettings;
 
-		$db = database();
-
-		if (!empty($_POST['remove_pages']) && !empty($_POST['remove']) && is_array($_POST['remove']))
-		{
-			checkSession();
-
-			foreach ($_POST['remove'] as $index => $page_id)
-				$_POST['remove'][(int) $index] = (int) $page_id;
-
-			$db->query('', '
-				DELETE FROM {db_prefix}sp_pages
-				WHERE id_page IN ({array_int:pages})',
+		// build the listoption array to display the categories
+		$listOptions = array(
+			'id' => 'portal_pages',
+			'title' => $txt['sp_admin_articles_list'],
+			'items_per_page' => $modSettings['defaultMaxMessages'],
+			'no_items_label' => $txt['error_sp_no_pages'],
+			'base_href' => $scripturl . '?action=admin;area=portalpages;sa=list;',
+			'default_sort_col' => 'title',
+			'get_items' => array(
+				'function' => array($this, 'list_spLoadPages'),
+			),
+			'get_count' => array(
+				'function' => array($this, 'list_spCountPages'),
+			),
+			'columns' => array(
+				'title' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_pages_col_title'],
+					),
+					'data' => array(
+						'db' => 'title',
+					),
+					'sort' => array(
+						'default' => 'title',
+						'reverse' => 'title DESC',
+					),
+				),
+				'namespace' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_pages_col_namespace'],
+					),
+					'data' => array(
+						'db' => 'page_id',
+					),
+					'sort' => array(
+						'default' => 'namespace',
+						'reverse' => 'namespace DESC',
+					),
+				),
+				'type' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_pages_col_type'],
+					),
+					'data' => array(
+						'db' => 'type',
+					),
+					'sort' => array(
+						'default' => 'type',
+						'reverse' => 'type DESC',
+					),
+				),
+				'views' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_pages_col_views'],
+					),
+					'data' => array(
+						'db' => 'views',
+					),
+					'sort' => array(
+						'default' => 'views',
+						'reverse' => 'views DESC',
+					),
+				),
+				'status' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_pages_col_status'],
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'db' => 'status_image',
+						'class' => 'centertext',
+					),
+					'sort' => array(
+						'default' => 'status',
+						'reverse' => 'status DESC',
+					),
+				),
+				'action' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_pages_col_actions'],
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'sprintf' => array(
+							'format' => '<a href="?action=admin;area=portalpages;sa=edit;page_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>&nbsp;
+								<a href="?action=admin;area=portalpages;sa=delete;page_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_categories_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+							'params' => array(
+								'id' => true,
+							),
+						),
+						'class' => "centertext",
+						'style' => "width: 40px",
+					),
+				),
+				'check' => array(
+					'header' => array(
+						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
+						'),
+						'class' => 'centertext',
+					),
+				),
+			),
+			'form' => array(
+				'href' => $scripturl . '?action=admin;area=portalpages;sa=remove',
+				'include_sort' => true,
+				'include_start' => true,
+				'hidden_fields' => array(
+					$context['session_var'] => $context['session_id'],
+				),
+			),
+			'additional_rows' => array(
 				array(
-					'pages' => $_POST['remove'],
-				)
-			);
-		}
-
-		$sort_methods = array(
-			'title' => array(
-				'down' => 'title ASC',
-				'up' => 'title DESC'
-			),
-			'namespace' => array(
-				'down' => 'namespace ASC',
-				'up' => 'namespace DESC'
-			),
-			'type' => array(
-				'down' => 'type ASC',
-				'up' => 'type DESC'
-			),
-			'views' => array(
-				'down' => 'views ASC',
-				'up' => 'views DESC'
-			),
-			'status' => array(
-				'down' => 'status ASC',
-				'up' => 'status DESC'
+					'position' => 'below_table_data',
+					'value' => '<input type="submit" name="remove_pages" value="' . $txt['sp_admin_pages_remove'] . '" class="right_submit" />',
+				),
 			),
 		);
 
-		$context['columns'] = array(
-			'title' => array(
-				'width' => '45%',
-				'label' => $txt['sp_admin_pages_col_title'],
-				'class' => 'first_th',
-				'sortable' => true
-			),
-			'namespace' => array(
-				'width' => '25%',
-				'label' => $txt['sp_admin_pages_col_namespace'],
-				'sortable' => true
-			),
-			'type' => array(
-				'width' => '8%',
-				'label' => $txt['sp_admin_pages_col_type'],
-				'sortable' => true
-			),
-			'views' => array(
-				'width' => '6%',
-				'label' => $txt['sp_admin_pages_col_views'],
-				'sortable' => true
-			),
-			'status' => array(
-				'width' => '6%',
-				'label' => $txt['sp_admin_pages_col_status'],
-				'sortable' => true
-			),
-			'actions' => array(
-				'width' => '10%',
-				'label' => $txt['sp_admin_pages_col_actions'],
-				'sortable' => false
-			),
-		);
+		// Set the context values
+		$context['page_title'] = $txt['sp_admin_pages_title'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'portal_pages';
 
-		if (!isset($_REQUEST['sort']) || !isset($sort_methods[$_REQUEST['sort']]))
-			$_REQUEST['sort'] = 'title';
+		// Create the list.
+		require_once(SUBSDIR . '/List.subs.php');
+		createList($listOptions);
+	}
 
-		foreach ($context['columns'] as $col => $dummy)
-		{
-			$context['columns'][$col]['selected'] = $col == $_REQUEST['sort'];
-			$context['columns'][$col]['href'] = $scripturl . '?action=admin;area=portalpages;sa=list;sort=' . $col;
+	/**
+	 * Callback for createList(),
+	 * Returns the number of articles in the system
+	 *
+	 * @param int $messageID
+	 */
+	public function list_spCountPages()
+	{
+	   return sp_count_pages();
+	}
 
-			if (!isset($_REQUEST['desc']) && $col == $_REQUEST['sort'])
-				$context['columns'][$col]['href'] .= ';desc';
-
-			$context['columns'][$col]['link'] = '<a href="' . $context['columns'][$col]['href'] . '">' . $context['columns'][$col]['label'] . '</a>';
-		}
-
-		$context['sort_by'] = $_REQUEST['sort'];
-		$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'down' : 'up';
-
-		$request = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}sp_pages'
-		);
-		list ($total_pages) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=portalpages;sa=list;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $total_pages, 20);
-		$context['start'] = $_REQUEST['start'];
-
-		$request = $db->query('', '
-			SELECT id_page, namespace, title, type, views, status
-			FROM {db_prefix}sp_pages
-			ORDER BY {raw:sort}
-			LIMIT {int:start}, {int:limit}',
-			array(
-				'sort' => $sort_methods[$_REQUEST['sort']][$context['sort_direction']],
-				'start' => $context['start'],
-				'limit' => 20,
-			)
-		);
-		$context['pages'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$context['pages'][$row['id_page']] = array(
-				'id' => $row['id_page'],
-				'page_id' => $row['namespace'],
-				'title' => $row['title'],
-				'href' => $scripturl . '?page=' . $row['namespace'],
-				'link' => '<a href="' . $scripturl . '?page=' . $row['namespace'] . '">' . $row['title'] . '</a>',
-				'type' => $row['type'],
-				'type_text' => $txt['sp_pages_type_' . $row['type']],
-				'views' => $row['views'],
-				'status' => $row['status'],
-				'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=status;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_pages_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
-				'actions' => array(
-					'edit' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=edit;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
-					'delete' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=delete;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_pages_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
-				)
-			);
-		}
-		$db->free_result($request);
-
-		$context['sub_template'] = 'pages_list';
-		$context['page_title'] = $txt['sp_admin_pages_list'];
+	/**
+	 * Callback for createList()
+	 * Returns an array of articles
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 */
+	public function list_spLoadPages($start, $items_per_page, $sort)
+	{
+		return sp_load_pages($start, $items_per_page, $sort);
 	}
 
 	/**
@@ -294,7 +315,7 @@ class ManagePortalPages_Controller extends Action_Controller
 				FROM {db_prefix}sp_pages
 				WHERE namespace = {string:namespace}
 					AND id_page != {int:current}
-				LIMIT (int:limit}',
+				LIMIT {int:limit}',
 				array(
 					'limit' => 1,
 					'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
@@ -617,19 +638,25 @@ class ManagePortalPages_Controller extends Action_Controller
 	 */
 	public function action_sportal_admin_page_delete()
 	{
-		$db = database();
+		$page_ids = array();
 
-		checkSession('get');
+		// Get the page id's to remove
+		if (!empty($_POST['remove_pages']) && !empty($_POST['remove']) && is_array($_POST['remove']))
+		{
+			checkSession();
 
-		$page_id = !empty($_REQUEST['page_id']) ? (int) $_REQUEST['page_id'] : 0;
+			foreach ($_POST['remove'] as $index => $page_id)
+				$page_ids[(int) $index] = (int) $page_id;
+		}
+		elseif (!empty($_REQUEST['page_id']))
+		{
+			checkSession('get');
+			$page_ids[] = (int) $_REQUEST['page_id'];
+		}
 
-		$db->query('', '
-			DELETE FROM {db_prefix}sp_pages
-			WHERE id_page = {int:id}',
-			array(
-				'id' => $page_id,
-			)
-		);
+		// If we have some to remove ....
+		if (!empty($page_ids))
+			sp_delete_pages($page_ids);
 
 		redirectexit('action=admin;area=portalpages');
 	}
