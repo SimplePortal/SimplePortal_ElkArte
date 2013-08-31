@@ -363,7 +363,7 @@ function sp_count_categories()
  */
 function sp_load_categories($start, $items_per_page, $sort)
 {
-	global $scripturl, $txt;
+	global $scripturl, $txt, $context;
 
 	$db = database();
 
@@ -490,7 +490,7 @@ function sp_count_articles()
  */
 function sp_load_articles($start, $items_per_page, $sort)
 {
-	global $scripturl, $txt;
+	global $scripturl, $txt, $context;
 
 	$db = database();
 

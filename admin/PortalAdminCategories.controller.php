@@ -106,11 +106,11 @@ class ManagePortalCategories_Controller extends Action_Controller
 						'value' => $txt['sp_admin_categories_col_namespace'],
 					),
 					'data' => array(
-						'db' => 'namespace',
+						'db' => 'category_id',
 					),
 					'sort' => array(
-						'default' => 'namespace',
-						'reverse' => 'namespace DESC',
+						'default' => 'category_id',
+						'reverse' => 'category_id DESC',
 					),
 				),
 				'articles' => array(
