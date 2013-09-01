@@ -224,6 +224,12 @@ table.sp_block {
 }
 .sp_block_section {
 	padding-bottom: 0.7em;
+	background: #efefef;
+	margin: 2px 0 2px 0;
+	border: 1px solid #ccc;
+	border-radius: 0 0 7px 7px;
+	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
+	overflow: auto;
 }
 body {
 	min-width: 750px;
@@ -403,7 +409,6 @@ input.shoutbox_input {
 	margin: 0.4em 0;
 }
 #sp_edit_shoutbox {
-	width: 70%;
 	margin: 0 auto;
 }
 #sp_prune_shoutbox {

@@ -5,7 +5,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -26,9 +26,7 @@ function template_view_articles()
 	{
 		echo '
 		<div class="windowbg2">
-			<span class="topslice"><span></span></span>
 			<div class="sp_content_padding">', $txt['error_sp_no_articles'], '</div>
-			<span class="botslice"><span></span></span>
 		</div>';
 	}
 
@@ -36,14 +34,12 @@ function template_view_articles()
 	{
 		echo '
 		<div class="windowbg2">
-			<span class="topslice"><span></span></span>
 			<div class="sp_content_padding">
 				<h4>', $article['link'], '</h4>
 				<span>', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '</span>
 				<p>', $article['preview'], '<a href="', $article['href'], '">...</a></p>
 				<span>', sprintf($article['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['views']) ,', ', sprintf($article['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '</span>
 			</div>
-			<span class="botslice"><span></span></span>
 		</div>';
 	}
 
@@ -74,7 +70,6 @@ function template_view_article()
 	echo '
 				</div>
 			</div>
-			<span class="botslice"><span></span></span>
 		</div>';
 
 	if (empty($context['preview']))
@@ -91,11 +86,9 @@ function template_view_article()
 		{
 			echo '
 			<div class="windowbg">
-				<span class="topslice"><span></span></span>
 				<div class="sp_content_padding">
 					', $txt['error_sp_no_comments'], '
 				</div>
-				<span class="botslice"><span></span></span>
 			</div>';
 		}
 
@@ -103,7 +96,6 @@ function template_view_article()
 		{
 			echo '
 			<div id="comment', $comment['id'], '" class="windowbg">
-				<span class="topslice"><span></span></span>
 				<div class="sp_content_padding flow_auto">
 					<span>', sprintf($txt['sp_posted_on_by'], $comment['time'], $comment['author']['link']), '</span>
 					<div>
@@ -119,7 +111,6 @@ function template_view_article()
 
 			echo '
 				</div>
-				<span class="botslice"><span></span></span>
 			</div>';
 		}
 
@@ -127,7 +118,6 @@ function template_view_article()
 		{
 			echo '
 			<div class="windowbg2">
-				<span class="topslice"><span></span></span>
 				<div class="sp_content_padding">
 					<form action="', $context['article']['href'], '" method="post" accept-charset="UTF-8">
 						<textarea name="body" rows="5" cols="50" style="', $context['browser']['is_ie8'] ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 99%', ';">', !empty($context['article']['comment']['body']) ? $context['article']['comment']['body'] : '', '</textarea>
@@ -138,7 +128,6 @@ function template_view_article()
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					</form>
 				</div>
-				<span class="botslice"><span></span></span>
 			</div>';
 		}
 
@@ -149,5 +138,3 @@ function template_view_article()
 	echo '
 	</div>';
 }
-
-?>

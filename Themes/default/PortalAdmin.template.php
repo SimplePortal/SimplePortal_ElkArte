@@ -91,7 +91,7 @@ function template_information()
 				spSetAnnouncements();
 				spCurrentVersion();
 			}
-			', $context['SPortal']['core_compat'] == 'old' ? 'add_load_event(func);' : 'addLoadEvent(func);', '
+			addLoadEvent(func);
 		// ]]></script>';
 	}
 

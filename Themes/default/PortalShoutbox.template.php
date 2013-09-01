@@ -12,53 +12,12 @@
 
 function template_shoutbox_all()
 {
-	global $context;
-
-	if ($context['SPortal']['core_compat'])
-		template_shoutbox_all_core();
-	else
-		template_shoutbox_all_curve();
-}
-
-function template_shoutbox_all_core()
-{
-	global $context, $scripturl, $settings, $txt;
-
-	echo '
-	<div class="tborder">
-		<div class="shoutbox_container">
-			<div class="catbg shoutbox_padding">
-					', $context['SPortal']['shoutbox']['name'], '
-			</div>
-			<div class="shoutbox_page_index windowbg smalltext">
-					', $txt['pages'], ': ', $context['page_index'], '
-			</div>
-			<div class="windowbg shoutbox_body">
-				<ul class="shoutbox_list_all" id="shouts">';
-
-	if (!empty($context['SPortal']['shouts_history']))
-		foreach ($context['SPortal']['shouts_history'] as $shout)
-			echo '
-					', !$shout['is_me'] ? '<li class="smalltext"><strong>' . $shout['author']['link'] . ':</strong></li>' : '', '
-					<li class="smalltext">', str_replace('ignored_shout', 'history_ignored_shout', $shout['text']), '</li>
-					<li class="smalltext shoutbox_time">', $shout['delete_link'], $shout['time'], '</li>';
-	else
-			echo '
-					<li class="smalltext">', $txt['sp_shoutbox_no_shout'], '</li>';
-
-	echo '
-				</ul>
-			</div>
-			<div class="shoutbox_page_index windowbg smalltext">
-					', $txt['pages'], ': ', $context['page_index'], '
-			</div>
-		</div>
-	</div>';
+	template_shoutbox_all_curve();
 }
 
 function template_shoutbox_all_curve()
 {
-	global $context, $scripturl, $settings, $txt;
+	global $context, $txt;
 
 	echo '
 	<div class="cat_bar">
@@ -67,7 +26,6 @@ function template_shoutbox_all_curve()
 		</h3>
 	</div>
 	<div class="windowbg">
-		<span class="topslice"><span></span></span>
 		<div class="sp_content_padding">
 			<div class="shoutbox_page_index smalltext">
 					', $txt['pages'], ': ', $context['page_index'], '
@@ -92,7 +50,6 @@ function template_shoutbox_all_curve()
 					', $txt['pages'], ': ', $context['page_index'], '
 			</div>
 		</div>
-		<span class="botslice"><span></span></span>
 	</div>';
 }
 
