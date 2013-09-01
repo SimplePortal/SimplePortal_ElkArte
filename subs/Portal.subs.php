@@ -41,11 +41,10 @@ function sportal_init($standalone = false)
 				$settings['sp_images_url'] = $settings['default_theme_url'] . '/images/sp';
 		}
 
-		$context['SPortal']['core_compat'] = $settings['name'] == 'Core Theme';
 		$context['SPortal']['on_portal'] = getShowInfo(0, 'portal', '');
 	}
 
-	if (WIRELESS || ($standalone && (isset($_REQUEST['wap']) || isset($_REQUEST['wap2']) || isset($_REQUEST['imode']))) || !empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')) || isset($_GET['debug']) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
+	if (!empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')) || isset($_GET['debug']) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
 	{
 		$context['disable_sp'] = true;
 		if ($standalone)
@@ -55,12 +54,13 @@ function sportal_init($standalone = false)
 				$get_string .= $get_var . (!empty($get_value) ? '=' . $get_value : '') . ';';
 			redirectexit(substr($get_string, 0, -1));
 		}
+
 		return;
 	}
 
 	if (!$standalone)
 	{
-		require_once(SOURCEDIR . '/PortalBlocks.php');
+		require_once(CONTROLLERDIR . '/PortalBlocks.php');
 
 		if (ELK != 'SSI')
 			require_once(BOARDDIR . '/SSI.php');
@@ -90,15 +90,16 @@ function sportal_init($standalone = false)
 				'name' => $context['forum_name'],
 			);
 
-		// If you want to remove Forum link when it is
-		// alone, take out the following two comment lines.
+		// If you want to remove Forum link when it is alone, take out the following two comment lines.
 		//if (empty($context['linktree'][1]))
 		//	$context['linktree'] = array();
 
 		if (!empty($context['linktree']) && $modSettings['sp_portal_mode'] == 1)
+		{
 			foreach ($context['linktree'] as $key => $tree)
 				if (strpos($tree['url'], '#c') !== false && strpos($tree['url'], 'action=forum#c') === false)
 					$context['linktree'][$key]['url'] = str_replace('#c', '?action=forum#c', $tree['url']);
+		}
 	}
 
 	$context['standalone'] = $standalone;
@@ -160,8 +161,8 @@ function sportal_init($standalone = false)
 		$context['SPortal']['sides'][$side['id']]['collapsed'] = $context['user']['is_guest'] ? !empty($_COOKIE['sp_' . $side['name']]) : !empty($options['sp_' . $side['name']]);
 	}
 
-	if (!empty($context['template_layers']) && !in_array('portal', $context['template_layers']))
-		$context['template_layers'][] = 'portal';
+	if (!Template_Layers::getInstance()->hasLayers(true) && !in_array('portal', Template_Layers::getInstance()->getLayers()))
+		Template_Layers::getInstance()->add('portal');
 }
 
 /**
@@ -172,59 +173,56 @@ function sportal_init_headers()
 	global $context, $settings, $modSettings;
 	static $initialized;
 
+	// If already loaded just return
 	if (!empty($initialized))
 		return;
 
-	$context['html_headers'] .= '
-	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/portal.js?24"></script>
-	<script type="text/javascript"><!-- // --><![CDATA[
-		var sp_images_url = "' . $settings['sp_images_url'] . '";
-		function sp_collapseBlock(id)
-		{
-			mode = document.getElementById("sp_block_" + id).style.display == "" ? 0 : 1;';
+	// Load up some javascript!
+	loadJavascriptFile('portal.js?sp24');
+
+	$javascript = '
+	var sp_images_url = "' . $settings['sp_images_url'] . '";
+	function sp_collapseBlock(id)
+	{
+		mode = document.getElementById("sp_block_" + id).style.display == "" ? 0 : 1;';
 
 	if ($context['user']['is_guest'])
-		$context['html_headers'] .= '
-			document.cookie = "sp_block_" + id + "=" + (mode ? 0 : 1);';
+		$javascript .= '
+		document.cookie = "sp_block_" + id + "=" + (mode ? 0 : 1);';
 	else
-		$context['html_headers'] .= '
-			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null, "' . $context['session_id'] . '", "' . $context['session_var'] . '");';
+		$javascript .= '
+		elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null, "' . $context['session_id'] . '", "' . $context['session_var'] . '");';
 
-	$context['html_headers'] .= '
-			document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/collapse.png" : "/expand.png");
-			document.getElementById("sp_block_" + id).style.display = mode ? "" : "none";
-		}';
+	$javascript .= '
+		document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/collapse.png" : "/expand.png");
+		document.getElementById("sp_block_" + id).style.display = mode ? "" : "none";
+	}';
 
 	if (empty($modSettings['sp_disable_side_collapse']))
 	{
-		$context['html_headers'] .= '
-		function sp_collapseSide(id)
-		{
-			var sp_sides = new Array();
-			sp_sides[1] = "sp_left";
-			sp_sides[4] = "sp_right";
-			mode = document.getElementById(sp_sides[id]).style.display == "" ? 0 : 1;' . ($context['user']['is_guest'] ? '
-			document.cookie = sp_sides[id] + "=" + (mode ? 0 : 1);' : '
-			elk_setThemeOption(sp_sides[id], mode ? 0 : 1, null, "' . $context['session_id'] . '");') . '
-			document.getElementById("sp_collapse_side" + id).src = sp_images_url + (mode ? "/collapse.png" : "/expand.png");
-			document.getElementById(sp_sides[id]).style.display = mode ? "" : "none";' . ($context['browser']['is_ie8'] ? '
-			document.getElementById("sp_center").style.width = "100%";' : '') . '
-		}';
+		$javascript .= '
+	function sp_collapseSide(id)
+	{
+		var sp_sides = new Array();
+		sp_sides[1] = "sp_left";
+		sp_sides[4] = "sp_right";
+		mode = document.getElementById(sp_sides[id]).style.display == "" ? 0 : 1;' . ($context['user']['is_guest'] ? '
+		document.cookie = sp_sides[id] + "=" + (mode ? 0 : 1);' : '
+		elk_setThemeOption(sp_sides[id], mode ? 0 : 1, null, "' . $context['session_id'] . '");') . '
+		document.getElementById("sp_collapse_side" + id).src = sp_images_url + (mode ? "/collapse.png" : "/expand.png");
+		document.getElementById(sp_sides[id]).style.display = mode ? "" : "none";' . (isBrowser('is_ie8') ? '
+		document.getElementById("sp_center").style.width = "100%";' : '') . '
+	}';
 	}
 
 	if ($modSettings['sp_resize_images'])
 	{
-		if (!$context['browser']['is_ie'] && !$context['browser']['is_mac_ie'])
-			$context['html_headers'] .= '
+		$javascript .= '
+		createEventListener(window);
 		window.addEventListener("load", sp_image_resize, false);';
-		else
-			$context['html_headers'] .= '
-		var window_oldSPImageOnload = window.onload;
-		window.onload = sp_image_resize;';
 	}
 
-	$context['html_headers'] .= '
-	// ]]></script>';
+	addInlineJavascript($javascript);
 
 	$initialized = true;
 }
@@ -251,11 +249,13 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 		$query[] = 'spb.col = {int:col}';
 		$parameters['col'] = !empty($column_id) ? $column_id : 0;
 	}
+
 	if (!empty($block_id))
 	{
 		$query[] = 'spb.id_block = {int:id_block}';
 		$parameters['id_block'] = !empty($block_id) ? $block_id : 0;
 	}
+
 	if (!empty($state))
 	{
 		$query[] = 'spb.state = {int:state}';
@@ -272,7 +272,6 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY spb.col, spb.row', $parameters
 	);
-
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -1410,7 +1409,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 
 	foreach ($shouts as $shout)
 	{
-		if (preg_match('~^@(.+?): ~u', $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
+		if (preg_match('~^@(.+?): ~' . ($context['utf8'] ? 'u' : ''), $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
 		{
 			unset($shouts[$shout['id']]);
 			continue;
