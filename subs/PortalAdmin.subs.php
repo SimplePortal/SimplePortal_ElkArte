@@ -13,31 +13,23 @@
 if (!defined('ELK'))
 	die('No access...');
 
-function sportal_admin_state_change()
+function sportal_admin_state_change($type, $id)
 {
-	checkSession('get');
-
-	if (!empty($_REQUEST['block_id']))
-		$id = (int) $_REQUEST['block_id'];
-	elseif (!empty($_REQUEST['category_id']))
-		$id = (int) $_REQUEST['category_id'];
-	elseif (!empty($_REQUEST['article_id']))
-		$id = (int) $_REQUEST['article_id'];
-	else
+	if (!in_array($type, array('block', 'category', 'article')))
 		fatal_lang_error('error_sp_id_empty', false);
 
-	changeState($_REQUEST['type'], $id);
+	sp_changeState($type, $id);
 
-	if ($_REQUEST['type'] == 'block')
+	if ($type == 'block')
 	{
 		$sides = array(1 => 'left', 2 => 'top', 3 => 'bottom', 4 => 'right');
 		$list = !empty($_GET['redirect']) && isset($sides[$_GET['redirect']]) ? $sides[$_GET['redirect']] : 'list';
 
 		redirectexit('action=admin;area=portalblocks;sa=' . $list);
 	}
-	elseif ($_REQUEST['type'] == 'category')
+	elseif ($type == 'category')
 		redirectexit('action=admin;area=portalarticles;sa=categories');
-	elseif ($_REQUEST['type'] == 'article')
+	elseif ($type == 'article')
 		redirectexit('action=admin;area=portalarticles;sa=articles');
 	else
 		redirectexit('action=admin;area=portalconfig');
@@ -100,49 +92,37 @@ function fixColumnRows($column_id = null)
 	}
 }
 
-function changeState($type = null, $id = null)
+function sp_changeState($type = null, $id = null)
 {
 	$db = database();
 
 	if ($type == 'block')
 		$query = array(
 			'column' => 'state',
-			'table' => 'blocks',
+			'table' => 'sp_blocks',
 			'query_id' => 'id_block',
 			'id' => $id
 		);
 	elseif ($type == 'category')
 		$query = array(
-			'column' => 'publish',
-			'table' => 'categories',
+			'column' => 'status',
+			'table' => 'sp_categories',
 			'query_id' => 'id_category',
 			'id' => $id
 		);
 	elseif ($type == 'article')
 		$query = array(
-			'column' => 'approved',
-			'table' => 'articles',
+			'column' => 'status',
+			'table' => 'sp_articles',
 			'query_id' => 'id_article',
 			'id' => $id
 		);
 	else
 		return false;
 
-	$request = $db->query('', '
-		SELECT {raw:column}
-		FROM {db_prefix}sp_{raw:table}
-		WHERE {raw:query_id} = {int:id}', $query
-	);
-
-	list ($state) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	$state = (int) $state;
-	$state = $state == 1 ? 0 : 1;
-
 	$db->query('', '
-		UPDATE {db_prefix}sp_{raw:table}
-		SET {raw:column} = {int:state}
+		UPDATE {db_prefix}{raw:table}
+		SET {raw:column} = CASE WHEN {raw:column} = {int:is_active} THEN 0 ELSE 1 END
 		WHERE {raw:query_id} = {int:id}',
 		array(
 			'table' => $query['table'],
@@ -150,6 +130,7 @@ function changeState($type = null, $id = null)
 			'state' => $state,
 			'query_id' => $query['query_id'],
 			'id' => $id,
+			'is_active' => 1,
 		)
 	);
 }
@@ -200,19 +181,18 @@ require_once(\'' . BOARDDIR . '/SSI.php\');
 
 	return $error;
 }
-/*
-  void sp_loadMemberGroups(Array $selectedGroups = array, Array $removeGroups = array(), string $show = 'normal', string $contextName = 'member_groups')
-  This will file the $context['member_groups'] to the given options
-  $selectedGroups means all groups who should be shown as selcted, if you like to check all than insert an 'all'
-  You can also Give the function a string with '2,3,4'
-  $removeGroups this group id should not shown in the list
-  $show have follow options
-  'normal' => will show all groups, and add a guest and regular member (Standard)
-  'post' => will load only post groups
-  'master' => will load only not postbased groups
-  $contextName where the datas should stored in the $context.
- */
 
+/**
+ * This will file the $context['member_groups'] to the given options
+ *
+ * @param type $selectedGroups - all groups who should be shown as selcted, if you like to check all than insert an 'all'
+ *								 You can also Give the function a string with '2,3,4'
+ * @param type $show -  'normal' => will show all groups, and add a guest and regular member (Standard)
+ *						'post' => will load only post groups
+ *						'master' => will load only not postbased groups
+ * @param type $contextName - where the datas should stored in the $context
+ * @param type $subContext
+ */
 function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $contextName = 'member_groups', $subContext = 'SPortal')
 {
 	global $context, $txt;
@@ -398,6 +378,76 @@ function sp_load_categories($start, $items_per_page, $sort)
 }
 
 /**
+ * Checks if a namespace is already in use by a category_id
+ *
+ * @param int $id
+ * @param string $namespace
+ */
+function sp_check_duplicate_category($id, $namespace)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT id_category
+		FROM {db_prefix}sp_categories
+		WHERE namespace = {string:namespace}
+			AND id_category != {int:current}
+		LIMIT {int:limit}',
+		array(
+			'limit' => 1,
+			'namespace' => $namespace,
+			'current' => $id,
+		)
+	);
+	list ($has_duplicate) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $has_duplicate;
+}
+
+/**
+ * Update an existing category or add a new one to the database
+ * If adding a new one, will return the id of the new category
+ *
+ * @param array $fields
+ * @param array $data
+ * @param boolean $is_new
+ */
+function sp_update_category($fields, $data, $is_new = false)
+{
+	$db = database();
+
+	$id = isset($data['id']) ? $data['id'] : null;
+
+	if ($is_new)
+	{
+		unset($data['id']);
+		$db->insert('', '
+			{db_prefix}sp_categories',
+			$fields,
+			$data,
+			array('id_category')
+		);
+		$id = $db->insert_id('{db_prefix}sp_categories', 'id_category');
+	}
+	else
+	{
+		$update_fields = array();
+
+		foreach ($fields as $name => $type)
+			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+
+		$db->query('', '
+			UPDATE {db_prefix}sp_categories
+			SET ' . implode(', ', $update_fields) . '
+			WHERE id_category = {int:id}', $data
+		);
+	}
+
+	return $id;
+}
+
+/**
  * Removes a category or group of categories by id
  *
  * @param array $category_ids
@@ -419,26 +469,6 @@ function sp_delete_categories($category_ids = array())
 		WHERE id_category IN ({array_int:categories})',
 		array(
 			'categories' => $category_id,
-		)
-	);
-}
-
-/**
- * Switches the active state of a category from active <-> inactive
- *
- * @param int $category_id
- */
-function sp_category_update($category_id)
-{
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}sp_categories
-		SET status = CASE WHEN status = {int:is_active} THEN 0 ELSE 1 END
-		WHERE id_category = {int:id}',
-		array(
-			'is_active' => 1,
-			'id' => $category_id,
 		)
 	);
 }

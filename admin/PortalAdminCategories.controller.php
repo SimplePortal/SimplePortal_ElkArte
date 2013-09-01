@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Category Administration controller class.
+ * SimplePortal Category Administation controller class.
  * This class handles the adding/editing/listing of categories
  */
 class ManagePortalCategories_Controller extends Action_Controller
@@ -34,7 +34,6 @@ class ManagePortalCategories_Controller extends Action_Controller
 		// We'll need the utility functions from here.
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
 		require_once(SUBSDIR . '/Portal.subs.php');
-		loadTemplate('PortalAdminCategories');
 
 		$subActions = array(
 			'list' => array($this, 'action_sportal_admin_category_list'),
@@ -227,41 +226,35 @@ class ManagePortalCategories_Controller extends Action_Controller
 		global $context, $txt;
 
 		$db = database();
+		loadTemplate('PortalAdminCategories');
 
 		$context['is_new'] = empty($_REQUEST['category_id']);
 
+		// Saving the category form
 		if (!empty($_POST['submit']))
 		{
 			checkSession();
 
-			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
+			// Clean what was sent
+			// @todo move all this to validator?
+			$name = isset($_POST['name']) ? Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) : '';
+			$namespace = isset($_POST['namespace']) ? Util::htmltrim(Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES)) : '';
+			$current = isset($_POST['category_id']) ? (int) $_POST['category_id'] : 0;
+			$description = isset($_POST['description']) ? Util::htmlspecialchars($_POST['description'], ENT_QUOTES) : '';
+
+			if (empty($name))
 				fatal_lang_error('sp_error_category_name_empty', false);
 
-			if (!isset($_POST['namespace']) || Util::htmltrim(Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES)) === '')
+			if (empty($namespace))
 				fatal_lang_error('sp_error_category_namespace_empty', false);
 
-			$result = $db->query('', '
-				SELECT id_category
-				FROM {db_prefix}sp_categories
-				WHERE namespace = {string:namespace}
-					AND id_category != {int:current}
-				LIMIT 1',
-				array(
-					'limit' => 1,
-					'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
-					'current' => (int) $_POST['category_id'],
-				)
-			);
-			list ($has_duplicate) = $db->fetch_row($result);
-			$db->free_result($result);
-
-			if (!empty($has_duplicate))
+			if (sp_check_duplicate_category($current, $namespace))
 				fatal_lang_error('sp_error_category_namespace_duplicate', false);
 
-			if (preg_match('~[^A-Za-z0-9_]+~', $_POST['namespace']) != 0)
+			if (preg_match('~[^A-Za-z0-9_]+~', $namespace) != 0)
 				fatal_lang_error('sp_error_category_namespace_invalid_chars', false);
 
-			if (preg_replace('~[0-9]+~', '', $_POST['namespace']) === '')
+			if (preg_replace('~[0-9]+~', '', $namespace) === '')
 				fatal_lang_error('sp_error_category_namespace_numeric', false);
 
 			$permission_set = 0;
@@ -297,43 +290,20 @@ class ManagePortalCategories_Controller extends Action_Controller
 
 			$category_info = array(
 				'id' => (int) $_POST['category_id'],
-				'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
-				'name' => Util::htmlspecialchars($_POST['name'], ENT_QUOTES),
-				'description' => Util::htmlspecialchars($_POST['description'], ENT_QUOTES),
+				'namespace' => $namespace,
+				'name' => $name,
+				'description' => $description,
 				'permission_set' => $permission_set,
 				'groups_allowed' => $groups_allowed,
 				'groups_denied' => $groups_denied,
 				'status' => !empty($_POST['status']) ? 1 : 0,
 			);
 
-			if ($context['is_new'])
-			{
-				unset($category_info['id']);
-
-				$db->insert('', '
-					{db_prefix}sp_categories',
-					$fields,
-					$category_info,
-					array('id_category')
-				);
-				$category_info['id'] = $db->insert_id('{db_prefix}sp_categories', 'id_category');
-			}
-			else
-			{
-				$update_fields = array();
-				foreach ($fields as $name => $type)
-					$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
-
-				$db->query('', '
-					UPDATE {db_prefix}sp_categories
-					SET ' . implode(', ', $update_fields) . '
-					WHERE id_category = {int:id}', $category_info
-				);
-			}
-
+			$category_info['id'] = sp_update_category($fields, $category_info, $context['is_new']);
 			redirectexit('action=admin;area=portalcategories');
 		}
 
+		// Creating a new category, lets set up some defaults for the form
 		if ($context['is_new'])
 		{
 			$context['category'] = array(
@@ -359,14 +329,14 @@ class ManagePortalCategories_Controller extends Action_Controller
 	}
 
 	/**
-	 * Switch the active status of a category
+	 * Switch the active status (on/off) of a category
 	 */
 	public function action_sportal_admin_category_status()
 	{
 		checkSession('get');
 
 		$category_id = !empty($_REQUEST['category_id']) ? (int) $_REQUEST['category_id'] : 0;
-		sp_category_update($category_id);
+		sp_changeState('category', $category_id);
 
 		redirectexit('action=admin;area=portalcategories');
 	}
@@ -378,7 +348,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 	{
 		$category_ids = array();
 
-		// Retrieve the cat ids to remove
+		// Retreive the cat ids to remove
 		if (!empty($_POST['remove_categories']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 		{
 			checkSession();
