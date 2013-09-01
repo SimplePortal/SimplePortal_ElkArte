@@ -41,7 +41,7 @@ function sportal_shoutbox()
 
 		if (!($flood = sp_prevent_flood('spsbp', false)))
 		{
-			require_once(SOURCEDIR . '/Subs-Post.php');
+			require_once(SOURCEDIR . '/Post.subs.php');
 
 			$_REQUEST['shout'] = Util::htmlspecialchars(trim($_REQUEST['shout']));
 			preparsecode($_REQUEST['shout']);
