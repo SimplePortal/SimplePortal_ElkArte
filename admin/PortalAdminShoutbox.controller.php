@@ -70,144 +70,158 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 	/**
 	 * List all the shouts in the system
+	 *
+	 * Shout, shout, let it all out, these are the things I can do without
+	 * Come on, I'm talking to you, come on
 	 */
 	public function action_sportal_admin_shoutbox_list()
 	{
-		global $txt, $context, $scripturl;
+		global $context, $scripturl, $txt, $modSettings;
 
-		$db = database();
-
-		if (!empty($_POST['remove_shoutbox']) && !empty($_POST['remove']) && is_array($_POST['remove']))
-		{
-			checkSession();
-
-			foreach ($_POST['remove'] as $index => $page_id)
-				$_POST['remove'][(int) $index] = (int) $page_id;
-
-			$db->query('', '
-				DELETE FROM {db_prefix}sp_shoutboxes
-				WHERE id_shoutbox IN ({array_int:shoutbox})',
+		// build the listoption array to display the categories
+		$listOptions = array(
+			'id' => 'portal_shout',
+			'title' => $txt['sp_admin_articles_list'],
+			'items_per_page' => $modSettings['defaultMaxMessages'],
+			'no_items_label' => $txt['error_sp_no_pages'],
+			'base_href' => $scripturl . '?action=admin;area=portalshoutbox;sa=list;',
+			'default_sort_col' => 'name',
+			'get_items' => array(
+				'function' => array($this, 'list_spLoadShoutbox'),
+			),
+			'get_count' => array(
+				'function' => array($this, 'list_spCountShoutbox'),
+			),
+			'columns' => array(
+				'name' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_shoutbox_col_name'],
+					),
+					'data' => array(
+						'db' => 'name',
+					),
+					'sort' => array(
+						'default' => 'name',
+						'reverse' => 'name DESC',
+					),
+				),
+				'num_shouts' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_shoutbox_col_shouts'],
+					),
+					'data' => array(
+						'db' => 'num_shouts',
+					),
+					'sort' => array(
+						'default' => 'num_shouts',
+						'reverse' => 'num_shouts DESC',
+					),
+				),
+				'caching' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_shoutbox_col_caching'],
+					),
+					'data' => array(
+						'db' => 'caching',
+					),
+					'sort' => array(
+						'default' => 'caching',
+						'reverse' => 'caching DESC',
+					),
+				),
+				'status' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_shoutbox_col_status'],
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'db' => 'status_image',
+						'class' => 'centertext',
+					),
+					'sort' => array(
+						'default' => 'status',
+						'reverse' => 'status DESC',
+					),
+				),
+				'action' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_shoutbox_col_actions'],
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'sprintf' => array(
+							'format' => '<a href="?action=admin;area=portalshoutbox;sa=edit;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="m">' . sp_embed_image('modify') . '</a>&nbsp;
+								<a href="?action=admin;area=portalshoutbox;sa=delete;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="p">' . sp_embed_image('bin') . '</a>&nbsp;
+								<a href="?action=admin;area=portalshoutbox;sa=delete;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_shoutbox_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+							'params' => array(
+								'id' => true,
+							),
+						),
+						'class' => "centertext",
+						'style' => "width: 65px",
+					),
+				),
+				'check' => array(
+					'header' => array(
+						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
+						'),
+						'class' => 'centertext',
+					),
+				),
+			),
+			'form' => array(
+				'href' => $scripturl . '?action=admin;area=portalshoutbox;sa=remove',
+				'include_sort' => true,
+				'include_start' => true,
+				'hidden_fields' => array(
+					$context['session_var'] => $context['session_id'],
+				),
+			),
+			'additional_rows' => array(
 				array(
-					'shoutbox' => $_POST['remove'],
-				)
-			);
-
-			$db->query('', '
-				DELETE FROM {db_prefix}sp_shouts
-				WHERE id_shoutbox IN ({array_int:shoutbox})',
-				array(
-					'shoutbox' => $_POST['remove'],
-				)
-			);
-		}
-
-		$sort_methods = array(
-			'name' => array(
-				'down' => 'name ASC',
-				'up' => 'name DESC'
-			),
-			'num_shouts' => array(
-				'down' => 'num_shouts ASC',
-				'up' => 'num_shouts DESC'
-			),
-			'caching' => array(
-				'down' => 'caching ASC',
-				'up' => 'caching DESC'
-			),
-			'status' => array(
-				'down' => 'status ASC',
-				'up' => 'status DESC'
+					'position' => 'below_table_data',
+					'value' => '<input type="submit" name="remove_shoutbox" value="' . $txt['sp_admin_shoutbox_remove'] . '" class="right_submit" />',
+				),
 			),
 		);
 
-		$context['columns'] = array(
-			'name' => array(
-				'width' => '40%',
-				'label' => $txt['sp_admin_shoutbox_col_name'],
-				'class' => 'first_th',
-				'sortable' => true
-			),
-			'num_shouts' => array(
-				'width' => '15%',
-				'label' => $txt['sp_admin_shoutbox_col_shouts'],
-				'sortable' => true
-			),
-			'caching' => array(
-				'width' => '15%',
-				'label' => $txt['sp_admin_shoutbox_col_caching'],
-				'sortable' => true
-			),
-			'status' => array(
-				'width' => '15%',
-				'label' => $txt['sp_admin_shoutbox_col_status'],
-				'sortable' => true
-			),
-			'actions' => array(
-				'width' => '15%',
-				'label' => $txt['sp_admin_shoutbox_col_actions'],
-				'sortable' => false
-			),
-		);
+		// Set the context values
+		$context['page_title'] = $txt['sp_admin_shoutbox_title'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'portal_shout';
 
-		if (!isset($_REQUEST['sort']) || !isset($sort_methods[$_REQUEST['sort']]))
-			$_REQUEST['sort'] = 'name';
+		// Create the list.
+		require_once(SUBSDIR . '/List.subs.php');
+		createList($listOptions);
+	}
 
-		foreach ($context['columns'] as $col => $dummy)
-		{
-			$context['columns'][$col]['selected'] = $col == $_REQUEST['sort'];
-			$context['columns'][$col]['href'] = $scripturl . '?action=admin;area=portalshoutbox;sa=list;sort=' . $col;
+	/**
+	 * Callback for createList(),
+	 * Returns the number of articles in the system
+	 *
+	 * @param int $messageID
+	 */
+	public function list_spCountShoutbox()
+	{
+	   return sp_count_shoutbox();
+	}
 
-			if (!isset($_REQUEST['desc']) && $col == $_REQUEST['sort'])
-				$context['columns'][$col]['href'] .= ';desc';
-
-			$context['columns'][$col]['link'] = '<a href="' . $context['columns'][$col]['href'] . '">' . $context['columns'][$col]['label'] . '</a>';
-		}
-
-		$context['sort_by'] = $_REQUEST['sort'];
-		$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'down' : 'up';
-
-		$request = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}sp_shoutboxes'
-		);
-		list ($total_shoutbox) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=portalshoutbox;sa=list;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $total_shoutbox, 20);
-		$context['start'] = $_REQUEST['start'];
-
-		$request = $db->query('', '
-			SELECT id_shoutbox, name, caching, status, num_shouts
-			FROM {db_prefix}sp_shoutboxes
-			ORDER BY id_shoutbox, {raw:sort}
-			LIMIT {int:start}, {int:limit}',
-			array(
-				'sort' => $sort_methods[$_REQUEST['sort']][$context['sort_direction']],
-				'start' => $context['start'],
-				'limit' => 20,
-			)
-		);
-		$context['shoutboxes'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$context['shoutboxes'][$row['id_shoutbox']] = array(
-				'id' => $row['id_shoutbox'],
-				'name' => $row['name'],
-				'shouts' => $row['num_shouts'],
-				'caching' => $row['caching'],
-				'status' => $row['status'],
-				'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=status;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_shoutbox_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
-				'actions' => array(
-					'edit' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=edit;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
-					'prune' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=prune;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('bin') . '</a>',
-					'delete' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=delete;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_shoutbox_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
-				)
-			);
-		}
-		$db->free_result($request);
-
-		$context['sub_template'] = 'shoutbox_list';
-		$context['page_title'] = $txt['sp_admin_shoutbox_list'];
+	/**
+	 * Callback for createList()
+	 * Returns an array of articles
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 */
+	public function list_spLoadShoutbox($start, $items_per_page, $sort)
+	{
+		return sp_load_shoutbox($start, $items_per_page, $sort);
 	}
 
 	/**
@@ -531,27 +545,25 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	 */
 	public function action_sportal_admin_shoutbox_delete()
 	{
-		$db = database();
+		$shoutbox_ids = array();
 
-		checkSession('get');
+		// Get the page id's to remove
+		if (!empty($_POST['remove_shoutbox']) && !empty($_POST['remove']) && is_array($_POST['remove']))
+		{
+			checkSession();
 
-		$shoutbox_id = !empty($_REQUEST['shoutbox_id']) ? (int) $_REQUEST['shoutbox_id'] : 0;
+			foreach ($_POST['remove'] as $index => $page_id)
+				$shoutbox_ids[(int) $index] = (int) $page_id;
+		}
+		elseif (!empty($_REQUEST['shoutbox_id']))
+		{
+			checkSession('get');
+			$shoutbox_ids[] = (int) $_REQUEST['shoutbox_id'];
+		}
 
-		$db->query('', '
-			DELETE FROM {db_prefix}sp_shoutboxes
-			WHERE id_shoutbox = {int:id}',
-			array(
-				'id' => $shoutbox_id,
-			)
-		);
-
-		$db->query('', '
-			DELETE FROM {db_prefix}sp_shouts
-			WHERE id_shoutbox = {int:id}',
-			array(
-				'id' => $shoutbox_id,
-			)
-		);
+		// If we have some to remove ....
+		if (!empty($shoutbox_ids))
+			sp_delete_shoutbox($shoutbox_ids);
 
 		redirectexit('action=admin;area=portalshoutbox');
 	}

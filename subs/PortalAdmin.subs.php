@@ -652,3 +652,94 @@ function sp_delete_pages($page_ids = array())
 		)
 	);
 }
+
+/**
+ * Returns the total count of pages in the system
+ */
+function sp_count_shoutbox()
+{
+	$db = database();
+	$total_shoutbox = 0;
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}sp_shoutboxes'
+	);
+	list ($total_shoutbox) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_shoutbox;
+}
+
+/**
+ * Loads all of the pages in the system
+ * Returns an indexed array of the pages
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ */
+function sp_load_shoutbox($start, $items_per_page, $sort)
+{
+	global $scripturl, $txt, $context;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_shoutbox, name, caching, status, num_shouts
+		FROM {db_prefix}sp_shoutboxes
+		ORDER BY id_shoutbox, {raw:sort}
+		LIMIT {int:start}, {int:limit}',
+		array(
+			'sort' => $sort,
+			'start' => $start,
+			'limit' => $items_per_page,
+		)
+	);
+	$shoutboxes = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$shoutboxes[$row['id_shoutbox']] = array(
+			'id' => $row['id_shoutbox'],
+			'name' => $row['name'],
+			'shouts' => $row['num_shouts'],
+			'caching' => $row['caching'],
+			'status' => $row['status'],
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=status;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_shoutbox_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
+			'actions' => array(
+				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=edit;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
+				'prune' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=prune;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('bin') . '</a>',
+				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=delete;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_shoutbox_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
+			)
+		);
+	}
+	$db->free_result($request);
+
+	return $shoutboxes;
+}
+
+/**
+ * Removes a shoutbox or group of shoutboxes by id
+ *
+ * @param array $article_ids
+ */
+function sp_delete_shoutbox($shoutbox_ids = array())
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_shoutboxes
+		WHERE id_shoutbox IN ({array_int:shoutbox})',
+		array(
+			'shoutbox' => $shoutbox_ids,
+		)
+	);
+
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_shouts
+		WHERE id_shoutbox IN ({array_int:shoutbox})',
+		array(
+			'shoutbox' => $shoutbox_ids,
+		)
+	);
+}

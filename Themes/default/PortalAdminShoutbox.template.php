@@ -10,96 +10,19 @@
  * @version 2.4
  */
 
-function template_shoutbox_list()
-{
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
-
-	echo '
-	<div id="sp_manage_shoutboxes">
-		<form action="', $scripturl, '?action=admin;area=portalshoutbox;sa=list" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['sp_shoutbox_remove_confirm'], '\');">
-			<div class="sp_align_left pagesection">
-				', $txt['pages'], ': ', $context['page_index'], '
-			</div>
-			<table class="table_grid" cellspacing="0" width="100%">
-				<thead>
-					<tr class="catbg">';
-
-	foreach ($context['columns'] as $column)
-	{
-		if ($column['selected'])
-			echo '
-						<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' width="' . $column['width'] . '"' : '', '>
-							<a href="', $column['href'], '">', $column['label'], '&nbsp;<img src="', $settings['images_url'], '/sort_', $context['sort_direction'], '.png" alt="" /></a>
-						</th>';
-		elseif ($column['sortable'])
-			echo '
-						<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' width="' . $column['width'] . '"' : '', '>
-							', $column['link'], '
-						</th>';
-		else
-			echo '
-						<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' width="' . $column['width'] . '"' : '', '>
-							', $column['label'], '
-						</th>';
-	}
-
-	echo '
-						<th scope="col" class="last_th">
-							<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />
-						</th>
-					</tr>
-				</thead>
-				<tbody>';
-
-	if (empty($context['shoutboxes']))
-	{
-		echo '
-					<tr class="windowbg2">
-						<td class="sp_center" colspan="', count($context['columns']) + 1, '">', $txt['sp_error_no_shoutbox'], '</td>
-					</tr>';
-	}
-
-	foreach ($context['shoutboxes'] as $shoutbox)
-	{
-		echo '
-					<tr class="windowbg2">
-						<td class="sp_left">', $shoutbox['name'], '</td>
-						<td class="sp_center">', $shoutbox['shouts'], '</td>
-						<td class="sp_center">', $shoutbox['caching'] ? $txt['sp_yes'] : $txt['sp_no'], '</td>
-						<td class="sp_center">', $shoutbox['status_image'], '</td>
-						<td class="sp_center">', implode('&nbsp;', $shoutbox['actions']), '</td>
-						<td class="sp_center"><input type="checkbox" name="remove[]" value="', $shoutbox['id'], '" class="input_check" /></td>
-					</tr>';
-	}
-
-	echo '
-				</tbody>
-			</table>
-			<div class="sp_align_left pagesection">
-				<div class="sp_float_right">
-					<input type="submit" name="remove_shoutbox" value="', $txt['sp_admin_shoutbox_remove'], '" class="button_submit" />
-				</div>
-				', $txt['pages'], ': ', $context['page_index'], '
-			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-		</form>
-	</div>';
-}
-
 function template_shoutbox_edit()
 {
-	global $context, $settings, $options, $scripturl, $txt, $helptxt, $modSettings;
+	global $context, $settings, $scripturl, $txt;
 
 	echo '
 	<div id="sp_edit_shoutbox">
-		<form action="', $scripturl, '?action=admin;area=portalshoutbox;sa=edit" method="post" accept-charset="UTF-8">
+		<form  id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalshoutbox;sa=edit" method="post" accept-charset="UTF-8">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					', $context['page_title'], '
 				</h3>
 			</div>
-			<div class="windowbg2">
-				<span class="topslice"><span></span></span>
+			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">
 						<dt>
@@ -109,7 +32,9 @@ function template_shoutbox_edit()
 							<input type="text" name="name" id="shoutbox_name" value="', $context['SPortal']['shoutbox']['name'], '" class="input_text" />
 						</dd>
 						<dt>
-							<a href="', $scripturl, '?action=helpadmin;help=sp_permissions" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
+							<a href="', $scripturl, '?action=quickhelp;help=sp_permissions" onclick="return reqOverlayDiv(this.href);" class="help">
+								<img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" />
+							</a>
 							<label for="shoutbox_permission_set">', $txt['sp_admin_shoutbox_col_permissions'], ':</label>
 						</dt>
 						<dd>
@@ -179,14 +104,18 @@ function template_shoutbox_edit()
 							// ]]></script>
 						</dd>
 						<dt>
-							<a href="', $scripturl, '?action=helpadmin;help=sp-shoutboxesWarning" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
+							<a href="', $scripturl, '?action=quickhelp;help=sp-shoutboxesWarning" onclick="return reqOverlayDiv(this.href);" class="help">
+								<img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" />
+							</a>
 							<label for="shoutbox_warning">', $txt['sp_admin_shoutbox_col_warning'], ':</label>
 						</dt>
 						<dd>
 							<input type="text" name="warning" id="shoutbox_warning" value="', $context['SPortal']['shoutbox']['warning'], '" size="25" class="input_text" />
 						</dd>
 						<dt>
-							<a href="', $scripturl, '?action=helpadmin;help=sp-shoutboxesBBC" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
+							<a href="', $scripturl, '?action=quickhelp;help=sp-shoutboxesBBC" onclick="return reqOverlayDiv(this.href);" class="help">
+								<img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" />
+							</a>
 							<label for="shoutbox_bbc">', $txt['sp_admin_shoutbox_col_bbc'], ':</label>
 						</dt>
 						<dd>
@@ -243,11 +172,8 @@ function template_shoutbox_edit()
 							<input type="checkbox" name="status" id="shoutbox_status" value="1"', $context['SPortal']['shoutbox']['status'] ? ' checked="checked"' : '', ' class="input_check" />
 						</dd>
 					</dl>
-					<div class="sp_button_container">
-						<input type="submit" name="submit" value="', $context['page_title'], '" class="button_submit" />
-					</div>
+					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
 				</div>
-				<span class="botslice"><span></span></span>
 			</div>
 			<input type="hidden" name="shoutbox_id" value="', $context['SPortal']['shoutbox']['id'], '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -271,14 +197,13 @@ function template_shoutbox_prune()
 
 	echo '
 	<div id="sp_prune_shoutbox">
-		<form action="', $scripturl, '?action=admin;area=portalshoutbox;sa=prune" method="post" accept-charset="UTF-8">
+		<form  id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalshoutbox;sa=prune" method="post" accept-charset="UTF-8">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					', $context['page_title'], '
 				</h3>
 			</div>
 			<div class="windowbg2">
-				<span class="topslice"><span></span></span>
 				<div class="sp_content_padding">
 					<dl class="sp_form">
 						<dt>
@@ -299,11 +224,8 @@ function template_shoutbox_prune()
 							<input type="text" name="member" id="member" value="" onclick="document.getElementById(\'type_member\').checked = true;" size="15" class="input_text" />
 						</dd>
 					</dl>
-					<div class="sp_button_container">
-						<input type="submit" name="submit" value="', $context['page_title'], '" class="button_submit" />
-					</div>
+					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
 				</div>
-				<span class="botslice"><span></span></span>
 			</div>
 			<input type="hidden" name="shoutbox_id" value="', $context['shoutbox']['id'], '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -335,14 +257,10 @@ function template_shoutbox_block_redirect()
 				', $context['page_title'], '
 			</h3>
 		</div>
-		<div class="windowbg2">
-			<span class="topslice"><span></span></span>
+		<div class="windowbg">
 			<div class="sp_content_padding">
 				', $context['redirect_message'], '
 			</div>
-			<span class="botslice"><span></span></span>
 		</div>
 	</div>';
 }
-
-?>
