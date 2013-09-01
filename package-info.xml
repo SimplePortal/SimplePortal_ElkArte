@@ -23,6 +23,7 @@
 		<require-dir name="sources" destination="BOARDDIR" />
 		<require-dir name="admin" destination="SOURCEDIR" />
 		<require-dir name="subs" destination="SOURCEDIR" />
+		<require-dir name="controller" destination="SOURCEDIR" />
 		<require-dir name="themes" destination="BOARDDIR" />
 		<database>database.php</database>
 		<code>settings.php</code>
@@ -52,12 +53,12 @@
 		<hook reverse="true" hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" />
 		<modification reverse="true">modification.xml</modification>
 		<remove-file name="BOARDDIR/PortalStandalone.php" />
-		<remove-file name="SOURCEDIR/PortalArticles.php" />
-		<remove-file name="SOURCEDIR/PortalBlocks.php" />
-		<remove-file name="SOURCEDIR/PortalMain.php" />
-		<remove-file name="SOURCEDIR/PortalPages.php" />
-		<remove-file name="SOURCEDIR/PortalShoutbox.php" />
-		<remove-file name="SOURCEDIR/PortalCategories.php" />
+		<remove-file name="CONTROLLERDIR/PortalArticles.php" />
+		<remove-file name="CONTROLLERDIR/PortalBlocks.php" />
+		<remove-file name="CONTROLLERDIR/PortalMain.php" />
+		<remove-file name="CONTROLLERDIR/PortalPages.php" />
+		<remove-file name="CONTROLLERDIR/PortalShoutbox.php" />
+		<remove-file name="CONTROLLERDIR/PortalCategories.php" />
 		<remove-file name="ADMINDIR/PortalAdminArticles.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminBlocks.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminCategories.controller.php" />
