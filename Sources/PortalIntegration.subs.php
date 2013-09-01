@@ -26,7 +26,7 @@ function sp_integrate_actions(&$actions)
 	if (!empty($context['disable_sp']))
 		return;
 
-	$actions['forum'] = array('BoardIndex.php', 'BoardIndex');
+	$actions['forum'] = array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_boardindex');
 	$actions['portal'] = array('PortalMain.php', 'sportal_main');
 }
 
@@ -254,7 +254,7 @@ function sp_integrate_whos_online($actions)
 }
 
 /**
- * Frontpage hook, integrate_frontpage, called from the dispatcher,
+ * Frontpage hook, integrate_frontpage, called from the site dispatcher,
  * used to replace the default action with a new one
  *
  * @param array $default_action
@@ -272,22 +272,22 @@ function sp_integrate_frontpage(&$default_action)
 		// Any actions we need to handle with the portal, set up the action here.
 		if (empty($_GET['page']) && empty($_GET['article']) && empty($_GET['category']) && $modSettings['sp_portal_mode'] == 1)
 		{
-			$file = SOURCEDIR . '/PortalMain.php';
+			$file = CONTROLLERDIR . '/PortalMain.php';
 			$function = 'sportal_main';
 		}
 		elseif (!empty($_GET['page']))
 		{
-			$file = SOURCEDIR . '/PortalPages.php';
+			$file = CONTROLLERDIR . '/PortalPages.php';
 			$function = 'sportal_page';
 		}
 		elseif (!empty($_GET['article']))
 		{
-			$file = $sourcedir . '/PortalArticles.php';
+			$file = CONTROLLERDIR . '/PortalArticles.php';
 			$function = 'sportal_article';
 		}
 		elseif (!empty($_GET['category']))
 		{
-			$file = $sourcedir . '/PortalCategories.php';
+			$file = CONTROLLERDIR . '/PortalCategories.php';
 			$function = 'sportal_category';
 		}
 
@@ -328,7 +328,7 @@ function sp_integrate_buffer($tourniquet)
 
 	$fix = str_replace('{version}', $sportal_version, '<a href="http://www.simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-2013, SimplePortal</a>');
 
-	if ((ELK == 'SSI' && empty($context['standalone'])) || empty($context['template_layers']) || WIRELESS || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
+	if ((ELK == 'SSI' && empty($context['standalone'])) || !Template_Layers::getInstance()->hasLayers() || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
 		return $tourniquet;
 
 	// Append our cp notice at the end of the line
