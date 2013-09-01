@@ -17,9 +17,6 @@ function sportal_main()
 {
 	global $context;
 
-	if (WIRELESS)
-		redirectexit('action=forum');
-
 	$context['page_title'] = $context['forum_name'];
 
 	if (isset($context['page_title_html_safe']))
@@ -58,7 +55,7 @@ function sportal_index()
 			$article['body'] = $smcFunc['substr']($article['body'], 0, $cutoff);
 
 		$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
-		$context['articles'][$article['id']]['date'] = timeformat($article['date']);
+		$context['articles'][$article['id']]['date'] = forum_time($article['date']);
 	}
 
 	$context['sub_template'] = 'portal_index';
