@@ -1163,7 +1163,7 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 
 function sp_boardNews($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $txt, $settings, $modSettings, $context, $color_profile;
+	global $scripturl, $txt, $settings, $modSettings, $color_profile;
 
 	$db = database();
 
@@ -1304,9 +1304,9 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		$return[] = array(
 			'id' => $row['id_topic'],
 			'message_id' => $row['id_msg'],
-			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" align="middle" alt="' . $row['icon'] . '" border="0" />',
+			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" class="icon" alt="' . $row['icon'] . '" />',
 			'subject' => $row['subject'],
-			'time' => timeformat($row['poster_time']),
+			'time' => forum_time($row['poster_time']),
 			'views' => $row['num_views'],
 			'body' => $row['body'],
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
@@ -1351,70 +1351,30 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		}
 	}
 
-	if ($context['SPortal']['core_compat'])
+	foreach ($return as $news)
 	{
-		foreach ($return as $news)
-		{
-			echo '
-					<div class="tborder sp_article_content">
-						<table class="sp_block">
-							<tr class="catbg">
-								<td class="sp_middle">', $news['icon'], '</td>
-								<td class="sp_middle sp_regular_padding sp_fullwidth"><a href="', $news['href'], '" >', $news['subject'], '</a></td>
-							</tr>
-							<tr class="windowbg">
-								<td class="sp_regular_padding" colspan="2">';
+		echo '
+				<div class="cat_bar">
+					<h3 class="catbg">
+						<span class="sp_float_left sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
+					</h3>
+				</div>
+				<div class="windowbg sp_article_content">
+					<div class="sp_content_padding">';
 
-			if ($avatars && $news['avatar']['name'] !== null && !empty($news['avatar']['href']))
-				echo '
-									<a href="', $scripturl, '?action=profile;u=', $news['poster']['id'], '"><img src="', $news['avatar']['href'], '" alt="', $news['poster']['name'], '" width="30" style="float: right;" /></a>
-									<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], '<br />', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
-			else
-				echo '
-									<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], ' | ', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
+		if ($avatars && $news['avatar']['name'] !== null && !empty($news['avatar']['href']))
+			echo '
+						<a href="', $scripturl, '?action=profile;u=', $news['poster']['id'], '"><img src="', $news['avatar']['href'], '" alt="', $news['poster']['name'], '" width="30" class="sp_float_right" /></a>
+						<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], '<br />', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
+		else
+			echo '
+						<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], ' | ', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
 
-			echo '
-									<div class="post"><hr />', $news['body'], '<br /><br /></div>
-								</td>
-							</tr>
-							<tr>
-								<td class="windowbg2" colspan="2">
-									<div class="sp_right sp_regular_padding">', $news['link'], ' ', $news['new_comment'], '</div>
-								</td>
-							</tr>
-						</table>
-					</div>';
-		}
-	}
-	else
-	{
-		foreach ($return as $news)
-		{
-			echo '
-					<div class="cat_bar">
-						<h3 class="catbg">
-							<span class="sp_float_left sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
-						</h3>
+		echo '
+						<div class="post"><hr />', $news['body'], '</div>
+						<div class="sp_right">', $news['link'], ' ', $news['new_comment'], '</div>
 					</div>
-					<div class="windowbg sp_article_content">
-						<span class="topslice"><span></span></span>
-						<div class="sp_content_padding">';
-
-			if ($avatars && $news['avatar']['name'] !== null && !empty($news['avatar']['href']))
-				echo '
-							<a href="', $scripturl, '?action=profile;u=', $news['poster']['id'], '"><img src="', $news['avatar']['href'], '" alt="', $news['poster']['name'], '" width="30" class="sp_float_right" /></a>
-							<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], '<br />', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
-			else
-				echo '
-							<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], ' | ', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
-
-			echo '
-							<div class="post"><hr />', $news['body'], '</div>
-							<div class="sp_right">', $news['link'], ' ', $news['new_comment'], '</div>
-						</div>
-						<span class="botslice"><span></span></span>
-					</div>';
-		}
+				</div>';
 	}
 
 	if (!empty($per_page))
@@ -1998,7 +1958,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 		return $block_parameters;
 
 	loadLanguage('Profile');
-	loadLanguage('Themes');
+	loadLanguage('ManageThemes');
 
 	if (!empty($_SESSION['id_theme']) && (!empty($modSettings['theme_allow']) || allowedTo('admin_forum')))
 		$current_theme = (int) $_SESSION['id_theme'];
