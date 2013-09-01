@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Category Administation controller class.
+ * SimplePortal Category Administration controller class.
  * This class handles the adding/editing/listing of categories
  */
 class ManagePortalCategories_Controller extends Action_Controller
@@ -146,7 +146,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=portalcategories;sa=edit;category_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>&nbsp;
+							'format' => '<a href="?action=admin;area=portalcategories;sa=edit;category_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
 								<a href="?action=admin;area=portalcategories;sa=delete;category_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_categories_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
 								'id' => true,
@@ -378,7 +378,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 	{
 		$category_ids = array();
 
-		// Retreive the cat ids to remove
+		// Retrieve the cat ids to remove
 		if (!empty($_POST['remove_categories']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 		{
 			checkSession();

@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Article Administation controller class.
+ * SimplePortal Article Administration controller class.
  * This class handles the adding/editing/listing of articles
  */
 class ManagePortalArticles_Controller extends Action_Controller
@@ -182,8 +182,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=portalarticles;sa=edit;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>&nbsp;
-								<a href="?action=admin;area=portalarticles;sa=delete;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_categories_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+							'format' => '<a href="?action=admin;area=portalarticles;sa=edit;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
+								<a href="?action=admin;area=portalarticles;sa=delete;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_articles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
 								'id' => true,
 							),
@@ -270,7 +270,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		$context['is_new'] = empty($_REQUEST['article_id']);
 
-		// @todo we don't have html_to_bbc anylonger
+		// @todo we don't have html_to_bbc any longer
 		if (!empty($_REQUEST['content_mode']) && $_POST['type'] == 'bbc')
 		{
 			$_REQUEST['content'] = html_to_bbc($_REQUEST['content']);

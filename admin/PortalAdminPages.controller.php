@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Page Administation controller class.
+ * SimplePortal Page Administration controller class.
  * This class handles the adding/editing/listing of pages
  */
 class ManagePortalPages_Controller extends Action_Controller
@@ -31,7 +31,7 @@ class ManagePortalPages_Controller extends Action_Controller
 		if (!allowedTo('sp_admin'))
 			isAllowedTo('sp_manage_pages');
 
-		// Can't do much without our little buddys
+		// Can't do much without our little buddy's
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
 		require_once(SUBSDIR . '/Portal.subs.php');
 		loadTemplate('PortalAdminPages');
@@ -68,9 +68,6 @@ class ManagePortalPages_Controller extends Action_Controller
 
 	/**
 	 * Show page listing of all portal pages in the system
-	 */
-	/**
-	 * Show a listing of articles in the system
 	 */
 	public function action_sportal_admin_page_list()
 	{
@@ -160,8 +157,8 @@ class ManagePortalPages_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=portalpages;sa=edit;page_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>&nbsp;
-								<a href="?action=admin;area=portalpages;sa=delete;page_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_categories_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+							'format' => '<a href="?action=admin;area=portalpages;sa=edit;page_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
+								<a href="?action=admin;area=portalpages;sa=delete;page_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_pages_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
 								'id' => true,
 							),
