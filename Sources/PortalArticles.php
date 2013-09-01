@@ -48,7 +48,7 @@ function sportal_articles()
  */
 function sportal_article()
 {
-	global $context, $sourcedir, $scripturl, $user_info, $txt;
+	global $context, $sourcedir, $scripturl, $user_info;
 
 	$db = database();
 
@@ -79,7 +79,7 @@ function sportal_article()
 
 		require_once($sourcedir . '/Subs-Post.php');
 
-		$body = $smcFunc['htmlspecialchars'](trim($_POST['body']));
+		$body = Util::htmlspecialchars(trim($_POST['body']));
 		preparsecode($body);
 
 		if (!empty($body) && trim(strip_tags(parse_bbc($body, false), '<img>')) !== '')
@@ -100,7 +100,7 @@ function sportal_article()
 				$smcFunc['db_free_result']($request);
 
 				if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
-				fatal_lang_error('error_sp_cannot_comment_modify', false);
+					fatal_lang_error('error_sp_cannot_comment_modify', false);
 
 				sportal_modify_comment($comment_id, $body);
 			}
@@ -113,55 +113,55 @@ function sportal_article()
 
 	if ($context['article']['can_comment'] && !empty($_GET['modify']))
 	{
-	checkSession('get');
+		checkSession('get');
 
-	$request = $smcFunc['db_query']('','
-	SELECT id_comment, id_member, body
-	FROM {db_prefix}sp_comments
-	WHERE id_comment = {int:comment_id}
-	LIMIT {int:limit}',
-	array(
-	'comment_id' => (int) $_GET['modify'],
-	'limit' => 1,
-	)
-	);
-	list ($comment_id, $author_id, $body) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+		$request = $smcFunc['db_query']('','
+			SELECT id_comment, id_member, body
+			FROM {db_prefix}sp_comments
+			WHERE id_comment = {int:comment_id}
+			LIMIT {int:limit}',
+			array(
+				'comment_id' => (int) $_GET['modify'],
+				'limit' => 1,
+			)
+		);
+		list ($comment_id, $author_id, $body) = $db->fetch_row($request);
+		$db->free_result($request);
 
-	if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
-	fatal_lang_error('error_sp_cannot_comment_modify', false);
+		if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
+			fatal_lang_error('error_sp_cannot_comment_modify', false);
 
-	require_once($sourcedir . '/Subs-Post.php');
+		require_once(SOURCEDIR . '/Post.subs.php');
 
-	$context['article']['comment'] = array(
-	'id' => $comment_id,
-	'body' => str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($body)),
-	);
+		$context['article']['comment'] = array(
+			'id' => $comment_id,
+			'body' => str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($body)),
+		);
 	}
 
 	if ($context['article']['can_comment'] && !empty($_GET['delete']))
 	{
-	checkSession('get');
+		checkSession('get');
 
-	$request = $smcFunc['db_query']('','
-	SELECT id_comment, id_article, id_member
-	FROM {db_prefix}sp_comments
-	WHERE id_comment = {int:comment_id}
-	LIMIT {int:limit}',
-	array(
-	'comment_id' => (int) $_GET['delete'],
-	'limit' => 1,
-	)
-	);
-	list ($comment_id, $article_id, $author_id) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+		$request = $db->query('','
+			SELECT id_comment, id_article, id_member
+			FROM {db_prefix}sp_comments
+			WHERE id_comment = {int:comment_id}
+			LIMIT {int:limit}',
+			array(
+				'comment_id' => (int) $_GET['delete'],
+				'limit' => 1,
+			)
+		);
+		list ($comment_id, $article_id, $author_id) = $db->fetch_row($request);
+		$db->free_result($request);
 
-	if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
-	fatal_lang_error('error_sp_cannot_comment_delete', false);
+		if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
+			fatal_lang_error('error_sp_cannot_comment_delete', false);
 
-	sportal_delete_comment($article_id, $comment_id);
+		sportal_delete_comment($article_id, $comment_id);
 
-	redirectexit('article=' . $context['article']['article_id']);
+		redirectexit('article=' . $context['article']['article_id']);
 	}
 
 	if (empty($_SESSION['last_viewed_article']) || $_SESSION['last_viewed_article'] != $context['article']['id'])
