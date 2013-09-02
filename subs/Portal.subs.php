@@ -182,6 +182,8 @@ function sportal_init_headers()
 
 	$javascript = '
 	var sp_images_url = "' . $settings['sp_images_url'] . '";
+
+	// Used to collapse an individual block
 	function sp_collapseBlock(id)
 	{
 		mode = document.getElementById("sp_block_" + id).style.display == "" ? 0 : 1;';
@@ -195,12 +197,14 @@ function sportal_init_headers()
 
 	$javascript .= '
 		document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/collapse.png" : "/expand.png");
-		document.getElementById("sp_block_" + id).style.display = mode ? "" : "none";
+
+		$(\'#\' + "sp_block_" + id).slideToggle(300);
 	}';
 
 	if (empty($modSettings['sp_disable_side_collapse']))
 	{
 		$javascript .= '
+	// Used to collapse side (if enabled)
 	function sp_collapseSide(id)
 	{
 		var sp_sides = new Array();
@@ -209,8 +213,14 @@ function sportal_init_headers()
 		mode = document.getElementById(sp_sides[id]).style.display == "" ? 0 : 1;' . ($context['user']['is_guest'] ? '
 		document.cookie = sp_sides[id] + "=" + (mode ? 0 : 1);' : '
 		elk_setThemeOption(sp_sides[id], mode ? 0 : 1, null, "' . $context['session_id'] . '");') . '
+
+		// Update the side expand/collapse image
 		document.getElementById("sp_collapse_side" + id).src = sp_images_url + (mode ? "/collapse.png" : "/expand.png");
-		document.getElementById(sp_sides[id]).style.display = mode ? "" : "none";' . (isBrowser('is_ie8') ? '
+
+		// Hide the side with a touch of animation
+		$(\'#\' + sp_sides[id]).toggle(400);
+
+		' . (isBrowser('is_ie8') ? '
 		document.getElementById("sp_center").style.width = "100%";' : '') . '
 	}';
 	}
