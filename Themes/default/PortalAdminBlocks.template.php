@@ -11,8 +11,8 @@
  */
 
 /**
- * Show the list of availalbe blocks in the sytem
- * If no area is provided will show all areas with available blocks in each
+ * Show the list of availalbe blocks in the system
+ * If no specific area is provided will show all areas with available blocks in each
  * otherwise will just show the chosen area
  */
 function template_block_list()

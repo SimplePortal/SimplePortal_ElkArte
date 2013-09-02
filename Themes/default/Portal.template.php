@@ -10,6 +10,9 @@
  * @version 2.4
  */
 
+/**
+ * Used to display articles
+ */
 function template_portal_index()
 {
 	global $context, $txt;
@@ -38,10 +41,14 @@ function template_portal_index()
 	</div>';
 }
 
+/**
+ * Displays the above blocks, this includes header, left and top blocks
+ */
 function template_portal_above()
 {
 	global $context, $modSettings;
 
+	// Allowing side collasping? if so show the buttons
 	if (empty($modSettings['sp_disable_side_collapse']) && ($context['SPortal']['sides'][1]['active'] || $context['SPortal']['sides'][4]['active']))
 	{
 		echo '
@@ -59,6 +66,7 @@ function template_portal_above()
 	</div>';
 	}
 
+	// Output any header blocks
 	if (!empty($context['SPortal']['blocks'][5]))
 	{
 		echo '
@@ -75,6 +83,7 @@ function template_portal_above()
 	<table id="sp_main">
 		<tr>';
 
+	// Output all the Left blocks
 	if (!empty($modSettings['showleft']) && !empty($context['SPortal']['blocks'][1]))
 	{
 		echo '
@@ -87,6 +96,7 @@ function template_portal_above()
 			</td>';
 	}
 
+	// Followed by all the Top Blocks
 	echo '
 			<td id="sp_center">';
 
@@ -101,10 +111,14 @@ function template_portal_above()
 	}
 }
 
+/**
+ * Display below blocks, this includes our right, bottom and footer blocks
+ */
 function template_portal_below()
 {
 	global $context, $modSettings;
 
+	// Output all the Bottom blocks
 	if (!empty($context['SPortal']['blocks'][3]))
 	{
 		if (empty($context['SPortal']['on_portal']) || !empty($context['SPortal']['blocks'][2]) || !empty($modSettings['articleactive']))
@@ -118,6 +132,7 @@ function template_portal_below()
 	echo '
 			</td>';
 
+	// And now all the Right Blocks
 	if (!empty($modSettings['showright']) && !empty($context['SPortal']['blocks'][4]))
 	{
 		echo '
@@ -134,6 +149,7 @@ function template_portal_below()
 		</tr>
 	</table>';
 
+	// Footer Blocks
 	if (!empty($context['SPortal']['blocks'][6]))
 	{
 		echo '
@@ -148,6 +164,9 @@ function template_portal_below()
 	}
 }
 
+/**
+ * Generic template to wrap blocks in
+ */
 function template_block($block)
 {
 	global $context, $modSettings, $txt;
@@ -171,10 +190,13 @@ function template_block($block)
 	if (isset($txt['sp_custom_block_title_' . $block['id']]))
 		$block['label'] = $txt['sp_custom_block_title_' . $block['id']];
 
-		template_block_curve($block);
+	template_block_default($block);
 }
 
-function template_block_curve($block)
+/**
+ * Wrap a block in our default wrapper
+ */
+function template_block_default($block)
 {
 	global $context, $modSettings, $settings;
 
