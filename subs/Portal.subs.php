@@ -60,7 +60,7 @@ function sportal_init($standalone = false)
 
 	if (!$standalone)
 	{
-		require_once(CONTROLLERDIR . '/PortalBlocks.php');
+		require_once(SUBSDIR . '/PortalBlocks.subs.php');
 
 		if (ELK != 'SSI')
 			require_once(BOARDDIR . '/SSI.php');
@@ -1404,7 +1404,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 				'author' => array(
 					'id' => $row['id_member'],
 					'name' => $row['member_name'],
-					'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '" title="' . $txt['on'] . ' ' . strip_tags(timeformat($row['log_time'])) . '"' . (!empty($online_color) ? ' style="color: ' . $online_color . ';"' : '') . '>' . $row['member_name'] . '</a>') : $row['member_name'],
+					'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '" title="' . $txt['on'] . ' ' . strip_tags(relativeTime($row['log_time'])) . '"' . (!empty($online_color) ? ' style="color: ' . $online_color . ';"' : '') . '>' . $row['member_name'] . '</a>') : $row['member_name'],
 					'color' => $online_color,
 				),
 				'time' => $row['log_time'],
@@ -1427,12 +1427,12 @@ function sportal_get_shouts($shoutbox, $parameters)
 
 		$shouts[$shout['id']] += array(
 			'is_me' => preg_match('~^<div\sclass="meaction">\* ' . preg_quote($shout['author']['name'], '~') . '.+</div>$~', $shout['text']) != 0,
-			'delete_link' => $can_delete ? '<a href="' . $scripturl . '?action=portal;sa=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('delete_small') . '</a> ' : '',
-			'delete_link_js' => $can_delete ? '<a href="' . $scripturl . '?action=portal;sa=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="sp_delete_shout(' . $shoutbox . ', ' . $shout['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false;">' . sp_embed_image('delete_small') . '</a> ' : '',
+			'delete_link' => $can_delete ? '<a href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('delete_small') . '</a> ' : '',
+			'delete_link_js' => $can_delete ? '<a href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="sp_delete_shout(' . $shoutbox . ', ' . $shout['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false;">' . sp_embed_image('delete_small') . '</a> ' : '',
 		);
 
 		$shouts[$shout['id']]['text'] = str_replace(':jade:', '<img src="http://www.simpleportal.net/sp/cheerleader.png" alt="Jade!" />', $shouts[$shout['id']]['text']);
-		$shouts[$shout['id']]['time'] = timeformat($shouts[$shout['id']]['time']);
+		$shouts[$shout['id']]['time'] = relativeTime($shouts[$shout['id']]['time']);
 		$shouts[$shout['id']]['text'] = preg_replace('~(</?)div([^<]*>)~', '$1span$2', $shouts[$shout['id']]['text']);
 		$shouts[$shout['id']]['text'] = preg_replace('~<a([^>]+>)([^<]+)</a>~', '<a$1' . $txt['sp_link'] . '</a>', $shouts[$shout['id']]['text']);
 		$shouts[$shout['id']]['text'] = censorText($shouts[$shout['id']]['text']);

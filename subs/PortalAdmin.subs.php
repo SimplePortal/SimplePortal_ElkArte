@@ -341,7 +341,7 @@ function sp_count_categories()
  * @param int $items_per_page
  * @param string $sort
  */
-function sp_load_categories($start, $items_per_page, $sort)
+function sp_load_categories($start = null, $items_per_page = null, $sort = null)
 {
 	global $scripturl, $txt, $context;
 
@@ -349,9 +349,9 @@ function sp_load_categories($start, $items_per_page, $sort)
 
 	$request = $db->query('', '
 		SELECT id_category, name, namespace, articles, status
-		FROM {db_prefix}sp_categories
-		ORDER BY {raw:sort}
-		LIMIT {int:start}, {int:limit}',
+		FROM {db_prefix}sp_categories' . (isset($sort) ? '
+		ORDER BY {raw:sort}' : '') . (isset($start) ? '
+		LIMIT {int:start}, {int:limit}' : ''),
 		array(
 			'sort' => $sort,
 			'start' => $start,

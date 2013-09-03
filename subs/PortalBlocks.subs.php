@@ -13,6 +13,13 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * User info block, shows avatar, group, icons, posts, karma, etc
+ *
+ * @param array $parameters, not used in this block
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_userInfo($parameters, $id, $return_parameters = false)
 {
 	global $context, $txt, $scripturl, $memberContext, $modSettings, $user_info, $color_profile, $settings;
@@ -29,7 +36,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 	{
 		echo '
 									<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/sha1.js"></script>
-									<form action="', $scripturl, '?action=login2" method="post" accept-charset="', $context['character_set'], '"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', ' >
+									<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', ' >
 										<table>
 											<tr>
 												<td class="sp_right"><label for="sp_user">', $txt['username'], ':</label>&nbsp;</td>
@@ -66,7 +73,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 		$member_info['karma']['total'] = $member_info['karma']['good'] - $member_info['karma']['bad'];
 
 		echo '
-									', strtolower($member_info['name']) === 'okarin' ? 'Okae-Rin, ' : $txt['hello_member'], ' <strong>', !empty($member_info['colored_name']) ? $member_info['colored_name'] : $member_info['name'], '</strong>
+									',  $txt['hello_member'], ' <strong>', !empty($member_info['colored_name']) ? $member_info['colored_name'] : $member_info['name'], '</strong>
 									<br /><br />';
 
 		if (!empty($member_info['avatar']['image']))
@@ -81,7 +88,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 									', $member_info['post_group'], '<br />';
 
 		echo '
-									', $member_info['group_stars'], '<br />';
+									', $member_info['group_icons'], '<br />';
 
 		echo '
 									<br />
@@ -126,6 +133,13 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 								</div>';
 }
 
+/**
+ * Latest member block, shows name and join date for X latest members
+ *
+ * @param array $parameters 'limit' => number of members to show
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_latestMember($parameters, $id, $return_parameters = false)
 {
 	global $scripturl, $txt, $color_profile;
@@ -164,7 +178,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 			'name' => $row['real_name'],
 			'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-			'date' => timeformat($row['date_registered'], '%d %b'),
+			'date' => relativeTime($row['date_registered'], '%d %b'),
 		);
 	}
 	$db->free_result($request);
@@ -196,6 +210,13 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 								</ul>';
 }
 
+/**
+ * Whos online block, shows count of users online names
+ *
+ * @param array $parameters 'online_today' => shows all users that were online today (requires user online today addon)
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_whosOnline($parameters, $id, $return_parameters = false)
 {
 	global $scripturl, $modSettings, $txt;
@@ -247,9 +268,9 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 								<div class="sp_fullwidth sp_center">', $txt['error_sp_no_online'], '</div>';
 	}
 
-	if ($online_today && file_exists(SOURCEDIR . '/Subs-MembersOnlineToday.php'))
+	if ($online_today && file_exists(SUBSDIR . '/MembersOnlineToday.subs.php'))
 	{
-		require_once(SOURCEDIR . '/Subs-MembersOnlineToday.php');
+		require_once(SUBSDIR . '/MembersOnlineToday.subs.php');
 
 		$membersOnlineTodayOptions = array(
 			'sort' => 'login_time',
@@ -280,6 +301,13 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 	}
 }
 
+/**
+ * Board Stats block, shows count of users online names
+ *
+ * @param array $parameters 'averages' => Will calculate the daily average (posts, topics, registrations, etc)
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_boardStats($parameters, $id, $return_parameters = false)
 {
 	global $scripturl, $modSettings, $txt;
@@ -299,6 +327,7 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 
 	$totals = ssi_boardStats('array');
 
+	// Get the averages from the activity log, its the most recent snapshot
 	if ($averages)
 	{
 		$result = $db->query('', '
@@ -343,6 +372,15 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 	}
 }
 
+/**
+ * Top Posters block, shows the top posters on the site, with avatar and name
+ *
+ * @param array $parameters
+ *		'limit' => number of top posters to show
+ *		'type' => period to determine the top poster, 0 all time, 1 today, 2 week, 3 month
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_topPoster($parameters, $id, $return_parameters = false)
 {
 	global $scripturl, $modSettings, $txt, $color_profile;
@@ -360,15 +398,19 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
 	$type = !empty($parameters['type']) ? (int) $parameters['type'] : 0;
 
+	// If not top poster of all time we need to set a start time
 	if (!empty($type))
 	{
+		// Today
 		if ($type == 1)
 		{
 			list($year, $month, $day) = explode('-', date('Y-m-d'));
 			$start_time = mktime(0, 0, 0, $month, $day, $year);
 		}
+		// This week
 		elseif ($type == 2)
 			$start_time = mktime(0, 0, 0, date("n"), date("j"), date("Y")) - (date("N") * 3600 * 24);
+		// This month
 		elseif ($type == 3)
 		{
 			$months = array(1 => 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
@@ -479,6 +521,20 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 								</table>';
 }
 
+/**
+ * Top stats block, shows the top x members who has acheived top postion of various stats
+ * Designed to be flexible so adding addional member stats is easy
+ *
+ * @param array $parameters
+ *		'limit' => number of top posters to show
+ *		'type' => top stat to show
+ *		'sort_asc' => direction to show the list
+ * 		'last_active_limit'
+ * 		'enable_label' => use the label
+ * 		'list_label' => title for the list
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_topStatsMember($parameters, $id, $return_parameters = false)
 {
 	global $context, $settings, $txt, $scripturl, $user_info, $user_info, $modSettings, $color_profile;
@@ -493,14 +549,8 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 			'2' => $txt['sp_topStatsMember_Karma_Good'],
 			'3' => $txt['sp_topStatsMember_Karma_Bad'],
 			'4' => $txt['sp_topStatsMember_Karma_Total'],
-			'5' => $txt['sp_topStatsMember_Thank-O-Matic_Top_Given'],
-			'6' => $txt['sp_topStatsMember_Thank-O-Matic_Top_Recived'],
-			'10' => $txt['sp_topStatsMember_Advanced_Reputation_System_Best'],
-			'11' => $txt['sp_topStatsMember_Advanced_Reputation_System_Worst'],
-			'sa_shop_money' => $txt['sp_topStatsMember_SA_Shop_Cash'],
-			'sa_shop_trades' => $txt['sp_topStatsMember_SA_Shop_Trades'],
-			'sa_shop_purchase' => $txt['sp_topStatsMember_SA_Shop_Purchase'],
-			'casino' => $txt['sp_topStatsMember_Casino'],
+			'5' => $txt['sp_topStatsMember_Likes_Received'],
+			'6' => $txt['sp_topStatsMember_Likes_Given'],
 		),
 		'limit' => 'int',
 		'sort_asc' => 'check',
@@ -515,31 +565,18 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	if (empty($sp_topStatsSystem))
 	{
 		/*
-		  The system setup array, order depend on the $txt array of the select
-		  name
-		  It's for better knowing what this option can do.
-		  mod_id
-		  Only as information
-		  field
-		  The members field that should be loaded
-		  Please don't forget to add mem. before the field names
-		  (That what is after the SELECT Statment)
-		  order
-		  What is the field name i need to be sort after
-		  where
-		  Here you can add additional where statments :)
-		  output_text
-		  What should be outputed after the avatar and nickname
-		  For example if you field is karmaGood
-		  'output' => $txt['karma'] . '%karmaGood%';
-		  output_function
-		  With this you can add to the $row of the query some infomartions.
-		  reverse
-		  On true it change the reverse cause, if not set it will be false :)
-		  enabled
-		  true = mod exists or is possible to use :D
-
-		  'error_msg' => $txt['my_error_msg'];; You can insert here what kind of error message should appear if the modification not exists =D
+		 * The system setup array, order depend on the $txt array of the select name
+		 *
+		 * 'mod_id' - Only used as information
+		 * 'field' - The members field that should be loaded.  Please don't forget to add mem. before the field names
+		 * 'order' - What is the field name i need to be sort after
+		 * 'where' - Here you can add additional where statments
+		 * 'output_text' - What should be displayed after the avatar and nickname
+		 *				For example if your field is karmaGood 'output_text' => $txt['karma'] . '%karmaGood%';
+		 * 'output_function' - With this you can add to the $row of the query some infomartion.
+		 * 'reverse' - On true it change the reverse cause, if not set it will be false :)
+		 * 'enabled' - true = mod exists or is possible to use :D
+		 * 'error_msg' => $txt['my_error_msg']; You can insert here what kind of error message should appear if the modification not exists =D
 		 */
 		$sp_topStatsSystem = array(
 			'0' => array(
@@ -606,113 +643,20 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 				'error_msg' => $txt['sp_karma_is_disabled'],
 			),
 			'5' => array(
-				'name' => 'Thank-O-Matic Top Given',
-				'mod_id' => 710,
-				'field' => 'mem.thank_you_post_made, mem.thank_you_post_became',
-				'order' => 'mem.thank_you_post_made',
-				'output_text' => '%thank_you_post_made% ' . (!empty($txt['thank_you_post_made_display']) ? $txt['thank_you_post_thx_display'] . ' ' . $txt['thank_you_post_made_display'] : ''),
-				'enabled' => file_exists(SOURCEDIR . '/ThankYouPost.php'),
-				'error_msg' => $txt['sp_thankomatic_no_exist'],
+				'name' => 'Likes Received',
+				'field' => 'mem.likes_received',
+				'order' => 'mem.likes_received',
+				'output_text' => '%likes_received% ' . $txt['sp_topStatsMember_Likes_Received'],
+				'enabled' => !empty($modSettings['likes_enabled']),
+				'error_msg' => $txt['sp_likes_is_disabled'],
 			),
 			'6' => array(
-				'name' => 'Thank-O-Matic Top Recived',
-				'mod_id' => 710,
-				'field' => 'mem.thank_you_post_made, mem.thank_you_post_became',
-				'order' => 'mem.thank_you_post_became',
-				'output_text' => '%thank_you_post_became% ' . (!empty($txt['thank_you_post_became_display']) ? $txt['thank_you_post_thx_display'] . ' ' . $txt['thank_you_post_became_display'] : ''),
-				'enabled' => file_exists(SOURCEDIR . '/ThankYouPost.php'),
-				'error_msg' => $txt['sp_thankomatic_no_exist'],
-			),
-			'10' => array(
-				'name' => 'Advanced Reputation System Best',
-				'mod_id' => 1129,
-				'field' => '(mem.karmaGood - mem.karmaBad) AS karma, karmaGood, karmaBad',
-				'order' => 'karma',
-				'where' => 'mem.karmaGood > mem.karmaBad',
-				'output_function' => create_function('&$row', '
-						global $modSettings;
-						$descriptions = preg_split("/(\r)?\n/", $modSettings["karmaDescriptions"]);
-						$rep_bars = "";
-
-						$points = $row["karma"];
-						$bars = ($points - ($points % $modSettings["karmaBarPoints"])) / $modSettings["karmaBarPoints"];
-						$bars = $bars < 1 ? 1 : (($bars > $modSettings["karmaMaxBars"]) ? $modSettings["karmaMaxBars"] : $bars);
-						$description = $descriptions[$bars - 1];
-
-						for($i = 0; $i < $bars; $i++)
-							$rep_bars .= \'<img src=\"\' . $settings["images_url"] . "/karmaGood_" . ($i < ($modSettings["karmaSuperBar"] - 1) ? "basic" : "super") . \'.png" title="\' . $row["realName"] . " " . $description . \'" alt="\' . $row["realName"] . " " . $description . \'" />\';
-
-						$row += array(
-							"reputation_bars" => $rep_bars,
-							"amount" => "+" . $row["karma"],
-						);
-				'),
-				'output_text' => (!empty($txt['karma_power']) ? $txt['karma_power'] : '') . ': %amount%<br />%reputation_bars%',
-				'enabled' => !empty($modSettings['karma_enabled']) && file_exists($settings['images_url'] . '/karmaBad_basic.png'),
-				'error_msg' => $txt['sp_reputation_no_exist'],
-			),
-			'11' => array(
-				'name' => 'Advanced Reputation System Worst',
-				'mod_id' => 1129,
-				'field' => '(karmaBad - karmaGood) AS karma, karmaGood, karmaBad',
-				'order' => 'karma',
-				'where' => 'mem.karmaBad > mem.karmaGood',
-				'output_function' => create_function('&$row', '
-						global $modSettings;
-						$rep_bars = "";
-
-						$points = $row["karma"];
-						$bars = ($points - ($points % $modSettings["karmaBarPoints"])) / $modSettings["karmaBarPoints"];
-						$bars = $bars < 1 ? 1 : (($bars > $modSettings["karmaMaxBars"]) ? $modSettings["karmaMaxBars"] : $bars);
-						$description = $descriptions[$bars - 1];
-
-						for($i = 0; $i < $bars; $i++)
-							$rep_bars .= \'<img src=\"\' . $settings["images_url"] . "/karmaGood_" . ($i < ($modSettings["karmaSuperBar"] - 1) ? "basic" : "super") . \'.png" title="\' . $row["realName"] . " " . $modSettings["karmaNegativeDescription"] . \'" alt="\' . $row["realName"] . " " . $modSettings["karmaNegativeDescription"] . \'" />\';
-
-						$row += array(
-							"reputation_bars" => $rep_bars,
-							"amount" => "-" . $row["karma"],
-						);
-				'),
-				'output_text' => (!empty($txt['karma_power']) ? $txt['karma_power'] : '') . ': %amount%<br />%reputation_bars%',
-				'enabled' => !empty($modSettings['karma_enabled']) && file_exists($settings['images_url'] . '/karmaBad_basic.png'),
-				'error_msg' => $txt['sp_reputation_no_exist'],
-			),
-			'sa_shop_money' => array(
-				'name' => 'SA Shop Money',
-				'mod_id' => 1794,
-				'field' => 'mem.cash, mem.purchHis, mem.tradeHis',
-				'order' => 'mem.cash',
-				'output_text' => (!empty($modSettings['shopprefix']) ? $modSettings['shopprefix'] : '') . '%cash%' . (!empty($modSettings['shopsurfix']) ? $modSettings['shopsurfix'] : ''),
-				'enabled' => file_exists(SOURCEDIR . 'shop2/Shop.php'),
-				'error_msg' => $txt['sp_sashop_no_exist'],
-			),
-			'sa_shop_trades' => array(
-				'name' => 'SA Shop Trades',
-				'mod_id' => 1794,
-				'field' => 'mem.cash, mem.purchHis, mem.tradeHis',
-				'order' => 'mem.tradeHis',
-				'output_text' => '%tradeHis%',
-				'enabled' => file_exists(SOURCEDIR . 'shop2/Shop.php') && !empty($modSettings['shop_Enable_Stats']),
-				'error_msg' => $txt['sp_sashop_no_exist'],
-			),
-			'sa_shop_purchase' => array(
-				'name' => 'SA Shop Purchase',
-				'mod_id' => 1794,
-				'field' => 'mem.cash, mem.purchHis, mem.tradeHis',
-				'order' => 'mem.purchHis',
-				'output_text' => '%purchHis%',
-				'enabled' => file_exists(SOURCEDIR . 'shop2/Shop.php') && !empty($modSettings['shop_Enable_Stats']),
-				'error_msg' => $txt['sp_sashop_no_exist'],
-			),
-			'casino' => array(
-				'name' => 'Casino Cash',
-				'mod_id' => 1641,
-				'field' => 'mem.cash',
-				'order' => 'mem.cash',
-				'output_text' => '%cash%',
-				'enabled' => file_exists(SOURCEDIR . 'casino/Casino.php'),
-				'error_msg' => $txt['sp_sashop_no_exist'],
+				'name' => 'Likes Given',
+				'field' => 'mem.likes_given',
+				'order' => 'mem.likes_given',
+				'output_text' => '%likes_given% ' . $txt['sp_topStatsMember_Likes_Given'],
+				'enabled' => !empty($modSettings['likes_enabled']),
+				'error_msg' => $txt['sp_likes_is_disabled'],
 			),
 		);
 	}
@@ -722,6 +666,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
 	$limit = empty($limit) ? 5 : $limit;
 	$sort_asc = !empty($parameters['sort_asc']);
+
 	// Time is in days :D, but i need seconds :P
 	$last_active_limit = !empty($parameters['last_active_limit']) ? $parameters['last_active_limit'] * 86400 : 0;
 	$enable_label = !empty($parameters['enable_label']);
@@ -783,7 +728,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	else
 		$where = "";
 
-	// Okay load the data :D
+	// Okay load the data
 	$request = $db->query('', '
 		SELECT
 			mem.id_member, mem.real_name, mem.avatar,
@@ -871,7 +816,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		$toCache = array($type, $limit, ($sort_asc ? 1 : 0), time(), implode(',', $chache_member_ids));
 		updateSettings(array($chache_id => implode(';', $toCache)));
 	}
-	// One time error, if this happen the chache need an update (Next reload is mystical fixed)
+	// One time error, if this happen the cache need an update (Next reload is mystical fixed)
 	elseif (!empty($modSettings[$chache_id]))
 		updateSettings(array($chache_id => '0;0;0;1000;0'));
 
@@ -909,9 +854,20 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 								</table>';
 }
 
+/**
+ * Recent Post or Topic block, shows the most recent posts or topics on the forum
+ *
+ * @param array $parameters
+ *		'boards' => list of boards to get posts from,
+ *		'limit' => number of topics/posts to show
+ *		'type' => recent 0 posts or 1 topics
+ * 		'display' => compact or full view of the post/topic
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_recent($parameters, $id, $return_parameters = false)
 {
-	global $txt, $scripturl, $settings, $context, $color_profile;
+	global $txt, $scripturl, $color_profile;
 
 	$block_parameters = array(
 		'boards' => 'boards',
@@ -928,6 +884,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
 	$type = 'ssi_recent' . (empty($parameters['type']) ? 'Posts' : 'Topics');
 	$display = empty($parameters['display']) ? 'compact' : 'full';
 
+	// Pass the values to the ssi_ function
 	$items = $type($limit, null, $boards, 'array');
 
 	if (empty($items))
@@ -952,11 +909,15 @@ function sp_recent($parameters, $id, $return_parameters = false)
 		}
 	}
 
+	// Show the data in either a compact or full format
 	if ($display == 'compact')
 	{
 		foreach ($items as $key => $item)
 			echo '
-								<a href="', $item['href'], '">', $item['subject'], '</a> <span class="smalltext">', $txt['by'], ' ', $item['poster']['link'], $item['new'] ? '' : ' <a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>', '<br />[', $item['time'], ']</span><br />', empty($item['is_last']) ? '<hr />' : '';
+								<a href="', $item['href'], '">', $item['subject'], '</a>
+								<span class="smalltext">', $txt['by'], ' ', $item['poster']['link'], $item['new'] ? '' : ' <a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>',
+								'<br />[', $item['time'], ']</span>
+								<br />', empty($item['is_last']) ? '<hr />' : '';
 	}
 	elseif ($display == 'full')
 	{
@@ -983,6 +944,15 @@ function sp_recent($parameters, $id, $return_parameters = false)
 	}
 }
 
+/**
+ * Top Topics Block, shows top topics by number of view or number of posts
+ *
+ * @param array $parameters
+ *		'limit' => number of posts to show
+ *		'type' => 0 replies or 1 views
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_topTopics($parameters, $id, $return_parameters = false)
 {
 	global $txt, $user_info, $user_info, $topics;
@@ -998,6 +968,7 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
 	$type = !empty($parameters['type']) ? $parameters['type'] : 0;
 	$limit = !empty($parameters['limit']) ? $parameters['limit'] : 5;
 
+	// Use teh ssi function to get the data
 	$topics = ssi_topTopics($type ? 'views' : 'replies', $limit, 'array');
 
 	if (empty($topics))
@@ -1021,6 +992,14 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
 								</ul>';
 }
 
+/**
+ * Top Boards Block, shows top boards by number of posts
+ *
+ * @param array $parameters
+ *		'limit' => number of boards to show
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_topBoards($parameters, $id, $return_parameters = false)
 {
 	global $txt, $user_info, $user_info, $boards;
@@ -1057,6 +1036,16 @@ function sp_topBoards($parameters, $id, $return_parameters = false)
 								</ul>';
 }
 
+/**
+ * Poll Block, Shows a specific poll, the most recent or a random poll
+ * If user can vote, provides for voting selection
+ *
+ * @param array $parameters
+ *		'topic' => topic id of the poll
+ *		'type' => 1 the most recently posted poll, 2 displays a random poll, null for specific topic
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_showPoll($parameters, $id, $return_parameters = false)
 {
 	global $context, $scripturl, $modSettings, $boardurl, $txt;
@@ -1123,7 +1112,7 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 	if ($poll['allow_vote'])
 	{
 		echo '
-								<form action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="', $context['character_set'], '">
+								<form action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="UTF-8">
 									<ul class="sp_list">
 										<li><strong>', $poll['question'], '</strong></li>
 										<li>', $poll['allowed_warning'], '</li>';
@@ -1161,6 +1150,19 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 								', $txt['poll_cannot_see'];
 }
 
+/**
+ * Board Block, Displays a list of posts from selected board(s)
+ *
+ * @param array $parameters
+ *		'board' => Board(s) to select posts from
+ *		'limit' => max number of posts to show
+ *		'start' => id of post to start from
+ *		'length' => preview length of the post
+ *		'avatar' => show the poster avatar
+ *		'per_page' => number of posts per page to show
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_boardNews($parameters, $id, $return_parameters = false)
 {
 	global $scripturl, $txt, $settings, $modSettings, $color_profile;
@@ -1276,7 +1278,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 
 		// Only place an ellipsis if the body has been shortened.
 		if ($limited)
-			$row['body'] .= '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">...</a>';
+			$row['body'] .= '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">&hellip;</a>';
 
 		if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
 		{
@@ -1306,7 +1308,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 			'message_id' => $row['id_msg'],
 			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" class="icon" alt="' . $row['icon'] . '" />',
 			'subject' => $row['subject'],
-			'time' => forum_time($row['poster_time']),
+			'time' => relativeTime($row['poster_time']),
 			'views' => $row['num_views'],
 			'body' => $row['body'],
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
@@ -1379,12 +1381,19 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 
 	if (!empty($per_page))
 		echo '
-					<div class="sp_page_index">', $txt['sp-articlesPages'], ': ', $page_index, '</div>';
+					<div class="pagelinks sp_page_index">', $page_index, '</div>';
 }
 
+/**
+ * Quick Search Block, Displays a quick search box
+ *
+ * @param array $parameters, not used in this block
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_quickSearch($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $txt, $context;
+	global $scripturl, $txt;
 
 	$block_parameters = array();
 
@@ -1392,7 +1401,7 @@ function sp_quickSearch($parameters, $id, $return_parameters = false)
 		return $block_parameters;
 
 	echo '
-								<form action="', $scripturl, '?action=search2" method="post" accept-charset="', $context['character_set'], '">
+								<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
 									<div class="sp_center">
 										<input type="text" name="search" value="" class="sp_search" /><br />
 										<input type="submit" name="submit" value="', $txt['search'], '" class="button_submit" />
@@ -1401,6 +1410,13 @@ function sp_quickSearch($parameters, $id, $return_parameters = false)
 								</form>';
 }
 
+/**
+ * News Block, Displays the forum news
+ *
+ * @param array $parameters, not used in this block
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_news($parameters, $id, $return_parameters = false)
 {
 	global $context;
@@ -1414,6 +1430,18 @@ function sp_news($parameters, $id, $return_parameters = false)
 								<div class="sp_center sp_fullwidth">', $context['random_news_line'], '</div>';
 }
 
+/**
+ * Image Attachment Block, Displays a list of recent post image attachments
+ *
+ * @param array $parameters
+ *		'limit' => Board(s) to select posts from
+ *		'direction' => 0 Horizontal or 1 Vertical display
+ *		'disablePoster' => don't show the poster of the attachment
+ *		'disableDownloads' => don't show a download link
+ *		'disableLink' => don't show a link to the post
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_attachmentImage($parameters, $id, $return_parameters = false)
 {
 	global $txt, $color_profile;
@@ -1436,6 +1464,7 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
 	$showDownloads = empty($parameters['disableDownloads']);
 	$showLink = empty($parameters['disableLink']);
 
+	// Let ssi get the attchments
 	$items = ssi_recentAttachments($limit, $type, 'array');
 
 	if (empty($items))
@@ -1482,6 +1511,14 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
 								</table>';
 }
 
+/**
+ * Attachment Block, Displays a list of recent attachments (by name)
+ *
+ * @param array $parameters
+ *		'limit' => Board(s) to select posts from
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_attachmentRecent($parameters, $id, $return_parameters = false)
 {
 	global $txt;
@@ -1517,6 +1554,16 @@ function sp_attachmentRecent($parameters, $id, $return_parameters = false)
 								</ul>';
 }
 
+/**
+ * Calendar Block, Displays a full calendar block
+ *
+ * @param array $parameters
+ *		'events' => show events
+ *		'birthdays' => show birthdays
+ *		'holidays' => show holidays
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_calendar($parameters, $id, $return_parameters = false)
 {
 	global $modSettings, $options, $scripturl, $txt;
@@ -1646,21 +1693,32 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 	}
 
 	echo '
-								<div class="sp_center smalltext" id="sp_calendar_0" style="display: none;">', $txt['error_sp_no_items_day'], '</div>
-								<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
-									var current_day = "sp_calendar_', $curPage['day'], '";
-									function sp_collapseCalendar(id)
-									{
-										new_day = "sp_calendar_" + id;
-										if (new_day == current_day)
-											return false;
-										document.getElementById(current_day).style.display = "none";
-										document.getElementById(new_day).style.display = "";
-										current_day = new_day;
-									}
-									// ]]></script>';
+								<div class="sp_center smalltext" id="sp_calendar_0" style="display: none;">', $txt['error_sp_no_items_day'], '</div>';
+
+	addInlineJavascript('
+		var current_day = "sp_calendar_' . $curPage['day'] . '";
+		function sp_collapseCalendar(id)
+		{
+			new_day = "sp_calendar_" + id;
+			if (new_day == current_day)
+				return false;
+			document.getElementById(current_day).style.display = "none";
+			document.getElementById(new_day).style.display = "";
+			current_day = new_day;
+		}');
 }
 
+/**
+ * Calendar Info Block, Displays basic calendar ... birthdays, events and holidays.
+ *
+ * @param array $parameters
+ *		'events' => show events
+ *		'future' => how many months out to look for items
+ *		'birthdays' => show birthdays
+ *		'holidays' => show holidays
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_calendarInformation($parameters, $id, $return_parameters = false)
 {
 	global $scripturl, $txt;
@@ -1808,6 +1866,20 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 	}
 }
 
+/**
+ * RSS Block, Displays rss feed in a block.
+ *
+ * @param array $parameters
+ *		'url' => url of the feed
+ *		'show_title' => Show the feed title
+ *		'show_content' => Show the content of the feed
+ *		'show_date' => Show the date of the feed item
+ *		'strip_preserve' => preserve tags
+ * 		'count' => number of items to show
+ * 		'limit' => number of charecters of content to show
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_rssFeed($parameters, $id, $return_parameters = false)
 {
 	global $context, $txt;
@@ -1862,7 +1934,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 	}
 
 	$data = str_replace(array("\n", "\r", "\t"), '', $data);
-	$data = preg_replace('~<\!\[CDATA\[(.+?)\]\]>~e' . ($context['utf8'] ? 'u' : ''), '\'#cdata_escape_encode#\' . Util::\'htmlspecialchars\'(\'$1\')', $data);
+	$data = preg_replace('~<\!\[CDATA\[(.+?)\]\]>~eu', '\'#cdata_escape_encode#\' . Util::\'htmlspecialchars\'(\'$1\')', $data);
 
 	preg_match_all('~<item>(.+?)</item>~', $data, $items);
 
@@ -1899,7 +1971,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 			'title' => $item['title'],
 			'href' => $item['link'],
 			'link' => $item['title'] == '' ? '' : ($item['link'] == '' ? $item['title'] : '<a href="' . $item['link'] . '" target="_blank" class="new_win">' . $item['title'] . '</a>'),
-			'content' => $limit > 0 && Util::strlen($item['description']) > $limit ? Util::substr($item['description'], 0, $limit) . '...' : $item['description'],
+			'content' => $limit > 0 && Util::strlen($item['description']) > $limit ? Util::substr($item['description'], 0, $limit) . '&hellip;' : $item['description'],
 			'date' => !empty($item['pubdate']) ? timeformat(strtotime($item['pubdate']), '%d %B') : '',
 		);
 	}
@@ -1946,6 +2018,13 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 	}
 }
 
+/**
+ * Theme Selection Block, Displays themes available for user selection
+ *
+ * @param array $parameters not used in this block
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_theme_select($parameters, $id, $return_parameters = false)
 {
 	global $context, $modSettings, $user_info, $settings, $language, $txt;
@@ -2030,7 +2109,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 
 		$available_themes[$id_theme]['name'] = preg_replace('~\stheme$~i', '', $theme_data['name']);
 		if (Util::strlen($available_themes[$id_theme]['name']) > 18)
-			$available_themes[$id_theme]['name'] = Util::substr($available_themes[$id_theme]['name'], 0, 18) . '...';
+			$available_themes[$id_theme]['name'] = Util::substr($available_themes[$id_theme]['name'], 0, 18) . '&hellip;';
 	}
 
 	$settings['images_url'] = $current_images_url;
@@ -2056,7 +2135,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 		updateMemberData($user_info['id'], array('id_theme' => $_POST['theme'] == -1 ? 0 : (int) $_POST['theme']));
 
 	echo '
-								<form method="post" action="" accept-charset="', $context['character_set'], '">
+								<form method="post" action="" accept-charset="UTF-8">
 									<div class="sp_center">
 										<select name="theme" onchange="sp_theme_select(this)">';
 
@@ -2073,23 +2152,33 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 										<br />
 										<input type="submit" name="sp_ts_submit" value="', $txt['sp-theme_change'], '" class="button_submit" />
 									</div>
-								</form>
-								<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
-									var sp_ts_thumbs = new Array();';
+								</form>';
+
+	$javascript = '
+		var sp_ts_thumbs = new Array();';
 
 	foreach ($available_themes as $id => $theme_data)
-		echo '
-									sp_ts_thumbs[', $id, '] = "', $theme_data['thumbnail_href'], '";';
+		$javascript .= '
+			sp_ts_thumbs[' . $id - '] = "' . $theme_data['thumbnail_href'] . '";';
 
-	echo '
-									function sp_theme_select(obj)
-									{
-										var id = obj.options[obj.selectedIndex].value;
-										document.getElementById("sp_ts_thumb").src = sp_ts_thumbs[id];
-									}
-								// ]]></script>';
+	$javascript .= '
+			function sp_theme_select(obj)
+			{
+				var id = obj.options[obj.selectedIndex].value;
+				document.getElementById("sp_ts_thumb").src = sp_ts_thumbs[id];
+			}';
+
+	addInlineJavascript($javascript);
 }
 
+/**
+ * Staff Block, show the list of forum staff members
+ *
+ * @param array $parameters
+ *		'lmod' => set to include local moderators as well
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_staff($parameters, $id, $return_parameters = false)
 {
 	global $scripturl, $modSettings, $color_profile;
@@ -2216,6 +2305,17 @@ function sp_staff($parameters, $id, $return_parameters = false)
 								</table>';
 }
 
+/**
+ * Article Block, show the list of forum staff members
+ *
+ * @param array $parameters
+ *		'category' => list of categories to choose article from
+ *		'limit' => number of articles to show
+ *		'type' => 0 latest 1 random
+ *		'image' => type of image to show with the post, poster avatar or cat image
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_articles($parameters, $id, $return_parameters = false)
 {
 	global $modSettings, $scripturl, $txt, $color_profile;
@@ -2233,7 +2333,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 	{
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
 
-		$categories = getCategoryInfo();
+		$categories = sp_load_categories();
 		foreach ($categories as $category)
 			$block_parameters['category'][$category['id']] = $category['name'];
 
@@ -2257,7 +2357,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			LEFT JOIN {db_prefix}attachments AS at ON (at.id_member = mem.id_member)
 		WHERE {query_see_board}
-			AND a.approved = {int:approved}' . (!empty($category) ? '
+			AND a.status = {int:approved}' . (!empty($category) ? '
 			AND a.id_category = {int:category}' : '') . '
 		ORDER BY {raw:type}
 		LIMIT {int:limit}',
@@ -2368,6 +2468,14 @@ function sp_articles($parameters, $id, $return_parameters = false)
 	}
 }
 
+/**
+ * Shoutbox Block, show the shoutbox thoughts box
+ *
+ * @param array $parameters
+ *		'shoutbox' => list of categories to choose article from
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_shoutbox($parameters, $id, $return_parameters = false)
 {
 	global $context, $modSettings, $user_info, $settings, $txt, $scripturl;

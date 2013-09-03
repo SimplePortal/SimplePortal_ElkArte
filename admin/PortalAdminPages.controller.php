@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Page Administration controller class.
+ * SimplePortal Page Administation controller class.
  * This class handles the adding/editing/listing of pages
  */
 class ManagePortalPages_Controller extends Action_Controller
@@ -31,7 +31,7 @@ class ManagePortalPages_Controller extends Action_Controller
 		if (!allowedTo('sp_admin'))
 			isAllowedTo('sp_manage_pages');
 
-		// Can't do much without our little buddy's
+		// Can't do much without our little buddys
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
 		require_once(SUBSDIR . '/Portal.subs.php');
 		loadTemplate('PortalAdminPages');

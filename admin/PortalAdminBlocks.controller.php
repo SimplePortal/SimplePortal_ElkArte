@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Blocks Administration controller class.
+ * SimplePortal Blocks Administation controller class.
  * This class handles the adding/editing/listing of blocks
  */
 class ManagePortalBlocks_Controller extends Action_Controller
@@ -214,7 +214,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		$db = database();
 
 		// Just in case, the admin could be doing something silly like editing a SP block while SP it disabled. ;)
-		require_once(SOURCEDIR . '/PortalBlocks.php');
+		require_once(SUBSDIR . '/PortalBlocks.subs.php');
 
 		$context['SPortal']['is_new'] = empty($_REQUEST['block_id']);
 
@@ -562,7 +562,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 					{
 						$firstBBCFound = true;
 
-						// Start Elk BBC System :)
+						// Start Elk BBC Sytem :)
 						require_once(SUBSDIR . '/Editor.subs.php');
 
 						// Prepare the output :D
@@ -593,7 +593,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 							'form' => 'sp_block',
 						);
 
-						// Run the ELK bbc editor routine
+						// Run the ELK bbc editor rutine
 						create_control_richedit($message_data);
 
 						// Store the updated data on the parameters

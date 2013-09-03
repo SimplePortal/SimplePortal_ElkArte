@@ -5,7 +5,7 @@
  *
  * @author SimplePortal Team
  * @copyright 2013 SimplePortal Team
- * @license BSD 3-clause 
+ * @license BSD 3-clause
  *
  * @version 2.4
  */
@@ -85,23 +85,14 @@ $txt['sp_eliana_no_exist'] = 'Sorry, we could not find the Automatic Karma syste
 $txt['sp_thankomatic_no_exist'] = 'Sorry, we could not find the Thank-O-Matic modification.';
 $txt['sp_reputation_no_exist'] = 'Sorry, we could not find the Advanced Reputation modification, it\'s either not installed or it\'s disabled';
 $txt['sp_karma_is_disabled'] = 'Karma System is disabled';
+$txt['sp_likes_is_disabled'] = 'Likes System is disabled';
 $txt['sp_topStatsMember_total_time_logged_in'] = 'Total Time Logged In';
 $txt['sp_topStatsMember_Posts'] = 'Posts';
 $txt['sp_topStatsMember_Karma_Good'] = 'Good Karma';
 $txt['sp_topStatsMember_Karma_Bad'] = 'Bad Karma';
 $txt['sp_topStatsMember_Karma_Total'] = 'Total Karma';
-$txt['sp_topStatsMember_Thank-O-Matic_Top_Given'] = 'Thank-O-Matic Given';
-$txt['sp_topStatsMember_Thank-O-Matic_Top_Recived'] = 'Thank-O-Matic Recived';
-$txt['sp_topStatsMember_Automatic_Karma_Good'] = 'Automatic Good Karma';
-$txt['sp_topStatsMember_Automatic_Karma_Bad'] = 'Automatic Bad Karma';
-$txt['sp_topStatsMember_Automatic_Karma_Total'] = 'Automatic Total Karma';
-$txt['sp_topStatsMember_Advanced_Reputation_System_Best'] = 'Advanced Reputation System Best';
-$txt['sp_topStatsMember_Advanced_Reputation_System_Worst'] = 'Advanced Reputation System Worst';
-$txt['sp_topStatsMember_SMF_Shop_Money'] = 'SMF Shop Money';
-$txt['sp_topStatsMember_SA_Shop_Cash'] = 'SA Shop Cash';
-$txt['sp_topStatsMember_SA_Shop_Trades'] = 'SA Shop Trades';
-$txt['sp_topStatsMember_SA_Shop_Purchase'] = 'SA Shop Purchase';
-$txt['sp_topStatsMember_Casino'] = 'Casino Cash';
+$txt['sp_topStatsMember_Likes_Received'] = 'Likes Received';
+$txt['sp_topStatsMember_Likes_Given'] = 'Likes Given';
 
 // Who area strings
 $txt['sp_who_index'] = 'Viewing the <a href="%s">Portal</a>.';

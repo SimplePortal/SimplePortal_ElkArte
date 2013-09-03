@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Article Administration controller class.
+ * SimplePortal Article Administation controller class.
  * This class handles the adding/editing/listing of articles
  */
 class ManagePortalArticles_Controller extends Action_Controller
@@ -270,7 +270,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		$context['is_new'] = empty($_REQUEST['article_id']);
 
-		// @todo we don't have html_to_bbc any longer
+		// @todo we don't have html_to_bbc anylonger
 		if (!empty($_REQUEST['content_mode']) && $_POST['type'] == 'bbc')
 		{
 			$_REQUEST['content'] = html_to_bbc($_REQUEST['content']);

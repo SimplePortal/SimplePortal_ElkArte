@@ -50,8 +50,8 @@ th.sp_center {
 	width: 100%;
 }
 .sp_page_index {
-	width: 100%;
-	text-align: center;
+	float: right;
+	padding-right: 1em;
 }
 .sp_clear {
 	clear: both;

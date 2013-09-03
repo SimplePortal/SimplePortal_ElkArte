@@ -225,6 +225,7 @@ function template_block_default($block)
 	echo '
 			<div class="', $block['type'] != 'sp_menu' ? 'sp_block' : 'sp_content_padding', '"', !empty($block['style']['body']['style']) ? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
 
+	// Call the block routine
 	$block['type']($block['parameters'], $block['id']);
 
 	echo '

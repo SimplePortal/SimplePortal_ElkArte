@@ -27,7 +27,9 @@ function sp_integrate_actions(&$actions)
 		return;
 
 	$actions['forum'] = array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_boardindex');
-	$actions['portal'] = array('PortalMain.php', 'sportal_main');
+	$actions['portal'] = array('PortalMain.controller.php', 'Sportal_Controller', 'action_sportal_main');
+	$actions['shoutbox'] = array('PortalShoutbox.controller.php', 'Shoutbox_Controller', 'action_sportal_shoutbox');
+
 }
 
 /**
@@ -272,23 +274,31 @@ function sp_integrate_frontpage(&$default_action)
 		// Any actions we need to handle with the portal, set up the action here.
 		if (empty($_GET['page']) && empty($_GET['article']) && empty($_GET['category']) && $modSettings['sp_portal_mode'] == 1)
 		{
-			$file = CONTROLLERDIR . '/PortalMain.php';
-			$function = 'sportal_main';
+			// View the portal
+			$file = CONTROLLERDIR . '/PortalMain.controller.php';
+			$controller = 'Sportal_Controller';
+			$function = 'action_sportal_main';
 		}
 		elseif (!empty($_GET['page']))
 		{
-			$file = CONTROLLERDIR . '/PortalPages.php';
-			$function = 'sportal_page';
+			// View a specific page
+			$file = CONTROLLERDIR . '/PortalPages.controller.php';
+			$controller = 'Pages_Controller';
+			$function = 'action_sportal_page';
 		}
 		elseif (!empty($_GET['article']))
 		{
-			$file = CONTROLLERDIR . '/PortalArticles.php';
-			$function = 'sportal_article';
+			// View a specific  article
+			$file = CONTROLLERDIR . '/PortalArticles.controller.php';
+			$controller = 'Article_Controller';
+			$function = 'action_sportal_article';
 		}
 		elseif (!empty($_GET['category']))
 		{
-			$file = CONTROLLERDIR . '/PortalCategories.php';
-			$function = 'sportal_category';
+			// View a specific category
+			$file = CONTROLLERDIR . '/PortalCategories.controller.php';
+			$controller = 'Categories_Controller';
+			$function = 'action_sportal_category';
 		}
 
 		// Something portal-ish, then set the new action
@@ -296,6 +306,7 @@ function sp_integrate_frontpage(&$default_action)
 		{
 			$default_action = array(
 				'file' => $file,
+				'controller' => isset($controller) ? $controller : null,
 				'function' => $function
 			);
 		}

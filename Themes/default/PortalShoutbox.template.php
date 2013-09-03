@@ -62,7 +62,8 @@ function template_shoutbox_embed($shoutbox)
 		<div class="shoutbox_container">
 			<div class="shoutbox_info">
 				<div id="shoutbox_load_', $shoutbox['id'], '" style="float: right; display: none;"><img src="', $settings['sp_images_url'], '/loading.gif" alt="" /></div>
-				<a href="', $scripturl, '?action=portal;sa=shoutbox;shoutbox_id=', $shoutbox['id'], '" onclick="sp_refresh_shout(', $shoutbox['id'], ', last_refresh_', $shoutbox['id'], '); return false;">', sp_embed_image('refresh'), '</a> <a href="', $scripturl, '?action=portal;sa=shoutbox;shoutbox_id=', $shoutbox['id'], '">', sp_embed_image('history'), '</a>';
+				<a href="', $scripturl, '?action=shoutbox;shoutbox_id=', $shoutbox['id'], '" onclick="sp_refresh_shout(', $shoutbox['id'], ', last_refresh_', $shoutbox['id'], '); return false;">', sp_embed_image('refresh'), '</a>
+				<a href="', $scripturl, '?action=shoutbox;shoutbox_id=', $shoutbox['id'], '">', sp_embed_image('history'), '</a>';
 
 	if ($context['can_shout'])
 		echo ' <a href="#smiley" onclick="sp_collapse_object(\'sb_smiley_', $shoutbox['id'], '\', false); return false;">', sp_embed_image('smiley'), '</a> <a href="#style" onclick="sp_collapse_object(\'sb_style_', $shoutbox['id'], '\', false); return false;">', sp_embed_image('style'), '</a>';
@@ -97,7 +98,7 @@ function template_shoutbox_embed($shoutbox)
 			else
 				echo '<a href="javascript:void(0);" onclick="surroundText(\'', $tag['before'], '\', \'', $tag['after'], '\', document.getElementById(\'new_shout_', $shoutbox['id'], '\')); return false;">';
 
-			echo '<img onmouseover="style_highlight(this, true);" onmouseout="if (window.style_highlight) style_highlight(this, false);" src="', $settings['images_url'], '/bbc/', $image, '.gif" align="bottom" width="23" height="22" alt="', $tag['description'], '" title="', $tag['description'], '" style="background-image: url(', $settings['images_url'], '/bbc/bbc_bg.gif); margin: 1px 2px 1px 1px;" /></a>';
+			echo '<img onmouseover="style_highlight(this, true);" onmouseout="if (window.style_highlight) style_highlight(this, false);" src="', $settings['images_url'], '/bbc/', $image, '.png" align="bottom" width="23" height="22" alt="', $tag['description'], '" title="', $tag['description'], '" style="background-image: url(', $settings['images_url'], '/bbc/bbc_bg.png); margin: 1px 2px 1px 1px;" /></a>';
 		}
 
 		echo '
@@ -146,7 +147,7 @@ function template_shoutbox_embed($shoutbox)
 
 	if (!empty($shoutbox['refresh']))
 		echo '
-		var interval_id_', $shoutbox['id'], ' = setInterval( "sp_auto_refresh_', $shoutbox['id'], '()", ', $shoutbox['refresh'], ' * 1000);
+		var interval_id_', $shoutbox['id'], ' = setInterval("sp_auto_refresh_', $shoutbox['id'], '()", ', $shoutbox['refresh'], ' * 1000);
 		function sp_auto_refresh_', $shoutbox['id'], '()
 		{
 			if (window.XMLHttpRequest)

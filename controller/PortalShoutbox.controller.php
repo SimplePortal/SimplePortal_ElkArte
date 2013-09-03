@@ -1,0 +1,135 @@
+<?php
+
+/**
+ * @package SimplePortal
+ *
+ * @author SimplePortal Team
+ * @copyright 2013 SimplePortal Team
+ * @license BSD 3-clause
+ *
+ * @version 2.4
+ */
+
+if (!defined('ELK'))
+	die('No access...');
+
+/**
+ * Shoutbox controller.
+ * This class handles requests for Shoutbox Functionality
+ */
+class Shoutbox_Controller extends Action_Controller
+{
+	/**
+	 * Default method
+	 */
+	public function action_index()
+	{
+		// We really only have one choice :P
+		$this->action_sportal_shoutbox();
+	}
+
+	/**
+	 * The Shoutbox ... allows for the adding, editing, deleting and viewing of shouts
+	 */
+	public function action_sportal_shoutbox()
+	{
+		global $context, $scripturl, $user_info;
+
+		$db = database();
+
+		$shoutbox_id = !empty($_REQUEST['shoutbox_id']) ? (int) $_REQUEST['shoutbox_id'] : 0;
+		$request_time = !empty($_REQUEST['time']) ? (int) $_REQUEST['time'] : 0;
+
+		$context['SPortal']['shoutbox'] = sportal_get_shoutbox($shoutbox_id, true, true);
+
+		if (empty($context['SPortal']['shoutbox']))
+			fatal_lang_error('error_sp_shoutbox_not_exist', false);
+
+		$context['SPortal']['shoutbox']['warning'] = parse_bbc($context['SPortal']['shoutbox']['warning']);
+
+		$can_moderate = allowedTo('sp_admin') || allowedTo('sp_manage_shoutbox');
+		if (!$can_moderate && !empty($context['SPortal']['shoutbox']['moderator_groups']))
+			$can_moderate = count(array_intersect($user_info['groups'], $context['SPortal']['shoutbox']['moderator_groups'])) > 0;
+
+		if (!empty($_REQUEST['shout']))
+		{
+			checkSession('request');
+
+			is_not_guest();
+
+			if (!($flood = sp_prevent_flood('spsbp', false)))
+			{
+				require_once(SUBSDIR . '/Post.subs.php');
+
+				$_REQUEST['shout'] = Util::htmlspecialchars(trim($_REQUEST['shout']));
+				preparsecode($_REQUEST['shout']);
+
+				if (!empty($_REQUEST['shout']))
+					sportal_create_shout($context['SPortal']['shoutbox'], $_REQUEST['shout']);
+			}
+			else
+				$context['SPortal']['shoutbox']['warning'] = $flood;
+		}
+
+		if (!empty($_REQUEST['delete']))
+		{
+			checkSession('request');
+
+			if (!$can_moderate)
+				fatal_lang_error('error_sp_cannot_shoutbox_moderate', false);
+
+			$_REQUEST['delete'] = (int) $_REQUEST['delete'];
+
+			if (!empty($_REQUEST['delete']))
+				sportal_delete_shout($shoutbox_id, $_REQUEST['delete']);
+		}
+
+		loadTemplate('PortalShoutbox');
+
+		if (isset($_REQUEST['xml']))
+		{
+			$shout_parameters = array(
+				'limit' => $context['SPortal']['shoutbox']['num_show'],
+				'bbc' => $context['SPortal']['shoutbox']['allowed_bbc'],
+				'reverse' => $context['SPortal']['shoutbox']['reverse'],
+				'cache' => $context['SPortal']['shoutbox']['caching'],
+				'can_moderate' => $can_moderate,
+			);
+			$context['SPortal']['shouts'] = sportal_get_shouts($shoutbox_id, $shout_parameters);
+
+			Template_Layers::getInstance()->removeAll();
+			$context['sub_template'] = 'shoutbox_xml';
+			$context['SPortal']['updated'] = empty($context['SPortal']['shoutbox']['last_update']) || $context['SPortal']['shoutbox']['last_update'] > $request_time;
+
+			return;
+		}
+
+		$request = $db->query('', '
+			SELECT COUNT(*)
+			FROM {db_prefix}sp_shouts
+			WHERE id_shoutbox = {int:current}',
+			array(
+				'current' => $shoutbox_id,
+			)
+		);
+		list ($total_shouts) = $db->fetch_row($request);
+		$db->free_result($request);
+
+		$context['per_page'] = $context['SPortal']['shoutbox']['num_show'];
+		$context['start'] = !empty($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+		$context['page_index'] = constructPageIndex($scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox_id, $context['start'], $total_shouts, $context['per_page']);
+
+		$shout_parameters = array(
+			'start' => $context['start'],
+			'limit' => $context['per_page'],
+			'bbc' => $context['SPortal']['shoutbox']['allowed_bbc'],
+			'cache' => $context['SPortal']['shoutbox']['caching'],
+			'can_moderate' => $can_moderate,
+		);
+		$context['SPortal']['shouts_history'] = sportal_get_shouts($shoutbox_id, $shout_parameters);
+
+		$context['SPortal']['shoutbox_id'] = $shoutbox_id;
+		$context['sub_template'] = 'shoutbox_all';
+		$context['page_title'] = $context['SPortal']['shoutbox']['name'];
+	}
+}

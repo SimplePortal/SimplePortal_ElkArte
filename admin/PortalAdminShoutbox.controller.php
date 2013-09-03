@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Shoutbox Administration controller class.
+ * SimplePortal Shoutbox Administation controller class.
  * This class handles the administration of the shoutbox
  */
 class ManagePortalShoutbox_Controller extends Action_Controller
@@ -27,7 +27,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		// You must have admin or shoutbox privileges to be here
+		// You must have admin or shoutbox privilages to be here
 		if (!allowedTo('sp_admin'))
 			isAllowedTo('sp_manage_shoutbox');
 
