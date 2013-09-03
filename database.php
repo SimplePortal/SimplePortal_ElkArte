@@ -23,7 +23,7 @@ global $db_prefix, $db_package_log;
 $db = database();
 $db_table = db_table();
 
-$tables = array(
+$sp_tables = array(
 	'sp_articles' => array(
 		'columns' => array(
 			array('name' => 'id_article', 'type' => 'mediumint', 'size' => 8, 'auto' => true),
@@ -174,8 +174,8 @@ $tables = array(
 	),
 );
 
-foreach ($tables as $table => $data)
-	$db_table->db_create_table('{db_prefix}' . $table, $data['columns'], $data['indexes'], array(), 'ignore');
+foreach ($sp_tables as $sp_table => $data)
+	$db_table->db_create_table('{db_prefix}' . $sp_table, $data['columns'], $data['indexes'], array(), 'ignore');
 
 $db->insert('ignore',
 	'{db_prefix}sp_functions',
@@ -286,8 +286,8 @@ if (empty($has_block))
 }
 
 $db_package_log = array();
-foreach ($tables as $table_name => $null)
-	$db_package_log[] = array('remove_table', $db_prefix . $table_name);
+foreach ($sp_tables as $sp_table_name => $null)
+	$db_package_log[] = array('remove_table', $db_prefix . $sp_table_name);
 
 if (ELK == 'SSI')
 	echo 'Database changes were carried out successfully.';
