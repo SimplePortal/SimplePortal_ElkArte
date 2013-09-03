@@ -37,6 +37,7 @@ class Shoutbox_Controller extends Action_Controller
 
 		$db = database();
 
+		// ID of the shoutbox we are working on and timestamp
 		$shoutbox_id = !empty($_REQUEST['shoutbox_id']) ? (int) $_REQUEST['shoutbox_id'] : 0;
 		$request_time = !empty($_REQUEST['time']) ? (int) $_REQUEST['time'] : 0;
 
@@ -45,18 +46,20 @@ class Shoutbox_Controller extends Action_Controller
 		if (empty($context['SPortal']['shoutbox']))
 			fatal_lang_error('error_sp_shoutbox_not_exist', false);
 
+		// Any warning title for the shoutbox, like Not For Support ;P
 		$context['SPortal']['shoutbox']['warning'] = parse_bbc($context['SPortal']['shoutbox']['warning']);
 
 		$can_moderate = allowedTo('sp_admin') || allowedTo('sp_manage_shoutbox');
 		if (!$can_moderate && !empty($context['SPortal']['shoutbox']['moderator_groups']))
 			$can_moderate = count(array_intersect($user_info['groups'], $context['SPortal']['shoutbox']['moderator_groups'])) > 0;
 
+		// Adding a shout
 		if (!empty($_REQUEST['shout']))
 		{
+			is_not_guest();
 			checkSession('request');
 
-			is_not_guest();
-
+			// If you are not flooding the system, add the shout to the box
 			if (!($flood = sp_prevent_flood('spsbp', false)))
 			{
 				require_once(SUBSDIR . '/Post.subs.php');
@@ -71,6 +74,7 @@ class Shoutbox_Controller extends Action_Controller
 				$context['SPortal']['shoutbox']['warning'] = $flood;
 		}
 
+		// Removing a shout, regret saying that do you :P
 		if (!empty($_REQUEST['delete']))
 		{
 			checkSession('request');
@@ -84,8 +88,7 @@ class Shoutbox_Controller extends Action_Controller
 				sportal_delete_shout($shoutbox_id, $_REQUEST['delete']);
 		}
 
-		loadTemplate('PortalShoutbox');
-
+		// Responding to an ajax request
 		if (isset($_REQUEST['xml']))
 		{
 			$shout_parameters = array(
@@ -95,8 +98,11 @@ class Shoutbox_Controller extends Action_Controller
 				'cache' => $context['SPortal']['shoutbox']['caching'],
 				'can_moderate' => $can_moderate,
 			);
+
+			// Get all the shouts for this box
 			$context['SPortal']['shouts'] = sportal_get_shouts($shoutbox_id, $shout_parameters);
 
+			// Return a clean xml response
 			Template_Layers::getInstance()->removeAll();
 			$context['sub_template'] = 'shoutbox_xml';
 			$context['SPortal']['updated'] = empty($context['SPortal']['shoutbox']['last_update']) || $context['SPortal']['shoutbox']['last_update'] > $request_time;
@@ -104,16 +110,9 @@ class Shoutbox_Controller extends Action_Controller
 			return;
 		}
 
-		$request = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}sp_shouts
-			WHERE id_shoutbox = {int:current}',
-			array(
-				'current' => $shoutbox_id,
-			)
-		);
-		list ($total_shouts) = $db->fetch_row($request);
-		$db->free_result($request);
+		// Show all the shouts in this box
+		loadTemplate('PortalShoutbox');
+		$total_shouts = sportal_get_shoutbox_count($shoutbox_id);
 
 		$context['per_page'] = $context['SPortal']['shoutbox']['num_show'];
 		$context['start'] = !empty($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;

@@ -1447,6 +1447,30 @@ function sportal_get_shouts($shoutbox, $parameters)
 	return $shouts;
 }
 
+/**
+ * Return the number of shouts in a given shoutbox
+ *
+ * @param int $shoutbox_id ID of the shoutbox
+ */
+function sportal_get_shoutbox_count($shoutbox_id)
+{
+	$db = database();
+	$total_shouts = 0;
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}sp_shouts
+		WHERE id_shoutbox = {int:current}',
+		array(
+			'current' => $shoutbox_id,
+		)
+	);
+	list ($total_shouts) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_shouts;
+}
+
 function sportal_create_shout($shoutbox, $shout)
 {
 	global $user_info;
