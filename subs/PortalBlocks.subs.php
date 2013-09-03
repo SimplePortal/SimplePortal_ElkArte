@@ -2650,13 +2650,20 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 	template_shoutbox_embed($shoutbox);
 }
 
+/**
+ * Gallery Block, show a gallery box with gallery items
+ *
+ * @param array $parameters
+ *		'limit' => number of gallery items to show
+ *		'type' =>
+ *		'direction' => 0 hortizontal or 1 vertical display in the block
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_gallery($parameters, $id, $return_parameters = false)
 {
-	global $context, $modSettings, $scripturl;
-	global $txt, $settings, $boardurl, $galurl;
-	static $mod, $GD_Installed;
-
-	$db = database();
+	global $scripturl, $txt, $scripturl;
+	static $mod;
 
 	$block_parameters = array(
 		'limit' => 'int',
@@ -2671,6 +2678,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 	$type = empty($parameters['type']) ? 0 : 1;
 	$direction = empty($parameters['direction']) ? 0 : 1;
 
+	// right now we only know about one gallery
 	if (!isset($mod))
 	{
 		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
@@ -2714,11 +2722,11 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 		if ($mod == 'aeva_media')
 		{
 			echo '
-												<a href="', $galurl, 'sa=item;in=', $item['id'], '">', $item['title'], '</a><br />
-												<a href="', $galurl, 'sa=item;in=', $item['id'], '"><img src="', $galurl, 'sa=media;in=', $item['id'], ';thumb" alt="" /></a><br />
+												<a href="', $scripturl, 'sa=item;in=', $item['id'], '">', $item['title'], '</a><br />
+												<a href="', $scripturl, 'sa=item;in=', $item['id'], '"><img src="', $scripturl, 'sa=media;in=', $item['id'], ';thumb" alt="" /></a><br />
 												', $txt['aeva_views'], ': ', $item['views'], '<br />
 												', $txt['aeva_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
-												', $txt['aeva_in_album'], ': <a href="', $galurl, 'sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>', $item['is_new'] ?
+												', $txt['aeva_in_album'], ': <a href="', $scripturl, 'sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>', $item['is_new'] ?
 					'<br /><span class="new_posts">' . $txt['new'] . '</span>' : '';
 		}
 
@@ -2733,6 +2741,14 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 								</table>';
 }
 
+/**
+ * Menu Block, creates a sidebar menu block basesd on the system main menu
+ * @todo needs updating .. superfish it?
+ *
+ * @param array $parameters -  not used in this block
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_menu($parameters, $id, $return_parameters = false)
 {
 	global $context;
@@ -2751,7 +2767,7 @@ function sp_menu($parameters, $id, $return_parameters = false)
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
 		echo '
-									<li>', sp_embed_image('dot'), ' <a title="', $button['title'], '" href="', $button['href'], '">', ($button['active_button'] ? '<strong>' : ''), $button['title'], ($button['active_button'] ? '</strong>' : ''), '</a>';
+									<li>', sp_embed_image('dot'), ' <a title="', strip_tags($button['title']), '" href="', $button['href'], '">', ($button['active_button'] ? '<strong>' : ''), $button['title'], ($button['active_button'] ? '</strong>' : ''), '</a>';
 
 		if (!empty($button['sub_buttons']))
 		{
@@ -2773,6 +2789,13 @@ function sp_menu($parameters, $id, $return_parameters = false)
 								</ul>';
 }
 
+/**
+ * Generic BBC Block, creates a BBC formatted block with parse_bbc
+ *
+ * @param array $parameters -  not used in this block
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_bbc($parameters, $id, $return_parameters = false)
 {
 	$block_parameters = array(
@@ -2788,6 +2811,13 @@ function sp_bbc($parameters, $id, $return_parameters = false)
 								', parse_bbc($content);
 }
 
+/**
+ * Generic HTML Block, creates a formatted block with HTML
+ *
+ * @param array $parameters -  not used in this block
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_html($parameters, $id, $return_parameters = false)
 {
 	$block_parameters = array(
@@ -2803,6 +2833,14 @@ function sp_html($parameters, $id, $return_parameters = false)
 								', un_htmlspecialchars($content);
 }
 
+/**
+ * Generic PHP Block, creates a PHP block to do whatever you can imagine :D
+ *
+ * @param array $parameters
+ *		'textarea' =>
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters
+ */
 function sp_php($parameters, $id, $return_parameters = false)
 {
 	$block_parameters = array(
@@ -2815,10 +2853,13 @@ function sp_php($parameters, $id, $return_parameters = false)
 	$content = !empty($parameters['content']) ? $parameters['content'] : '';
 
 	$content = trim(un_htmlspecialchars($content));
+
+	// Strip leading / trailing php wrapper
 	if (substr($content, 0, 5) == '<?php')
 		$content = substr($content, 5);
 	if (substr($content, -2) == '?>')
 		$content = substr($content, 0, -2);
 
+	// Can be scary :0
 	eval($content);
 }
