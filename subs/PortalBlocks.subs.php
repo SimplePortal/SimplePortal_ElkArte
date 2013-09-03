@@ -211,7 +211,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 }
 
 /**
- * Whos online block, shows count of users online names
+ * Who's online block, shows count of users online names
  *
  * @param array $parameters 'online_today' => shows all users that were online today (requires user online today addon)
  * @param int $id - not used in this block
@@ -522,8 +522,8 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 }
 
 /**
- * Top stats block, shows the top x members who has acheived top postion of various stats
- * Designed to be flexible so adding addional member stats is easy
+ * Top stats block, shows the top x members who has achieved top position of various stats
+ * Designed to be flexible so adding additional member stats is easy
  *
  * @param array $parameters
  *		'limit' => number of top posters to show
@@ -570,10 +570,10 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		 * 'mod_id' - Only used as information
 		 * 'field' - The members field that should be loaded.  Please don't forget to add mem. before the field names
 		 * 'order' - What is the field name i need to be sort after
-		 * 'where' - Here you can add additional where statments
+		 * 'where' - Here you can add additional where statements
 		 * 'output_text' - What should be displayed after the avatar and nickname
 		 *				For example if your field is karmaGood 'output_text' => $txt['karma'] . '%karmaGood%';
-		 * 'output_function' - With this you can add to the $row of the query some infomartion.
+		 * 'output_function' - With this you can add to the $row of the query some information.
 		 * 'reverse' - On true it change the reverse cause, if not set it will be false :)
 		 * 'enabled' - true = mod exists or is possible to use :D
 		 * 'error_msg' => $txt['my_error_msg']; You can insert here what kind of error message should appear if the modification not exists =D
@@ -682,7 +682,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		return;
 	}
 
-	// Possible to ouput?
+	// Possible to output?
 	if (empty($current_system['enabled']))
 	{
 		echo (!empty($current_system['error_msg']) ? $current_system['error_msg'] : '');
@@ -696,13 +696,13 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		return;
 	}
 
-	// Switch the reverse? (It's a reverse to reverse the allready reverse, fun byside :P)
+	// Switch the reverse? (It's a reverse to reverse the already reverse, fun beside :P)
 	$sort_asc = !empty($current_system['reverse']) ? !$sort_asc : $sort_asc;
 
-	// Create the where statment :)
+	// Create the where statement :)
 	$where = array();
 
-	// Some cached data availible?
+	// Some cached data available?
 	$chache_id = 'sp_chache_' . $id . '_topStatsMember';
 	if (empty($modSettings['sp_disableChache']) && !empty($modSettings[$chache_id]))
 	{
@@ -740,7 +740,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		ORDER BY {raw:order} {raw:sort}
 		LIMIT {int:limit}',
 		array(
-			'limit' => $context['common_stats']['total_members'] > 100 ? ($limit + 5) : $limit, // Prevent delete of user if the cache is avaible :D
+			'limit' => $context['common_stats']['total_members'] > 100 ? ($limit + 5) : $limit, // Prevent delete of user if the cache is available :D
 			'field' => $current_system['field'],
 			'where' => $where,
 			'order' => $current_system['order'],
@@ -968,7 +968,7 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
 	$type = !empty($parameters['type']) ? $parameters['type'] : 0;
 	$limit = !empty($parameters['limit']) ? $parameters['limit'] : 5;
 
-	// Use teh ssi function to get the data
+	// Use the ssi function to get the data
 	$topics = ssi_topTopics($type ? 'views' : 'replies', $limit, 'array');
 
 	if (empty($topics))
@@ -1464,7 +1464,7 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
 	$showDownloads = empty($parameters['disableDownloads']);
 	$showLink = empty($parameters['disableLink']);
 
-	// Let ssi get the attchments
+	// Let ssi get the attachments
 	$items = ssi_recentAttachments($limit, $type, 'array');
 
 	if (empty($items))
@@ -1876,7 +1876,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
  *		'show_date' => Show the date of the feed item
  *		'strip_preserve' => preserve tags
  * 		'count' => number of items to show
- * 		'limit' => number of charecters of content to show
+ * 		'limit' => number of characters of content to show
  * @param int $id - not used in this block
  * @param boolean $return_parameters
  */
@@ -2656,7 +2656,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
  * @param array $parameters
  *		'limit' => number of gallery items to show
  *		'type' =>
- *		'direction' => 0 hortizontal or 1 vertical display in the block
+ *		'direction' => 0 horizontal or 1 vertical display in the block
  * @param int $id - not used in this block
  * @param boolean $return_parameters
  */
@@ -2742,7 +2742,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 }
 
 /**
- * Menu Block, creates a sidebar menu block basesd on the system main menu
+ * Menu Block, creates a sidebar menu block based on the system main menu
  * @todo needs updating .. superfish it?
  *
  * @param array $parameters -  not used in this block
