@@ -23,7 +23,7 @@
 		<require-dir name="sources" destination="BOARDDIR" />
 		<require-dir name="admin" destination="SOURCEDIR" />
 		<require-dir name="subs" destination="SOURCEDIR" />
-		<require-dir name="controller" destination="SOURCEDIR" />
+		<require-dir name="controllers" destination="SOURCEDIR" />
 		<require-dir name="themes" destination="BOARDDIR" />
 		<database>database.php</database>
 		<code>settings.php</code>
