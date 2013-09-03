@@ -9,13 +9,15 @@
  *
  * @version 2.4
  */
-
 function template_shoutbox_all()
 {
-	template_shoutbox_all_curve();
+	template_shoutbox_all_default();
 }
 
-function template_shoutbox_all_curve()
+/**
+ * Template to display all of the shouts in a system
+ */
+function template_shoutbox_all_default()
 {
 	global $context, $txt;
 
@@ -27,8 +29,8 @@ function template_shoutbox_all_curve()
 	</div>
 	<div class="windowbg">
 		<div class="sp_content_padding">
-			<div class="shoutbox_page_index smalltext">
-					', $txt['pages'], ': ', $context['page_index'], '
+			<div class="pagesection">
+				', $context['page_index'], '
 			</div>
 			<div class="shoutbox_body">
 				<ul class="shoutbox_list_all" id="shouts">';
@@ -40,19 +42,24 @@ function template_shoutbox_all_curve()
 					<li class="smalltext">', str_replace('ignored_shout', 'history_ignored_shout', $shout['text']), '</li>
 					<li class="smalltext shoutbox_time">', $shout['delete_link'], $shout['time'], '</li>';
 	else
-			echo '
+		echo '
 					<li class="smalltext">', $txt['sp_shoutbox_no_shout'], '</li>';
 
 	echo '
 				</ul>
 			</div>
-			<div class="shoutbox_page_index smalltext">
-					', $txt['pages'], ': ', $context['page_index'], '
+			<div class="pagesection">
+				', $context['page_index'], '
 			</div>
 		</div>
 	</div>';
 }
 
+/**
+ * Embeds a shoutbox block on a page
+ *
+ * @param int $shoutbox
+ */
 function template_shoutbox_embed($shoutbox)
 {
 	global $context, $scripturl, $settings, $txt;
@@ -73,6 +80,7 @@ function template_shoutbox_embed($shoutbox)
 
 	if ($context['can_shout'])
 	{
+		// Smiley box
 		echo '
 			<div id="sp_object_sb_smiley_', $shoutbox['id'], '" style="display: none;">';
 
@@ -80,10 +88,11 @@ function template_shoutbox_embed($shoutbox)
 			echo '
 				<a href="javascript:void(0);" onclick="replaceText(\' ', $smiley['code'], '\', document.getElementById(\'new_shout_', $shoutbox['id'], '\')); return false;"><img src="', $settings['smileys_url'], '/', $smiley['filename'], '" alt="', $smiley['description'], '" title="', $smiley['description'], '" /></a>';
 
-			if (!empty($shoutbox['smileys']['popup']))
-				echo '
+		if (!empty($shoutbox['smileys']['popup']))
+			echo '
 					<a onclick="sp_showMoreSmileys(\'', $shoutbox['id'], '\', \'', $txt['more_smileys_title'], '\', \'', $txt['more_smileys_pick'], '\', \'', $txt['more_smileys_close_window'], '\', \'', $settings['theme_url'], '\', \'', $settings['smileys_url'], '\'); return false;" href="javascript:void(0);">[', $txt['more_smileys'], ']</a>';
 
+		// bbc box
 		echo '
 			</div>
 			<div id="sp_object_sb_style_', $shoutbox['id'], '" style="display: none;">';
@@ -105,31 +114,33 @@ function template_shoutbox_embed($shoutbox)
 			</div>';
 	}
 
+	// The shouts!
 	echo '
 			<div class="shoutbox_body">
 				<ul class="shoutbox_list_compact" id="shouts_', $shoutbox['id'], '"', !empty($shoutbox['height']) ? ' style="height: ' . $shoutbox['height'] . 'px;"' : '', '>';
 
 	if (!empty($shoutbox['warning']))
 		echo '
-					<li class="shoutbox_warning smalltext">', $shoutbox['warning'], '</li>';
+					<li class="shoutbox_warning">', $shoutbox['warning'], '</li>';
 
 	if (!empty($shoutbox['shouts']))
 		foreach ($shoutbox['shouts'] as $shout)
 			echo '
-					<li class="smalltext">', !$shout['is_me'] ? '<strong>' . $shout['author']['link'] . ':</strong> ' : '', $shout['text'], '<br />', !empty($shout['delete_link_js']) ? '<span class="shoutbox_delete">' . $shout['delete_link_js'] . '</span>' : '' , '<span class="smalltext shoutbox_time">', $shout['time'], '</span></li>';
+					<li>', !$shout['is_me'] ? '<strong>' . $shout['author']['link'] . ':</strong> ' : '', $shout['text'], '<br />', !empty($shout['delete_link_js']) ? '<span class="shoutbox_delete">' . $shout['delete_link_js'] . '</span>' : '', '<span class="smalltext shoutbox_time">', $shout['time'], '</span></li>';
 	else
-			echo '
-					<li class="smalltext">', $txt['sp_shoutbox_no_shout'], '</li>';
+		echo '
+					<li>', $txt['sp_shoutbox_no_shout'], '</li>';
 
 	echo '
 				</ul>
 			</div>';
 
+	// Show an input box, if they can use it
 	if ($context['can_shout'])
 		echo '
-			<div class="shoutbox_input smalltext">
+			<div class="shoutbox_input">
 				<input type="text" name="new_shout" id="new_shout_', $shoutbox['id'], '" class="shoutbox_input sp_float_left input_text"', $context['browser']['is_ie'] ? ' onkeypress="if (sp_catch_enter(event)) { sp_submit_shout(' . $shoutbox['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false; }"' : '', ' />
-				<input type="submit" name="submit_shout" value="', $txt['sp_shoutbox_button'], '" class="sp_float_right button_submit" onclick="sp_submit_shout(', $shoutbox['id'], ', \'', $context['session_var'], '\', \'', $context['session_id'], '\'); return false;" />
+				<input type="submit" name="submit_shout" value="', $txt['sp_shoutbox_button'], '" class="right_submit" onclick="sp_submit_shout(', $shoutbox['id'], ', \'', $context['session_var'], '\', \'', $context['session_id'], '\'); return false;" />
 			</div>';
 
 	echo '
@@ -137,6 +148,7 @@ function template_shoutbox_embed($shoutbox)
 		<input type="hidden" name="shoutbox_id" value="', $shoutbox['id'], '" />
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 	</form>
+
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var last_refresh_', $shoutbox['id'], ' = ', time(), ';';
 
@@ -164,6 +176,7 @@ function template_shoutbox_embed($shoutbox)
 		echo '
 		if (sp_smileys == undefined)
 			var sp_smileys = [';
+
 		foreach ($shoutbox['smileys']['popup'] as $smiley)
 		{
 			echo '
@@ -171,12 +184,13 @@ function template_shoutbox_embed($shoutbox)
 			if (empty($smiley['last']))
 				echo ',';
 		}
+
 		echo ']';
 
 		echo '
 		if (sp_moreSmileysTemplate == undefined)
 		{
-			var sp_moreSmileysTemplate =  ', JavaScriptEscape('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+			var sp_moreSmileysTemplate = ', JavaScriptEscape('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 					<html>
 						<head>
 							<title>' . $txt['more_smileys_title'] . '</title>
@@ -205,6 +219,9 @@ function template_shoutbox_embed($shoutbox)
 	// ]]></script>';
 }
 
+/**
+ * Return an xml response to a shoutbox
+ */
 function template_shoutbox_xml()
 {
 	global $context, $txt;
@@ -221,8 +238,8 @@ function template_shoutbox_xml()
 	<warning>', !empty($context['SPortal']['shoutbox']['warning']) ? htmlspecialchars($context['SPortal']['shoutbox']['warning']) : 0, '</warning>
 	<reverse>', !empty($context['SPortal']['shoutbox']['reverse']) ? 1 : 0, '</reverse>';
 
-	foreach ($context['SPortal']['shouts'] as $shout)
-		echo '
+		foreach ($context['SPortal']['shouts'] as $shout)
+			echo '
 	<shout>
 		<id>', $shout['id'], '</id>
 		<author>', htmlspecialchars($shout['author']['link']), '</author>

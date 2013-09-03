@@ -156,7 +156,7 @@ tsp_shop_divider {
 }
 
 #sp_menu {
-	width: 100%;
+	width: 150px;
 }
 #sp_menu a {
 	margin: 0;
@@ -167,11 +167,12 @@ tsp_shop_divider {
 }
 #sp_menu li ul {
 	position: absolute;
-	top: 0;
-	left: 75%;
-	width: 200px;
 	background: #FFFFFF;
 	border: 1px solid #AAA;
+	left: 75px;
+	top: 5px;
+	z-index: 90;
+	width: 18.4em;
 }
 #sp_menu ul {
 	display: none;
@@ -237,7 +238,7 @@ body {
 
 .shoutbox_container {
 	width: 100%;
-	font-size: x-small;
+	font-size: small;
 }
 .shoutbox_padding {
 	padding: 5px;
