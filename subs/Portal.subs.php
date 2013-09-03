@@ -186,19 +186,21 @@ function sportal_init_headers()
 	// Used to collapse an individual block
 	function sp_collapseBlock(id)
 	{
-		mode = document.getElementById("sp_block_" + id).style.display == "" ? 0 : 1;';
+		$("#sp_block_" + id).slideToggle(300).promise().done(function() {
+			var mode = false;
+			if ($("#sp_block_" + id).is(":visible"))
+				mode = true;';
 
 	if ($context['user']['is_guest'])
 		$javascript .= '
-		document.cookie = "sp_block_" + id + "=" + (mode ? 0 : 1);';
+			document.cookie = "sp_block_" + id + "=" + (mode ? 0 : 1);';
 	else
 		$javascript .= '
-		elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null, "' . $context['session_id'] . '", "' . $context['session_var'] . '");';
+			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null, "' . $context['session_id'] . '", "' . $context['session_var'] . '");';
 
 	$javascript .= '
-		document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/collapse.png" : "/expand.png");
-
-		$(\'#\' + "sp_block_" + id).slideToggle(300);
+			$("#sp_collapse_" + id).attr("src", elk_images_url + (mode ? "/collapse.png" : "/expand.png"));
+		});
 	}';
 
 	if (empty($modSettings['sp_disable_side_collapse']))

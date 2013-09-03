@@ -28,10 +28,11 @@ function template_shoutbox_all_default()
 		</h3>
 	</div>
 	<div class="windowbg">
-		<div class="sp_content_padding">
-			<div class="pagesection">
-				', $context['page_index'], '
-			</div>
+		<div class="sp_content_padding">';
+
+	template_pagesection();
+
+	echo '
 			<div class="shoutbox_body">
 				<ul class="shoutbox_list_all" id="shouts">';
 
@@ -47,10 +48,11 @@ function template_shoutbox_all_default()
 
 	echo '
 				</ul>
-			</div>
-			<div class="pagesection">
-				', $context['page_index'], '
-			</div>
+			</div>';
+
+	template_pagesection();
+
+	echo '
 		</div>
 	</div>';
 }
