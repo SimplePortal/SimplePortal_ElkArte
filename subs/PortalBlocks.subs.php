@@ -1298,7 +1298,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		censorText($row['body']);
 
 		if ($modSettings['sp_resize_images'])
-			$row['body'] = preg_replace('~class="bbc_img~i', 'class="bbc_img sp_article', $row['body']);
+			$row['body'] = str_ireplace('class="bbc_img', 'class="bbc_img sp_article', $row['body']);
 
 		if (!empty($row['id_member']))
 			$colorids[$row['id_member']] = $row['id_member'];
