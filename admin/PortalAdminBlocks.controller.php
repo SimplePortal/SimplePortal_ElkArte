@@ -529,7 +529,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 						getBoardTree();
 					}
 
-					// Merge the array ;). (Only in 2.0 needed)
+					// Merge the array ;)
 					if (!isset($context['SPortal']['block']['parameters'][$name]))
 						$context['SPortal']['block']['parameters'][$name] = array();
 					elseif (!empty($context['SPortal']['block']['parameters'][$name]) && is_array($context['SPortal']['block']['parameters'][$name]))
@@ -576,7 +576,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 							{
 								// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
 								if ($i % 4 == 0)
-									$parts[$i] = preg_replace('~\[html\](.+?)\[/html\]~ise', '\'[html]\' . preg_replace(\'~<br\s?/?>~i\', \'&lt;br /&gt;<br />\', \'$1\') . \'[/html]\'', $parts[$i]);
+									$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', create_function('$m', 'return "[html]" . preg_replace(\'~<br\s?/?>~i\', \'&lt;br /&gt;<br />\', "$m[1]") . "[/html]";'), $parts[$i]);
 							}
 							$form_message = implode('', $parts);
 						}
