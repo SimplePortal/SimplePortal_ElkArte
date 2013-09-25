@@ -18,7 +18,7 @@ if (!defined('ELK'))
  *
  * @param array $parameters, not used in this block
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_userInfo($parameters, $id, $return_parameters = false)
 {
@@ -138,7 +138,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
  *
  * @param array $parameters 'limit' => number of members to show
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_latestMember($parameters, $id, $return_parameters = false)
 {
@@ -215,7 +215,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
  *
  * @param array $parameters 'online_today' => shows all users that were online today (requires user online today addon)
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_whosOnline($parameters, $id, $return_parameters = false)
 {
@@ -306,7 +306,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
  *
  * @param array $parameters 'averages' => Will calculate the daily average (posts, topics, registrations, etc)
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_boardStats($parameters, $id, $return_parameters = false)
 {
@@ -379,7 +379,7 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
  *		'limit' => number of top posters to show
  *		'type' => period to determine the top poster, 0 all time, 1 today, 2 week, 3 month
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_topPoster($parameters, $id, $return_parameters = false)
 {
@@ -533,7 +533,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
  * 		'enable_label' => use the label
  * 		'list_label' => title for the list
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_topStatsMember($parameters, $id, $return_parameters = false)
 {
@@ -863,7 +863,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
  *		'type' => recent 0 posts or 1 topics
  * 		'display' => compact or full view of the post/topic
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_recent($parameters, $id, $return_parameters = false)
 {
@@ -951,7 +951,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
  *		'limit' => number of posts to show
  *		'type' => 0 replies or 1 views
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_topTopics($parameters, $id, $return_parameters = false)
 {
@@ -998,7 +998,7 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
  * @param array $parameters
  *		'limit' => number of boards to show
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_topBoards($parameters, $id, $return_parameters = false)
 {
@@ -1044,7 +1044,7 @@ function sp_topBoards($parameters, $id, $return_parameters = false)
  *		'topic' => topic id of the poll
  *		'type' => 1 the most recently posted poll, 2 displays a random poll, null for specific topic
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_showPoll($parameters, $id, $return_parameters = false)
 {
@@ -1161,7 +1161,7 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
  *		'avatar' => show the poster avatar
  *		'per_page' => number of posts per page to show
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_boardNews($parameters, $id, $return_parameters = false)
 {
@@ -1389,7 +1389,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
  *
  * @param array $parameters, not used in this block
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_quickSearch($parameters, $id, $return_parameters = false)
 {
@@ -1415,7 +1415,7 @@ function sp_quickSearch($parameters, $id, $return_parameters = false)
  *
  * @param array $parameters, not used in this block
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_news($parameters, $id, $return_parameters = false)
 {
@@ -1440,7 +1440,7 @@ function sp_news($parameters, $id, $return_parameters = false)
  *		'disableDownloads' => don't show a download link
  *		'disableLink' => don't show a link to the post
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_attachmentImage($parameters, $id, $return_parameters = false)
 {
@@ -1517,7 +1517,7 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
  * @param array $parameters
  *		'limit' => Board(s) to select posts from
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_attachmentRecent($parameters, $id, $return_parameters = false)
 {
@@ -1562,7 +1562,7 @@ function sp_attachmentRecent($parameters, $id, $return_parameters = false)
  *		'birthdays' => show birthdays
  *		'holidays' => show holidays
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_calendar($parameters, $id, $return_parameters = false)
 {
@@ -1717,7 +1717,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
  *		'birthdays' => show birthdays
  *		'holidays' => show holidays
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_calendarInformation($parameters, $id, $return_parameters = false)
 {
@@ -1878,7 +1878,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
  * 		'count' => number of items to show
  * 		'limit' => number of characters of content to show
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_rssFeed($parameters, $id, $return_parameters = false)
 {
@@ -2023,7 +2023,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
  *
  * @param array $parameters not used in this block
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_theme_select($parameters, $id, $return_parameters = false)
 {
@@ -2177,7 +2177,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
  * @param array $parameters
  *		'lmod' => set to include local moderators as well
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_staff($parameters, $id, $return_parameters = false)
 {
@@ -2314,7 +2314,7 @@ function sp_staff($parameters, $id, $return_parameters = false)
  *		'type' => 0 latest 1 random
  *		'image' => type of image to show with the post, poster avatar or cat image
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_articles($parameters, $id, $return_parameters = false)
 {
@@ -2474,7 +2474,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
  * @param array $parameters
  *		'shoutbox' => list of categories to choose article from
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_shoutbox($parameters, $id, $return_parameters = false)
 {
@@ -2658,7 +2658,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
  *		'type' =>
  *		'direction' => 0 horizontal or 1 vertical display in the block
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_gallery($parameters, $id, $return_parameters = false)
 {
@@ -2747,7 +2747,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
  *
  * @param array $parameters -  not used in this block
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_menu($parameters, $id, $return_parameters = false)
 {
@@ -2794,7 +2794,7 @@ function sp_menu($parameters, $id, $return_parameters = false)
  *
  * @param array $parameters -  not used in this block
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_bbc($parameters, $id, $return_parameters = false)
 {
@@ -2816,7 +2816,7 @@ function sp_bbc($parameters, $id, $return_parameters = false)
  *
  * @param array $parameters -  not used in this block
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_html($parameters, $id, $return_parameters = false)
 {
@@ -2839,7 +2839,7 @@ function sp_html($parameters, $id, $return_parameters = false)
  * @param array $parameters
  *		'textarea' =>
  * @param int $id - not used in this block
- * @param boolean $return_parameters
+ * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_php($parameters, $id, $return_parameters = false)
 {

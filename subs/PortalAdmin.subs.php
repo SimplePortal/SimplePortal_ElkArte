@@ -773,3 +773,106 @@ function sp_delete_shoutbox($shoutbox_ids = array())
 		)
 	);
 }
+
+/**
+ * Returns the total count of profiles in the system
+ */
+function sp_count_profiles()
+{
+	$db = database();
+	$total_profiles = 0;
+
+	$request = $db->query('','
+		SELECT COUNT(*)
+		FROM {db_prefix}sp_profiles
+		WHERE type = {int:type}',
+		array(
+			'type' => 1,
+		)
+	);
+	list ($total_profiles) =  $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_profiles;
+}
+
+/**
+ * Loads all of the permission profiles in the system
+ * Returns an indexed array of them
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ */
+function sp_load_profiles($start, $items_per_page, $sort)
+{
+	global $scripturl, $txt, $context;
+
+	$db = database();
+
+	// First load up all of the permission profiles names in the system
+	$request = $db->query('','
+		SELECT id_profile, name
+		FROM {db_prefix}sp_profiles
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:limit}',
+		array(
+			'sort' => $sort,
+			'start' => $start,
+			'limit' => $items_per_page,
+		)
+	);
+	$profiles = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$profiles[$row['id_profile']] = array(
+			'id' => $row['id_profile'],
+			'name' => $row['name'],
+			'label' => isset($txt['sp_admin_profiles' . substr($row['name'], 1)]) ? $txt['sp_admin_profiles' . substr($row['name'], 1)] : $row['name'],
+			'actions' => array(
+				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalprofiles;sa=editpermission;profile_id=' . $row['id_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
+				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalprofiles;sa=deletepermission;profile_id=' . $row['id_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_profiles_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
+			)
+		);
+	}
+	$db->free_result($request);
+
+	// Now for each profile, load up the specific permisssions for each area of the portal
+	foreach (array('articles', 'blocks', 'categories', 'pages', 'shoutboxes') as $module)
+	{
+		$request = $db->query('','
+			SELECT permissions, COUNT(*) AS used
+			FROM smf_sp_{raw:module}
+			GROUP BY permissions',
+			array(
+				'module' => $module,
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+		{
+			if (isset($profiles[$row['permissions']]))
+				$profiles[$row['permissions']][$module] = $row['used'];
+		}
+		$db->free_result($request);
+	}
+
+	return $profiles;
+}
+
+/**
+ * Removes a permission group by id
+ *
+ * @param array $article_ids
+ */
+function sp_delete_profiles($remove_ids = array())
+{
+	$db = database();
+
+	$db->query('','
+		DELETE FROM {db_prefix}sp_profiles
+		WHERE id_profile IN ({array_int:profiles})',
+		array(
+			'profiles' => $remove_ids,
+		)
+	);
+}

@@ -44,51 +44,17 @@ function template_categories_edit()
 							<textarea name="description" id="category_description" rows="5" cols="45">', $context['category']['description'], '</textarea>
 						</dd>
 						<dt>
-							<a href="', $scripturl, '?action=quickhelp;help=sp_permissions" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
-							<label for="category_permission_set">', $txt['sp_admin_categories_col_permissions'], ':</label>
+							<label for="category_permissions">', $txt['sp_admin_categories_col_permissions'], ':</label>
 						</dt>
 						<dd>
-							<select name="permission_set" id="category_permission_set" onchange="sp_update_permissions();">';
+						<select name="permissions" id="category_permissions">';
 
-	$permission_sets = array(1 => 'guests', 2 => 'members', 3 => 'everyone', 0 => 'custom');
-	foreach ($permission_sets as $id => $label)
+	foreach ($context['category']['permission_profiles'] as $profile)
 		echo '
-								<option value="', $id, '"', $id == $context['category']['permission_set'] ? ' selected="selected"' : '', '>', $txt['sp_admin_categories_permissions_set_' . $label], '</option>';
+								<option value="', $profile['id'], '"', $profile['id'] == $context['category']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
 
 	echo '
 							</select>
-						</dd>
-						<dt id="category_custom_permissions_label">
-							', $txt['sp_admin_categories_col_custom_permissions'], ':
-						</dt>
-						<dd id="category_custom_permissions_input">
-							<table>
-								<tr>
-									<th>', $txt['sp_admin_categories_custom_permissions_membergroup'], '</td>
-									<th title="', $txt['sp_admin_categories_custom_permissions_allowed'], '">', $txt['sp_admin_categories_custom_permissions_allowed_short'], '</th>
-									<th title="', $txt['sp_admin_categories_custom_permissions_disallowed'], '">', $txt['sp_admin_categories_custom_permissions_disallowed_short'], '</th>
-									<th title="', $txt['sp_admin_categories_custom_permissions_denied'], '">', $txt['sp_admin_categories_custom_permissions_denied_short'], '</th>
-								</tr>';
-
-	foreach ($context['category']['groups'] as $id => $label)
-	{
-		$current = 0;
-		if (in_array($id, $context['category']['groups_allowed']))
-			$current = 1;
-		elseif (in_array($id, $context['category']['groups_denied']))
-			$current = -1;
-
-		echo '
-								<tr>
-									<td>', $label, '</td>
-									<td><input type="radio" name="membergroups[', $id, ']" value="1"', $current == 1 ? ' checked="checked"' : '', ' class="input_radio"></td>
-									<td><input type="radio" name="membergroups[', $id, ']" value="0"', $current == 0 ? ' checked="checked"' : '', ' class="input_radio"></td>
-									<td><input type="radio" name="membergroups[', $id, ']" value="-1"', $current == -1 ? ' checked="checked"' : '', ' class="input_radio"></td>
-								</tr>';
-	}
-
-	echo '
-							</table>
 						</dd>
 						<dt>
 							<label for="category_status">', $txt['sp_admin_categories_col_status'], ':</label>
@@ -103,15 +69,5 @@ function template_categories_edit()
 				</div>
 			</div>
 		</form>
-	</div>
-	<script type="text/javascript"><!-- // --><![CDATA[
-		sp_update_permissions();
-
-		function sp_update_permissions()
-		{
-			var new_state = document.getElementById("category_permission_set").value;
-			document.getElementById("category_custom_permissions_label").style.display = new_state != 0 ? "none" : "";
-			document.getElementById("category_custom_permissions_input").style.display = new_state != 0 ? "none" : "";
-		}
-	// ]]></script>';
+	</div>';
 }

@@ -326,36 +326,13 @@ class ManagePortalArticles_Controller extends Action_Controller
 					fatal_lang_error('error_sp_php_' . $error, false);
 			}
 
-			$permission_set = 0;
-			$groups_allowed = $groups_denied = '';
-
-			if (!empty($_POST['permission_set']))
-				$permission_set = (int) $_POST['permission_set'];
-			elseif (!empty($_POST['membergroups']) && is_array($_POST['membergroups']))
-			{
-				$groups_allowed = $groups_denied = array();
-
-				foreach ($_POST['membergroups'] as $id => $value)
-				{
-					if ($value == 1)
-						$groups_allowed[] = (int) $id;
-					elseif ($value == -1)
-						$groups_denied[] = (int) $id;
-				}
-
-				$groups_allowed = implode(',', $groups_allowed);
-				$groups_denied = implode(',', $groups_denied);
-			}
-
 			$fields = array(
 				'id_category' => 'int',
 				'namespace' => 'string',
 				'title' => 'string',
 				'body' => 'string',
 				'type' => 'string',
-				'permission_set' => 'int',
-				'groups_allowed' => 'string',
-				'groups_denied' => 'string',
+				'permissions' => 'int',
 				'status' => 'int',
 			);
 
@@ -365,10 +342,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 				'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
 				'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
 				'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
-				'type' => $_POST['type'],
-				'permission_set' => $permission_set,
-				'groups_allowed' => $groups_allowed,
-				'groups_denied' => $groups_denied,
+				'type' => in_array($_POST['type'], array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
+				'permissions' => (int) $_POST['permissions'],
 				'status' => !empty($_POST['status']) ? 1 : 0,
 			);
 
@@ -444,22 +419,6 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		if (!empty($_POST['preview']))
 		{
-			$permission_set = 0;
-			$groups_allowed = $groups_denied = array();
-
-			if (!empty($_POST['permission_set']))
-				$permission_set = (int) $_POST['permission_set'];
-			elseif (!empty($_POST['membergroups']) && is_array($_POST['membergroups']))
-			{
-				foreach ($_POST['membergroups'] as $id => $value)
-				{
-					if ($value == 1)
-						$groups_allowed[] = (int) $id;
-					elseif ($value == -1)
-						$groups_denied[] = (int) $id;
-				}
-			}
-
 			if (!$context['is_new'])
 			{
 				$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
@@ -481,9 +440,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 				'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
 				'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
 				'type' => $_POST['type'],
-				'permission_set' => $permission_set,
-				'groups_allowed' => $groups_allowed,
-				'groups_denied' => $groups_denied,
+				'permissions' => $_POST['permissions'],
 				'date' => $date,
 				'status' => !empty($_POST['status']),
 			);
@@ -504,8 +461,6 @@ class ManagePortalArticles_Controller extends Action_Controller
 				'body' => '',
 				'type' => 'bbc',
 				'permission_set' => 3,
-				'groups_allowed' => array(),
-				'groups_denied' => array(),
 				'status' => 1,
 			);
 		}
@@ -537,8 +492,11 @@ class ManagePortalArticles_Controller extends Action_Controller
 		if (isset($temp_editor))
 			$options['wysiwyg_default'] = $temp_editor;
 
-		$context['article']['groups'] = sp_load_membergroups();
+		$context['article']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		$context['article']['categories'] = sportal_get_categories();
+
+		if (empty($context['article']['permission_profiles']))
+			fatal_lang_error('error_sp_no_permission_profiles', false);
 
 		if (empty($context['article']['categories']))
 			fatal_lang_error('error_sp_no_category', false);
@@ -601,7 +559,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 				$article_info = sportal_get_articles($article_id);
 				sp_category_update_total($article_info['category']['id']);
 			}
-			
+
 			sp_delete_articles($article_ids);
 		}
 

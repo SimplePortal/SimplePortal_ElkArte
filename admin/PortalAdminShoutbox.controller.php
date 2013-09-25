@@ -260,27 +260,6 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			if (!empty($has_duplicate))
 				fatal_lang_error('sp_error_shoutbox_name_duplicate', false);
 
-			$permission_set = 0;
-			$groups_allowed = $groups_denied = '';
-
-			if (!empty($_POST['permission_set']))
-				$permission_set = (int) $_POST['permission_set'];
-			elseif (!empty($_POST['membergroups']) && is_array($_POST['membergroups']))
-			{
-				$groups_allowed = $groups_denied = array();
-
-				foreach ($_POST['membergroups'] as $id => $value)
-				{
-					if ($value == 1)
-						$groups_allowed[] = (int) $id;
-					elseif ($value == -1)
-						$groups_denied[] = (int) $id;
-				}
-
-				$groups_allowed = implode(',', $groups_allowed);
-				$groups_denied = implode(',', $groups_denied);
-			}
-
 			if (isset($_POST['moderator_groups']) && is_array($_POST['moderator_groups']) && count($_POST['moderator_groups']) > 0)
 			{
 				foreach ($_POST['moderator_groups'] as $id => $group)
@@ -303,9 +282,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 			$fields = array(
 				'name' => 'string',
-				'permission_set' => 'int',
-				'groups_allowed' => 'string',
-				'groups_denied' => 'string',
+				'permissions' => 'int',
 				'moderator_groups' => 'string',
 				'warning' => 'string',
 				'allowed_bbc' => 'string',
@@ -321,10 +298,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			$shoutbox_info = array(
 				'id' => (int) $_POST['shoutbox_id'],
 				'name' => Util::htmlspecialchars($_POST['name'], ENT_QUOTES),
-				'permission_set' => $permission_set,
-				'groups_allowed' => $groups_allowed,
-				'groups_denied' => $groups_denied,
-				'moderator_groups' => $_POST['moderator_groups'],
+				'permissions' => (int) $_POST['permissions'],				'moderator_groups' => $_POST['moderator_groups'],
 				'warning' => Util::htmlspecialchars($_POST['warning'], ENT_QUOTES),
 				'allowed_bbc' => $_POST['allowed_bbc'],
 				'height' => (int) $_POST['height'],
@@ -374,9 +348,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			$context['SPortal']['shoutbox'] = array(
 				'id' => 0,
 				'name' => $txt['sp_shoutbox_default_name'],
-				'permission_set' => 3,
-				'groups_allowed' => array(),
-				'groups_denied' => array(),
+				'permissions' => 3,
 				'moderator_groups' => array(),
 				'warning' => '',
 				'allowed_bbc' => array('b', 'i', 'u', 's', 'url', 'code', 'quote', 'me'),
@@ -397,8 +369,11 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 		loadLanguage('Post');
 
-		$context['SPortal']['shoutbox']['groups'] = sp_load_membergroups();
+		$context['SPortal']['shoutbox']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		sp_loadMemberGroups($context['SPortal']['shoutbox']['moderator_groups'], 'moderator', 'moderator_groups');
+
+		if (empty($context['SPortal']['shoutbox']['permission_profiles']))
+			fatal_lang_error('error_sp_no_permission_profiles', false);
 
 		$context['allowed_bbc'] = array(
 			'b' => $txt['bold'],
@@ -569,7 +544,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	}
 
 	/**
-	 * Shows the status of the shoutout system
+	 * Updates the system status of the shoutout, toggle on/off
 	 */
 	public function action_sportal_admin_shoutbox_status()
 	{

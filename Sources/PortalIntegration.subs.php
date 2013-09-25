@@ -29,7 +29,6 @@ function sp_integrate_actions(&$actions)
 	$actions['forum'] = array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_boardindex');
 	$actions['portal'] = array('PortalMain.controller.php', 'Sportal_Controller', 'action_sportal_main');
 	$actions['shoutbox'] = array('PortalShoutbox.controller.php', 'Shoutbox_Controller', 'action_sportal_shoutbox');
-
 }
 
 /**
@@ -56,7 +55,7 @@ function sp_integrate_admin_areas(&$admin_areas)
 		{
 			$admin_areas['portal'] = array(
 				'title' => $txt['sp-adminCatTitle'],
-				'permission' => array('sp_admin', 'sp_manage_settings', 'sp_manage_blocks', 'sp_manage_articles', 'sp_manage_pages', 'sp_manage_shoutbox'),
+				'permission' => array('sp_admin', 'sp_manage_settings', 'sp_manage_blocks', 'sp_manage_articles', 'sp_manage_pages', 'sp_manage_shoutbox', 'sp_manage_profiles'),
 				'areas' => array(
 					'portalconfig' => array(
 						'label' => $txt['sp-adminConfiguration'],
@@ -138,6 +137,17 @@ function sp_integrate_admin_areas(&$admin_areas)
 							'add' => array($txt['sp_admin_shoutbox_add']),
 						),
 					),
+					'portalprofiles' => array(
+						'label' => $txt['sp_admin_profiles_title'],
+						'file' => 'PortalAdminProfiles.php',
+						'function' => 'sportal_admin_profiles_main',
+						'icon' => 'profiles.png',
+						'permission' => array('sp_admin', 'sp_manage_profiles'),
+						'subsections' => array(
+							'listpermission' => array($txt['sp_admin_permission_profiles_list']),
+							'addpermission' => array($txt['sp_admin_permission_profiles_add']),
+						),
+					),
 				),
 			);
 		}
@@ -162,6 +172,7 @@ function sp_integrate_load_permissions(&$permissionGroups, &$permissionList, &$l
 	$permissionList['membergroup']['sp_manage_articles'] = array(false, 'sp', 'sp');
 	$permissionList['membergroup']['sp_manage_pages'] = array(false, 'sp', 'sp');
 	$permissionList['membergroup']['sp_manage_shoutbox'] = array(false, 'sp', 'sp');
+	$permissionList['membergroup']['sp_manage_profiles'] = array(false, 'sp', 'sp');
 
 	$permissionGroups['membergroup'][] = 'sp';
 

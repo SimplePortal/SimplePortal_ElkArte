@@ -58,12 +58,14 @@
 		<remove-file name="CONTROLLERDIR/PortalPages.controller.php" />
 		<remove-file name="CONTROLLERDIR/PortalShoutbox.controller.php" />
 		<remove-file name="CONTROLLERDIR/PortalCategories.controller.php" />
+		<remove-file name="CONTROLLERDIR/PortalProfiles.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminArticles.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminBlocks.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminCategories.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminMain.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminPages.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminShoutbox.controller.php" />
+		<remove-file name="ADMINDIR/PortalAdminProfiles.php" />
 		<remove-file name="SUBSDIR/PortalBlocks.subs.php" />
 		<remove-file name="SUBSDIR/Portal.subs.php" />
 		<remove-file name="SUBSDIR/PortalAdmin.subs.php" />
@@ -73,10 +75,13 @@
 		<remove-file name="$themedir/PortalPages.template.php" />
 		<remove-file name="$themedir/PortalShoutbox.template.php" />
 		<remove-file name="$themedir/PortalAdmin.template.php" />
+		<remove-file name="$themedir/PortalCategories.template.php" />
 		<remove-file name="$themedir/PortalAdminArticles.template.php" />
 		<remove-file name="$themedir/PortalAdminBlocks.template.php" />
 		<remove-file name="$themedir/PortalAdminPages.template.php" />
 		<remove-file name="$themedir/PortalAdminShoutbox.template.php" />
+		<remove-file name="$themedir/PortalAdminProfiles.template.php" />
+		<remove-file name="$themedir/PortalAdminCategories.template.php" />
 		<remove-file name="LANGUAGEDIR/SPortal.english.php" />
 		<remove-file name="LANGUAGEDIR/SPortalAdmin.english.php" />
 		<remove-file name="LANGUAGEDIR/SPortalHelp.english.php" />
@@ -86,6 +91,7 @@
 		<remove-file name="$imagesdir/admin/blocks.png" />
 		<remove-file name="$imagesdir/admin/categories.png" />
 		<remove-file name="$imagesdir/admin/pages.png" />
+		<remove-file name="$imagesdir/admin/profiles.png" />
 		<remove-file name="$imagesdir/admin/shoutbox.png" />
 		<remove-file name="$themedir/css/portal.css" />
 		<remove-file name="$themedir/css/portal_rtl.css" />

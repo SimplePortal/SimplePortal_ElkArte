@@ -16,7 +16,7 @@ if (!defined('ELK'))
 function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings;
-	global $settings, $options, $maintenance, $sportal_version;
+	global $settings, $maintenance, $sportal_version;
 
 	$sportal_version = '2.4';
 
@@ -106,60 +106,8 @@ function sportal_init($standalone = false)
 
 	// Load the headers if necessary.
 	sportal_init_headers();
-
-	$context['SPortal']['sides'] = array(
-		5 => array(
-			'id' => '5',
-			'name' => 'header',
-			'active' => true,
-		),
-		1 => array(
-			'id' => '1',
-			'name' => 'left',
-			'active' => !empty($modSettings['showleft']),
-		),
-		2 => array(
-			'id' => '2',
-			'name' => 'top',
-			'active' => true,
-		),
-		3 => array(
-			'id' => '3',
-			'name' => 'bottom',
-			'active' => true,
-		),
-		4 => array(
-			'id' => '4',
-			'name' => 'right',
-			'active' => !empty($modSettings['showright']),
-		),
-		6 => array(
-			'id' => '6',
-			'name' => 'footer',
-			'active' => true,
-		),
-	);
-
-	$blocks = getBlockInfo(null, null, true, true, true);
-	$context['SPortal']['blocks'] = array();
-	foreach ($blocks as $block)
-	{
-		if (!$context['SPortal']['sides'][$block['column']]['active'])
-			continue;
-
-		$block['style'] = sportal_parse_style('explode', $block['style'], true);
-
-		$context['SPortal']['sides'][$block['column']]['last'] = $block['id'];
-		$context['SPortal']['blocks'][$block['column']][] = $block;
-	}
-
-	foreach ($context['SPortal']['sides'] as $side)
-	{
-		if (empty($context['SPortal']['blocks'][$side['id']]))
-			$context['SPortal']['sides'][$side['id']]['active'] = false;
-
-		$context['SPortal']['sides'][$side['id']]['collapsed'] = $context['user']['is_guest'] ? !empty($_COOKIE['sp_' . $side['name']]) : !empty($options['sp_' . $side['name']]);
-	}
+	sportal_load_permissions();
+	sportal_load_blocks();
 
 	if (!Template_Layers::getInstance()->hasLayers(true) && !in_array('portal', Template_Layers::getInstance()->getLayers()))
 		Template_Layers::getInstance()->add('portal');
@@ -239,6 +187,97 @@ function sportal_init_headers()
 	$initialized = true;
 }
 
+function sportal_load_permissions()
+{
+	global $context, $user_info;
+
+	$profiles = sportal_get_profiles(null, 1);
+	$allowed = array();
+
+	foreach ($profiles as $profile)
+	{
+		$result = false;
+		if (!empty($profile['groups_denied']) && count(array_intersect($user_info['groups'], $profile['groups_denied'])) > 0)
+			$result = false;
+		elseif (!empty($profile['groups_allowed']) && count(array_intersect($user_info['groups'], $profile['groups_allowed'])) > 0)
+			$result = true;
+
+		if ($result)
+			$allowed[] = $profile['id'];
+	}
+
+	$context['SPortal']['permissions'] = array(
+		'profiles' => $allowed,
+		'query' => empty($allowed) ? '0=1' : 'FIND_IN_SET(%s, \'' . implode(',', $allowed) . '\')',
+	);
+}
+
+/**
+ * Loads all the defined portal blocks in to context
+ *
+ * @global array $context
+ * @global array $modSettings
+ * @global array $options
+ */
+function sportal_load_blocks()
+{
+	global $context, $modSettings, $options;
+
+	$context['SPortal']['sides'] = array(
+		5 => array(
+			'id' => '5',
+			'name' => 'header',
+			'active' => true,
+		),
+		1 => array(
+			'id' => '1',
+			'name' => 'left',
+			'active' => !empty($modSettings['showleft']),
+		),
+		2 => array(
+			'id' => '2',
+			'name' => 'top',
+			'active' => true,
+		),
+		3 => array(
+			'id' => '3',
+			'name' => 'bottom',
+			'active' => true,
+		),
+		4 => array(
+			'id' => '4',
+			'name' => 'right',
+			'active' => !empty($modSettings['showright']),
+		),
+		6 => array(
+			'id' => '6',
+			'name' => 'footer',
+			'active' => true,
+		),
+	);
+
+	$blocks = getBlockInfo(null, null, true, true, true);
+	$context['SPortal']['blocks'] = array();
+	foreach ($blocks as $block)
+	{
+		if (!$context['SPortal']['sides'][$block['column']]['active'])
+			continue;
+
+		$block['style'] = sportal_parse_style('explode', $block['style'], true);
+
+		$context['SPortal']['sides'][$block['column']]['last'] = $block['id'];
+		$context['SPortal']['blocks'][$block['column']][] = $block;
+	}
+
+	foreach($context['SPortal']['sides'] as $side)
+	{
+		if (empty($context['SPortal']['blocks'][$side['id']]))
+			$context['SPortal']['sides'][$side['id']]['active'] = false;
+
+		$context['SPortal']['sides'][$side['id']]['collapsed'] = $context['user']['is_guest'] ? !empty($_COOKIE['sp_' . $side['name']]) : !empty($options['sp_' . $side['name']]);
+	}
+}
+
 /**
  * This function, returns all of the information about particular blocks.
  *
@@ -268,6 +307,9 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 		$parameters['id_block'] = !empty($block_id) ? $block_id : 0;
 	}
 
+	if (!empty($permission))
+		$query[] = sprintf($context['SPortal']['permissions']['query'], 'spb.permissions');
+
 	if (!empty($state))
 	{
 		$query[] = 'spb.state = {int:state}';
@@ -276,9 +318,8 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 
 	$request = $db->query('', '
 		SELECT
-			spb.id_block, spb.label, spb.type, spb.col, spb.row, spb.permission_set,
-			spb.groups_allowed, spb.groups_denied, spb.state, spb.force_view, spb.display,
-			spb.display_custom, spb.style, spp.variable, spp.value
+			spb.id_block, spb.label, spb.type, spb.col, spb.row, spb.permissions, spb.state,
+			spb.force_view, spb.display, spb.display_custom, spb.style, spp.variable, spp.value
 		FROM {db_prefix}sp_blocks AS spb
 			LEFT JOIN {db_prefix}sp_parameters AS spp ON (spp.id_block = spb.id_block)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
@@ -290,9 +331,6 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 		if (!empty($show) && !getShowInfo($row['id_block'], $row['display'], $row['display_custom']))
 			continue;
 
-		if (!empty($permission) && !sp_allowed_to('block', $row['id_block'], $row['permission_set'], $row['groups_allowed'], $row['groups_denied']))
-			continue;
-
 		if (!isset($return[$row['id_block']]))
 		{
 			$return[$row['id_block']] = array(
@@ -302,9 +340,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 				'type_text' => !empty($txt['sp_function_' . $row['type'] . '_label']) ? $txt['sp_function_' . $row['type'] . '_label'] : $txt['sp_function_unknown_label'],
 				'column' => $row['col'],
 				'row' => $row['row'],
-				'permission_set' => $row['permission_set'],
-				'groups_allowed' => $row['groups_allowed'] !== '' ? explode(',', $row['groups_allowed']) : array(),
-				'groups_denied' => $row['groups_denied'] !== '' ? explode(',', $row['groups_denied']) : array(),
+				'permissions' => $row['permissions'],
 				'state' => empty($row['state']) ? 0 : 1,
 				'force_view' => $row['force_view'],
 				'display' => $row['display'],
@@ -531,94 +567,6 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 
 	// Ummm, no block!
 	return false;
-}
-
-function sp_allowed_to($type, $id, $set = null, $allowed = null, $denied = null)
-{
-	global $user_info;
-	static $cache, $types;
-
-	$db = database();
-
-	if (!isset($types))
-	{
-		$types = array(
-			'article' => array(
-				'table' => 'articless',
-				'id' => 'id_article',
-			),
-			'block' => array(
-				'table' => 'blocks',
-				'id' => 'id_block',
-			),
-			'category' => array(
-				'table' => 'categories',
-				'id' => 'id_category',
-			),
-			'page' => array(
-				'table' => 'pages',
-				'id' => 'id_page',
-			),
-			'shoutbox' => array(
-				'table' => 'shoutboxes',
-				'id' => 'id_shoutbox',
-			),
-		);
-	}
-
-	if (empty($id) || empty($type) || !isset($types[$type]))
-		return false;
-
-	if (!isset($set, $allowed, $denied))
-	{
-		$request = $db->query('', '
-			SELECT permission_set, groups_allowed, groups_denied
-			FROM {db_prefix}sp_{raw:table}
-			WHERE {raw:id} = {int:id_item}
-			LIMIT {int:limit}',
-			array(
-				'table' => $types[$type]['table'],
-				'id' => $types[$type]['id'],
-				'id_item' => $id,
-				'limit' => 1,
-			)
-		);
-		list ($set, $allowed, $denied) = $db->fetch_row($request);
-		$db->free_result($request);
-	}
-
-	$result = false;
-	$cache_name = md5(implode(':', array($set, $allowed, $denied)));
-
-	if (isset($cache[$cache_name]))
-		$result = $cache[$cache_name];
-	else
-	{
-		switch ($set)
-		{
-			case 3:
-				$result = true;
-				break;
-			case 2:
-				$result = empty($user_info['is_guest']);
-				break;
-			case 1:
-				$result = !empty($user_info['is_guest']);
-				break;
-			case 0:
-				if (!empty($denied) && count(array_intersect($user_info['groups'], explode(',', $denied))) > 0)
-					$result = false;
-				elseif (!empty($allowed) && count(array_intersect($user_info['groups'], explode(',', $allowed))) > 0)
-					$result = true;
-				break;
-			default:
-				break;
-		}
-
-		$cache[$cache_name] = $result;
-	}
-
-	return $result;
 }
 
 /**
@@ -973,6 +921,11 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 		$query[] = 'spa.id_category = {int:category_id}';
 		$parameters['category_id'] = (int) $category_id;
 	}
+	if (!empty($allowed))
+	{
+		$query[] = sprintf($context['SPortal']['permissions']['query'], 'spa.permissions');
+		$query[] = sprintf($context['SPortal']['permissions']['query'], 'spc.permissions');
+	}
 	if (!empty($active))
 	{
 		$query[] = 'spa.status = {int:article_status}';
@@ -986,9 +939,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 			spa.id_article, spa.id_category, spc.name, spc.namespace AS category_namespace,
 			IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name,
 			spa.namespace AS article_namespace, spa.title, spa.body, spa.type, spa.date, spa.status,
-			spa.permission_set AS article_permission_set, spa.groups_allowed AS article_groups_allowed,
-			spa.groups_denied AS article_groups_denied, spc.permission_set AS category_permission_set,
-			spc.groups_allowed AS category_groups_allowed, spc.groups_denied AS category_groups_denied,
+			spa.permissions AS article_permissions, spc.permissions AS category_permissions,
 			spa.views, spa.comments
 		FROM {db_prefix}sp_articles AS spa
 			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
@@ -999,12 +950,6 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		if (!empty($allowed) && !sp_allowed_to('article', $row['id_article'], $row['article_permission_set'], $row['article_groups_allowed'], $row['article_groups_denied']))
-			continue;
-
-		if (!empty($allowed) && !sp_allowed_to('category', $row['id_category'], $row['category_permission_set'], $row['category_groups_allowed'], $row['category_groups_denied']))
-			continue;
-
 		$return[$row['id_article']] = array(
 			'id' => $row['id_article'],
 			'category' => array(
@@ -1013,6 +958,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 				'name' => $row['name'],
 				'href' => $scripturl . '?category=' . $row['category_namespace'],
 				'link' => '<a href="' . $scripturl . '?category=' . $row['category_namespace'] . '">' . $row['name'] . '</a>',
+				'permissions' => $row['category_permissions'],
 			),
 			'author' => array(
 				'id' => $row['id_author'],
@@ -1027,9 +973,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 			'body' => $row['body'],
 			'type' => $row['type'],
 			'date' => $row['date'],
-			'permission_set' => $row['article_permission_set'],
-			'groups_allowed' => $row['article_groups_allowed'] !== '' ? explode(',', $row['article_groups_allowed']) : array(),
-			'groups_denied' => $row['article_groups_denied'] !== '' ? explode(',', $row['article_groups_denied']) : array(),
+			'permissions' => $row['article_permissions'],
 			'views' => $row['views'],
 			'comments' => $row['comments'],
 			'status' => $row['status'],
@@ -1042,7 +986,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 
 function sportal_get_categories($category_id = null, $active = false, $allowed = false, $sort = 'name')
 {
-	global $scripturl;
+	global $scripturl, $context;
 
 	$db = database();
 
@@ -1059,6 +1003,8 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 		$query[] = 'namespace = {string:namespace}';
 		$parameters['namespace'] = $category_id;
 	}
+	if (!empty($allowed))
+		$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
 	if (!empty($active))
 	{
 		$query[] = 'status = {int:status}';
@@ -1067,8 +1013,8 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 
 	$request = $db->query('', '
 		SELECT
-			id_category, namespace, name, description, permission_set,
-			groups_allowed, groups_denied, articles, status
+			id_category, namespace, name, description,
+			permissions, articles, status
 		FROM {db_prefix}sp_categories' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}', $parameters
@@ -1076,9 +1022,6 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		if (!empty($allowed) && !sp_allowed_to('category', $row['id_category'], $row['permission_set'], $row['groups_allowed'], $row['groups_denied']))
-			continue;
-
 		$return[$row['id_category']] = array(
 			'id' => $row['id_category'],
 			'category_id' => $row['namespace'],
@@ -1086,9 +1029,7 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 			'href' => $scripturl . '?category=' . $row['namespace'],
 			'link' => '<a href="' . $scripturl . '?category=' . $row['namespace'] . '">' . $row['name'] . '</a>',
 			'description' => $row['description'],
-			'permission_set' => $row['permission_set'],
-			'groups_allowed' => $row['groups_allowed'] !== '' ? explode(',', $row['groups_allowed']) : array(),
-			'groups_denied' => $row['groups_denied'] !== '' ? explode(',', $row['groups_denied']) : array(),
+			'permissions' => $row['permissions'],
 			'articles' => $row['articles'],
 			'status' => $row['status'],
 		);
@@ -1168,8 +1109,6 @@ function sportal_create_comment($article_id, $body)
 
 function sportal_modify_comment($comment_id, $body)
 {
-	global $smcFunc;
-
 	$db = database();
 
 	$db->query('', '
@@ -1228,7 +1167,7 @@ function sportal_recount_comments($article_id)
 
 function sportal_get_pages($page_id = null, $active = false, $allowed = false, $sort = 'title')
 {
-	global $scripturl;
+	global $context, $scripturl;
 
 	$db = database();
 
@@ -1245,6 +1184,8 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 		$query[] = 'namespace = {string:namespace}';
 		$parameters['namespace'] = $page_id;
 	}
+	if (!empty($allowed))
+		$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
 	if (!empty($active))
 	{
 		$query[] = 'status = {int:status}';
@@ -1253,8 +1194,8 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 
 	$request = $db->query('', '
 		SELECT
-			id_page, namespace, title, body, type, permission_set,
-			groups_allowed, groups_denied, views, style, status
+			id_page, namespace, title, body, type,
+			permissions, views, style, status
 		FROM {db_prefix}sp_pages' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}', $parameters
@@ -1262,9 +1203,6 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		if (!empty($allowed) && !sp_allowed_to('page', $row['id_page'], $row['permission_set'], $row['groups_allowed'], $row['groups_denied']))
-			continue;
-
 		$return[$row['id_page']] = array(
 			'id' => $row['id_page'],
 			'page_id' => $row['namespace'],
@@ -1273,9 +1211,7 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 			'link' => '<a href="' . $scripturl . '?page=' . $row['namespace'] . '">' . $row['title'] . '</a>',
 			'body' => $row['body'],
 			'type' => $row['type'],
-			'permission_set' => $row['permission_set'],
-			'groups_allowed' => $row['groups_allowed'] !== '' ? explode(',', $row['groups_allowed']) : array(),
-			'groups_denied' => $row['groups_denied'] !== '' ? explode(',', $row['groups_denied']) : array(),
+			'permissions' => $row['permissions'],
 			'views' => $row['views'],
 			'style' => $row['style'],
 			'status' => $row['status'],
@@ -1303,8 +1239,64 @@ function sportal_parse_content($body, $type)
 	}
 }
 
+function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_profile')
+{
+	global $txt;
+
+	$db = database();
+
+	$query = array();
+	$parameters = array('sort' => $sort);
+
+	if (isset($profile_id))
+	{
+		$query[] = 'id_profile = {int:profile_id}';
+		$parameters['profile_id'] = (int) $profile_id;
+	}
+	if (isset($type))
+	{
+		$query[] = 'type = {int:type}';
+		$parameters['type'] = (int) $type;
+	}
+
+	$request = $db->query('','
+		SELECT id_profile, type, name, value
+		FROM {db_prefix}sp_profiles' . (!empty($query) ? '
+		WHERE ' . implode(' AND ', $query) : '') . '
+		ORDER BY {raw:sort}',
+		$parameters
+	);
+	$return = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$return[$row['id_profile']] = array(
+			'id' => $row['id_profile'],
+			'name' => $row['name'],
+			'label' => isset($txt['sp_admin_profiles' . substr($row['name'], 1)]) ? $txt['sp_admin_profiles' . substr($row['name'], 1)] : $row['name'],
+			'type' => $row['type'],
+			'value' => $row['value'],
+		);
+
+		if ($row['type'] == 1)
+		{
+			list ($groups_allowed, $groups_denied) = explode('|',  $row['value']);
+
+			$return[$row['id_profile']] = array_merge($return[$row['id_profile']], array(
+				'groups_allowed' => $groups_allowed !== '' ? explode(',', $groups_allowed) : array(),
+				'groups_denied' => $groups_denied !== '' ? explode(',', $groups_denied) : array(),
+			));
+		}
+	}
+
+	$db->free_result($request);
+
+	return !empty($profile_id) ? current($return) : $return;
+}
+
 function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = false)
 {
+	global $contex;
+
 	$db = database();
 
 	$query = array();
@@ -1315,6 +1307,8 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 		$query[] = 'id_shoutbox = {int:shoutbox_id}';
 		$parameters['shoutbox_id'] = $shoutbox_id;
 	}
+	if (!empty($allowed))
+		$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
 	if (!empty($active))
 	{
 		$query[] = 'status = {int:status}';
@@ -1323,25 +1317,21 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 
 	$request = $db->query('', '
 		SELECT
-			id_shoutbox, name, permission_set, groups_allowed, groups_denied,
-			moderator_groups, warning, allowed_bbc, height, num_show, num_max,
-			refresh, reverse, caching, status, num_shouts, last_update
+			id_shoutbox, name, permissions, moderator_groups, warning,
+			allowed_bbc, height, num_show, num_max, refresh, reverse,
+			caching, status, num_shouts, last_update
 		FROM {db_prefix}sp_shoutboxes' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY name', $parameters
+		ORDER BY name',
+		$parameters
 	);
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		if (!empty($allowed) && !sp_allowed_to('shoutbox', $row['id_shoutbox'], $row['permission_set'], $row['groups_allowed'], $row['groups_denied']))
-			continue;
-
 		$return[$row['id_shoutbox']] = array(
 			'id' => $row['id_shoutbox'],
 			'name' => $row['name'],
-			'permission_set' => $row['permission_set'],
-			'groups_allowed' => $row['groups_allowed'] !== '' ? explode(',', $row['groups_allowed']) : array(),
-			'groups_denied' => $row['groups_denied'] !== '' ? explode(',', $row['groups_denied']) : array(),
+			'permissions' => $row['permissions'],
 			'moderator_groups' => $row['moderator_groups'] !== '' ? explode(',', $row['moderator_groups']) : array(),
 			'warning' => $row['warning'],
 			'allowed_bbc' => explode(',', $row['allowed_bbc']),

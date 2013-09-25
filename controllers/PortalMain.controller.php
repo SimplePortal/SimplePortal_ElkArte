@@ -67,6 +67,9 @@ class Sportal_Controller extends Action_Controller
 		$context['sub_template'] = 'portal_index';
 	}
 
+	/**
+	 * Displays the credit page outside of the admin area
+	 */
 	public function action_sportal_credits()
 	{
 		global $context, $txt;
