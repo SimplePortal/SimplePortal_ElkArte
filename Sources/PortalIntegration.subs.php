@@ -32,126 +32,128 @@ function sp_integrate_actions(&$actions)
 }
 
 /**
- * Admin hook, integrate_admin_areas, called from Menu.subs
+ * Admin hook, integrate_admin_menu, called from Menu.subs
  * adds the admin menu
  *
- * @param array $admin_areas
+ * @param array $options
  */
-function sp_integrate_admin_areas(&$admin_areas)
+function sp_integrate_admin_menu(&$options)
 {
 	global $txt;
 
 	loadLanguage('SPortalAdmin');
 	loadLanguage('SPortal');
 
-	$temp = $admin_areas;
-	$admin_areas = array();
+	$allMenus = Standard_Menu::context();
+	$menu = $allMenus->get('Admin_Menu');
 
-	foreach ($temp as $area => $data)
-	{
-		$admin_areas[$area] = $data;
-
-		if ($area == 'layout')
-		{
-			$admin_areas['portal'] = array(
+	// Add in our admin menu option after layout aka forum
+	$menu->after('layout')->add(
+		array(
+			'portal' => array(
 				'title' => $txt['sp-adminCatTitle'],
 				'permission' => array('sp_admin', 'sp_manage_settings', 'sp_manage_blocks', 'sp_manage_articles', 'sp_manage_pages', 'sp_manage_shoutbox', 'sp_manage_profiles'),
-				'areas' => array(
-					'portalconfig' => array(
-						'label' => $txt['sp-adminConfiguration'],
-						'file' => 'PortalAdminMain.controller.php',
-						'controller' => 'ManagePortalConfig_Controller',
-						'function' => 'action_index',
-						'icon' => 'configuration.png',
-						'permission' => array('sp_admin', 'sp_manage_settings'),
-						'subsections' => array(
-							'information' => array($txt['sp-info_title']),
-							'generalsettings' => array($txt['sp-adminGeneralSettingsName']),
-							'blocksettings' => array($txt['sp-adminBlockSettingsName']),
-							'articlesettings' => array($txt['sp-adminArticleSettingsName']),
-						),
-					),
-					'portalblocks' => array(
-						'label' => $txt['sp-blocksBlocks'],
-						'file' => 'PortalAdminBlocks.controller.php',
-						'controller' => 'ManagePortalBlocks_Controller',
-						'function' => 'action_index',
-						'icon' => 'blocks.png',
-						'permission' => array('sp_admin', 'sp_manage_blocks'),
-						'subsections' => array(
-							'list' => array($txt['sp-adminBlockListName']),
-							'add' => array($txt['sp-adminBlockAddName']),
-							'header' => array($txt['sp-positionHeader']),
-							'left' => array($txt['sp-positionLeft']),
-							'top' => array($txt['sp-positionTop']),
-							'bottom' => array($txt['sp-positionBottom']),
-							'right' => array($txt['sp-positionRight']),
-							'footer' => array($txt['sp-positionFooter']),
-						),
-					),
-					'portalarticles' => array(
-						'label' => $txt['sp_admin_articles_title'],
-						'file' => 'PortalAdminArticles.controller.php',
-						'controller' => 'ManagePortalArticles_Controller',
-						'function' => 'action_index',
-						'icon' => 'articles.png',
-						'permission' => array('sp_admin', 'sp_manage_articles'),
-						'subsections' => array(
-							'list' => array($txt['sp_admin_articles_list']),
-							'add' => array($txt['sp_admin_articles_add']),
-						),
-					),
-					'portalcategories' => array(
-						'label' => $txt['sp_admin_categories_title'],
-						'file' => 'PortalAdminCategories.controller.php',
-						'controller' => 'ManagePortalCategories_Controller',
-						'function' => 'action_index',
-						'icon' => 'categories.png',
-						'permission' => array('sp_admin', 'sp_manage_articles'),
-						'subsections' => array(
-							'list' => array($txt['sp_admin_categories_list']),
-							'add' => array($txt['sp_admin_categories_add']),
-						),
-					),
-					'portalpages' => array(
-						'label' => $txt['sp_admin_pages_title'],
-						'file' => 'PortalAdminPages.controller.php',
-						'controller' => 'ManagePortalPages_Controller',
-						'function' => 'action_index',
-						'icon' => 'pages.png',
-						'permission' => array('sp_admin', 'sp_manage_pages'),
-						'subsections' => array(
-							'list' => array($txt['sp_admin_pages_list']),
-							'add' => array($txt['sp_admin_pages_add']),
-						),
-					),
-					'portalshoutbox' => array(
-						'label' => $txt['sp_admin_shoutbox_title'],
-						'file' => 'PortalAdminShoutbox.controller.php',
-						'controller' => 'ManagePortalShoutbox_Controller',
-						'function' => 'action_index',
-						'icon' => 'shoutbox.png',
-						'permission' => array('sp_admin', 'sp_manage_shoutbox'),
-						'subsections' => array(
-							'list' => array($txt['sp_admin_shoutbox_list']),
-							'add' => array($txt['sp_admin_shoutbox_add']),
-						),
-					),
-					'portalprofiles' => array(
-						'label' => $txt['sp_admin_profiles_title'],
-						'file' => 'PortalAdminProfiles.php',
-						'function' => 'sportal_admin_profiles_main',
-						'icon' => 'profiles.png',
-						'permission' => array('sp_admin', 'sp_manage_profiles'),
-						'subsections' => array(
-							'listpermission' => array($txt['sp_admin_permission_profiles_list']),
-							'addpermission' => array($txt['sp_admin_permission_profiles_add']),
-						),
-					),
+			),
+		)
+	);
+
+	// Now populate our new top level admin portal menu with its options
+	$portal_areas = $menu->childOf('portal')->add('portal_areas');
+	$portal_areas->addBulk(
+		array(
+			'portalconfig' => array(
+				'label' => $txt['sp-adminConfiguration'],
+				'file' => 'PortalAdminMain.controller.php',
+				'controller' => 'ManagePortalConfig_Controller',
+				'function' => 'action_index',
+				'icon' => 'configuration.png',
+				'permission' => array('sp_admin', 'sp_manage_settings'),
+				'subsections' => array(
+					'information' => array($txt['sp-info_title']),
+					'generalsettings' => array($txt['sp-adminGeneralSettingsName']),
+					'blocksettings' => array($txt['sp-adminBlockSettingsName']),
+					'articlesettings' => array($txt['sp-adminArticleSettingsName']),
 				),
-			);
-		}
-	}
+			),
+			'portalblocks' => array(
+				'label' => $txt['sp-blocksBlocks'],
+				'file' => 'PortalAdminBlocks.controller.php',
+				'controller' => 'ManagePortalBlocks_Controller',
+				'function' => 'action_index',
+				'icon' => 'blocks.png',
+				'permission' => array('sp_admin', 'sp_manage_blocks'),
+				'subsections' => array(
+					'list' => array($txt['sp-adminBlockListName']),
+					'add' => array($txt['sp-adminBlockAddName']),
+					'header' => array($txt['sp-positionHeader']),
+					'left' => array($txt['sp-positionLeft']),
+					'top' => array($txt['sp-positionTop']),
+					'bottom' => array($txt['sp-positionBottom']),
+					'right' => array($txt['sp-positionRight']),
+					'footer' => array($txt['sp-positionFooter']),
+				),
+			),
+			'portalarticles' => array(
+				'label' => $txt['sp_admin_articles_title'],
+				'file' => 'PortalAdminArticles.controller.php',
+				'controller' => 'ManagePortalArticles_Controller',
+				'function' => 'action_index',
+				'icon' => 'articles.png',
+				'permission' => array('sp_admin', 'sp_manage_articles'),
+				'subsections' => array(
+					'list' => array($txt['sp_admin_articles_list']),
+					'add' => array($txt['sp_admin_articles_add']),
+				),
+			),
+			'portalcategories' => array(
+				'label' => $txt['sp_admin_categories_title'],
+				'file' => 'PortalAdminCategories.controller.php',
+				'controller' => 'ManagePortalCategories_Controller',
+				'function' => 'action_index',
+				'icon' => 'categories.png',
+				'permission' => array('sp_admin', 'sp_manage_articles'),
+				'subsections' => array(
+					'list' => array($txt['sp_admin_categories_list']),
+					'add' => array($txt['sp_admin_categories_add']),
+				),
+			),
+			'portalpages' => array(
+				'label' => $txt['sp_admin_pages_title'],
+				'file' => 'PortalAdminPages.controller.php',
+				'controller' => 'ManagePortalPages_Controller',
+				'function' => 'action_index',
+				'icon' => 'pages.png',
+				'permission' => array('sp_admin', 'sp_manage_pages'),
+				'subsections' => array(
+					'list' => array($txt['sp_admin_pages_list']),
+					'add' => array($txt['sp_admin_pages_add']),
+				),
+			),
+			'portalshoutbox' => array(
+				'label' => $txt['sp_admin_shoutbox_title'],
+				'file' => 'PortalAdminShoutbox.controller.php',
+				'controller' => 'ManagePortalShoutbox_Controller',
+				'function' => 'action_index',
+				'icon' => 'shoutbox.png',
+				'permission' => array('sp_admin', 'sp_manage_shoutbox'),
+				'subsections' => array(
+					'list' => array($txt['sp_admin_shoutbox_list']),
+					'add' => array($txt['sp_admin_shoutbox_add']),
+				),
+			),
+			'portalprofiles' => array(
+				'label' => $txt['sp_admin_profiles_title'],
+				'file' => 'PortalAdminProfiles.php',
+				'function' => 'sportal_admin_profiles_main',
+				'icon' => 'profiles.png',
+				'permission' => array('sp_admin', 'sp_manage_profiles'),
+				'subsections' => array(
+					'listpermission' => array($txt['sp_admin_permission_profiles_list']),
+					'addpermission' => array($txt['sp_admin_permission_profiles_add']),
+				),
+			),
+		)
+	);
 }
 
 /**
@@ -328,7 +330,7 @@ function sp_integrate_frontpage(&$default_action)
 
 /**
  * Help hook, integrate_quickhelp, called from help.controller.php
- * Used to add in additional help lanaguages for use in the admin quickhelp
+ * Used to add in additional help languages for use in the admin quickhelp
  */
 function sp_integrate_quickhelp()
 {
@@ -377,63 +379,23 @@ function sp_integrate_buffer($tourniquet)
  * Menu Button hook, integrate_menu_buttons, called from subs.php
  * used to add top menu buttons
  *
- * @param array $buttons
+ * @param array $menu_count
  */
-function sp_integrate_menu_buttons(&$buttons)
+function sp_integrate_menu_buttons(&$menu_count)
 {
 	global $txt, $scripturl, $modSettings;
 
 	loadLanguage('SPortal');
 
-	// Where do we want to place our button
-	$insert_after = 'home';
-	$counter = 0;
-
-	// find the location in the buttons array
-	foreach ($buttons as $area => $dummy)
-	{
-		if (++$counter && $area == $insert_after)
-			break;
-	}
-
-	// Define the new menu item(s)
-	sp_array_insert($buttons, 'home', array(
-		'forum' => array(
-			'title' => empty($txt['sp-forum']) ? 'Forum' : $txt['sp-forum'],
-			'href' => $scripturl . ($modSettings['sp_portal_mode'] == 1 && empty($context['disable_sp']) ? '?action=forum' : ''),
-			'show' => in_array($modSettings['sp_portal_mode'], array(1, 3)) && empty($context['disable_sp']),
-			'sub_buttons' => array(
+	$allMenus = Standard_Menu::context();
+	$menu = $allMenus->get('Main_Menu');
+	$menu->after('home')->add(
+		array(
+			'forum' => array(
+				'title' => empty($txt['sp-forum']) ? 'Forum' : $txt['sp-forum'],
+				'href' => $scripturl . ($modSettings['sp_portal_mode'] == 1 && empty($context['disable_sp']) ? '?action=forum' : ''),
+				'show' => in_array($modSettings['sp_portal_mode'], array(1, 3)) && empty($context['disable_sp']),
 			),
-		),
-	), 'after');
-}
-
-/**
- * Helper function to insert a menu
- *
- * @param array $input the array we will insert to
- * @param string $key the key in the array
- * @param array $insert the data to add before or after the above key
- * @param string $where adding before or after
- * @param bool $strict
- */
-function sp_array_insert(&$input, $key, $insert, $where = 'before', $strict = false)
-{
-	$position = array_search($key, array_keys($input), $strict);
-
-	// If the key is not found, just insert it at the end
-	if ($position === false)
-	{
-		$input = array_merge($input, $insert);
-		return;
-	}
-
-	if ($where === 'after')
-		$position += 1;
-
-	// Insert as first
-	if ($position === 0)
-		$input = array_merge($insert, $input);
-	else
-		$input = array_merge(array_slice($input, 0, $position), $insert, array_slice($input, $position));
+		)
+	);
 }
