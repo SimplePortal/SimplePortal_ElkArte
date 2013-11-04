@@ -16,12 +16,11 @@ function template_permission_profiles_edit()
 
 	echo '
 	<div id="sp_edit_profile">
-		<form action="', $scripturl, '?action=admin;area=portalprofiles;sa=editpermission" method="post" accept-charset="', $context['character_set'], '" onsubmit="submitonce(this);">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalprofiles;sa=editpermission" method="post" accept-charset="', $context['character_set'], '" onsubmit="submitonce(this);">
 			<h3 class="category_header">
 				', $context['page_title'], '
 			</h3>
 			<div class="windowbg2">
-				<span class="topslice"><span></span></span>
 				<div class="sp_content_padding">
 					<dl class="sp_form">
 						<dt>
@@ -63,14 +62,13 @@ function template_permission_profiles_edit()
 							</table>
 						</dd>
 					</dl>
-					<div class="sp_button_container">
+					<div class="submitbutton">
 						<input type="submit" name="submit" value="', $context['page_title'], '" class="button_submit" />
+						<input type="hidden" name="profile_id" value="', $context['profile']['id'], '" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					</div>
 				</div>
-				<span class="botslice"><span></span></span>
 			</div>
-			<input type="hidden" name="profile_id" value="', $context['profile']['id'], '" />
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
 	</div>';
 }
