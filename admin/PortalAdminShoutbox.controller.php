@@ -196,7 +196,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 		$context['default_list'] = 'portal_shout';
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
