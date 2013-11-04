@@ -899,7 +899,7 @@ function sportal_parse_style($action, $setting = '', $process = false)
 
 function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title', $category_id = null)
 {
-	global $scripturl;
+	global $scripturl, $context;
 
 	$db = database();
 
