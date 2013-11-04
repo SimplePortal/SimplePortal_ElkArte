@@ -115,8 +115,6 @@ $txt['error_sp_no_category_normaluser'] = 'Sorry, articles require categories to
 $txt['error_sp_no_category_sp_moderator'] = 'A new category can be created <a href="%s">here</a>.';
 $txt['error_sp_side_wrong'] = 'Wrong side selected.';
 $txt['error_sp_block_wrong'] = 'Wrong block selected.';
-$txt['error_sp_php_syntax'] = 'Syntax error in block code. Please check the code.';
-$txt['error_sp_php_database'] = 'Database error in block code. Please check the code.';
 $txt['error_sp_no_posts_found'] = 'No posts were found.';
 $txt['error_sp_no_members_found'] = 'No members were found.';
 $txt['error_sp_no_gallery_found'] = 'There are no gallery mods installed.';

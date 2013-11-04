@@ -135,53 +135,6 @@ function sp_changeState($type = null, $id = null)
 	);
 }
 
-function sp_validate_php($code)
-{
-	global $boardurl, $modSettings;
-
-	$id = time();
-	$token = md5(mt_rand() . session_id() . (string) microtime() . $modSettings['rand_seed']);
-	$error = false;
-	$filename = 'sp_tmp_' . $id . '.php';
-
-	$code = trim($code);
-	if (substr($code, 0, 5) == '<?php')
-		$code = substr($code, 5);
-	if (substr($code, -2) == '?>')
-		$code = substr($code, 0, -2);
-
-	require_once(SUBSDIR . '/Package.subs.php');
-
-	$content = '<?php
-
-if (empty($_GET[\'token\']) || $_GET[\'token\'] !== \'' . $token . '\')
-	exit();
-
-require_once(\'' . BOARDDIR . '/SSI.php\');
-
-' . $code . '
-
-?>';
-
-	$fp = fopen(BOARDDIR . '/' . $filename, 'w');
-	fwrite($fp, $content);
-	fclose($fp);
-
-	if (!file_exists(BOARDDIR . '/' . $filename))
-		return false;
-
-	$result = fetch_web_data($boardurl . '/' . $filename . '?token=' . $token);
-
-	if ($result === false)
-		$error = 'database';
-	elseif (preg_match('~ <b>(\d+)</b><br( /)?' . '>$~i', $result) != 0)
-		$error = 'syntax';
-
-	unlink(BOARDDIR . '/' . $filename);
-
-	return $error;
-}
-
 /**
  * This will file the $context['member_groups'] to the given options
  *

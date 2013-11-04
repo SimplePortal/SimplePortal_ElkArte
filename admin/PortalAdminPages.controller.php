@@ -202,7 +202,7 @@ class ManagePortalPages_Controller extends Action_Controller
 		$context['default_list'] = 'portal_pages';
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -333,10 +333,15 @@ class ManagePortalPages_Controller extends Action_Controller
 
 			if ($_POST['type'] == 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
 			{
-				$error = sp_validate_php($_POST['content']);
+				require_once(SUBSDIR . '/DataValidator.class.php');
+
+				$validator = new Data_Validator();
+				$validator->validation_rules(array('content' => 'php_syntax'));
+				$validator->validate(array('content' => $_POST['content']));
+				$error = $validator->validation_errors();
 
 				if ($error)
-					fatal_lang_error('error_sp_php_' . $error, false);
+					fatal_lang_error($error, false);
 			}
 
 			if (!empty($_POST['blocks']) && is_array($_POST['blocks']))
