@@ -143,8 +143,9 @@ function sp_integrate_admin_menu(&$options)
 			),
 			'portalprofiles' => array(
 				'label' => $txt['sp_admin_profiles_title'],
-				'file' => 'PortalAdminProfiles.php',
-				'function' => 'sportal_admin_profiles_main',
+				'file' => 'PortalAdminProfiles.controller.php',
+				'controller' => 'ManagePortalProfile_Controller',
+				'function' => 'action_index',
 				'icon' => 'profiles.png',
 				'permission' => array('sp_admin', 'sp_manage_profiles'),
 				'subsections' => array(
