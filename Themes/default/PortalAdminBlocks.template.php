@@ -32,15 +32,13 @@ function template_block_list()
 	foreach($context['sides'] as $id => $side)
 	{
 		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<a class="sp_float_right" href="', $scripturl, '?action=admin;area=portalblocks;sa=add;col=', $side['id'], '">', sp_embed_image('add', sprintf($txt['sp-blocksCreate'], $side['label'])), '</a>
-				<a href="', $scripturl, '?action=quickhelp;help=', $side['help'], '" onclick="return reqOverlayDiv(this.href);" class="help">
-					<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
-				</a>
-				<a href="', $scripturl, '?action=admin;area=portalblocks;sa=', $id, '">', $side['label'], ' ', $txt['sp-blocksBlocks'], '</a>
-			</h3>
-		</div>
+		<h3 class="category_header">
+			<a class="sp_float_right" href="', $scripturl, '?action=admin;area=portalblocks;sa=add;col=', $side['id'], '">', sp_embed_image('add', sprintf($txt['sp-blocksCreate'], $side['label'])), '</a>
+			<a href="', $scripturl, '?action=quickhelp;help=', $side['help'], '" onclick="return reqOverlayDiv(this.href);" class="help">
+				<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
+			</a>
+			<a href="', $scripturl, '?action=admin;area=portalblocks;sa=', $id, '">', $side['label'], ' ', $txt['sp-blocksBlocks'], '</a>
+		</h3>
 		<table class="table_grid">
 			<thead>
 				<tr class="table_head">';
@@ -124,14 +122,12 @@ function template_block_edit()
 	echo '
 	<div id="sp_edit_block">
 		<form id="admin_form_wrapper" name="sp_edit_block_form" id="sp_edit_block_form" action="', $scripturl, '?action=admin;area=portalblocks;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<a href="', $scripturl, '?action=quickhelp;help=sp-blocks', $context['SPortal']['is_new'] ? 'Add' : 'Edit', '" onclick="return reqOverlayDiv(this.href);" class="help">
-						<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
-					</a>
-					', $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				<a href="', $scripturl, '?action=quickhelp;help=sp-blocks', $context['SPortal']['is_new'] ? 'Add' : 'Edit', '" onclick="return reqOverlayDiv(this.href);" class="help">
+					<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
+				</a>
+				', $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'], '
+			</h3>
 			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">
@@ -350,14 +346,12 @@ function template_block_edit()
 	{
 		echo '
 			<br />
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<a href="', $scripturl, '?action=quickhelp;help=sp-blocksDisplayOptions" onclick="return reqOverlayDiv(this.href);" class="help">
-						<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
-					</a>
-					', $txt['sp-blocksDisplayOptions'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				<a href="', $scripturl, '?action=quickhelp;help=sp-blocksDisplayOptions" onclick="return reqOverlayDiv(this.href);" class="help">
+					<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
+				</a>
+				', $txt['sp-blocksDisplayOptions'], '
+			</h3>
 			<div class="windowbg2">
 				<div class="sp_content_padding">
 					<span class="sp_float_right">', $txt['sp-blocksAdvancedOptions'], '<input type="checkbox" name="display_advanced" id="display_advanced" onclick="document.getElementById(\'sp_display_advanced\').style.display = this.checked ? \'block\' : \'none\'; document.getElementById(\'display_simple\').disabled = this.checked;" ', empty($context['SPortal']['block']['display_type']) ? '' : ' checked="checked"', ' class="input_check" /></span>
@@ -423,14 +417,12 @@ function template_block_edit()
 	{
 		echo '
 			<br />
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<a href="', $scripturl, '?action=quickhelp;help=sp-blocksStyleOptions" onclick="return reqOverlayDiv(this.href);" class="help">
-						<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
-					</a>
-					', $txt['sp-blocksStyleOptions'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				<a href="', $scripturl, '?action=quickhelp;help=sp-blocksStyleOptions" onclick="return reqOverlayDiv(this.href);" class="help">
+					<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
+				</a>
+				', $txt['sp-blocksStyleOptions'], '
+			</h3>
 			<div class="windowbg2">
 				<div class="sp_content_padding">';
 
@@ -505,14 +497,12 @@ function template_block_select_type()
 
 	echo '
 	<div id="sp_select_block_type">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<a href="', $scripturl, '?action=quickhelp;help=sp-blocksSelectType" onclick="return reqOverlayDiv(this.href);" class="help">
-					<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
-				</a>
-				', $txt['sp-blocksSelectType'], '
-			</h3>
-		</div>
+		<h3 class="category_header">
+			<a href="', $scripturl, '?action=quickhelp;help=sp-blocksSelectType" onclick="return reqOverlayDiv(this.href);" class="help">
+				<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
+			</a>
+			', $txt['sp-blocksSelectType'], '
+		</h3>
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalblocks;sa=add" method="post" accept-charset="UTF-8">
 			<table>
 				<tr>';

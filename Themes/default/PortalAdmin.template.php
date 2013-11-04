@@ -19,21 +19,17 @@ function template_information()
 	<div id="sp_admin_main">
 		<div id="admin_main_section">
 			<div id="sp_live_info" class="sp_float_left">
-				<div class="cat_bar">
-					<h3 class="catbg">
-						', $txt['sp-info_live'], '
-					</h3>
-				</div>
+				<h3 class="category_header">
+					', $txt['sp-info_live'], '
+				</h3>
 				<div class="windowbg">
 					<div id="spAnnouncements" style="">', $txt['sp-info_no_live'], '</div>
 				</div>
 			</div>
 			<div id="sp_general_info" class="sp_float_right">
-				<div class="cat_bar">
-					<h3 class="catbg">
-						', $txt['sp-info_general'], '
-					</h3>
-				</div>
+				<h3 class="category_header">
+					', $txt['sp-info_general'], '
+				</h3>
 				<div class="windowbg">
 					<div class="sp_content_padding">
 						<strong>', $txt['sp-info_versions'], ':</strong><br />

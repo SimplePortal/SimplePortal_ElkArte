@@ -16,11 +16,9 @@ function template_view_articles()
 
 	echo '
 	<div id="sp_view_articles">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $context['page_title'], '
-			</h3>
-		</div>';
+		<h3 class="category_header">
+			', $context['page_title'], '
+		</h3>';
 
 	if (empty($context['articles']))
 	{
@@ -54,11 +52,9 @@ function template_view_article()
 
 	echo '
 	<div id="sp_view_article">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $context['article']['title'], '
-			</h3>
-		</div>
+		<h3 class="category_header">
+			', $context['article']['title'], '
+		</h3>
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="sp_content_padding">
@@ -76,11 +72,9 @@ function template_view_article()
 	{
 		echo '
 		<div id="sp_view_comments">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['sp-comments'], '
-				</h3>
-			</div>';
+			<h3 class="category_header">
+				', $txt['sp-comments'], '
+			</h3>';
 
 		if (empty($context['article']['comments']))
 		{

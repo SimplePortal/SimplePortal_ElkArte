@@ -1030,7 +1030,7 @@ function sp_topBoards($parameters, $id, $return_parameters = false)
 	foreach ($boards as $board)
 		echo '
 									<li class="sp_list_top">', sp_embed_image('board'), ' ', $board['link'], '</li>
-									<li class="sp_list_indent', empty($board['is_last']) ? ' sp_list_bottom' : '', ' smalltext">', $txt['topics'], ': ', comma_format($board['num_topics']), ' | ', $txt['posts'], ': ', comma_format($board['num_posts']), '</li>';
+									<li class="sp_list_indent', empty($board['is_last']) ? ' sp_list_bottom' : '', ' smalltext">', $txt['topics'], ': ', $board['num_topics'], ' | ', $txt['posts'], ': ', $board['num_posts'], '</li>';
 
 	echo '
 								</ul>';
@@ -1356,11 +1356,9 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	foreach ($return as $news)
 	{
 		echo '
-				<div class="cat_bar">
-					<h3 class="catbg">
-						<span class="sp_float_left sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
-					</h3>
-				</div>
+				<h3 class="category_header">
+					<span class="sp_float_left sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
+				</h3>
 				<div class="windowbg sp_article_content">
 					<div class="sp_content_padding">';
 

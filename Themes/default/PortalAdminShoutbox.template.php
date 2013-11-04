@@ -17,11 +17,9 @@ function template_shoutbox_edit()
 	echo '
 	<div id="sp_edit_shoutbox">
 		<form  id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalshoutbox;sa=edit" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $context['page_title'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				', $context['page_title'], '
+			</h3>
 			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">
@@ -152,11 +150,9 @@ function template_shoutbox_prune()
 	echo '
 	<div id="sp_prune_shoutbox">
 		<form  id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalshoutbox;sa=prune" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $context['page_title'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				', $context['page_title'], '
+			</h3>
 			<div class="windowbg2">
 				<div class="sp_content_padding">
 					<dl class="sp_form">
@@ -206,11 +202,9 @@ function template_shoutbox_block_redirect()
 
 	echo '
 	<div id="sp_shoutbox_redirect">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $context['page_title'], '
-			</h3>
-		</div>
+		<h3 class="category_header">
+			', $context['page_title'], '
+		</h3>
 		<div class="windowbg">
 			<div class="sp_content_padding">
 				', $context['redirect_message'], '

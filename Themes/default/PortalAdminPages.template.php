@@ -30,11 +30,9 @@ function template_pages_edit()
 	echo '
 	<div id="sp_edit_page">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalpages;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $context['SPortal']['is_new'] ? $txt['sp_admin_pages_add'] : $txt['sp_admin_pages_edit'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				', $context['SPortal']['is_new'] ? $txt['sp_admin_pages_add'] : $txt['sp_admin_pages_edit'], '
+			</h3>
 			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">
@@ -135,11 +133,9 @@ function template_pages_edit()
 
 	echo '
 			<br />
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['sp_admin_pages_style'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				', $txt['sp_admin_pages_style'], '
+			</h3>
 			<div class="windowbg2">
 				<div class="sp_content_padding">';
 

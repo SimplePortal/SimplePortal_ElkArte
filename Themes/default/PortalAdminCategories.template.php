@@ -17,11 +17,9 @@ function template_categories_edit()
 	echo '
 	<div id="sp_edit_category">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalcategories;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $context['page_title'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				', $context['page_title'], '
+			</h3>
 			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">

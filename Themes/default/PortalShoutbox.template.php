@@ -9,6 +9,7 @@
  *
  * @version 2.4
  */
+
 function template_shoutbox_all()
 {
 	template_shoutbox_all_default();
@@ -22,11 +23,9 @@ function template_shoutbox_all_default()
 	global $context, $txt;
 
 	echo '
-	<div class="cat_bar">
-		<h3 class="catbg">
-			', $context['SPortal']['shoutbox']['name'], '
-		</h3>
-	</div>
+	<h3 class="category_header">
+		', $context['SPortal']['shoutbox']['name'], '
+	</h3>
 	<div class="windowbg">
 		<div class="sp_content_padding">';
 
@@ -200,11 +199,9 @@ function template_shoutbox_embed($shoutbox)
 						</head>
 						<body id="help_popup">
 							<div class="padding windowbg">
-								<div class="cat_bar">
-									<h3 class="catbg">
-										' . $txt['more_smileys_pick'] . '
-									</h3>
-								</div>
+								<h3 class="category_header">
+									' . $txt['more_smileys_pick'] . '
+								</h3>
 								<div class="padding">
 									%smileyRows%
 								</div>

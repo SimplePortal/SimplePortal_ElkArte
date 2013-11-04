@@ -23,11 +23,9 @@ function template_portal_index()
 	foreach ($context['articles'] as $article)
 	{
 		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $article['link'], '
-			</h3>
-		</div>
+		<h3 class="category_header">
+			', $article['link'], '
+		</h3>
 		<div class="windowbg2">
 			<div class="sp_content_padding">
 				<span>', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '</span>

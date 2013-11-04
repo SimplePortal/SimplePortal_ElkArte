@@ -16,11 +16,9 @@ function template_view_categories()
 
 	echo '
 	<div id="sp_view_categories">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $context['page_title'], '
-			</h3>
-		</div>';
+		<h3 class="category_header">
+			', $context['page_title'], '
+		</h3>';
 
 	if (empty($context['categories']))
 	{
@@ -52,11 +50,9 @@ function template_view_category()
 
 	echo '
 	<div id="sp_view_category">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $context['page_title'], '
-			</h3>
-		</div>';
+		<h3 class="category_header">
+			', $context['page_title'], '
+		</h3>';
 
 	if (empty($context['articles']))
 	{

@@ -32,11 +32,9 @@ function template_articles_edit()
 	echo '
 	<div id="sp_edit_article">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalarticles;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $context['is_new'] ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				', $context['is_new'] ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'], '
+			</h3>
 			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">

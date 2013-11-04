@@ -17,11 +17,9 @@ function template_permission_profiles_edit()
 	echo '
 	<div id="sp_edit_profile">
 		<form action="', $scripturl, '?action=admin;area=portalprofiles;sa=editpermission" method="post" accept-charset="', $context['character_set'], '" onsubmit="submitonce(this);">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $context['page_title'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				', $context['page_title'], '
+			</h3>
 			<div class="windowbg2">
 				<span class="topslice"><span></span></span>
 				<div class="sp_content_padding">
