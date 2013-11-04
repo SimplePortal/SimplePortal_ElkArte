@@ -246,7 +246,10 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		if (!empty($_REQUEST['content_mode']) && $_POST['type'] == 'bbc')
 		{
-			$_REQUEST['content'] = html_to_bbc($_REQUEST['content']);
+			require_once(SUBSDIR . 'Html2BBC.class.php');
+			$bbc_converter = new Convert_BBC($_REQUEST['content']);
+			$_REQUEST['content'] = $bbc_converter->get_bbc();
+
 			$_REQUEST['content'] = un_htmlspecialchars($_REQUEST['content']);
 			$_POST['content'] = $_REQUEST['content'];
 		}
@@ -368,7 +371,8 @@ class ManagePortalPages_Controller extends Action_Controller
 				'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
 				'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
 				'type' => in_array($_POST['type'], array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
-				'permissions' => (int) $_POST['permissions'],				'style' => sportal_parse_style('implode'),
+				'permissions' => (int) $_POST['permissions'],
+				'style' => sportal_parse_style('implode'),
 				'status' => !empty($_POST['status']) ? 1 : 0,
 			);
 

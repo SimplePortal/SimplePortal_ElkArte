@@ -226,8 +226,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			// If we came from WYSIWYG then turn it back into BBC regardless.
 			if (!empty($_REQUEST['bbc_' . $_POST['bbc_name'] . '_mode']) && isset($_POST['parameters'][$_POST['bbc_name']]))
 			{
-				require_once(SUBSDIR . '/Editor.subs.php');
-				$_POST['parameters'][$_POST['bbc_name']] = html_to_bbc($_POST['parameters'][$_POST['bbc_name']]);
+				require_once(SUBSDIR . 'Html2BBC.class.php');
+				$bbc_converter = new Convert_BBC($_POST['parameters'][$_POST['bbc_name']]);
+				$_POST['parameters'][$_POST['bbc_name']] = $bbc_converter->get_bbc();
 
 				// We need to unhtml it now as it gets done shortly.
 				$_POST['parameters'][$_POST['bbc_name']] = un_htmlspecialchars($_POST['parameters'][$_POST['bbc_name']]);

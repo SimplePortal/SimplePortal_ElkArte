@@ -270,10 +270,12 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		$context['is_new'] = empty($_REQUEST['article_id']);
 
-		// @todo we don't have html_to_bbc anylonger
+		// Convert this to BBC?
 		if (!empty($_REQUEST['content_mode']) && $_POST['type'] == 'bbc')
 		{
-			$_REQUEST['content'] = html_to_bbc($_REQUEST['content']);
+			require_once(SUBSDIR . 'Html2BBC.class.php');
+			$bbc_converter = new Convert_BBC($_REQUEST['content']);
+			$_REQUEST['content'] = $bbc_converter->get_bbc();
 			$_REQUEST['content'] = un_htmlspecialchars($_REQUEST['content']);
 			$_POST['content'] = $_REQUEST['content'];
 		}
