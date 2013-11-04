@@ -764,7 +764,7 @@ function sp_load_profiles($start, $items_per_page, $sort)
 	$db = database();
 
 	// First load up all of the permission profiles names in the system
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT id_profile, name
 		FROM {db_prefix}sp_profiles
 		ORDER BY {raw:sort}
@@ -793,9 +793,9 @@ function sp_load_profiles($start, $items_per_page, $sort)
 	// Now for each profile, load up the specific permisssions for each area of the portal
 	foreach (array('articles', 'blocks', 'categories', 'pages', 'shoutboxes') as $module)
 	{
-		$request = $db->query('','
+		$request = $db->query('', '
 			SELECT permissions, COUNT(*) AS used
-			FROM smf_sp_{raw:module}
+			FROM {db_prefix}sp_{raw:module}
 			GROUP BY permissions',
 			array(
 				'module' => $module,
