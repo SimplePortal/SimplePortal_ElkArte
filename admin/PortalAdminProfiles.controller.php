@@ -27,26 +27,22 @@ class ManagePortalProfile_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		// You are allowed here yes?
-		if (!allowedTo('sp_admin'))
-			isAllowedTo('sp_manage_profiles');
-
 		// Helpers
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
 		loadTemplate('PortalAdminProfiles');
 
 		// What can we do
 		$subActions = array(
-			'listpermission' => 'sportal_admin_permission_profiles_list',
-			'addpermission' => 'sportal_admin_permission_profiles_edit',
-			'editpermission' => 'sportal_admin_permission_profiles_edit',
-			'deletepermission' => 'sportal_admin_permission_profiles_delete',
+			'listpermission' =>  array($this, 'action_sportal_admin_permission_profiles_list', 'permission' => 'sp_manage_profiles'),
+			'addpermission' =>  array($this, 'action_sportal_admin_permission_profiles_edit', 'permission' => 'sp_manage_profiles'),
+			'editpermission' =>  array($this, 'action_sportal_admin_permission_profiles_edit', 'permission' => 'sp_manage_profiles'),
+			'deletepermission' =>  array($this, 'action_sportal_admin_permission_profiles_delete', 'permission' => 'sp_manage_profiles'),
 		);
 
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'listpermission';
 		$context['sub_action'] = $subAction;
 
-		// Lead some breadcrumbs so we knwo our way back
+		// Leave some breadcrumbs so we know our way back
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['sp_admin_profiles_title'],
 			'help' => 'sp_ProfilesArea',
@@ -59,7 +55,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			),
 		);
 
-		// Call the right function for this sub-action.
+		// Call the right function for this sub-action, if you have permission
 		$action = new Action();
 		$action->initialize($subActions, 'listpermission');
 		$action->dispatch($subAction);
@@ -68,9 +64,9 @@ class ManagePortalProfile_Controller extends Action_Controller
 	/**
 	 * Show page listing of all premission groups in the system
 	 */
-	function sportal_admin_permission_profiles_list()
+	function action_sportal_admin_permission_profiles_list()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $scripturl, $txt, $modSettings;
 
 		// Removing some permission profiles?
 		if (!empty($_POST['remove_profiles']) && !empty($_POST['remove']) && is_array($_POST['remove']))
@@ -116,7 +112,9 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'value' => $txt['sp_admin_profiles_col_articles'],
 					),
 					'data' => array(
-						'db' => 'article_id',
+						'function' => create_function('$row', '
+							return empty($row[\'articles\']) ? \'\' : $row[\'articles\'];
+						'),
 					),
 				),
 				'blocks' => array(
@@ -124,7 +122,9 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'value' => $txt['sp_admin_profiles_col_blocks'],
 					),
 					'data' => array(
-						'db' => 'article_id',
+						'function' => create_function('$row', '
+							return empty($row[\'blocks\']) ? \'\' : $row[\'blocks\'];
+						'),
 					),
 				),
 				'categories' => array(
@@ -132,7 +132,9 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'value' => $txt['sp_admin_profiles_col_categories'],
 					),
 					'data' => array(
-						'db' => 'article_id',
+						'function' => create_function('$row', '
+							return empty($row[\'categories\']) ? \'\' : $row[\'categories\'];
+						'),
 					),
 				),
 				'pages' => array(
@@ -140,7 +142,9 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'value' => $txt['sp_admin_profiles_col_pages'],
 					),
 					'data' => array(
-						'db' => 'article_id',
+						'function' => create_function('$row', '
+							return empty($row[\'pages\']) ? \'\' : $row[\'pages\'];
+						'),
 					),
 				),
 				'shoutboxes' => array(
@@ -148,7 +152,9 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'value' => $txt['sp_admin_profiles_col_shoutboxes'],
 					),
 					'data' => array(
-						'db' => 'article_id',
+						'function' => create_function('$row', '
+							return empty($row[\'shoutboxes\']) ? \'\' : $row[\'shoutboxes\'];
+						'),
 					),
 				),
 				'action' => array(
@@ -158,8 +164,8 @@ class ManagePortalProfile_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=portalarticles;sa=edit;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
-								<a href="?action=admin;area=portalarticles;sa=delete;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_articles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+							'format' => '<a href="?action=admin;area=portalprofiles;sa=editpermission;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
+								<a href="?action=admin;area=portalprofiles;sa=deletepermission;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_articles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
 								'id' => true,
 							),
@@ -174,7 +180,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => create_function('$row', '
 							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
 						'),
 						'class' => 'centertext',
@@ -189,14 +195,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 					$context['session_var'] => $context['session_id'],
 				),
 			),
-			'additional_rows' => array(
-				array(
-					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="remove_articles" value="' . $txt['sp_admin_articles_remove'] . '" class="right_submit" />',
-				),
-			),
 		);
-
 
 		// Set the context values
 		$context['page_title'] = $txt['sp_admin_permission_profiles_list'];
@@ -232,7 +231,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 		return sp_load_profiles($start, $items_per_page, $sort);
 	}
 
-	function sportal_admin_permission_profiles_edit()
+	function action_sportal_admin_permission_profiles_edit()
 	{
 		global $context, $txt;
 
@@ -328,7 +327,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 		$context['sub_template'] = 'permission_profiles_edit';
 	}
 
-	function sportal_admin_permission_delete()
+	function action_sportal_admin_permission_delete()
 	{
 		$db = database();
 
