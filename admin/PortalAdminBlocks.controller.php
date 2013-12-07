@@ -154,6 +154,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				if ($context['sub_action'] != $side)
 					unset($context['sides'][$side]);
 			}
+
 			$context['sp_blocks_single_side_list'] = true;
 		}
 
@@ -1017,6 +1018,10 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	 * Pass this off to the state change function
 	 */
 	public function action_sportal_admin_state_change() {
-		sportal_admin_state_change();
+
+		$id = (int) $_REQUEST['block_id'];
+		$type = $_REQUEST['type'];
+
+		sportal_admin_state_change($type, $id);
 	}
 }
