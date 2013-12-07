@@ -63,7 +63,8 @@ function sp_integrate_admin_areas(&$admin_areas)
 						'file' => 'PortalAdminMain.controller.php',
 						'controller' => 'ManagePortalConfig_Controller',
 						'function' => 'action_index',
-						'icon' => 'configuration.png',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_corefeatures',
 						'permission' => array('sp_admin', 'sp_manage_settings'),
 						'subsections' => array(
 							'information' => array($txt['sp-info_title']),
@@ -95,7 +96,8 @@ function sp_integrate_admin_areas(&$admin_areas)
 						'file' => 'PortalAdminArticles.controller.php',
 						'controller' => 'ManagePortalArticles_Controller',
 						'function' => 'action_index',
-						'icon' => 'articles.png',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_news',
 						'permission' => array('sp_admin', 'sp_manage_articles'),
 						'subsections' => array(
 							'list' => array($txt['sp_admin_articles_list']),
@@ -119,7 +121,8 @@ function sp_integrate_admin_areas(&$admin_areas)
 						'file' => 'PortalAdminPages.controller.php',
 						'controller' => 'ManagePortalPages_Controller',
 						'function' => 'action_index',
-						'icon' => 'pages.png',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_posts',
 						'permission' => array('sp_admin', 'sp_manage_pages'),
 						'subsections' => array(
 							'list' => array($txt['sp_admin_pages_list']),
@@ -131,7 +134,8 @@ function sp_integrate_admin_areas(&$admin_areas)
 						'file' => 'PortalAdminShoutbox.controller.php',
 						'controller' => 'ManagePortalShoutbox_Controller',
 						'function' => 'action_index',
-						'icon' => 'shoutbox.png',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_smiley',
 						'permission' => array('sp_admin', 'sp_manage_shoutbox'),
 						'subsections' => array(
 							'list' => array($txt['sp_admin_shoutbox_list']),
@@ -143,7 +147,8 @@ function sp_integrate_admin_areas(&$admin_areas)
 						'file' => 'PortalAdminProfiles.controller.php',
 						'controller' => 'ManagePortalProfile_Controller',
 						'function' => 'action_index',
-						'icon' => 'profiles.png',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_permissions',
 						'permission' => array('sp_admin', 'sp_manage_profiles'),
 						'subsections' => array(
 							'listpermission' => array($txt['sp_admin_permission_profiles_list']),
