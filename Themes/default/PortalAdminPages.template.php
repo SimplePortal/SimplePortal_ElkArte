@@ -127,8 +127,8 @@ function template_pages_edit()
 	$style_sections = array('title' => 'left', 'body' => 'right');
 	$style_types = array('default' => 'DefaultClass', 'class' => 'CustomClass', 'style' => 'CustomStyle');
 	$style_parameters = array(
-		'title' => array('catbg', 'catbg2', 'catbg3', 'titlebg', 'titlebg2'),
-		'body' => array('windowbg',  'windowbg2', 'windowbg3', 'information', 'roundframe'),
+		'title' => array('category_header', 'secondary_header'),
+		'body' => array('windowbg',  'windowbg2', 'information', 'roundframe'),
 	);
 
 	echo '

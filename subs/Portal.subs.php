@@ -855,7 +855,7 @@ function sportal_parse_style($action, $setting = '', $process = false)
 		else
 		{
 			$style = array(
-				'title_default_class' => 'catbg',
+				'title_default_class' => 'category_header',
 				'title_custom_class' => '',
 				'title_custom_style' => '',
 				'body_default_class' => 'windowbg',

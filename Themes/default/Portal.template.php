@@ -206,7 +206,7 @@ function template_block_default($block)
 
 		if (empty($block['force_view']))
 			echo '
-			<a class="sp_float_right" style="padding-top: 7px;" href="javascript:void(0);" onclick="sp_collapseBlock(\'', $block['id'], '\')"><img id="sp_collapse_', $block['id'], '" src="', $settings['images_url'], $block['collapsed'] ? '/expand.png' : '/collapse.png', '" alt="*" /></a>';
+			<a class="sp_float_right" href="javascript:void(0);" onclick="sp_collapseBlock(\'', $block['id'], '\')"><img id="sp_collapse_', $block['id'], '" src="', $settings['images_url'], $block['collapsed'] ? '/expand.png' : '/collapse.png', '" alt="*" /></a>';
 
 		echo '
 			', parse_bbc($block['label']), '

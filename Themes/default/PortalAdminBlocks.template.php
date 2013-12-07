@@ -17,7 +17,7 @@
  */
 function template_block_list()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="sp_manage_blocks">';
@@ -34,9 +34,7 @@ function template_block_list()
 		echo '
 		<h3 class="category_header">
 			<a class="sp_float_right" href="', $scripturl, '?action=admin;area=portalblocks;sa=add;col=', $side['id'], '">', sp_embed_image('add', sprintf($txt['sp-blocksCreate'], $side['label'])), '</a>
-			<a href="', $scripturl, '?action=quickhelp;help=', $side['help'], '" onclick="return reqOverlayDiv(this.href);" class="help">
-				<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
-			</a>
+			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=', $side['help'], '" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 			<a href="', $scripturl, '?action=admin;area=portalblocks;sa=', $id, '">', $side['label'], ' ', $txt['sp-blocksBlocks'], '</a>
 		</h3>
 		<table class="table_grid">
@@ -123,9 +121,7 @@ function template_block_edit()
 	<div id="sp_edit_block">
 		<form id="admin_form_wrapper" name="sp_edit_block_form" id="sp_edit_block_form" action="', $scripturl, '?action=admin;area=portalblocks;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=sp-blocks', $context['SPortal']['is_new'] ? 'Add' : 'Edit', '" onclick="return reqOverlayDiv(this.href);" class="help">
-					<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
-				</a>
+				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=sp-blocks', $context['SPortal']['is_new'] ? 'Add' : 'Edit', '" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 				', $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'], '
 			</h3>
 			<div class="windowbg">
@@ -205,6 +201,7 @@ function template_block_edit()
 				foreach ($context['SPortal']['block']['board_options'][$name] as $option)
 					echo '
 								<option value="', $option['value'], '"', ($option['selected'] ? ' selected="selected"' : ''), ' >', $option['text'], '</option>';
+
 				echo '
 							</select>';
 		}
@@ -236,7 +233,7 @@ function template_block_edit()
 				echo '
 							<select name="parameters[', $name, ']" id="', $name, '">';
 
-				foreach ($type as $key => $option)
+				foreach ($tsp_manage_blockssp_manage_blocksspype as $key => $option)
 					echo '
 								<option value="', $key, '"', $context['SPortal']['block']['parameters'][$name] == $key ? ' selected="selected"' : '', '>', $option, '</option>';
 
@@ -347,9 +344,7 @@ function template_block_edit()
 		echo '
 			<br />
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=sp-blocksDisplayOptions" onclick="return reqOverlayDiv(this.href);" class="help">
-					<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
-				</a>
+				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=sp-blocksDisplayOptions" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 				', $txt['sp-blocksDisplayOptions'], '
 			</h3>
 			<div class="windowbg2">
@@ -408,8 +403,8 @@ function template_block_edit()
 	$style_sections = array('title' => 'left', 'body' => 'right');
 	$style_types = array('default' => 'DefaultClass', 'class' => 'CustomClass', 'style' => 'CustomStyle');
 	$style_parameters = array(
-		'title' => array('catbg', 'catbg2', 'catbg3', 'titlebg', 'titlebg2'),
-		'body' => array('windowbg',  'windowbg2', 'windowbg3', 'information', 'roundframe'),
+		'title' => array('category_header', 'secondary_header'),
+		'body' => array('windowbg', 'windowbg2', 'information', 'roundframe'),
 	);
 
 	// Style options for the block, but not boardNews
@@ -418,9 +413,7 @@ function template_block_edit()
 		echo '
 			<br />
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=sp-blocksStyleOptions" onclick="return reqOverlayDiv(this.href);" class="help">
-					<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
-				</a>
+				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=sp-blocksStyleOptions" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 				', $txt['sp-blocksStyleOptions'], '
 			</h3>
 			<div class="windowbg2">
@@ -498,9 +491,7 @@ function template_block_select_type()
 	echo '
 	<div id="sp_select_block_type">
 		<h3 class="category_header">
-			<a href="', $scripturl, '?action=quickhelp;help=sp-blocksSelectType" onclick="return reqOverlayDiv(this.href);" class="help">
-				<img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" />
-			</a>
+			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=sp-blocksSelectType" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 			', $txt['sp-blocksSelectType'], '
 		</h3>
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalblocks;sa=add" method="post" accept-charset="UTF-8">
