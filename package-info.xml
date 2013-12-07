@@ -16,7 +16,7 @@
 	<name>SimplePortal</name>
 	<version>2.4</version>
 	<type>modification</type>
-	<install for="1.0 Alpha - 1.0.99">
+	<install for="1.0 Beta - 1.0.99">
 		<readme type="inline">This will install SimplePortal 2.4 for Elkarte.</readme>
 		<modification>modification.xml</modification>
 		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
@@ -39,7 +39,7 @@
 		<hook hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SOURCEDIR/PortalIntegration.subs.php"/>
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
-	<uninstall for="1.0 Alpha - 1.0.99">
+	<uninstall for="1.0 Beta - 1.0.99">
 		<readme type="inline">This will uninstall SimplePortal 2.4 for Elkarte.</readme>
 		<hook reverse="true" hook="integrate_theme_include" file="LANGUAGEDIR/SPortal.english.php" />
 		<hook reverse="true" hook="integrate_load_theme" function="sportal_init" />
@@ -82,9 +82,9 @@
 		<remove-file name="$themedir/PortalAdminShoutbox.template.php" />
 		<remove-file name="$themedir/PortalAdminProfiles.template.php" />
 		<remove-file name="$themedir/PortalAdminCategories.template.php" />
-		<remove-file name="LANGUAGEDIR/SPortal.english.php" />
-		<remove-file name="LANGUAGEDIR/SPortalAdmin.english.php" />
-		<remove-file name="LANGUAGEDIR/SPortalHelp.english.php" />
+		<remove-file name="LANGUAGEDIR/english/SPortal.english.php" />
+		<remove-file name="LANGUAGEDIR/english/SPortalAdmin.english.php" />
+		<remove-file name="LANGUAGEDIR/english/SPortalHelp.english.php" />
 		<remove-dir name="$imagesdir/sp" />
 		<remove-file name="$imagesdir/admin/configuration.png" />
 		<remove-file name="$imagesdir/admin/articles.png" />
