@@ -52,34 +52,39 @@ function template_pages_edit()
 							<label for="page_type">', $txt['sp_admin_pages_col_type'], ':</label>
 						</dt>
 						<dd>
-							<select name="type" id="page_type" onchange="sp_update_editor();">';
+							<div class="styled-select">
+								<select name="type" id="page_type" onchange="sp_update_editor();">';
 
 	$content_types = array('bbc', 'html', 'php');
 	foreach ($content_types as $type)
 		echo '
-								<option value="', $type, '"', $context['SPortal']['page']['type'] == $type ? ' selected="selected"' : '', '>', $txt['sp_pages_type_' . $type], '</option>';
+									<option value="', $type, '"', $context['SPortal']['page']['type'] == $type ? ' selected="selected"' : '', '>', $txt['sp_pages_type_' . $type], '</option>';
 
 	echo '
-							</select>
+								</select>
+							</div>
 						</dd>
 						<dt>
 							<label for="page_permissions">', $txt['sp_admin_pages_col_permissions'], ':</label>
 						</dt>
 						<dd>
-							<select name="permissions" id="page_permissions">';
+							<div class="styled-select">
+								<select name="permissions" id="page_permissions">';
 
 	foreach ($context['SPortal']['page']['permission_profiles'] as $profile)
 		echo '
-								<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['page']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+									<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['page']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
 
 	echo '
-							</select>
+								</select>
+							</div>
 						</dd>
 						<dt>
 							<label for="page_blocks">', $txt['sp_admin_pages_col_blocks'], ':</label>
 						</dt>
 						<dd>
-							<select name="blocks[]" id="page_blocks" size="7" multiple="multiple">';
+							<div class="styled-select">
+								<select name="blocks[]" id="page_blocks" size="7" multiple="multiple">';
 
 	foreach ($context['sides'] as $side => $label)
 	{
@@ -87,19 +92,20 @@ function template_pages_edit()
 			continue;
 
 		echo '
-								<optgroup label="', $label, '">';
+									<optgroup label="', $label, '">';
 
 		foreach ($context['page_blocks'][$side] as $block)
 		{
 			echo '
-									<option value="', $block['id'], '"', $block['shown'] ? ' selected="selected"' : '', '>', $block['label'], '</option>';
+										<option value="', $block['id'], '"', $block['shown'] ? ' selected="selected"' : '', '>', $block['label'], '</option>';
 		}
 
 		echo '
-								</optgroup>';
+									</optgroup>';
 	}
 
 	echo '
+								</div>
 							</select>
 						</dd>
 						<dt>
@@ -155,14 +161,16 @@ function template_pages_edit()
 			if ($type == 'default')
 			{
 				echo '
-							<select name="', $section, '_default_class" id="', $section, '_default_class">';
+							<div class="styled-select">
+								<select name="', $section, '_default_class" id="', $section, '_default_class">';
 
 				foreach ($style_parameters[$section] as $class)
 					echo '
-								<option value="', $class, '"', $context['SPortal']['page']['style'][$section . '_default_class'] == $class ? ' selected="selected"' : '', '>', $class, '</option>';
+									<option value="', $class, '"', $context['SPortal']['page']['style'][$section . '_default_class'] == $class ? ' selected="selected"' : '', '>', $class, '</option>';
 
 				echo '
-							</select>';
+								</select>
+							</div>';
 			}
 			else
 				echo '

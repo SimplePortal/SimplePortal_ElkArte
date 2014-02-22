@@ -36,6 +36,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Portal.subs.php');
 		loadTemplate('PortalAdminArticles');
 
+		// This are all the actions that we know
 		$subActions = array(
 			'list' => array($this, 'action_sportal_admin_article_list'),
 			'add' => array($this, 'action_sportal_admin_article_edit'),
@@ -49,6 +50,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$context['sub_action'] = $subAction;
 
 		// Set up the tab data
+		$context['sub_action'] = $subAction;
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['sp_admin_articles_title'],
 			'help' => 'sp_ArticlesArea',
@@ -61,7 +63,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			),
 		);
 
-		// Call the right function for this sub-action.
+		// Call the right function for this sub-action
 		$action = new Action();
 		$action->initialize($subActions, 'list');
 		$action->dispatch($subAction);
@@ -74,7 +76,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
-		// build the listoption array to display the categories
+		// Build the listoption array to display the categories
 		$listOptions = array(
 			'id' => 'portal_articles',
 			'title' => $txt['sp_admin_articles_list'],
@@ -261,7 +263,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 */
 	public function action_sportal_admin_article_edit()
 	{
-		global $context, $modSettings, $user_info, $options, $txt;
+		global $context, $modSettings, $user_info, $options, $txt, $scripturl;
 
 		$db = database();
 
@@ -280,10 +282,12 @@ class ManagePortalArticles_Controller extends Action_Controller
 			$_POST['content'] = $_REQUEST['content'];
 		}
 
+		// Saving the work?
 		if (!empty($_POST['submit']))
 		{
 			checkSession();
 
+			// If its not new, lets get the current data
 			if (!$context['is_new'])
 			{
 				$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
@@ -297,7 +301,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 				fatal_lang_error('sp_error_article_namespace_empty', false);
 
 			$result = $db->query('', '
-				SELECT id_article
+				SELECT
+					id_article
 				FROM {db_prefix}sp_articles
 				WHERE namespace = {string:namespace}
 					AND id_article != {int:current}
@@ -320,7 +325,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			if (preg_replace('~[0-9]+~', '', $_POST['namespace']) === '')
 				fatal_lang_error('sp_error_article_namespace_numeric', false);
 
-			if ($_POST['type'] == 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
+			if ($_POST['type'] === 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
 			{
 				require_once(SUBSDIR . '/DataValidator.class.php');
 
@@ -354,9 +359,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 				'status' => !empty($_POST['status']) ? 1 : 0,
 			);
 
-			if ($article_info['type'] == 'bbc')
+			if ($article_info['type'] === 'bbc')
 				preparsecode($article_info['body']);
 
+			// A brand new article
 			if ($context['is_new'])
 			{
 				unset($article_info['id']);
@@ -373,6 +379,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 					'date' => time(),
 				));
 
+				// Add the new article to the system
 				$db->insert('', '
 					{db_prefix}sp_articles',
 					$fields,
@@ -381,6 +388,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 				);
 				$article_info['id'] = $db->insert_id('{db_prefix}sp_articles', 'id_article');
 			}
+			// Editing we update what was there
 			else
 			{
 				$update_fields = array();

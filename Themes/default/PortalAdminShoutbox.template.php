@@ -33,14 +33,16 @@ function template_shoutbox_edit()
 							<label for="shoutbox_permissions">', $txt['sp_admin_shoutbox_col_permissions'], ':</label>
 						</dt>
 						<dd>
-							<select name="permissions" id="shoutbox_permissions">';
+							<div class="styled-select">
+								<select name="permissions" id="shoutbox_permissions">';
 
 	foreach ($context['SPortal']['shoutbox']['permission_profiles'] as $profile)
 		echo '
-								<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['shoutbox']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+									<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['shoutbox']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
 
 	echo '
-							</select>
+								</select>
+							</div>
 						</dd>
 						<dt>
 							', $txt['sp_admin_shoutbox_col_moderators'], ':
@@ -81,15 +83,17 @@ function template_shoutbox_edit()
 							<label for="shoutbox_bbc">', $txt['sp_admin_shoutbox_col_bbc'], ':</label>
 						</dt>
 						<dd>
-							<select name="allowed_bbc[]" id="shoutbox_bbc" size="7" multiple="multiple">';
+							<div class="styled-select">
+								<select name="allowed_bbc[]" id="shoutbox_bbc" size="7" multiple="multiple">';
 
 	foreach ($context['allowed_bbc'] as $tag => $label)
 		if (!isset($context['disabled_tags'][$tag]))
 			echo '
-								<option value="', $tag, '"', in_array($tag, $context['SPortal']['shoutbox']['allowed_bbc']) ? ' selected="selected"' : '', '>[', $tag, '] - ', $label, '</option>';
+									<option value="', $tag, '"', in_array($tag, $context['SPortal']['shoutbox']['allowed_bbc']) ? ' selected="selected"' : '', '>[', $tag, '] - ', $label, '</option>';
 
 	echo '
-							</select>
+								</select>
+							</div>
 						</dd>
 						<dt>
 							<label for="shoutbox_height">', $txt['sp_admin_shoutbox_col_height'], '</label>

@@ -54,41 +54,47 @@ function template_articles_edit()
 							<label for="article_category">', $txt['sp_admin_articles_col_category'], ':</label>
 						</dt>
 						<dd>
-							<select name="category_id" id="article_category">';
+							<div class="styled-select">
+								<select name="category_id" id="article_category">';
 
 	foreach ($context['article']['categories'] as $category)
 		echo '
-								<option value="', $category['id'], '"', $context['article']['category']['id'] == $category['id'] ? ' selected="selected"' : '', '>', $category['name'], '</option>';
+									<option value="', $category['id'], '"', $context['article']['category']['id'] == $category['id'] ? ' selected="selected"' : '', '>', $category['name'], '</option>';
 
 	echo '
-							</select>
+								</select>
+							</div>
 						</dd>
 						<dt>
 							<label for="article_type">', $txt['sp_admin_articles_col_type'], ':</label>
 						</dt>
 						<dd>
-							<select name="type" id="article_type" onchange="sp_update_editor();">';
+							<div class="styled-select">
+								<select name="type" id="article_type" onchange="sp_update_editor();">';
 
 	$content_types = array('bbc', 'html', 'php');
 	foreach ($content_types as $type)
 		echo '
-								<option value="', $type, '"', $context['article']['type'] == $type ? ' selected="selected"' : '', '>', $txt['sp_articles_type_' . $type], '</option>';
+									<option value="', $type, '"', $context['article']['type'] == $type ? ' selected="selected"' : '', '>', $txt['sp_articles_type_' . $type], '</option>';
 
 	echo '
-							</select>
+								</select>
+							</div>
 						</dd>
 						<dt>
 							<label for="article_permissions">', $txt['sp_admin_articles_col_permissions'], ':</label>
 						</dt>
 						<dd>
-							<select name="permission_set" id="article_permission_set" onchange="sp_update_permissions();">';
+							<div class="styled-select">
+								<select name="permission_set" id="article_permission_set" onchange="sp_update_permissions();">';
 
 	foreach ($context['article']['permission_profiles'] as $profile)
 		echo '
-								<option value="', $profile['id'], '"', $profile['id'] == $context['article']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+									<option value="', $profile['id'], '"', $profile['id'] == $context['article']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
 
 	echo '
-							</select>
+								</select>
+							</div>
 						</dd>
 						<dt>
 							<label for="article_status">', $txt['sp_admin_articles_col_status'], ':</label>

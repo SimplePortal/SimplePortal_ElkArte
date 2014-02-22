@@ -35,8 +35,6 @@ class Shoutbox_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $user_info;
 
-		$db = database();
-
 		// ID of the shoutbox we are working on and timestamp
 		$shoutbox_id = !empty($_REQUEST['shoutbox_id']) ? (int) $_REQUEST['shoutbox_id'] : 0;
 		$request_time = !empty($_REQUEST['time']) ? (int) $_REQUEST['time'] : 0;

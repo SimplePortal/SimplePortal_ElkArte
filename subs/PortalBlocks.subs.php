@@ -35,7 +35,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 	if ($context['user']['is_guest'])
 	{
 		echo '
-									<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/sha1.js"></script>
+									<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/sha256.js"></script>
 									<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', ' >
 										<table>
 											<tr>

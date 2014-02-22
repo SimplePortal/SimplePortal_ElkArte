@@ -102,14 +102,14 @@ class ManagePortalConfig_Controller extends Action_Controller
 			$context['SPortal']['themes'][$row['id_theme']] = $row['name'];
 		$db->free_result($request);
 
-		// initialize the form
-		$this->_initGeneralSettingsForm();
-		$config_vars = $this->_generalSettingsForm->settings();
-
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(ADMINDIR . '/ManagePermissions.controller.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
 		require_once(SUBSDIR . '/Settings.class.php');
+
+		// Initialize the form
+		$this->_initGeneralSettingsForm();
+		$config_vars = $this->_generalSettingsForm->settings();
 
 		if (isset($_GET['save']))
 		{
@@ -135,7 +135,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_generalSettingsForm = new Settings_Form();
 
 		$config_vars = array(
@@ -162,14 +162,14 @@ class ManagePortalConfig_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt;
 
-		// initialize the form
-		$this->_initBlockSettingsForm();
-		$config_vars = $this->_blockSettingsForm->settings();
-
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(ADMINDIR . '/ManagePermissions.controller.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
 		require_once(SUBSDIR . '/Settings.class.php');
+
+		// Initialize the form
+		$this->_initBlockSettingsForm();
+		$config_vars = $this->_blockSettingsForm->settings();
 
 		if (isset($_GET['save']))
 		{
@@ -255,14 +255,14 @@ class ManagePortalConfig_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt;
 
-		// initialize the form
-		$this->_initArticleSettingsForm();
-		$config_vars = $this->_articleSettingsForm->settings();
-
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(ADMINDIR . '/ManagePermissions.controller.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
 		require_once(SUBSDIR . '/Settings.class.php');
+
+		// Initialize the form
+		$this->_initArticleSettingsForm();
+		$config_vars = $this->_articleSettingsForm->settings();
 
 		// Save away
 		if (isset($_GET['save']))

@@ -127,7 +127,6 @@ function sp_changeState($type = null, $id = null)
 		array(
 			'table' => $query['table'],
 			'column' => $query['column'],
-			'state' => $state,
 			'query_id' => $query['query_id'],
 			'id' => $id,
 			'is_active' => 1,
@@ -403,7 +402,7 @@ function sp_update_category($fields, $data, $is_new = false)
 /**
  * Removes a category or group of categories by id
  *
- * @param array $category_ids
+ * @param int[] $category_ids
  */
 function sp_delete_categories($category_ids = array())
 {
@@ -421,7 +420,7 @@ function sp_delete_categories($category_ids = array())
 		DELETE FROM {db_prefix}sp_articles
 		WHERE id_category IN ({array_int:categories})',
 		array(
-			'categories' => $category_id,
+			'categories' => $category_ids,
 		)
 	);
 }

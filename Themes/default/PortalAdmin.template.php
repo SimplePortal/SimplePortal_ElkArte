@@ -19,7 +19,7 @@ function template_information()
 	<div id="sp_admin_main">
 		<div id="admin_main_section">
 			<div id="sp_live_info" class="sp_float_left">
-				<h3 class="category_header">
+				<h3 class="category_header hdicon cat_img_talk">
 					', $txt['sp-info_live'], '
 				</h3>
 				<div class="windowbg">
@@ -27,7 +27,7 @@ function template_information()
 				</div>
 			</div>
 			<div id="sp_general_info" class="sp_float_right">
-				<h3 class="category_header">
+				<h3 class="category_header hdicon cat_img_config">
 					', $txt['sp-info_general'], '
 				</h3>
 				<div class="windowbg">

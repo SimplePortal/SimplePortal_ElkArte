@@ -238,7 +238,7 @@ function sp_integrate_whos_online($actions)
 			array(
 				'numeric_ids' => $numeric_ids,
 				'string_ids' => $string_ids,
-				'limit' => count($page_ids),
+				'limit' => 1,
 			)
 		);
 		$page_data = array();
@@ -401,4 +401,35 @@ function sp_integrate_menu_buttons(&$buttons)
 			'sub_buttons' => array(),
 		),
 	), 'after');
+}
+
+/**
+ * Redirection hook, integrate_redirect, called from subs.php redirectexit()
+ *
+ * @param type $setLocation
+ * @param type $refresh
+ * @uses redirectexit_callback in subs.php
+ */
+function sp_integrate_redirect(&$setLocation, &$refresh)
+{
+	global $modSettings, $context, $scripturl;
+
+	// Set the default redirect location as the forum or the portal.
+	if ($scripturl == $setLocation && ($modSettings['sp_portal_mode'] == 1 || $modSettings['sp_portal_mode'] == 3))
+	{
+		// Redirect the user to the forum.
+		if (!empty($modSettings['sp_disableForumRedirect']))
+			$setLocation = '?action=forum';
+		// Redirect the user to the SSI.php standalone portal.
+		elseif ($modSettings['sp_portal_mode'] == 3)
+			$setLocation = $context['portal_url'];
+	}
+	// If we are using Search engine friendly URLs then lets do the same for page links
+	elseif (!empty($modSettings['queryless_urls']) && (empty($context['server']['is_cgi']) || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && (!empty($context['server']['is_apache']) || !empty($context['server']['is_lighttpd']) || !empty($context['server']['is_litespeed'])))
+	{
+		if (defined('SID') && SID != '')
+			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:page)=[^#]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
+		else
+			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?((?:page)=[^#"]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
+	}
 }

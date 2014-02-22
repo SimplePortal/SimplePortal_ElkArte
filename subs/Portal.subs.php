@@ -15,12 +15,11 @@ if (!defined('ELK'))
 
 function sportal_init($standalone = false)
 {
-	global $context, $scripturl, $modSettings;
-	global $settings, $maintenance, $sportal_version;
+	global $context, $scripturl, $modSettings, $settings, $maintenance, $sportal_version;
 
 	$sportal_version = '2.4';
 
-	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach')
+	if ((isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach') || isset($_REQUEST['xml']) || isset($_REQUEST['api']))
 		return;
 
 	if (!$standalone)
@@ -158,6 +157,7 @@ function sportal_init_headers()
 	function sp_collapseSide(id)
 	{
 		var sp_sides = new Array();
+
 		sp_sides[1] = "sp_left";
 		sp_sides[4] = "sp_right";
 		mode = document.getElementById(sp_sides[id]).style.display == "" ? 0 : 1;' . ($context['user']['is_guest'] ? '
@@ -187,6 +187,9 @@ function sportal_init_headers()
 	$initialized = true;
 }
 
+/**
+ * Loads the permissions for the profiles
+ */
 function sportal_load_permissions()
 {
 	global $context, $user_info;
@@ -214,10 +217,6 @@ function sportal_load_permissions()
 
 /**
  * Loads all the defined portal blocks in to context
- *
- * @global array $context
- * @global array $modSettings
- * @global array $options
  */
 function sportal_load_blocks()
 {
@@ -522,12 +521,18 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 
 	// Maybe we don't want to show it in somewhere special.
 	if (!empty($exclude['special']))
+	{
 		foreach ($exclude['special'] as $key => $value)
+		{
 			if (isset($_GET[$key]))
+			{
 				if (is_array($value) && !in_array($_GET[$key], $value))
 					continue;
 				else
 					return false;
+			}
+		}
+	}
 
 	// If no display info and/or integration disabled and we are on portal; show it!
 	if ((empty($display) || empty($modSettings['sp_enableIntegration'])) && $portal)
@@ -559,11 +564,15 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 
 	// For mods using weird urls...
 	foreach ($special as $key => $value)
+	{
 		if (isset($_GET[$key]))
+		{
 			if (is_array($value) && !in_array($_GET[$key], $value))
 				continue;
 			else
 				return true;
+		}
+	}
 
 	// Ummm, no block!
 	return false;
@@ -705,7 +714,7 @@ function sp_loadColors($users = array())
 	// Make sure it's an array.
 	$users = !is_array($users) ? array($users) : array_unique($users);
 
-	//Check up the array :)
+	// Check up the array :)
 	foreach ($users as $k => $u)
 	{
 		$u = (int) $u;
@@ -737,6 +746,7 @@ function sp_loadColors($users = array())
 
 	// Correct array pointer for the user
 	reset($users);
+
 	// Load the data.
 	$request = $db->query('', '
 		SELECT
@@ -841,11 +851,10 @@ function sportal_parse_style($action, $setting = '', $process = false)
 	}
 	elseif ($action == 'explode')
 	{
+		$style = array();
 		if (!empty($setting))
 		{
 			$temp = explode('|', $setting);
-			$style = array();
-
 			foreach ($temp as $item)
 			{
 				list ($key, $value) = explode('~', $item);
@@ -1295,7 +1304,7 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_prof
 
 function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = false)
 {
-	global $contex;
+	global $context;
 
 	$db = database();
 

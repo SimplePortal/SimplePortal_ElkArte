@@ -225,7 +225,6 @@ class ManagePortalCategories_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		$db = database();
 		loadTemplate('PortalAdminCategories');
 
 		$context['is_new'] = empty($_REQUEST['category_id']);

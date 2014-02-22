@@ -143,14 +143,16 @@ function template_block_edit()
 							<label for="block_permissions">', $txt['sp_admin_blocks_col_permissions'], ':</label>
 						</dt>
 						<dd>
-							<select name="permissions" id="block_permissions">';
+							<div class="styled-select">
+								<select name="permissions" id="block_permissions">';
 
 	foreach ($context['SPortal']['block']['permission_profiles'] as $profile)
 		echo '
-									<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['block']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+										<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['block']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
 
 	echo '
-							</select>
+								</select>
+							</div>
 						</dd>';
 
 	foreach ($context['SPortal']['block']['options'] as $name => $type)
@@ -189,21 +191,23 @@ function template_block_edit()
 		elseif ($type == 'boards' || $type == 'board_select')
 		{
 					echo '
-							<input type="hidden" name="parameters[', $name, ']" value="" />';
+							<input type="hidden" name="parameters[', $name, ']" value="" />
+							<div class="styled-select">';
 
 				if ($type == 'boards')
 					echo '
-							<select name="parameters[', $name, '][]" id="', $name, '" size="7" multiple="multiple">';
+								<select name="parameters[', $name, '][]" id="', $name, '" size="7" multiple="multiple">';
 				else
 					echo '
-							<select name="parameters[', $name, '][]" id="', $name, '">';
+								<select name="parameters[', $name, '][]" id="', $name, '">';
 
 				foreach ($context['SPortal']['block']['board_options'][$name] as $option)
 					echo '
-								<option value="', $option['value'], '"', ($option['selected'] ? ' selected="selected"' : ''), ' >', $option['text'], '</option>';
+									<option value="', $option['value'], '"', ($option['selected'] ? ' selected="selected"' : ''), ' >', $option['text'], '</option>';
 
 				echo '
-							</select>';
+								</select>
+							</div>';
 		}
 		elseif ($type == 'int')
 			echo '
@@ -219,26 +223,30 @@ function template_block_edit()
 				$options = explode('|', $txt['sp_param_' . $context['SPortal']['block']['type'] . '_' . $name . '_options']);
 
 				echo '
-							<select name="parameters[', $name, ']" id="', $name, '">';
+							<div class="styled-select">
+								<select name="parameters[', $name, ']" id="', $name, '">';
 
 				foreach ($options as $key => $option)
 					echo '
-								<option value="', $key, '"', $context['SPortal']['block']['parameters'][$name] == $key ? ' selected="selected"' : '', '>', $option, '</option>';
+									<option value="', $key, '"', $context['SPortal']['block']['parameters'][$name] == $key ? ' selected="selected"' : '', '>', $option, '</option>';
 
 				echo '
-							</select>';
+								</select>
+							</div>';
 		}
 		elseif (is_array($type))
 		{
 				echo '
-							<select name="parameters[', $name, ']" id="', $name, '">';
+							<div class="styled-select">
+								<select name="parameters[', $name, ']" id="', $name, '">';
 
 				foreach ($tsp_manage_blockssp_manage_blocksspype as $key => $option)
 					echo '
-								<option value="', $key, '"', $context['SPortal']['block']['parameters'][$name] == $key ? ' selected="selected"' : '', '>', $option, '</option>';
+									<option value="', $key, '"', $context['SPortal']['block']['parameters'][$name] == $key ? ' selected="selected"' : '', '>', $option, '</option>';
 
 				echo '
-							</select>';
+								</select>
+							</div>';
 		}
 		elseif ($type == 'textarea')
 		{
@@ -265,15 +273,17 @@ function template_block_edit()
 							<label for="block_column">', $txt['sp-blocksColumn'], ':</label>
 						</dt>
 						<dd>
-							<select id="block_column" name="block_column">';
+							<div class="styled-select">
+								<select id="block_column" name="block_column">';
 
 		$block_sides = array(5 => 'Header', 1 => 'Left', 2 => 'Top', 3 => 'Bottom', 4 => 'Right', 6 => 'Footer');
 		foreach ($block_sides as $id => $side)
 			echo '
-								<option value="', $id, '">', $txt['sp-position' . $side], '</option>';
+									<option value="', $id, '">', $txt['sp-position' . $side], '</option>';
 
 		echo '
-							</select>
+								</select>
+							</div>
 						</dd>';
 	}
 
@@ -284,22 +294,26 @@ function template_block_edit()
 							', $txt['sp-blocksRow'], ':
 						</dt>
 						<dd>
-							<select id="order" name="placement"', !$context['SPortal']['is_new'] ? ' onchange="this.form.block_row.disabled = this.options[this.selectedIndex].value == \'\';"' : '', '>
-								', !$context['SPortal']['is_new'] ? '<option value="nochange">' . $txt['sp-placementUnchanged'] . '</option>' : '', '
-								<option value="before">', $txt['sp-placementBefore'], '...</option>
-								<option value="after">', $txt['sp-placementAfter'], '...</option>
-							</select>
-							<select id="block_row" name="block_row"', !$context['SPortal']['is_new'] ? ' disabled="disabled"' : '', '>';
+							<div class="styled-select">
+								<select id="order" name="placement"', !$context['SPortal']['is_new'] ? ' onchange="this.form.block_row.disabled = this.options[this.selectedIndex].value == \'\';"' : '', '>
+									', !$context['SPortal']['is_new'] ? '<option value="nochange">' . $txt['sp-placementUnchanged'] . '</option>' : '', '
+									<option value="before">', $txt['sp-placementBefore'], '...</option>
+									<option value="after">', $txt['sp-placementAfter'], '...</option>
+								</select>
+							</div>
+							<div class="styled-select">
+								<select id="block_row" name="block_row"', !$context['SPortal']['is_new'] ? ' disabled="disabled"' : '', '>';
 
 		foreach ($context['SPortal']['block']['list_blocks'] as $block)
 		{
 			if ($block['id'] != $context['SPortal']['block']['id'])
 				echo '
-								<option value="', $block['row'], '">', $block['label'], '</option>';
+									<option value="', $block['row'], '">', $block['label'], '</option>';
 		}
 
 		echo '
-							</select>
+								</select>
+							</div>
 						</dd>';
 	}
 
@@ -351,14 +365,16 @@ function template_block_edit()
 				<div class="sp_content_padding">
 					<span class="sp_float_right">', $txt['sp-blocksAdvancedOptions'], '<input type="checkbox" name="display_advanced" id="display_advanced" onclick="document.getElementById(\'sp_display_advanced\').style.display = this.checked ? \'block\' : \'none\'; document.getElementById(\'display_simple\').disabled = this.checked;" ', empty($context['SPortal']['block']['display_type']) ? '' : ' checked="checked"', ' class="input_check" /></span>
 					', $txt['sp-blocksShowBlock'], '
-					<select name="display_simple" id="display_simple"', empty($context['SPortal']['block']['display_type']) ? '' : ' disabled="disabled"', '>';
+					<div class="styled-select">
+						<select name="display_simple" id="display_simple"', empty($context['SPortal']['block']['display_type']) ? '' : ' disabled="disabled"', '>';
 
 		foreach ($context['simple_actions'] as $action => $label)
 			echo '
-						<option value="', $action, '"', in_array($action, $context['SPortal']['block']['display']) ? ' selected="selected"' : '', '>', $label, '</option>';
+							<option value="', $action, '"', in_array($action, $context['SPortal']['block']['display']) ? ' selected="selected"' : '', '>', $label, '</option>';
 
 		echo '
-					</select>
+						</select>
+					</div>
 					<div id="sp_display_advanced"', empty($context['SPortal']['block']['display_type']) ? ' style="display: none;"' : '', '>';
 
 		$display_types = array('actions', 'boards', 'pages');
@@ -435,14 +451,16 @@ function template_block_edit()
 				if ($type == 'default')
 				{
 					echo '
-							<select name="', $section, '_default_class" id="', $section, '_default_class">';
+							<div class="styled-select">
+								<select name="', $section, '_default_class" id="', $section, '_default_class">';
 
 					foreach ($style_parameters[$section] as $class)
 						echo '
-								<option value="', $class, '"', $context['SPortal']['block']['style'][$section . '_default_class'] == $class ? ' selected="selected"' : '', '>', $class, '</option>';
+									<option value="', $class, '"', $context['SPortal']['block']['style'][$section . '_default_class'] == $class ? ' selected="selected"' : '', '>', $class, '</option>';
 
 					echo '
-							</select>';
+								</select>
+							</div>';
 				}
 				else
 					echo '
@@ -486,7 +504,7 @@ function template_block_edit()
  */
 function template_block_select_type()
 {
-	global $context, $scripturl, $settings, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="sp_select_block_type">

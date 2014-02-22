@@ -88,7 +88,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			),
 		);
 
-		// Call the right function for this sub-action.
+		// Call the right function for this sub-action, The default action will show the block list
 		$action = new Action();
 		$action->initialize($subActions, 'list');
 		$action->dispatch($subAction);
@@ -312,13 +312,13 @@ class ManagePortalBlocks_Controller extends Action_Controller
 					{
 						if ($type == 'bbc')
 						{
-							$parameter['value'] = $_POST['parameters'][$name];
+							$value = $_POST['parameters'][$name];
 							require_once(SUBSDIR . '/Post.subs.php');
 
-							$parameter['value'] = Util::htmlspecialchars($parameter['value'], ENT_QUOTES);
-							preparsecode($parameter['value']);
+							$value = Util::htmlspecialchars($value, ENT_QUOTES);
+							preparsecode($value);
 
-							$_POST['parameters'][$name] = $parameter['value'];
+							$_POST['parameters'][$name] = $value;
 						}
 						elseif ($type == 'boards' || $type == 'board_select')
 							$_POST['parameters'][$name] = is_array($_POST['parameters'][$name]) ? implode('|', $_POST['parameters'][$name]) : $_POST['parameters'][$name];
@@ -695,15 +695,15 @@ class ManagePortalBlocks_Controller extends Action_Controller
 						// Prepare BBC Content for ELK 2 special case =D
 						if ($type == 'bbc')
 						{
-							$parameter['value'] = $_POST['parameters'][$name];
+							$value = $_POST['parameters'][$name];
 							require_once(SUBSDIR . '/Post.subs.php');
 
 							// Prepare the message a bit for some additional testing.
-							$parameter['value'] = Util::htmlspecialchars($parameter['value'], ENT_QUOTES);
-							preparsecode($parameter['value']);
+							$value = Util::htmlspecialchars($value, ENT_QUOTES);
+							preparsecode($value);
 
 							// Store now the correct and fixed value ;)
-							$_POST['parameters'][$name] = $parameter['value'];
+							$_POST['parameters'][$name] = $value;
 						}
 						elseif ($type == 'boards' || $type == 'board_select')
 							$_POST['parameters'][$name] = is_array($_POST['parameters'][$name]) ? implode('|', $_POST['parameters'][$name]) : $_POST['parameters'][$name];
@@ -746,6 +746,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 				if (!empty($_POST['display_custom']))
 				{
+					$custom = array();
 					$temp = explode(',', $_POST['display_custom']);
 					foreach ($temp as $action)
 						$custom[] = Util::htmlspecialchars(Util::htmltrim($action), ENT_QUOTES);
@@ -873,6 +874,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		$db = database();
 
 		checkSession('get');
+		$target_side = null;
+		$block_id = null;
 
 		if (empty($_REQUEST['block_id']))
 			fatal_lang_error('error_sp_id_empty', false);
@@ -967,6 +970,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	 */
 	public function action_sportal_admin_block_delete()
 	{
+		global $context;
+		
 		$db = database();
 
 		// Check if he can?

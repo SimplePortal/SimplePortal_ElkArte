@@ -229,7 +229,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	 */
 	public function action_sportal_admin_shoutbox_edit()
 	{
-		global $txt, $context, $modSettings;
+		global $txt, $context, $modSettings, $editortxt;
 
 		$db = database();
 
@@ -367,7 +367,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			$context['SPortal']['shoutbox'] = sportal_get_shoutbox($_REQUEST['shoutbox_id']);
 		}
 
-		loadLanguage('Post');
+		loadLanguage('Editor');
 
 		$context['SPortal']['shoutbox']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		sp_loadMemberGroups($context['SPortal']['shoutbox']['moderator_groups'], 'moderator', 'moderator_groups');
@@ -376,26 +376,22 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			fatal_lang_error('error_sp_no_permission_profiles', false);
 
 		$context['allowed_bbc'] = array(
-			'b' => $txt['bold'],
-			'i' => $txt['italic'],
-			'u' => $txt['underline'],
-			's' => $txt['strike'],
-			'pre' => $txt['preformatted'],
-			'flash' => $txt['flash'],
-			'img' => $txt['image'],
-			'url' => $txt['hyperlink'],
-			'email' => $txt['insert_email'],
-			'ftp' => $txt['ftp'],
-			'glow' => $txt['glow'],
-			'shadow' => $txt['shadow'],
-			'sup' => $txt['superscript'],
-			'sub' => $txt['subscript'],
-			'tt' => $txt['teletype'],
-			'code' => $txt['bbc_code'],
-			'quote' => $txt['bbc_quote'],
-			'size' => $txt['font_size'],
-			'font' => $txt['font_face'],
-			'color' => $txt['change_color'],
+			'b' => $editortxt['Bold'],
+			'i' => $editortxt['Italic'],
+			'u' => $editortxt['Underline'],
+			's' => $editortxt['Strikethrough'],
+			'pre' => $editortxt['Preformatted Text'],
+			'img' => $editortxt['Insert an image'],
+			'url' => $editortxt['Insert a link'],
+			'email' => $editortxt['Insert an email'],
+			'sup' => $editortxt['Superscript'],
+			'sub' => $editortxt['Subscript'],
+			'tt' => $editortxt['Teletype'],
+			'code' => $editortxt['Code'],
+			'quote' => $editortxt['Insert a Quote'],
+			'size' => $editortxt['Font Size'],
+			'font' => $editortxt['Font Name'],
+			'color' => $editortxt['Font Color'],
 			'me' => 'me',
 		);
 
