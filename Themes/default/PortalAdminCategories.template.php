@@ -12,7 +12,7 @@
 
 function template_categories_edit()
 {
-	global $context, $scripturl, $settings, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="sp_edit_category">

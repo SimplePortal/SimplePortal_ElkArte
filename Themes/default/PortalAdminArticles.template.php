@@ -86,7 +86,7 @@ function template_articles_edit()
 						</dt>
 						<dd>
 							<div class="styled-select">
-								<select name="permission_set" id="article_permission_set" onchange="sp_update_permissions();">';
+								<select name="permissions" id="article_permissions" onchange="sp_update_permissions();">';
 
 	foreach ($context['article']['permission_profiles'] as $profile)
 		echo '

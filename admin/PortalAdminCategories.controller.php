@@ -161,7 +161,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => create_function('$row', '
 							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
 						'),
 						'class' => 'centertext',
@@ -256,49 +256,16 @@ class ManagePortalCategories_Controller extends Action_Controller
 			if (preg_replace('~[0-9]+~', '', $namespace) === '')
 				fatal_lang_error('sp_error_category_namespace_numeric', false);
 
-			$permission_set = 0;
-			$groups_allowed = $groups_denied = '';
-
-			if (!empty($_POST['permission_set']))
-				$permission_set = (int) $_POST['permission_set'];
-			elseif (!empty($_POST['membergroups']) && is_array($_POST['membergroups']))
-			{
-				$groups_allowed = $groups_denied = array();
-
-				foreach ($_POST['membergroups'] as $id => $value)
-				{
-					if ($value == 1)
-						$groups_allowed[] = (int) $id;
-					elseif ($value == -1)
-						$groups_denied[] = (int) $id;
-				}
-
-				$groups_allowed = implode(',', $groups_allowed);
-				$groups_denied = implode(',', $groups_denied);
-			}
-
-			$fields = array(
-				'namespace' => 'string',
-				'name' => 'string',
-				'description' => 'string',
-				'permission_set' => 'int',
-				'groups_allowed' => 'string',
-				'groups_denied' => 'string',
-				'status' => 'int',
-			);
-
 			$category_info = array(
 				'id' => (int) $_POST['category_id'],
 				'namespace' => $namespace,
 				'name' => $name,
 				'description' => $description,
-				'permission_set' => $permission_set,
-				'groups_allowed' => $groups_allowed,
-				'groups_denied' => $groups_denied,
+				'permissions' => (int) $_POST['permissions'],
 				'status' => !empty($_POST['status']) ? 1 : 0,
 			);
 
-			$category_info['id'] = sp_update_category($fields, $category_info, $context['is_new']);
+			$category_info['id'] = sp_update_category($category_info, $context['is_new']);
 			redirectexit('action=admin;area=portalcategories');
 		}
 
@@ -310,7 +277,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 				'category_id' => 'category' . mt_rand(1, 5000),
 				'name' => $txt['sp_categories_default_name'],
 				'description' => '',
-				'permission_set' => 3,
+				'permissions' => 3,
 				'groups_allowed' => array(),
 				'groups_denied' => array(),
 				'status' => 1,
@@ -322,6 +289,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 			$context['category'] = sportal_get_categories($_REQUEST['category_id']);
 		}
 
+		$context['category']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		$context['category']['groups'] = sp_load_membergroups();
 		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_categories_add'] : $txt['sp_admin_categories_edit'];
 		$context['sub_template'] = 'categories_edit';

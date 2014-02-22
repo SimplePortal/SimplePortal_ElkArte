@@ -263,9 +263,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 */
 	public function action_sportal_admin_article_edit()
 	{
-		global $context, $modSettings, $user_info, $options, $txt, $scripturl;
-
-		$db = database();
+		global $context, $user_info, $options, $txt, $scripturl;
 
 		require_once(SUBSDIR . '/Editor.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
@@ -287,151 +285,13 @@ class ManagePortalArticles_Controller extends Action_Controller
 		{
 			checkSession();
 
-			// If its not new, lets get the current data
-			if (!$context['is_new'])
-			{
-				$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
-				$context['article'] = sportal_get_articles($_REQUEST['article_id']);
-			}
 
-			if (!isset($_POST['title']) || Util::htmltrim(Util::htmlspecialchars($_POST['title'], ENT_QUOTES)) === '')
-				fatal_lang_error('sp_error_article_name_empty', false);
+			$this->_sportal_admin_article_edit_save();
 
-			if (!isset($_POST['namespace']) || Util::htmltrim(Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES)) === '')
-				fatal_lang_error('sp_error_article_namespace_empty', false);
 
-			$result = $db->query('', '
-				SELECT
-					id_article
-				FROM {db_prefix}sp_articles
-				WHERE namespace = {string:namespace}
-					AND id_article != {int:current}
-				LIMIT 1',
-				array(
-					'limit' => 1,
-					'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
-					'current' => (int) $_POST['article_id'],
-				)
-			);
-			list ($has_duplicate) = $db->fetch_row($result);
-			$db->free_result($result);
-
-			if (!empty($has_duplicate))
-				fatal_lang_error('sp_error_article_namespace_duplicate', false);
-
-			if (preg_match('~[^A-Za-z0-9_]+~', $_POST['namespace']) != 0)
-				fatal_lang_error('sp_error_article_namespace_invalid_chars', false);
-
-			if (preg_replace('~[0-9]+~', '', $_POST['namespace']) === '')
-				fatal_lang_error('sp_error_article_namespace_numeric', false);
-
-			if ($_POST['type'] === 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
-			{
-				require_once(SUBSDIR . '/DataValidator.class.php');
-
-				$validator = new Data_Validator();
-				$validator->validation_rules(array('content' => 'php_syntax'));
-				$validator->validate(array('content' => $_POST['content']));
-				$error = $validator->validation_errors();
-
-				if ($error)
-					fatal_lang_error($error, false);
-			}
-
-			$fields = array(
-				'id_category' => 'int',
-				'namespace' => 'string',
-				'title' => 'string',
-				'body' => 'string',
-				'type' => 'string',
-				'permissions' => 'int',
-				'status' => 'int',
-			);
-
-			$article_info = array(
-				'id' => (int) $_POST['article_id'],
-				'id_category' => (int) $_POST['category_id'],
-				'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
-				'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
-				'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
-				'type' => in_array($_POST['type'], array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
-				'permissions' => (int) $_POST['permissions'],
-				'status' => !empty($_POST['status']) ? 1 : 0,
-			);
-
-			if ($article_info['type'] === 'bbc')
-				preparsecode($article_info['body']);
-
-			// A brand new article
-			if ($context['is_new'])
-			{
-				unset($article_info['id']);
-
-				$fields = array_merge($fields, array(
-					'id_member' => 'int',
-					'member_name' => 'string',
-					'date' => 'int',
-				));
-
-				$article_info = array_merge($article_info, array(
-					'id_member' => $user_info['id'],
-					'member_name' => $user_info['name'],
-					'date' => time(),
-				));
-
-				// Add the new article to the system
-				$db->insert('', '
-					{db_prefix}sp_articles',
-					$fields,
-					$article_info,
-					array('id_article')
-				);
-				$article_info['id'] = $db->insert_id('{db_prefix}sp_articles', 'id_article');
-			}
-			// Editing we update what was there
-			else
-			{
-				$update_fields = array();
-				foreach ($fields as $name => $type)
-					$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
-
-				$db->query('', '
-					UPDATE {db_prefix}sp_articles
-					SET ' . implode(', ', $update_fields) . '
-					WHERE id_article = {int:id}',
-					array (
-						'id' => $article_info['id'],
-					)
-				);
-			}
-
-			if ($context['is_new'] || $article_info['id_category'] != $context['article']['category']['id'])
-			{
-				$db->query('', '
-					UPDATE {db_prefix}sp_categories
-					SET articles = articles + 1
-					WHERE id_category = {int:id}',
-					array(
-						'id' => $article_info['id_category'],
-					)
-				);
-
-				if (!$context['is_new'])
-				{
-					$db->query('', '
-						UPDATE {db_prefix}sp_categories
-						SET articles = articles - 1
-						WHERE id_category = {int:id}',
-						array(
-							'id' => $context['article']['category']['id'],
-						)
-					);
-				}
-			}
-
-			redirectexit('action=admin;area=portalarticles');
 		}
 
+		// Just taking a look before you save?
 		if (!empty($_POST['preview']))
 		{
 			if (!$context['is_new'])
@@ -460,12 +320,13 @@ class ManagePortalArticles_Controller extends Action_Controller
 				'status' => !empty($_POST['status']),
 			);
 
-			if ($context['article']['type'] == 'bbc')
+			if ($context['article']['type'] === 'bbc')
 				preparsecode($context['article']['body']);
 
 			loadTemplate('PortalArticles');
 			$context['preview'] = true;
 		}
+		// Something new?
 		elseif ($context['is_new'])
 		{
 			$context['article'] = array(
@@ -475,25 +336,28 @@ class ManagePortalArticles_Controller extends Action_Controller
 				'title' => $txt['sp_articles_default_title'],
 				'body' => '',
 				'type' => 'bbc',
-				'permission_set' => 3,
+				'permissions' => 3,
 				'status' => 1,
 			);
 		}
+		// Something used
 		else
 		{
 			$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
 			$context['article'] = sportal_get_articles($_REQUEST['article_id']);
 		}
 
-		if ($context['article']['type'] == 'bbc')
+		if ($context['article']['type'] === 'bbc')
 			$context['article']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($context['article']['body']));
 
-		if ($context['article']['type'] != 'bbc')
+		// Over ride user preferance for wizzy mode if they don't need it
+		if ($context['article']['type'] !== 'bbc')
 		{
 			$temp_editor = !empty($options['wysiwyg_default']);
 			$options['wysiwyg_default'] = false;
 		}
 
+		// Fire up the editor
 		$editor_options = array(
 			'id' => 'content',
 			'value' => $context['article']['body'],
@@ -504,15 +368,17 @@ class ManagePortalArticles_Controller extends Action_Controller
 		create_control_richedit($editor_options);
 		$context['post_box_name'] = $editor_options['id'];
 
+		// Restore thier settings
 		if (isset($temp_editor))
 			$options['wysiwyg_default'] = $temp_editor;
 
+		// Final bits for the template, categorys and permission settings
 		$context['article']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		$context['article']['categories'] = sportal_get_categories();
 
+		// Articles need permissions and categorys defined
 		if (empty($context['article']['permission_profiles']))
 			fatal_lang_error('error_sp_no_permission_profiles', false);
-
 		if (empty($context['article']['categories']))
 			fatal_lang_error('error_sp_no_category', false);
 
@@ -521,25 +387,108 @@ class ManagePortalArticles_Controller extends Action_Controller
 	}
 
 	/**
-	 * Update an articles status
+	 * Does the actual saving of the article data
+	 *
+	 * - validates the data is safe to save
+	 * - updates existing articles or creates new ones
+	 */
+	private function _sportal_admin_article_edit_save()
+	{
+		global $context;
+
+		// No errors, yet.
+		$article_errors = Error_Context::context('article', 0);
+
+		// Use our standard validation functions in a few spots
+		require_once(SUBSDIR . '/DataValidator.class.php');
+		$validator = new Data_Validator();
+
+		// If its not new, lets get the current data
+		$is_new = empty($_REQUEST['article_id']);
+		if (!$is_new)
+		{
+			$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
+			$context['article'] = sportal_get_articles($_REQUEST['article_id']);
+		}
+
+		// Review the post data for compliance
+		$validator->sanitation_rules(array(
+			'title' => 'trim|Util::htmlspecialchars',
+			'namespace' => 'trim|Util::htmlspecialchars',
+			'article_id' => 'intval',
+			'category_id' => 'intval',
+			'permissions' => 'intval',
+			'type' => 'trim'
+		));
+		$validator->validation_rules(array(
+			'title' => 'required',
+			'namespace' => 'alpha_numeric|required',
+			'type' => 'required')
+		);
+		$validator->text_replacements(array('title' => $txt['sp_error_article_name_empty'], 'namespace' => $txt['sp_error_article_namespace_empty']));
+
+		// If you messed this up, back you go
+		if (!$validator->validate($_POST))
+		{
+			foreach ($validator->validation_errors() as $id => $error)
+				$article_errors->addError($error);
+
+			return $this->action_sportal_admin_article_edit();
+		}
+
+		// Lets make sure this namespace is unique
+		$has_duplicate = sp_duplicate_articles($validator->article_id, $validator->namespace);
+		if (!empty($has_duplicate))
+			$article_errors->addError('sp_error_article_namespace_duplicate');
+
+		// And we can't have just a numeric namespace
+		if (preg_replace('~[0-9]+~', '', $validator->namespace) === '')
+			$article_errors->addError('sp_error_article_namespace_numeric');
+
+		// Posting some PHP code, and allowed? Then we need to validate it will run
+		if ($_POST['type'] === 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
+		{
+			$validator_php = new Data_Validator();
+			$validator_php->validation_rules(array('content' => 'php_syntax'));
+
+			// Bad PHP code
+			if (!$validator_php->validate(array('content' => $_POST['content'])))
+				$article_errors->addError($validator_php->validation_errors());
+		}
+
+		// None shall pass
+		if ($article_errors->hasErrors())
+			return $this->action_sportal_admin_article_edit();
+
+		// No errors then, prepare the data for saving
+		$article_info = array(
+			'id' => $validator->article_id,
+			'id_category' => $validator->category_id,
+			'namespace' => $validator->namespace,
+			'title' => $validator->title,
+			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
+			'type' => in_array($$validator->type, array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
+			'permissions' => $validator->permissions,
+			'status' => !empty($_POST['status']) ? 1 : 0,
+		);
+
+		if ($article_info['type'] === 'bbc')
+			preparsecode($article_info['body']);
+
+		// Save away
+		sp_save_article($article_info, $is_new);
+		redirectexit('action=admin;area=portalarticles');
+	}
+
+	/**
+	 * Toggle an articles status
 	 */
 	public function action_sportal_admin_article_status()
 	{
-		$db = database();
-
 		checkSession('get');
 
 		$article_id = !empty($_REQUEST['article_id']) ? (int) $_REQUEST['article_id'] : 0;
-
-		$db->query('', '
-			UPDATE {db_prefix}sp_articles
-			SET status = CASE WHEN status = {int:is_active} THEN 0 ELSE 1 END
-			WHERE id_article = {int:id}',
-			array(
-				'is_active' => 1,
-				'id' => $article_id,
-			)
-		);
+		sp_changeState('article', $article_id);
 
 		redirectexit('action=admin;area=portalarticles');
 	}

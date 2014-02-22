@@ -231,7 +231,8 @@ function sp_integrate_whos_online($actions)
 			$page_where[] = 'namespace IN ({array_string:string_ids})';
 
 		$result = $db->query('', '
-			SELECT id_page, namespace, title, permission_set, groups_allowed, groups_denied
+			SELECT
+				id_page, namespace, title, permissions
 			FROM {db_prefix}sp_pages
 			WHERE ' . implode(' OR ', $page_where) . '
 			LIMIT {int:limit}',
@@ -244,7 +245,7 @@ function sp_integrate_whos_online($actions)
 		$page_data = array();
 		while ($row = $db->fetch_assoc($result))
 		{
-			if (!sp_allowed_to('page', $row['id_page'], $row['permission_set'], $row['groups_allowed'], $row['groups_denied']))
+			if (!sp_allowed_to('page', $row['id_page'], $row['permissions']))
 				continue;
 
 			$page_data[] = array(
