@@ -1405,7 +1405,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 				'author' => array(
 					'id' => $row['id_member'],
 					'name' => $row['member_name'],
-					'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '" title="' . $txt['on'] . ' ' . strip_tags(relativeTime($row['log_time'])) . '"' . (!empty($online_color) ? ' style="color: ' . $online_color . ';"' : '') . '>' . $row['member_name'] . '</a>') : $row['member_name'],
+					'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '" title="' . $txt['on'] . ' ' . strip_tags(standardTime($row['log_time'])) . '"' . (!empty($online_color) ? ' style="color: ' . $online_color . ';"' : '') . '>' . $row['member_name'] . '</a>') : $row['member_name'],
 					'color' => $online_color,
 				),
 				'time' => $row['log_time'],
@@ -1433,7 +1433,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 		);
 
 		$shouts[$shout['id']]['text'] = str_replace(':jade:', '<img src="http://www.simpleportal.net/sp/cheerleader.png" alt="Jade!" />', $shouts[$shout['id']]['text']);
-		$shouts[$shout['id']]['time'] = relativeTime($shouts[$shout['id']]['time']);
+		$shouts[$shout['id']]['time'] = standardTime($shouts[$shout['id']]['time']);
 		$shouts[$shout['id']]['text'] = preg_replace('~(</?)div([^<]*>)~', '$1span$2', $shouts[$shout['id']]['text']);
 		$shouts[$shout['id']]['text'] = preg_replace('~<a([^>]+>)([^<]+)</a>~', '<a$1' . $txt['sp_link'] . '</a>', $shouts[$shout['id']]['text']);
 		$shouts[$shout['id']]['text'] = censorText($shouts[$shout['id']]['text']);

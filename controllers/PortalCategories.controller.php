@@ -82,7 +82,7 @@ class Categories_Controller extends Action_Controller
 				$article['body'] = Util::substr($article['body'], 0, $cutoff);
 
 			$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
-			$context['articles'][$article['id']]['date'] = relativeTime($article['date']);
+			$context['articles'][$article['id']]['date'] = standardTime($article['date']);
 		}
 
 		$context['linktree'][] = array(

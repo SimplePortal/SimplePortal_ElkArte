@@ -52,7 +52,7 @@ class Article_Controller extends Action_Controller
 				$article['body'] = Util::substr($article['body'], 0, $cutoff);
 
 			$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
-			$context['articles'][$article['id']]['date'] = relativeTime($article['date']);
+			$context['articles'][$article['id']]['date'] = standardTime($article['date']);
 		}
 
 		$context['linktree'][] = array(
@@ -86,7 +86,7 @@ class Article_Controller extends Action_Controller
 		if (empty($context['article']['id']))
 			fatal_lang_error('error_sp_article_not_found', false);
 
-		$context['article']['date'] = relativeTime($context['article']['date']);
+		$context['article']['date'] = standardTime($context['article']['date']);
 		$context['article']['comments'] = sportal_get_comments($context['article']['id']);
 		$context['article']['can_comment'] = $context['user']['is_logged'];
 		$context['article']['can_moderate'] = allowedTo('sp_admin') || allowedTo('sp_manage_articles');

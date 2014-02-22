@@ -178,7 +178,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 			'name' => $row['real_name'],
 			'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-			'date' => relativeTime($row['date_registered'], '%d %b'),
+			'date' => standardTime($row['date_registered'], '%d %b'),
 		);
 	}
 	$db->free_result($request);
@@ -1308,7 +1308,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 			'message_id' => $row['id_msg'],
 			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" class="icon" alt="' . $row['icon'] . '" />',
 			'subject' => $row['subject'],
-			'time' => relativeTime($row['poster_time']),
+			'time' => standardTime($row['poster_time']),
 			'views' => $row['num_views'],
 			'body' => $row['body'],
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
