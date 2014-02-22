@@ -1181,6 +1181,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $block_parameters;
 
+	// Break out / sanitize all the block parameters
 	$board = !empty($parameters['board']) ? explode('|', $parameters['board']) : null;
 	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
 	$start = !empty($parameters['start']) ? (int) $parameters['start'] : 0;
@@ -1236,8 +1237,6 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 
 		$clean_url = preg_replace('~news' . $id . '=\d+;?~', '', $_SERVER['REQUEST_URL']);
 		$current_url = $clean_url . (strpos($clean_url, '?') !== false ? (in_array(substr($clean_url, -1), array(';', '?')) ? '' : ';') : '?');
-
-		$page_index = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, true);
 	}
 
 	$request = $db->query('', '
@@ -1262,23 +1261,14 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	$colorids = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$limited = false;
-		if (($cutoff = Util::strpos($row['body'], '[cutoff]')) !== false)
-		{
-			$row['body'] = Util::substr($row['body'], 0, $cutoff);
-			$limited = true;
-		}
-		elseif (!empty($length) && Util::strlen($row['body']) > $length)
-		{
-			$row['body'] = Util::substr($row['body'], 0, $length);
-			$limited = true;
-		}
+		// Shorten the text if needed and run it through the parser
+		if (!empty($length))
+			$row['body'] = shorten_text($row['body'], $length, true);
 
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
-		// Only place an ellipsis if the body has been shortened.
-		if ($limited)
-			$row['body'] .= '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">&hellip;</a>';
+		// Link the ellipsis if the body has been shortened.
+		$row['body'] = preg_replace('~(\.{3})$(?<!\.{4})~', '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">&hellip;</a>', $row['body']);
 
 		if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
 		{
@@ -1303,6 +1293,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		if (!empty($row['id_member']))
 			$colorids[$row['id_member']] = $row['id_member'];
 
+		// Build an array of message information for output
 		$return[] = array(
 			'id' => $row['id_topic'],
 			'message_id' => $row['id_msg'],
@@ -1335,6 +1326,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	}
 	$db->free_result($request);
 
+	// Nothing found, say so and exit
 	if (empty($return))
 	{
 		echo '
@@ -1344,6 +1336,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 
 	$return[count($return) - 1]['is_last'] = true;
 
+	// If we want color id's then lets add them in
 	if (!empty($colorids) && sp_loadColors($colorids) !== false)
 	{
 		foreach ($return as $k => $p)
@@ -1353,6 +1346,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		}
 	}
 
+	// Output all the details we have found
 	foreach ($return as $news)
 	{
 		echo '
@@ -1377,9 +1371,18 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 				</div>';
 	}
 
+	// Pagenation is a good thing
 	if (!empty($per_page))
+	{
+		global $context;
+
+		$context['page_index']  = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, false);
+
 		echo '
-					<div class="pagelinks sp_page_index">', $page_index, '</div>';
+				<div class="sp_page_index">',
+					template_pagesection(), '
+				</div>';
+	}
 }
 
 /**
@@ -2025,7 +2028,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
  */
 function sp_theme_select($parameters, $id, $return_parameters = false)
 {
-	global $context, $modSettings, $user_info, $settings, $language, $txt;
+	global $modSettings, $user_info, $settings, $language, $txt;
 
 	$db = database();
 
@@ -2135,18 +2138,20 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 	echo '
 								<form method="post" action="" accept-charset="UTF-8">
 									<div class="sp_center">
-										<select name="theme" onchange="sp_theme_select(this)">';
+										<div class="styled-select">
+											<select name="theme" onchange="sp_theme_select(this)">';
 
 	foreach ($available_themes as $theme)
 		echo '
-											<option value="', $theme['id'], '"', $theme['selected'] ? ' selected="selected"' : '', '>', $theme['name'], '</option>';
+												<option value="', $theme['id'], '"', $theme['selected'] ? ' selected="selected"' : '', '>', $theme['name'], '</option>';
 
 	echo '
-										</select>
+											</select>
+										</div>
 										<br /><br />
 										<img src="', $available_themes[$current_theme]['thumbnail_href'], '" alt="', $available_themes[$current_theme]['name'], '" id="sp_ts_thumb" />
 										<br /><br />
-										<input type="checkbox" name="sp_ts_permanent" value="1" /> ', $txt['sp-theme_permanent'], '
+										<input type="checkbox" class="input_check" name="sp_ts_permanent" value="1" /> ', $txt['sp-theme_permanent'], '
 										<br />
 										<input type="submit" name="sp_ts_submit" value="', $txt['sp-theme_change'], '" class="button_submit" />
 									</div>

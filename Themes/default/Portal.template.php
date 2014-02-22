@@ -163,7 +163,7 @@ function template_portal_below()
 }
 
 /**
- * Generic template to wrap blocks in
+ * Generic template to wrap blocks
  */
 function template_block($block)
 {
@@ -172,10 +172,10 @@ function template_block($block)
 	if (empty($block) || empty($block['type']))
 		return;
 
-	if ($block['type'] == 'sp_boardNews')
+	if ($block['type'] === 'sp_boardNews')
 	{
 		echo '
-			<div class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['articleactive'])) ? '_last' : '', '">';
+			<div id="sp_block_', $block['id'], '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['articleactive'])) ? '_last' : '', '">';
 
 		$block['type']($block['parameters'], $block['id']);
 
@@ -201,7 +201,6 @@ function template_block_default($block)
 	if (empty($block['style']['no_title']))
 	{
 		echo '
-	<div class="', in_array($block['style']['title']['class'], array('titlebg', 'titlebg2')) ? 'title_bar' : 'cat_bar', '"', !empty($block['style']['title']['style']) ? ' style="' . $block['style']['title']['style'] . '"' : '', '>
 		<h3 class="', $block['style']['title']['class'], '">';
 
 		if (empty($block['force_view']))
@@ -210,8 +209,7 @@ function template_block_default($block)
 
 		echo '
 			', parse_bbc($block['label']), '
-		</h3>
-	</div>';
+		</h3>';
 	}
 
 	echo '

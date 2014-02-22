@@ -13,6 +13,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Initializes the portal, outputs all the blocks as needed
+ *
+ * @param boolean $standalone
+ */
 function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings, $maintenance, $sportal_version;
@@ -22,6 +27,7 @@ function sportal_init($standalone = false)
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach') || isset($_REQUEST['xml']) || isset($_REQUEST['api']))
 		return;
 
+	// Not running standalone then we need to load in some template information
 	if (!$standalone)
 	{
 		loadTemplate(false, 'portal');
@@ -43,9 +49,11 @@ function sportal_init($standalone = false)
 		$context['SPortal']['on_portal'] = getShowInfo(0, 'portal', '');
 	}
 
+	// Portal not enabled then bow out now
 	if (!empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')) || isset($_GET['debug']) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
 	{
 		$context['disable_sp'] = true;
+
 		if ($standalone)
 		{
 			$get_string = '';
@@ -57,13 +65,16 @@ function sportal_init($standalone = false)
 		return;
 	}
 
+	// Not standalone means we need to load some portal specific information in to context
 	if (!$standalone)
 	{
 		require_once(SUBSDIR . '/PortalBlocks.subs.php');
 
-		if (ELK != 'SSI')
+		// Not running via ssi then we need to get SSI for its functions
+		if (ELK !== 'SSI')
 			require_once(BOARDDIR . '/SSI.php');
 
+		// portal specific templates and language
 		loadTemplate('Portal');
 		loadLanguage('SPortal', sp_languageSelect('SPortal'));
 
@@ -105,7 +116,11 @@ function sportal_init($standalone = false)
 
 	// Load the headers if necessary.
 	sportal_init_headers();
+
+	// Load permissions
 	sportal_load_permissions();
+
+	// Play with our blocks
 	sportal_load_blocks();
 
 	if (!Template_Layers::getInstance()->hasLayers(true) && !in_array('portal', Template_Layers::getInstance()->getLayers()))
@@ -127,6 +142,7 @@ function sportal_init_headers()
 	// Load up some javascript!
 	loadJavascriptFile('portal.js?sp24');
 
+	// Javascipt to open/collapse blocks as the user wants
 	$javascript = '
 	var sp_images_url = "' . $settings['sp_images_url'] . '";
 
@@ -143,13 +159,14 @@ function sportal_init_headers()
 			document.cookie = "sp_block_" + id + "=" + (mode ? 0 : 1);';
 	else
 		$javascript .= '
-			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null, "' . $context['session_id'] . '", "' . $context['session_var'] . '");';
+			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null);';
 
 	$javascript .= '
 			$("#sp_collapse_" + id).attr("src", elk_images_url + (mode ? "/collapse.png" : "/expand.png"));
 		});
 	}';
 
+	// Allow for left / right side collapsing
 	if (empty($modSettings['sp_disable_side_collapse']))
 	{
 		$javascript .= '
@@ -182,7 +199,8 @@ function sportal_init_headers()
 		window.addEventListener("load", sp_image_resize, false);';
 	}
 
-	addInlineJavascript($javascript);
+	// Let the template know we have some inline JS to display
+	addInlineJavascript($javascript, true);
 
 	$initialized = true;
 }
@@ -432,6 +450,7 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 
 	// Still, we might not be in portal!
 	if (!empty($_GET) && empty($context['standalone']))
+	{
 		foreach ($_GET as $key => $value)
 		{
 			if (preg_match('~^news\d+$~', $key))
@@ -442,6 +461,7 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 			elseif (is_array($portal_actions[$key]) && !in_array($value, $portal_actions[$key]))
 				$portal = false;
 		}
+	}
 
 	// Set the action to more known one.
 	foreach ($exceptions as $key => $exception)
@@ -579,7 +599,7 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 }
 
 /**
- * This is a simple function that return nothing if the language file exist and english if it does not exist
+ * This is a simple function that returns nothing if the language file exist and english if it does not exist
  * This will help to make it possible to load each time the english language!
  *
  * @param string $template_name
@@ -649,6 +669,13 @@ function sp_languageSelect($template_name)
 	return '';
 }
 
+/**
+ * Loads a set of calendar data
+ *
+ * @param string $type type of data to load, events, birthdays, etc
+ * @param string $low_date don't load data before this date
+ * @param string|false $high_date dont load data after this date, false for no limit
+ */
 function sp_loadCalendarData($type, $low_date, $high_date = false)
 {
 	static $loaded;
