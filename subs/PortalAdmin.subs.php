@@ -13,13 +13,24 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * toggles the current state of a block / control
+ *
+ * - calls sp_changeState to toggle the on/off status
+ * - directs back based on type passed
+ *
+ * @param string $type type of control
+ * @param type $id id of the control
+ */
 function sportal_admin_state_change($type, $id)
 {
 	if (!in_array($type, array('block', 'category', 'article')))
 		fatal_lang_error('error_sp_id_empty', false);
 
+	// Toggle the current state
 	sp_changeState($type, $id);
 
+	// Based on the type, find our way back
 	if ($type == 'block')
 	{
 		$sides = array(1 => 'left', 2 => 'top', 3 => 'bottom', 4 => 'right');
@@ -35,12 +46,22 @@ function sportal_admin_state_change($type, $id)
 		redirectexit('action=admin;area=portalconfig');
 }
 
+/**
+ * Fetches all the functions (blocks) in the system
+ *
+ * - if supplied a name gets just that functions id
+ * - returns the functions in the order specifed in the table
+ * - will not return sp_php to non admins for security
+ *
+ * @param string|null $function
+ */
 function getFunctionInfo($function = null)
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_function, name
+		SELECT
+			id_function, name
 		FROM {db_prefix}sp_functions' . (!empty($function) ? '
 		WHERE name = {string:function}' : '') . '
 		ORDER BY function_order',
@@ -51,6 +72,7 @@ function getFunctionInfo($function = null)
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
 	{
+		// You must be an admin to use those functions
 		if ($row['name'] == 'sp_php' && !allowedTo('admin_forum'))
 			continue;
 
@@ -64,10 +86,20 @@ function getFunctionInfo($function = null)
 	return $return;
 }
 
+/**
+ * Assigns row id's to each block in a specifed column
+ *
+ * - ensures each block has a unique row id
+ * - For each block in a column, it will sequentially number the row id
+ * based on the order the blocks are returned via getBlockInfo
+ *
+ * @param int $column_id
+ */
 function fixColumnRows($column_id = null)
 {
 	$db = database();
 
+	// Get the list of all blocks in this column
 	$blockList = getBlockInfo($column_id);
 	$blockIds = array();
 
@@ -76,6 +108,7 @@ function fixColumnRows($column_id = null)
 
 	$counter = 0;
 
+	// Now seqentially set the row number for each block in this column
 	foreach ($blockIds as $block)
 	{
 		$counter = $counter + 1;
@@ -92,6 +125,12 @@ function fixColumnRows($column_id = null)
 	}
 }
 
+/**
+ * Toggles the active state of a passed control ID of a given Type
+ *
+ * @param string $type type of control
+ * @param int $id specific id of the control
+ */
 function sp_changeState($type = null, $id = null)
 {
 	$db = database();
@@ -120,6 +159,7 @@ function sp_changeState($type = null, $id = null)
 	else
 		return false;
 
+	// Clap on, Clap off
 	$db->query('', '
 		UPDATE {db_prefix}{raw:table}
 		SET {raw:column} = CASE WHEN {raw:column} = {int:is_active} THEN 0 ELSE 1 END
@@ -195,7 +235,7 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 	if (!isset($show_option[$show]))
 		$show = 'normal';
 
-	// Guest and Members are added manually. Only on normal ond master View =)
+	// Guest and Members are added manually. Only on normal and master View =)
 	if ($show == 'normal' || $show == 'master' || $show == 'moderator')
 	{
 		if ($show != 'moderator')
@@ -238,21 +278,32 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 	$db->free_result($request);
 }
 
+/**
+ * Loads the membergroups in the system
+ *
+ * - excludes moderator groups
+ * - loads id and name for each group
+ * - used for template group select lists / permissions
+ */
 function sp_load_membergroups()
 {
 	global $txt;
 
 	$db = database();
 
+	// Need to speak the right language
 	loadLanguage('ManageBoards');
 
+	// Start off with some known ones, guests and regular members
 	$groups = array(
 		-1 => $txt['parent_guests_only'],
 		0 => $txt['parent_members_only'],
 	);
 
+	// Load up all groups in the system as long as they are not moderator groups
 	$request = $db->query('', '
-		SELECT group_name, id_group, min_posts
+		SELECT
+			group_name, id_group, min_posts
 		FROM {db_prefix}membergroups
 		WHERE id_group != {int:moderator_group}
 		ORDER BY min_posts, group_name',
@@ -359,18 +410,29 @@ function sp_check_duplicate_category($id, $namespace)
 
 /**
  * Update an existing category or add a new one to the database
+ *
  * If adding a new one, will return the id of the new category
  *
  * @param array $fields
  * @param array $data
  * @param boolean $is_new
  */
-function sp_update_category($fields, $data, $is_new = false)
+function sp_update_category($data, $is_new = false)
 {
 	$db = database();
 
 	$id = isset($data['id']) ? $data['id'] : null;
 
+	// Field defnitions
+	$fields = array(
+		'namespace' => 'string',
+		'name' => 'string',
+		'description' => 'string',
+		'permissions' => 'int',
+		'status' => 'int',
+	);
+
+	// New category?
 	if ($is_new)
 	{
 		unset($data['id']);
@@ -382,6 +444,7 @@ function sp_update_category($fields, $data, $is_new = false)
 		);
 		$id = $db->insert_id('{db_prefix}sp_categories', 'id_category');
 	}
+	// Update an existing one then
 	else
 	{
 		$update_fields = array();
@@ -408,6 +471,7 @@ function sp_delete_categories($category_ids = array())
 {
 	$db = database();
 
+	// Remove the categories
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_categories
 		WHERE id_category IN ({array_int:categories})',
@@ -416,6 +480,7 @@ function sp_delete_categories($category_ids = array())
 		)
 	);
 
+	// And remove the articles that were in those categories
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_articles
 		WHERE id_category IN ({array_int:categories})',
@@ -534,11 +599,14 @@ function sp_load_articles($start, $items_per_page, $sort)
 /**
  * Removes a article or group of articles by id's
  *
- * @param array $article_ids
+ * @param int[]|int $article_ids
  */
 function sp_delete_articles($article_ids = array())
 {
 	$db = database();
+
+	if (!is_array($article_ids))
+		$article_ids = array($article_ids);
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_articles
@@ -547,6 +615,121 @@ function sp_delete_articles($article_ids = array())
 			'id' => $article_ids,
 		)
 	);
+}
+
+/**
+ * Validates that an articles id is not duplicated in a given namespace
+ *
+ * return true if its a duplate or false if its unique
+ *
+ * @param int $article_id
+ * @param string $namespace
+ */
+function sp_duplicate_articles($article_id, $namespace)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT
+			id_article
+		FROM {db_prefix}sp_articles
+		WHERE namespace = {string:namespace}
+			AND id_article != {int:current}
+		LIMIT 1',
+		array(
+			'limit' => 1,
+			'namespace' => $namespace,
+			'current' => $article_id,
+		)
+	);
+	list ($has_duplicate) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $has_duplicate;
+}
+
+/**
+ * Saves or updates an articles information
+ *
+ * - expects to have $context popluated from sportal_get_articles()
+ * - add items as a new article is is_new is true otherwise updates and existing one
+ *
+ * @param mixed[] $article_info array of feilds details to save/update
+ * @param boolean $is_new true for new insertion, false to update
+ * @param boolean $update_counts true to update category counts
+ */
+function sp_save_article($article_info, $is_new = false, $update_counts = true)
+{
+	global $context;
+
+	$db = database();
+
+	// Our article database looks like this, so shall you comply
+	$fields = array(
+		'id_category' => 'int',
+		'namespace' => 'string',
+		'title' => 'string',
+		'body' => 'string',
+		'type' => 'string',
+		'permissions' => 'int',
+		'status' => 'int',
+	);
+
+	// Brand new, insert it
+	if ($is_new)
+	{
+		// Add the new article to the system
+		$db->insert('', '
+			{db_prefix}sp_articles',
+			$fields,
+			$article_info,
+			array('id_article')
+		);
+		$article_info['id'] = $db->insert_id('{db_prefix}sp_articles', 'id_article');
+	}
+	// The editing so we update what was there
+	else
+	{
+		$update_fields = array();
+		foreach ($fields as $name => $type)
+			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+
+		$db->query('', '
+			UPDATE {db_prefix}sp_articles
+			SET ' . implode(', ', $update_fields) . '
+			WHERE id_article = {int:id}',
+			array (
+				'id' => $article_info['id'],
+			)
+		);
+	}
+
+	// Now is a good time to update the counters if needed
+	if ($update_counts && ($is_new || $article_info['id_category'] != $context['article']['category']['id']))
+	{
+		// Increase the number of items in this category
+		$db->query('', '
+			UPDATE {db_prefix}sp_categories
+			SET articles = articles + 1
+			WHERE id_category = {int:id}',
+			array(
+				'id' => $article_info['id_category'],
+			)
+		);
+
+		// Not new then moved, so decrease the old category count
+		if (!$is_new)
+		{
+			$db->query('', '
+				UPDATE {db_prefix}sp_categories
+				SET articles = articles - 1
+				WHERE id_category = {int:id}',
+				array(
+					'id' => $context['article']['category']['id'],
+				)
+			);
+		}
+	}
 }
 
 /**
