@@ -34,6 +34,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// We'll need the utility functions from here.
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
 		require_once(SUBSDIR . '/Portal.subs.php');
+
 		loadTemplate('PortalAdminArticles');
 
 		// This are all the actions that we know
@@ -200,7 +201,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => create_function('$row', '
 							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
 						'),
 						'class' => 'centertext',
@@ -265,46 +266,46 @@ class ManagePortalArticles_Controller extends Action_Controller
 	{
 		global $context, $user_info, $options, $txt, $scripturl;
 
-		require_once(SUBSDIR . '/Editor.subs.php');
-		require_once(SUBSDIR . '/Post.subs.php');
-
 		$context['is_new'] = empty($_REQUEST['article_id']);
+
+		$article_errors = Error_Context::context('article', 0);
+
+		// Going to use editor an post functions
+		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Editor.subs.php');
 
 		// Convert this to BBC?
 		if (!empty($_REQUEST['content_mode']) && $_POST['type'] == 'bbc')
 		{
-			require_once(SUBSDIR . 'Html2BBC.class.php');
-			$bbc_converter = new Convert_BBC($_REQUEST['content']);
-			$_REQUEST['content'] = $bbc_converter->get_bbc();
-			$_REQUEST['content'] = un_htmlspecialchars($_REQUEST['content']);
-			$_POST['content'] = $_REQUEST['content'];
+			$convert = $_REQUEST['content'];
+			require_once(SUBSDIR . '/Html2BBC.class.php');
+			$bbc_converter = new Convert_BBC($convert);
+			$convert = $bbc_converter->get_bbc();
+			$convert = un_htmlspecialchars($convert);
+			$_POST['content'] = $convert;
 		}
 
 		// Saving the work?
-		if (!empty($_POST['submit']))
+		if (!empty($_POST['submit']) && !$article_errors->hasErrors())
 		{
 			checkSession();
-
-
 			$this->_sportal_admin_article_edit_save();
-
-
 		}
 
 		// Just taking a look before you save?
-		if (!empty($_POST['preview']))
+		if (!empty($_POST['preview']) || $article_errors->hasErrors())
 		{
 			if (!$context['is_new'])
 			{
 				$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
 				$current = sportal_get_articles($_REQUEST['article_id']);
 				$author = $current['author'];
-				$date = timeformat($current['date']);
+				$date = standardTime($current['date']);
 			}
 			else
 			{
 				$author = array('link' => '<a href="' . $scripturl .'?action=profile;u=' . $user_info['id'] . '">' . $user_info['name'] . '</a>');
-				$date = timeformat(time());
+				$date = standardTime(time());
 			}
 
 			$context['article'] = array(
@@ -324,7 +325,16 @@ class ManagePortalArticles_Controller extends Action_Controller
 				preparsecode($context['article']['body']);
 
 			loadTemplate('PortalArticles');
-			$context['preview'] = true;
+
+			// Showing errors or a preview?
+			if ($article_errors->hasErrors())
+				$context['article_errors'] = array(
+					'errors' => $article_errors->prepareErrors(),
+					'type' => $article_errors->getErrorType() == 0 ? 'minor' : 'serious',
+					'title' => $txt['ban_errors_detected'],
+				);
+			else
+				$context['preview'] = true;
 		}
 		// Something new?
 		elseif ($context['is_new'])
@@ -350,7 +360,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		if ($context['article']['type'] === 'bbc')
 			$context['article']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($context['article']['body']));
 
-		// Over ride user preferance for wizzy mode if they don't need it
+		// Override user prefs for wizzy mode if they don't need it
 		if ($context['article']['type'] !== 'bbc')
 		{
 			$temp_editor = !empty($options['wysiwyg_default']);
@@ -403,7 +413,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		require_once(SUBSDIR . '/DataValidator.class.php');
 		$validator = new Data_Validator();
 
-		// If its not new, lets get the current data
+		// If its not new, lets load the current data
 		$is_new = empty($_REQUEST['article_id']);
 		if (!$is_new)
 		{
@@ -411,21 +421,27 @@ class ManagePortalArticles_Controller extends Action_Controller
 			$context['article'] = sportal_get_articles($_REQUEST['article_id']);
 		}
 
-		// Review the post data for compliance
+		// Clean and Review the post data for compliance
 		$validator->sanitation_rules(array(
 			'title' => 'trim|Util::htmlspecialchars',
 			'namespace' => 'trim|Util::htmlspecialchars',
 			'article_id' => 'intval',
 			'category_id' => 'intval',
 			'permissions' => 'intval',
-			'type' => 'trim'
+			'type' => 'trim',
+			'content' => 'trim'
 		));
 		$validator->validation_rules(array(
 			'title' => 'required',
 			'namespace' => 'alpha_numeric|required',
-			'type' => 'required')
-		);
-		$validator->text_replacements(array('title' => $txt['sp_error_article_name_empty'], 'namespace' => $txt['sp_error_article_namespace_empty']));
+			'type' => 'required',
+			'content' => 'required'
+		));
+		$validator->text_replacements(array(
+			'title' => $txt['sp_admin_articles_col_title'],
+			'namespace' => $txt['sp_admin_articles_col_namespace'],
+			'content' => $txt['sp_admin_articles_col_body']
+		));
 
 		// If you messed this up, back you go
 		if (!$validator->validate($_POST))
@@ -436,12 +452,12 @@ class ManagePortalArticles_Controller extends Action_Controller
 			return $this->action_sportal_admin_article_edit();
 		}
 
-		// Lets make sure this namespace is unique
+		// Lets make sure this namespace (article id) is unique
 		$has_duplicate = sp_duplicate_articles($validator->article_id, $validator->namespace);
 		if (!empty($has_duplicate))
 			$article_errors->addError('sp_error_article_namespace_duplicate');
 
-		// And we can't have just a numeric namespace
+		// And we can't have just a numeric namespace (article id)
 		if (preg_replace('~[0-9]+~', '', $validator->namespace) === '')
 			$article_errors->addError('sp_error_article_namespace_numeric');
 
@@ -456,7 +472,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 				$article_errors->addError($validator_php->validation_errors());
 		}
 
-		// None shall pass
+		// None shall pass ... with errors
 		if ($article_errors->hasErrors())
 			return $this->action_sportal_admin_article_edit();
 
@@ -467,7 +483,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			'namespace' => $validator->namespace,
 			'title' => $validator->title,
 			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
-			'type' => in_array($$validator->type, array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
+			'type' => in_array($validator->type, array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
 			'permissions' => $validator->permissions,
 			'status' => !empty($_POST['status']) ? 1 : 0,
 		);

@@ -15,7 +15,7 @@
  */
 function template_articles_edit()
 {
-	global $context, $scripturl, $settings, $txt;
+	global $context, $scripturl, $txt;
 
 	// Taking a peek before you publish?
 	if (!empty($context['preview']))
@@ -28,6 +28,9 @@ function template_articles_edit()
 		echo '
 	</div>';
 	}
+
+	// If there were errors creating the article, show them.
+	template_show_error('article_errors');
 
 	echo '
 	<div id="sp_edit_article">

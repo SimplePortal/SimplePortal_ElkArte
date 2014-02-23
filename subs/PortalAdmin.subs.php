@@ -678,6 +678,9 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 	// Brand new, insert it
 	if ($is_new)
 	{
+		// New will set this
+		unset($article_info['id']);
+
 		// Add the new article to the system
 		$db->insert('', '
 			{db_prefix}sp_articles',

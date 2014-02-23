@@ -1842,7 +1842,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 
 			foreach ($calendar_array['todayEvents'] as $event)
 				echo '
-									<li>', sp_embed_image('event'), ' ', $event['link'], !$show_titles ? ' - ' . timeformat(forum_time(), '%d %b') : '', '</li>';
+									<li>', sp_embed_image('event'), ' ', $event['link'], !$show_titles ? ' - ' . standardTime(forum_time(), '%d %b') : '', '</li>';
 		}
 
 		if (!empty($calendar_array['futureEvents']))
@@ -1973,7 +1973,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 			'href' => $item['link'],
 			'link' => $item['title'] == '' ? '' : ($item['link'] == '' ? $item['title'] : '<a href="' . $item['link'] . '" target="_blank" class="new_win">' . $item['title'] . '</a>'),
 			'content' => $limit > 0 && Util::strlen($item['description']) > $limit ? Util::substr($item['description'], 0, $limit) . '&hellip;' : $item['description'],
-			'date' => !empty($item['pubdate']) ? timeformat(strtotime($item['pubdate']), '%d %B') : '',
+			'date' => !empty($item['pubdate']) ? standardTime(strtotime($item['pubdate']), '%d %B') : '',
 		);
 	}
 
