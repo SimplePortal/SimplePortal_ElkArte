@@ -140,7 +140,7 @@ function template_shoutbox_embed($shoutbox)
 	if ($context['can_shout'])
 		echo '
 			<div class="shoutbox_input">
-				<input type="text" name="new_shout" id="new_shout_', $shoutbox['id'], '" class="shoutbox_input sp_float_left input_text"', $context['browser']['is_ie'] ? ' onkeypress="if (sp_catch_enter(event)) { sp_submit_shout(' . $shoutbox['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false; }"' : '', ' />
+				<input type="text" name="new_shout" id="new_shout_', $shoutbox['id'], '" class="shoutbox_input sp_float_left input_text"', isBrowser('is_ie8') ? ' onkeypress="if (sp_catch_enter(event)) { sp_submit_shout(' . $shoutbox['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false; }"' : '', ' />
 				<input type="submit" name="submit_shout" value="', $txt['sp_shoutbox_button'], '" class="right_submit" onclick="sp_submit_shout(', $shoutbox['id'], ', \'', $context['session_var'], '\', \'', $context['session_id'], '\'); return false;" />
 			</div>';
 
@@ -225,7 +225,7 @@ function template_shoutbox_xml()
 {
 	global $context, $txt;
 
-	echo '<', '?xml version="1.0" encoding="', $context['character_set'], '"?', '>
+	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
 <elk>
 	<shoutbox>', $context['SPortal']['shoutbox']['id'], '</shoutbox>';
 
@@ -241,11 +241,11 @@ function template_shoutbox_xml()
 			echo '
 	<shout>
 		<id>', $shout['id'], '</id>
-		<author>', htmlspecialchars($shout['author']['link']), '</author>
+		<author>', Util::htmlspecialchars($shout['author']['link']), '</author>
 		<time>', htmlspecialchars($shout['time']), '</time>
 		<timeclean>', htmlspecialchars(strip_tags($shout['time'])), '</timeclean>
 		<delete>', !empty($shout['delete_link_js']) ? htmlspecialchars($shout['delete_link_js']) : 0, '</delete>
-		<content>', htmlspecialchars($shout['text']), '</content>
+		<content>',  Util::htmlspecialchars($shout['text']), '</content>
 		<is_me>', $shout['is_me'] ? 1 : 0, '</is_me>
 	</shout>';
 	}

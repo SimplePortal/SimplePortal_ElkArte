@@ -24,7 +24,10 @@ function sportal_init($standalone = false)
 
 	$sportal_version = '2.4';
 
-	if ((isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach') || isset($_REQUEST['xml']) || isset($_REQUEST['api']))
+	if ((isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach'))
+		return;
+
+	if ((isset($_REQUEST['xml']) || isset($_REQUEST['api'])) && ((isset($_REQUEST['action']) && $_REQUEST['action'] !== 'shoutbox')))
 		return;
 
 	// Not running standalone then we need to load in some template information
@@ -670,7 +673,7 @@ function sp_languageSelect($template_name)
 }
 
 /**
- * Loads a set of calendar data
+ * Loads a set of calendar data, holdays, birthdays, events
  *
  * @param string $type type of data to load, events, birthdays, etc
  * @param string $low_date don't load data before this date
@@ -809,6 +812,7 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 {
 	global $modSettings, $settings, $txt;
 	static $default_alt, $randomizer;
+				loadLanguage('SPortal', sp_languageSelect('SPortal'));
 
 	if (!isset($default_alt))
 	{
@@ -1447,7 +1451,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 
 	foreach ($shouts as $shout)
 	{
-		if (preg_match('~^@(.+?): ~' . ($context['utf8'] ? 'u' : ''), $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
+		if (preg_match('~^@(.+?): ~u', $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
 		{
 			unset($shouts[$shout['id']]);
 			continue;

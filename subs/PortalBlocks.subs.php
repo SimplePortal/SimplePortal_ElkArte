@@ -1181,7 +1181,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $block_parameters;
 
-	// Break out / sanitize all the block parameters
+	// Break out / sanitize all the parameters
 	$board = !empty($parameters['board']) ? explode('|', $parameters['board']) : null;
 	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
 	$start = !empty($parameters['start']) ? (int) $parameters['start'] : 0;
@@ -1923,15 +1923,15 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 	{
 		preg_match('~encoding="([^"]*)"~', $data, $charset);
 
-		if (!empty($charset[1]) && $charset != $context['character_set'])
-			$data = mb_convert_encoding($data, $context['character_set'], $charset[1]);
+		if (!empty($charset[1]) && $charset != 'UTF-8')
+			$data = mb_convert_encoding($data, 'UTF-8', $charset[1]);
 	}
 	elseif (function_exists('iconv'))
 	{
 		preg_match('~encoding="([^"]*)"~', $data, $charset);
 
-		if (!empty($charset[1]) && $charset != $context['character_set'])
-			$data = iconv($charset[1], $context['character_set'], $data);
+		if (!empty($charset[1]) && $charset != 'UTF-8')
+			$data = iconv($charset[1], 'UTF-8', $data);
 	}
 
 	$data = str_replace(array("\n", "\r", "\t"), '', $data);
@@ -2475,13 +2475,13 @@ function sp_articles($parameters, $id, $return_parameters = false)
  * Shoutbox Block, show the shoutbox thoughts box
  *
  * @param array $parameters
- *		'shoutbox' => list of categories to choose article from
+ *		'shoutbox' => list of shoutboxes to choose from
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_shoutbox($parameters, $id, $return_parameters = false)
 {
-	global $context, $modSettings, $user_info, $settings, $txt, $scripturl;
+	global $context, $modSettings, $user_info, $settings, $txt, $scripturl, $editortxt;
 
 	$db = database();
 
@@ -2489,6 +2489,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 		'shoutbox' => array(),
 	);
 
+	// return the paramters for use in setting up the blocks
 	if ($return_parameters)
 	{
 		$shoutboxes = sportal_get_shoutbox();
@@ -2507,6 +2508,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 				$in_use[] = $row['value'];
 		$db->free_result($request);
 
+		// Load up all the shoutboxes that are NOT being used
 		foreach ($shoutboxes as $shoutbox)
 			if (!in_array($shoutbox['id'], $in_use))
 				$block_parameters['shoutbox'][$shoutbox['id']] = $shoutbox['name'];
@@ -2518,10 +2520,12 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 	}
 
 	loadTemplate('PortalShoutbox');
+	loadLanguage('Editor');
 	loadLanguage('Post');
 
 	$shoutbox = sportal_get_shoutbox($parameters['shoutbox'], true, true);
 
+	// To add a shoutbox you must have one or more defined for use
 	if (empty($shoutbox))
 	{
 		echo '
@@ -2529,10 +2533,11 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 		return;
 	}
 
+	// Going to add to the shoutbox \
 	if (!empty($_POST['new_shout']) && !empty($_POST['submit_shout']) && !empty($_POST['shoutbox_id']) && $_POST['shoutbox_id'] == $shoutbox['id'])
 	{
+		// Make sure things are in order
 		checkSession();
-
 		is_not_guest();
 
 		if (!($flood = sp_prevent_flood('spsbp', false)))
@@ -2630,23 +2635,19 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 		}
 
 		$shoutbox['bbc'] = array(
-			'bold' => array('code' => 'b', 'before' => '[b]', 'after' => '[/b]', 'description' => $txt['bold']),
-			'italicize' => array('code' => 'i', 'before' => '[i]', 'after' => '[/i]', 'description' => $txt['italic']),
-			'underline' => array('code' => 'u', 'before' => '[u]', 'after' => '[/u]', 'description' => $txt['underline']),
-			'strike' => array('code' => 's', 'before' => '[s]', 'after' => '[/s]', 'description' => $txt['strike']),
-			'pre' => array('code' => 'pre', 'before' => '[pre]', 'after' => '[/pre]', 'description' => $txt['preformatted']),
-			'flash' => array('code' => 'flash', 'before' => '[flash=200,200]', 'after' => '[/flash]', 'description' => $txt['flash']),
-			'img' => array('code' => 'img', 'before' => '[img]', 'after' => '[/img]', 'description' => $txt['image']),
-			'url' => array('code' => 'url', 'before' => '[url]', 'after' => '[/url]', 'description' => $txt['hyperlink']),
-			'email' => array('code' => 'email', 'before' => '[email]', 'after' => '[/email]', 'description' => $txt['insert_email']),
-			'ftp' => array('code' => 'ftp', 'before' => '[ftp]', 'after' => '[/ftp]', 'description' => $txt['ftp']),
-			'glow' => array('code' => 'glow', 'before' => '[glow=red,2,300]', 'after' => '[/glow]', 'description' => $txt['glow']),
-			'shadow' => array('code' => 'shadow', 'before' => '[shadow=red,left]', 'after' => '[/shadow]', 'description' => $txt['shadow']),
-			'sup' => array('code' => 'sup', 'before' => '[sup]', 'after' => '[/sup]', 'description' => $txt['superscript']),
-			'sub' => array('code' => 'sub', 'before' => '[sub]', 'after' => '[/sub]', 'description' => $txt['subscript']),
-			'tele' => array('code' => 'tt', 'before' => '[tt]', 'after' => '[/tt]', 'description' => $txt['teletype']),
-			'code' => array('code' => 'code', 'before' => '[code]', 'after' => '[/code]', 'description' => $txt['bbc_code']),
-			'quote' => array('code' => 'quote', 'before' => '[quote]', 'after' => '[/quote]', 'description' => $txt['bbc_quote']),
+			'bold' => array('code' => 'b', 'before' => '[b]', 'after' => '[/b]', 'description' => $editortxt['Bold']),
+			'italicize' => array('code' => 'i', 'before' => '[i]', 'after' => '[/i]', 'description' => $editortxt['Italic']),
+			'underline' => array('code' => 'u', 'before' => '[u]', 'after' => '[/u]', 'description' => $editortxt['Underline']),
+			'strike' => array('code' => 's', 'before' => '[s]', 'after' => '[/s]', 'description' => $editortxt['Strikethrough']),
+			'pre' => array('code' => 'pre', 'before' => '[pre]', 'after' => '[/pre]', 'description' => $editortxt['Preformatted Text']),
+			'img' => array('code' => 'img', 'before' => '[img]', 'after' => '[/img]', 'description' => $editortxt['Insert an image']),
+			'url' => array('code' => 'url', 'before' => '[url]', 'after' => '[/url]', 'description' => $editortxt['Insert a link']),
+			'email' => array('code' => 'email', 'before' => '[email]', 'after' => '[/email]', 'description' => $editortxt['Insert an email']),
+			'sup' => array('code' => 'sup', 'before' => '[sup]', 'after' => '[/sup]', 'description' => $editortxt['Superscript']),
+			'sub' => array('code' => 'sub', 'before' => '[sub]', 'after' => '[/sub]', 'description' => $editortxt['Subscript']),
+			'tele' => array('code' => 'tt', 'before' => '[tt]', 'after' => '[/tt]', 'description' => $editortxt['Teletype']),
+			'code' => array('code' => 'code', 'before' => '[code]', 'after' => '[/code]', 'description' => $editortxt['Code']),
+			'quote' => array('code' => 'quote', 'before' => '[quote]', 'after' => '[/quote]', 'description' => $editortxt['Insert a Quote']),
 		);
 	}
 

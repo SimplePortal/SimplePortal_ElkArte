@@ -20,6 +20,14 @@ if (!defined('ELK'))
 class Shoutbox_Controller extends Action_Controller
 {
 	/**
+	 * Need the template for the shoutbox
+	 */
+	public function pre_dispatch()
+	{
+		loadTemplate('PortalShoutbox');
+	}
+
+	/**
 	 * Default method
 	 */
 	public function action_index()
@@ -39,6 +47,7 @@ class Shoutbox_Controller extends Action_Controller
 		$shoutbox_id = !empty($_REQUEST['shoutbox_id']) ? (int) $_REQUEST['shoutbox_id'] : 0;
 		$request_time = !empty($_REQUEST['time']) ? (int) $_REQUEST['time'] : 0;
 
+		// We need to know which shoutbox this is for/from
 		$context['SPortal']['shoutbox'] = sportal_get_shoutbox($shoutbox_id, true, true);
 
 		if (empty($context['SPortal']['shoutbox']))
@@ -54,6 +63,7 @@ class Shoutbox_Controller extends Action_Controller
 		// Adding a shout
 		if (!empty($_REQUEST['shout']))
 		{
+			// Pretty basic
 			is_not_guest();
 			checkSession('request');
 
@@ -109,7 +119,6 @@ class Shoutbox_Controller extends Action_Controller
 		}
 
 		// Show all the shouts in this box
-		loadTemplate('PortalShoutbox');
 		$total_shouts = sportal_get_shoutbox_count($shoutbox_id);
 
 		$context['per_page'] = $context['SPortal']['shoutbox']['num_show'];

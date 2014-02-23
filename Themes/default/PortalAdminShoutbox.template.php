@@ -200,6 +200,10 @@ function template_shoutbox_prune()
 	// ]]></script>';
 }
 
+/**
+ * Once a shoutbox has been created, displays a success message with instructions
+ * @global type $context
+ */
 function template_shoutbox_block_redirect()
 {
 	global $context;
@@ -209,7 +213,7 @@ function template_shoutbox_block_redirect()
 		<h3 class="category_header">
 			', $context['page_title'], '
 		</h3>
-		<div class="windowbg">
+		<div class="infobox">
 			<div class="sp_content_padding">
 				', $context['redirect_message'], '
 			</div>

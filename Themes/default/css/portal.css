@@ -136,9 +136,6 @@ th.sp_center {
 	text-align: center;
 	vertical-align: top;
 }
-.sp_acalendar_divider {
-	width: 80%;
-}
 table.sp_blog, table.sp_articles, .sp_shop_info {
 	line-height: 1.7em;
 }
@@ -222,6 +219,9 @@ table.sp_block {
 }
 .sp_block_padding {
 	padding: 5px;
+}
+.sp_block_active {
+	color: green;
 }
 .sp_block_section, .sp_block_section_last {
 	padding-bottom: 0.5em;
@@ -427,8 +427,11 @@ input.shoutbox_input {
 	width: 34%;
 }
 #sp_shoutbox_redirect {
-	width: 70%;
 	margin: 0 auto;
+	margin-top: 1em;
+}
+#sp_shoutbox_redirect div {
+	font-size: 1.071em;
 }
 #sp_manage_profiles table.table_grid {
 	margin: 0.4em 0;

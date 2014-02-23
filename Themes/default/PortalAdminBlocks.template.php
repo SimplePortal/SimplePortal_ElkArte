@@ -99,7 +99,7 @@ function template_block_list()
 }
 
 /**
- * Used to edit a blocks details
+ * Used to edit a blocks details when using the block on the portal
  */
 function template_block_edit()
 {
@@ -155,6 +155,7 @@ function template_block_edit()
 							</div>
 						</dd>';
 
+	// Display any options that are available for this block
 	foreach ($context['SPortal']['block']['options'] as $name => $type)
 	{
 		if (empty($context['SPortal']['block']['parameters'][$name]))
@@ -240,7 +241,7 @@ function template_block_edit()
 							<div class="styled-select">
 								<select name="parameters[', $name, ']" id="', $name, '">';
 
-				foreach ($tsp_manage_blockssp_manage_blocksspype as $key => $option)
+				foreach ($type as $key => $option)
 					echo '
 									<option value="', $key, '"', $context['SPortal']['block']['parameters'][$name] == $key ? ' selected="selected"' : '', '>', $option, '</option>';
 
@@ -516,8 +517,13 @@ function template_block_select_type()
 			<table>
 				<tr>';
 
+	// For every block type defined in the system
 	foreach($context['SPortal']['block_types'] as $index => $type)
 	{
+		$this_block = isset($context['SPortal']['block_inuse'][$type['function']]) ? $context['SPortal']['block_inuse'][$type['function']] : false;
+		$this_title = !empty($this_block) ? $txt['sp-adminBlockInuse'] . ': ' . $context['location'][$this_block['column']] . (!empty($this_block['state']) ? '(' . $txt['sp-blocksActive'] . ')' : '') : '';
+
+		// 3 tidy columns will work out nice
 		if ($index != 0 && $index % 3 == 0)
 		{
 			echo '
@@ -529,8 +535,11 @@ function template_block_select_type()
 					<td>
 						<div class="windowbg">
 							<div class="sp_content_padding">
-								<input type="radio" name="selected_type[]" id="block_', $type['function'], '" value="', $type['function'], '" class="input_radio" /> <label for="block_', $type['function'], '"><strong>', $txt['sp_function_' . $type['function'] . '_label'], '</strong></label>
-								<p class="smalltext">', $txt['sp_function_' . $type['function'] . '_desc'], '</p>
+								<input type="radio" name="selected_type[]" id="block_', $type['function'], '" value="', $type['function'], '" class="input_radio" />
+								<strong><label ', (!empty($this_block) ? 'class="sp_block_active" ' : ''), 'for="block_', $type['function'], '" title="', $this_title, '">', $txt['sp_function_' . $type['function'] . '_label'], '</label></strong>
+								<p class="smalltext">', $txt['sp_function_' . $type['function'] . '_desc'], '</p>';
+
+		echo '
 							</div>
 						</div>
 					</td>';

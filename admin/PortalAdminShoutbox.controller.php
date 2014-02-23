@@ -78,7 +78,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
-		// build the listoption array to display the categories
+		// Build the listoption array to display the categories
 		$listOptions = array(
 			'id' => 'portal_shout',
 			'title' => $txt['sp_admin_articles_list'],
@@ -105,16 +105,16 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 						'reverse' => 'name DESC',
 					),
 				),
-				'num_shouts' => array(
+				'shouts' => array(
 					'header' => array(
 						'value' => $txt['sp_admin_shoutbox_col_shouts'],
 					),
 					'data' => array(
-						'db' => 'num_shouts',
+						'db' => 'shouts',
 					),
 					'sort' => array(
-						'default' => 'num_shouts',
-						'reverse' => 'num_shouts DESC',
+						'default' => 'shouts',
+						'reverse' => 'shouts DESC',
 					),
 				),
 				'caching' => array(
@@ -167,7 +167,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => create_function('$row', '
 							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
 						'),
 						'class' => 'centertext',

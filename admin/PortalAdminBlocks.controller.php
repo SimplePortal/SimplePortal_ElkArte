@@ -254,9 +254,18 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			}
 		}
 
+		// Want use a block on the portal?
 		if ($context['SPortal']['is_new'] && empty($_POST['selected_type']) && empty($_POST['add_block']))
 		{
+			// Gather the blocks we have available
 			$context['SPortal']['block_types'] = getFunctionInfo();
+
+			// Create a list of the blocks in use
+			$in_use = getBlockInfo();
+			foreach ($in_use as $block)
+				$context['SPortal']['block_inuse'][$block['type']] = array('state' => $block['state'], 'column' => $block['column']);
+
+			$context['location'] = array(1 => $txt['sp-positionLeft'], $txt['sp-positionTop'], $txt['sp-positionBottom'], $txt['sp-positionRight'], $txt['sp-positionHeader'], $txt['sp-positionFooter']);
 
 			if (!empty($_REQUEST['col']))
 				$context['SPortal']['block']['column'] = $_REQUEST['col'];
@@ -264,6 +273,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$context['sub_template'] = 'block_select_type';
 			$context['page_title'] = $txt['sp-blocksAdd'];
 		}
+		// Selecting a block to place in to service, load some initial values
 		elseif ($context['SPortal']['is_new'] && !empty($_POST['selected_type']))
 		{
 			$context['SPortal']['block'] = array(
@@ -284,6 +294,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'list_blocks' => !empty($_POST['block_column']) ? getBlockInfo($_POST['block_column']) : array(),
 			);
 		}
+		// Saving the block to one of the zones
 		elseif (!$context['SPortal']['is_new'] && empty($_POST['add_block']))
 		{
 			$_REQUEST['block_id'] = (int) $_REQUEST['block_id'];
@@ -295,6 +306,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			);
 		}
 
+		// Want to take a look at how this block will appear, well we try our best
 		if (!empty($_POST['preview_block']))
 		{
 			// Just in case, the admin could be doing something silly like editing a SP block while SP is disabled. ;)
@@ -421,6 +433,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 		if (!empty($_POST['selected_type']) || !empty($_POST['preview_block']) || (!$context['SPortal']['is_new'] && empty($_POST['add_block'])))
 		{
+			// Only the admin can use PHP blocks
 			if ($context['SPortal']['block']['type'] == 'sp_php' && !allowedTo('admin_forum'))
 				fatal_lang_error('cannot_admin_forum', false);
 
@@ -781,7 +794,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'type' => $_POST['block_type'],
 				'col' => $_POST['block_column'],
 				'row' => $row,
-				'permissions' => (int) $_POST['permissions'],				'state' => !empty($_POST['block_active']) ? 1 : 0,
+				'permissions' => (int) $_POST['permissions'],
+				'state' => !empty($_POST['block_active']) ? 1 : 0,
 				'force_view' => !empty($_POST['block_force']) ? 1 : 0,
 				'display' => $display,
 				'display_custom' => $custom,
@@ -971,7 +985,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	public function action_sportal_admin_block_delete()
 	{
 		global $context;
-		
+
 		$db = database();
 
 		// Check if he can?

@@ -10,7 +10,8 @@
 
 function sp_collapse_object(id, has_image)
 {
-	mode = document.getElementById("sp_object_" + id).style.display === '' ? 0 : 1;
+	var mode = document.getElementById("sp_object_" + id).style.display === '' ? 0 : 1;
+
 	$("#sp_object_" + id).toggle(300);
 
 	if (typeof(has_image) === "undefined" || has_image === true)
@@ -40,7 +41,7 @@ function sp_image_resize()
 		}
 	}
 
-	if (typeof(window_oldSPImageOnload) !== "undefined" && window_oldSPImageOnload)
+	if (typeof (window_oldSPImageOnload) !== "undefined" && window_oldSPImageOnload)
 	{
 		window_oldSPImageOnload();
 		window_oldSPImageOnload = null;
@@ -107,7 +108,7 @@ function onShoutReceived(XMLDoc)
 			new_body += '<li class="shoutbox_warning smalltext">' + warning + '</li>';
 
 		if (error !== "0")
-			setInnerHTML(document.getElementById('shouts_' + shoutbox_id), new_body + '<li class="smalltext">' + error + '</li>');
+			document.getElementById('shouts_' + shoutbox_id).innerHTML = new_body + '<li class="smalltext">' + error + '</li>';
 		else
 		{
 			for (var i = 0; i < shouts.length; i++)
@@ -121,17 +122,17 @@ function onShoutReceived(XMLDoc)
 				content = shout.getElementsByTagName("content")[0].childNodes[0].nodeValue;
 				is_me = shout.getElementsByTagName("is_me")[0].childNodes[0].nodeValue;
 
-				new_body += '<li class="smalltext">' + (is_me === 0 ? '<strong>' + author + ':</strong> ' : '') + content + '<br />' + (delete_link !== 0 ? ('<span class="shoutbox_delete">' + delete_link + '</span>') : '') + '<span class="smalltext shoutbox_time">' + time + '</span></li>';
+				new_body += '<li>' + (is_me === "0" ? '<strong>' + author + ':</strong> ' : '') + content + '<br />' + (delete_link !== 0 ? ('<span class="shoutbox_delete">' + delete_link + '</span>') : '') + '<span class="smalltext shoutbox_time">' + time + '</span></li>';
 			}
 
-			setInnerHTML(document.getElementById('shouts_' + shoutbox_id), new_body);
+			document.getElementById('shouts_' + shoutbox_id).innerHTML = new_body;
 
 			if (reverse !== "0")
 				document.getElementById('shouts_' + shoutbox_id).scrollTop = document.getElementById('shouts_' + shoutbox_id).scrollHeight;
 			else
 				document.getElementById('shouts_' + shoutbox_id).scrollTop = 0;
 
-			var sp_date = new Date;
+			var sp_date = new Date();
 			eval("last_refresh_" + shoutbox_id + " = " + Math.round(sp_date.getTime() / 1000, 0) + ";");
 		}
 	}
@@ -198,7 +199,6 @@ function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_them
 			sp_smileys[i][0] = sp_smileys[i][0].replace(/"/g, '&quot;');
 			sp_smileyRowsContent += '<a href="javascript:void(0);" onclick="window.opener.replaceText(\' ' + sp_smileys[i][0].php_addslashes() + '\', window.opener.document.getElementById(\'new_shout_' + postbox + '\')); window.focus(); return false;"><img src="' + elk_smileys_url + '/' + sp_smileys[i][1] + '" id="sml_' + sp_smileys[i][1] + '" alt="' + sp_smileys[i][2] + '" title="' + sp_smileys[i][2] + '" style="padding: 4px;" border="0" /></a> ';
 		}
-
 	}
 
 	this.oSmileyPopupWindow = window.open('', 'add_smileys', 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,width=480,height=220,resizable=yes');
