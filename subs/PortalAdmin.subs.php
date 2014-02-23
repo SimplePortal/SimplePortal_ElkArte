@@ -20,7 +20,7 @@ if (!defined('ELK'))
  * - directs back based on type passed
  *
  * @param string $type type of control
- * @param type $id id of the control
+ * @param int $id id of the control
  */
 function sportal_admin_state_change($type, $id)
 {

@@ -225,7 +225,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	}
 
 	/**
-	 * Edit an existing shout or add a new one
+	 * Edit an existing shoutbox or add a new one
 	 */
 	public function action_sportal_admin_shoutbox_edit()
 	{

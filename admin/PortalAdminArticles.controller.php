@@ -394,7 +394,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 */
 	private function _sportal_admin_article_edit_save()
 	{
-		global $context;
+		global $context, $txt;
 
 		// No errors, yet.
 		$article_errors = Error_Context::context('article', 0);

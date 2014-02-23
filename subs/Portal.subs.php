@@ -1568,6 +1568,15 @@ function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
 	sportal_update_shoutbox($shoutbox_id, $prune ? count($shouts) - 1 : count($shouts));
 }
 
+/**
+ * Updates the number of shouts for a given shoutbox
+ *
+ * Can supply a specific number to update the count to
+ * Use true to increment by 1
+ *
+ * @param int $shoutbox_id
+ * @param int|true $num_shouts
+ */
 function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
 {
 	$db = database();
