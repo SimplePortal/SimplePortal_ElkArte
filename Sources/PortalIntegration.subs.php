@@ -445,3 +445,20 @@ function sp_integrate_boardindex()
 	if (!empty($_GET) && $_GET !== array('action' => 'forum'))
 		$context['robot_no_index'] = true;
 }
+
+/**
+ * Dealing with the current action?
+ *
+ * @param string $current_action
+ */
+function sp_integrate_current_action(&$current_action)
+{
+	global $modSettings, $context;
+
+	// If it is home, it may be something else
+	if ($current_action == 'home')
+		$current_action = $modSettings['sp_portal_mode'] == 3 && empty($context['standalone']) && empty($context['disable_sp']) ? 'forum' : 'home';
+
+	if(empty($context['disable_sp']) && ((isset($_GET['board']) || isset($_GET['topic']) || in_array($context['current_action'], array('unread', 'unreadreplies', 'recent', 'stats', 'who'))) && in_array($modSettings['sp_portal_mode'], array(1, 3))))
+		$current_action = 'forum';
+}
