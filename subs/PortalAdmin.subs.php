@@ -822,7 +822,7 @@ function sp_delete_pages($page_ids = array())
 }
 
 /**
- * Returns the total count of pages in the system
+ * Returns the total count of shoutboxes in the system
  */
 function sp_count_shoutbox()
 {
@@ -840,8 +840,8 @@ function sp_count_shoutbox()
 }
 
 /**
- * Loads all of the pages in the system
- * Returns an indexed array of the pages
+ * Loads all of the shoutboxes in the system
+ * Returns an indexed array of the shoutboxes
  *
  * @param int $start
  * @param int $items_per_page
@@ -1201,14 +1201,14 @@ function sp_block_update($blockInfo)
  *
  * @param mixed[] $new_parameters
  */
-function sp_block_insert_parameters($new_parameters)
+function sp_block_insert_parameters($new_parameters, $id_block)
 {
 	$db = database();
 
 	$parameters = array();
 	foreach ($new_parameters as $variable => $value)
 		$parameters[] = array(
-			'id_block' => $blockInfo['id'],
+			'id_block' => $id_block,
 			'variable' => $variable,
 			'value' => $value,
 		);

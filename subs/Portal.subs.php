@@ -808,12 +808,24 @@ function sp_loadColors($users = array())
 	return empty($loaded_ids) ? false : $loaded_ids;
 }
 
+/**
+ * Builds an image tag for use in templates
+ *
+ * @param string $name
+ * @param string $alt
+ * @param int $width
+ * @param int $height
+ * @param string|true $title
+ * @param int $id
+ */
 function sp_embed_image($name, $alt = '', $width = null, $height = null, $title = true, $id = null)
 {
 	global $modSettings, $settings, $txt;
 	static $default_alt, $randomizer;
-				loadLanguage('SPortal', sp_languageSelect('SPortal'));
 
+	loadLanguage('SPortal', sp_languageSelect('SPortal'));
+
+	// Some default alt text settings for our standard images
 	if (!isset($default_alt))
 	{
 		$default_alt = array(
@@ -836,28 +848,39 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 		$randomizer = 0;
 	$randomizer++;
 
+	// Use a default alt text if available and none was supplied
 	if (empty($alt) && isset($default_alt[$name]))
 		$alt = $default_alt[$name];
 
+	// You want a title, use the alt text if we can
 	if ($title === true)
 		$title = !empty($alt) ? $alt : '';
 
 	if (empty($alt))
 		$alt = $name;
 
+	// dots using random colors
 	if (in_array($name, array('dot', 'star')) && empty($modSettings['sp_disable_random_bullets']))
 		$name .= $randomizer;
 
+	// Build the image tag
 	$image = '<img src="' . $settings['sp_images_url'] . '/' . $name . '.png" alt="' . $alt . '"' . (!empty($title) ? ' title="' . $title . '"' : '') . (!empty($width) ? ' width="' . $width . '"' : '') . (!empty($height) ? ' height="' . $height . '"' : '') . (!empty($id) ? ' id="' . $id . '"' : '') . ' />';
 
 	return $image;
 }
 
+/**
+ * Implodes or Expands a set of style attributes
+ *
+ * @param string $action implode or explode
+ * @param string $setting string of style options joined on name~value|name~value
+ * @param boolean $process
+ */
 function sportal_parse_style($action, $setting = '', $process = false)
 {
 	static $process_cache;
 
-	if ($action == 'implode')
+	if ($action === 'implode')
 	{
 		$style = '';
 		$style_parameters = array(
@@ -880,9 +903,11 @@ function sportal_parse_style($action, $setting = '', $process = false)
 		if (!empty($style))
 			$style = substr($style, 0, -1);
 	}
-	elseif ($action == 'explode')
+	elseif ($action === 'explode')
 	{
 		$style = array();
+
+		// Supplying a style set or using our defaults
 		if (!empty($setting))
 		{
 			$temp = explode('|', $setting);
@@ -906,6 +931,7 @@ function sportal_parse_style($action, $setting = '', $process = false)
 			);
 		}
 
+		// Set the style values for use in the templates
 		if ($process && !isset($process_cache[$setting]))
 		{
 			if (empty($style['no_title']))

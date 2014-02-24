@@ -319,26 +319,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				foreach ($type_parameters as $name => $type)
 				{
 					if (isset($_POST['parameters'][$name]))
-					{
-						if ($type == 'bbc')
-						{
-							$value = $_POST['parameters'][$name];
-							require_once(SUBSDIR . '/Post.subs.php');
-
-							$value = Util::htmlspecialchars($value, ENT_QUOTES);
-							preparsecode($value);
-
-							$_POST['parameters'][$name] = $value;
-						}
-						elseif ($type == 'boards' || $type == 'board_select')
-							$_POST['parameters'][$name] = is_array($_POST['parameters'][$name]) ? implode('|', $_POST['parameters'][$name]) : $_POST['parameters'][$name];
-						elseif ($type == 'int' || $type == 'select')
-							$_POST['parameters'][$name] = (int) $_POST['parameters'][$name];
-						elseif ($type == 'text' || $type == 'textarea' || is_array($type))
-							$_POST['parameters'][$name] = Util::htmlspecialchars($_POST['parameters'][$name], ENT_QUOTES);
-						elseif ($type == 'check')
-							$_POST['parameters'][$name] = !empty($_POST['parameters'][$name]) ? 1 : 0;
-					}
+						$this->_prepare_parameters($type, $name);
 				}
 			}
 			else
@@ -655,27 +636,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				{
 					if (isset($_POST['parameters'][$name]))
 					{
-						// Prepare BBC Content for ELK 2 special case =D
+						// Prepare BBC Content for ELK
 						if ($type === 'bbc')
-						{
-							$value = $_POST['parameters'][$name];
-							require_once(SUBSDIR . '/Post.subs.php');
-
-							// Prepare the message a bit for some additional testing.
-							$value = Util::htmlspecialchars($value, ENT_QUOTES);
-							preparsecode($value);
-
-							// Store now the correct and fixed value ;)
-							$_POST['parameters'][$name] = $value;
-						}
-						elseif ($type == 'boards' || $type == 'board_select')
-							$_POST['parameters'][$name] = is_array($_POST['parameters'][$name]) ? implode('|', $_POST['parameters'][$name]) : $_POST['parameters'][$name];
-						elseif ($type == 'int' || $type == 'select')
-							$_POST['parameters'][$name] = (int) $_POST['parameters'][$name];
-						elseif ($type == 'text' || $type == 'textarea' || is_array($type))
-							$_POST['parameters'][$name] = Util::htmlspecialchars($_POST['parameters'][$name], ENT_QUOTES);
-						elseif ($type == 'check')
-							$_POST['parameters'][$name] = !empty($_POST['parameters'][$name]) ? 1 : 0;
+							$this->_prepare_parameters($type, $name);
 					}
 				}
 			}
@@ -766,10 +729,40 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 			// Save any parameters for the block
 			if (!empty($_POST['parameters']))
-				sp_block_insert_parameters($_POST['parameters']);
+				sp_block_insert_parameters($_POST['parameters'], $blockInfo['id']);
 
 			redirectexit('action=admin;area=portalblocks');
 		}
+	}
+
+	/**
+	 * Preparse the post parameters for use
+	 *
+	 * @param string $type
+	 * @param string $name
+	 */
+	private function _prepare_parameters($type, $name)
+	{
+		if ($type === 'bbc')
+		{
+			$value = $_POST['parameters'][$name];
+			require_once(SUBSDIR . '/Post.subs.php');
+
+			// Prepare the message a bit for some additional testing.
+			$value = Util::htmlspecialchars($value, ENT_QUOTES);
+			preparsecode($value);
+
+			// Store now the correct and fixed value ;)
+			$_POST['parameters'][$name] = $value;
+		}
+		elseif ($type == 'boards' || $type == 'board_select')
+			$_POST['parameters'][$name] = is_array($_POST['parameters'][$name]) ? implode('|', $_POST['parameters'][$name]) : $_POST['parameters'][$name];
+		elseif ($type == 'int' || $type == 'select')
+			$_POST['parameters'][$name] = (int) $_POST['parameters'][$name];
+		elseif ($type == 'text' || $type == 'textarea' || is_array($type))
+			$_POST['parameters'][$name] = Util::htmlspecialchars($_POST['parameters'][$name], ENT_QUOTES);
+		elseif ($type == 'check')
+			$_POST['parameters'][$name] = !empty($_POST['parameters'][$name]) ? 1 : 0;
 	}
 
 	/**
