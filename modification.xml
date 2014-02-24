@@ -15,17 +15,6 @@
 	<id>[SiNaN]:SimplePortal</id>
 	<version>2.4</version>
 
-	<file name="BOARDDIR/index.php">
-		<operation>
-			<search position="replace"><![CDATA[	// What shall we do?]]></search>
-			<add><![CDATA[	// Load SimplePortal.
-	require_once(SUBSDIR . '/Portal.subs.php');
-	sportal_init();
-
-	// What shall we do?]]></add>
-		</operation>
-	</file>
-
 	<file name="CONTROLLERDIR/BoardIndex.controller.php">
 		<operation error="ignore">
 			<search position="replace"><![CDATA[if (!empty($_GET))]]></search>
