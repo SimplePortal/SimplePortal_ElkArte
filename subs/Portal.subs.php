@@ -301,11 +301,11 @@ function sportal_load_blocks()
 /**
  * This function, returns all of the information about particular blocks.
  *
- * @param int $column_id
- * @param int $block_id
- * @param boolean $state
- * @param boolean $show
- * @param boolean $permission
+ * @param int|null $column_id
+ * @param int|null $block_id
+ * @param boolean|null $state
+ * @param boolean|null $show
+ * @param boolean|null $permission
  */
 function getBlockInfo($column_id = null, $block_id = null, $state = null, $show = null, $permission = null)
 {
@@ -382,9 +382,9 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 /**
  * Function to get a block's display/show information.
  *
- * @param int $block_id
- * @param string $display
- * @param string $custom
+ * @param int|null $block_id
+ * @param string|null $display
+ * @param string|null $custom
  */
 function getShowInfo($block_id = null, $display = null, $custom = null)
 {
@@ -703,7 +703,7 @@ function sp_loadCalendarData($type, $low_date, $high_date = false)
 /**
  * This is a small script to load colors for SPortal.
  *
- * @param array $users
+ * @param int[] $users
  */
 function sp_loadColors($users = array())
 {
@@ -813,10 +813,10 @@ function sp_loadColors($users = array())
  *
  * @param string $name
  * @param string $alt
- * @param int $width
- * @param int $height
+ * @param int|null $width
+ * @param int|null $height
  * @param string|true $title
- * @param int $id
+ * @param int|null $id
  */
 function sp_embed_image($name, $alt = '', $width = null, $height = null, $title = true, $id = null)
 {
@@ -1207,7 +1207,7 @@ function sportal_recount_comments($article_id)
 {
 	$db = database();
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_comments
 		WHERE id_article = {int:article_id}
@@ -1323,8 +1323,9 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_prof
 		$parameters['type'] = (int) $type;
 	}
 
-	$request = $db->query('','
-		SELECT id_profile, type, name, value
+	$request = $db->query('', '
+		SELECT
+			id_profile, type, name, value
 		FROM {db_prefix}sp_profiles' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}',
@@ -1343,7 +1344,7 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_prof
 
 		if ($row['type'] == 1)
 		{
-			list ($groups_allowed, $groups_denied) = explode('|',  $row['value']);
+			list ($groups_allowed, $groups_denied) = explode('|', $row['value']);
 
 			$return[$row['id_profile']] = array_merge($return[$row['id_profile']], array(
 				'groups_allowed' => $groups_allowed !== '' ? explode(',', $groups_allowed) : array(),
@@ -1599,7 +1600,7 @@ function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
  * Use true to increment by 1
  *
  * @param int $shoutbox_id
- * @param int|true $num_shouts
+ * @param int|boolean $num_shouts
  */
 function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
 {

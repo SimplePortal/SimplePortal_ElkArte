@@ -64,7 +64,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	/**
 	 * Show page listing of all premission groups in the system
 	 */
-	function action_sportal_admin_permission_profiles_list()
+	public function action_sportal_admin_permission_profiles_list()
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
@@ -231,7 +231,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 		return sp_load_profiles($start, $items_per_page, $sort);
 	}
 
-	function action_sportal_admin_permission_profiles_edit()
+	public function action_sportal_admin_permission_profiles_edit()
 	{
 		global $context, $txt;
 
@@ -327,7 +327,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 		$context['sub_template'] = 'permission_profiles_edit';
 	}
 
-	function action_sportal_admin_permission_delete()
+	public function action_sportal_admin_permission_delete()
 	{
 		$db = database();
 
@@ -335,7 +335,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 
 		$profile_id = !empty($_REQUEST['profile_id']) ? (int) $_REQUEST['profile_id'] : 0;
 
-		$db->query('','
+		$db->query('', '
 			DELETE FROM {db_prefix}sp_profiles
 			WHERE id_profile = {int:id}',
 			array(

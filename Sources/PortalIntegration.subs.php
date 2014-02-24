@@ -17,7 +17,7 @@ if (!defined('ELK'))
  * integration hook integrate_actions
  * Called from dispatcher.class, used to add in custom actions
  *
- * @param array $actions
+ * @param mixed[] $actions
  */
 function sp_integrate_actions(&$actions)
 {
@@ -35,7 +35,7 @@ function sp_integrate_actions(&$actions)
  * Admin hook, integrate_admin_areas, called from Menu.subs
  * adds the admin menu
  *
- * @param array $admin_areas
+ * @param mixed[] $admin_areas
  */
 function sp_integrate_admin_areas(&$admin_areas)
 {
@@ -165,11 +165,11 @@ function sp_integrate_admin_areas(&$admin_areas)
  * Permissions hook, integrate_load_permissions, called from ManagePermissions.php
  * used to add new permisssions
  *
- * @param array $permissionGroups
- * @param array $permissionList
- * @param array $leftPermissionGroups
- * @param array $hiddenPermissions
- * @param array $relabelPermissions
+ * @param mixed[] $permissionGroups
+ * @param mixed[] $permissionList
+ * @param mixed[] $leftPermissionGroups
+ * @param mixed[] $hiddenPermissions
+ * @param mixed[] $relabelPermissions
  */
 function sp_integrate_load_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
 {
@@ -190,7 +190,7 @@ function sp_integrate_load_permissions(&$permissionGroups, &$permissionList, &$l
  * Whos online hook, integrate_whos_online, called from who.subs
  * translates custom actions to allow show what area a user is in
  *
- * @param type $actions
+ * @param string $actions
  */
 function sp_integrate_whos_online($actions)
 {
@@ -278,7 +278,7 @@ function sp_integrate_whos_online($actions)
  * Frontpage hook, integrate_frontpage, called from the site dispatcher,
  * used to replace the default action with a new one
  *
- * @param array $default_action
+ * @param string $default_action
  */
 function sp_integrate_frontpage(&$default_action)
 {
@@ -385,7 +385,7 @@ function sp_integrate_buffer($tourniquet)
  * Menu Button hook, integrate_menu_buttons, called from subs.php
  * used to add top menu buttons
  *
- * @param array $buttons
+ * @param mixed[] $buttons
  */
 function sp_integrate_menu_buttons(&$buttons)
 {
@@ -407,8 +407,8 @@ function sp_integrate_menu_buttons(&$buttons)
 /**
  * Redirection hook, integrate_redirect, called from subs.php redirectexit()
  *
- * @param type $setLocation
- * @param type $refresh
+ * @param string $setLocation
+ * @param boolean $refresh
  * @uses redirectexit_callback in subs.php
  */
 function sp_integrate_redirect(&$setLocation, &$refresh)

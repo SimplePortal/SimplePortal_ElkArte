@@ -859,8 +859,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	/**
 	 * Pass this off to the state change function
 	 */
-	public function action_sportal_admin_state_change() {
-
+	public function action_sportal_admin_state_change()
+	{
 		$id = (int) $_REQUEST['block_id'];
 		$type = $_REQUEST['type'];
 

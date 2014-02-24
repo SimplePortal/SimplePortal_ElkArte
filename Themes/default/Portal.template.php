@@ -164,6 +164,8 @@ function template_portal_below()
 
 /**
  * Generic template to wrap blocks
+ *
+ * @param mixed[] $block
  */
 function template_block($block)
 {
@@ -193,6 +195,8 @@ function template_block($block)
 
 /**
  * Wrap a block in our default wrapper
+ *
+ * @param mixed[] $block
  */
 function template_block_default($block)
 {

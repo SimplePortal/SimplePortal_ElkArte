@@ -93,7 +93,7 @@ function getFunctionInfo($function = null)
  * - For each block in a column, it will sequentially number the row id
  * based on the order the blocks are returned via getBlockInfo
  *
- * @param int $column_id
+ * @param int|null $column_id
  */
 function fixColumnRows($column_id = null)
 {
@@ -128,8 +128,8 @@ function fixColumnRows($column_id = null)
 /**
  * Toggles the active state of a passed control ID of a given Type
  *
- * @param string $type type of control
- * @param int $id specific id of the control
+ * @param string|null $type type of control
+ * @param int|null $id specific id of the control
  */
 function sp_changeState($type = null, $id = null)
 {
@@ -177,13 +177,13 @@ function sp_changeState($type = null, $id = null)
 /**
  * This will file the $context['member_groups'] to the given options
  *
- * @param type $selectedGroups - all groups who should be shown as selcted, if you like to check all than insert an 'all'
+ * @param int[]|string $selectedGroups - all groups who should be shown as selcted, if you like to check all than insert an 'all'
  *								 You can also Give the function a string with '2,3,4'
- * @param type $show -  'normal' => will show all groups, and add a guest and regular member (Standard)
- *						'post' => will load only post groups
- *						'master' => will load only not postbased groups
- * @param type $contextName - where the datas should stored in the $context
- * @param type $subContext
+ * @param string $show - 'normal' => will show all groups, and add a guest and regular member (Standard)
+ *						 'post' => will load only post groups
+ *						 'master' => will load only not postbased groups
+ * @param string $contextName - where the datas should stored in the $context
+ * @param string $subContext
  */
 function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $contextName = 'member_groups', $subContext = 'SPortal')
 {
@@ -338,7 +338,8 @@ function sp_count_categories()
 
 /**
  * Loads all of the categorys in the system
- * Returns an indexed array of the categories
+ *
+ * - Returns an indexed array of the categories
  *
  * @param int $start
  * @param int $items_per_page
@@ -806,7 +807,7 @@ function sp_load_pages($start, $items_per_page, $sort)
 /**
  * Removes a page or group of pages by id
  *
- * @param array $article_ids
+ * @param int[] $article_ids
  */
 function sp_delete_pages($page_ids = array())
 {
@@ -889,7 +890,7 @@ function sp_load_shoutbox($start, $items_per_page, $sort)
 /**
  * Removes a shoutbox or group of shoutboxes by id
  *
- * @param array $article_ids
+ * @param int[] $article_ids
  */
 function sp_delete_shoutbox($shoutbox_ids = array())
 {
@@ -920,7 +921,7 @@ function sp_count_profiles()
 	$db = database();
 	$total_profiles = 0;
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_profiles
 		WHERE type = {int:type}',
@@ -1000,7 +1001,7 @@ function sp_load_profiles($start, $items_per_page, $sort)
 /**
  * Removes a permission group by id
  *
- * @param array $article_ids
+ * @param int[] $article_ids
  */
 function sp_delete_profiles($remove_ids = array())
 {
@@ -1200,6 +1201,7 @@ function sp_block_update($blockInfo)
  * Inserts parameters for a specific block
  *
  * @param mixed[] $new_parameters
+ * @param int $id_block
  */
 function sp_block_insert_parameters($new_parameters, $id_block)
 {

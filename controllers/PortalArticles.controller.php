@@ -107,7 +107,7 @@ class Article_Controller extends Action_Controller
 			{
 				if (!empty($_POST['comment']))
 				{
-					$request = $db->query('','
+					$request = $db->query('', '
 						SELECT id_comment, id_member
 						FROM {db_prefix}sp_comments
 						WHERE id_comment = {int:comment_id}
@@ -136,7 +136,7 @@ class Article_Controller extends Action_Controller
 		{
 			checkSession('get');
 
-			$request = $db->query('','
+			$request = $db->query('', '
 				SELECT id_comment, id_member, body
 				FROM {db_prefix}sp_comments
 				WHERE id_comment = {int:comment_id}
@@ -164,7 +164,7 @@ class Article_Controller extends Action_Controller
 		{
 			checkSession('get');
 
-			$request = $db->query('','
+			$request = $db->query('', '
 				SELECT id_comment, id_article, id_member
 				FROM {db_prefix}sp_comments
 				WHERE id_comment = {int:comment_id}

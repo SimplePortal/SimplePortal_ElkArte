@@ -16,7 +16,7 @@ if (!defined('ELK'))
 /**
  * User info block, shows avatar, group, icons, posts, karma, etc
  *
- * @param array $parameters, not used in this block
+ * @param mixed[] $parameters, not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -136,7 +136,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 /**
  * Latest member block, shows name and join date for X latest members
  *
- * @param array $parameters 'limit' => number of members to show
+ * @param mixed[] $parameters 'limit' => number of members to show
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -213,7 +213,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 /**
  * Who's online block, shows count of users online names
  *
- * @param array $parameters 'online_today' => shows all users that were online today (requires user online today addon)
+ * @param mixed[] $parameters 'online_today' => shows all users that were online today (requires user online today addon)
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -304,7 +304,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 /**
  * Board Stats block, shows count of users online names
  *
- * @param array $parameters 'averages' => Will calculate the daily average (posts, topics, registrations, etc)
+ * @param mixed[] $parameters 'averages' => Will calculate the daily average (posts, topics, registrations, etc)
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -375,7 +375,7 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 /**
  * Top Posters block, shows the top posters on the site, with avatar and name
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'limit' => number of top posters to show
  *		'type' => period to determine the top poster, 0 all time, 1 today, 2 week, 3 month
  * @param int $id - not used in this block
@@ -525,7 +525,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
  * Top stats block, shows the top x members who has achieved top position of various stats
  * Designed to be flexible so adding additional member stats is easy
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'limit' => number of top posters to show
  *		'type' => top stat to show
  *		'sort_asc' => direction to show the list
@@ -857,7 +857,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 /**
  * Recent Post or Topic block, shows the most recent posts or topics on the forum
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'boards' => list of boards to get posts from,
  *		'limit' => number of topics/posts to show
  *		'type' => recent 0 posts or 1 topics
@@ -947,7 +947,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
 /**
  * Top Topics Block, shows top topics by number of view or number of posts
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'limit' => number of posts to show
  *		'type' => 0 replies or 1 views
  * @param int $id - not used in this block
@@ -995,7 +995,7 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
 /**
  * Top Boards Block, shows top boards by number of posts
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'limit' => number of boards to show
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
@@ -1040,7 +1040,7 @@ function sp_topBoards($parameters, $id, $return_parameters = false)
  * Poll Block, Shows a specific poll, the most recent or a random poll
  * If user can vote, provides for voting selection
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'topic' => topic id of the poll
  *		'type' => 1 the most recently posted poll, 2 displays a random poll, null for specific topic
  * @param int $id - not used in this block
@@ -1153,7 +1153,7 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 /**
  * Board Block, Displays a list of posts from selected board(s)
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'board' => Board(s) to select posts from
  *		'limit' => max number of posts to show
  *		'start' => id of post to start from
@@ -1388,7 +1388,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 /**
  * Quick Search Block, Displays a quick search box
  *
- * @param array $parameters, not used in this block
+ * @param mixed[] $parameters, not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -1414,7 +1414,7 @@ function sp_quickSearch($parameters, $id, $return_parameters = false)
 /**
  * News Block, Displays the forum news
  *
- * @param array $parameters, not used in this block
+ * @param mixed[] $parameters, not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -1434,7 +1434,7 @@ function sp_news($parameters, $id, $return_parameters = false)
 /**
  * Image Attachment Block, Displays a list of recent post image attachments
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'limit' => Board(s) to select posts from
  *		'direction' => 0 Horizontal or 1 Vertical display
  *		'disablePoster' => don't show the poster of the attachment
@@ -1515,7 +1515,7 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
 /**
  * Attachment Block, Displays a list of recent attachments (by name)
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'limit' => Board(s) to select posts from
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
@@ -1558,7 +1558,7 @@ function sp_attachmentRecent($parameters, $id, $return_parameters = false)
 /**
  * Calendar Block, Displays a full calendar block
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'events' => show events
  *		'birthdays' => show birthdays
  *		'holidays' => show holidays
@@ -1712,7 +1712,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 /**
  * Calendar Info Block, Displays basic calendar ... birthdays, events and holidays.
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'events' => show events
  *		'future' => how many months out to look for items
  *		'birthdays' => show birthdays
@@ -1870,7 +1870,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 /**
  * RSS Block, Displays rss feed in a block.
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'url' => url of the feed
  *		'show_title' => Show the feed title
  *		'show_content' => Show the content of the feed
@@ -2022,7 +2022,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 /**
  * Theme Selection Block, Displays themes available for user selection
  *
- * @param array $parameters not used in this block
+ * @param mixed[] $parameters not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -2177,7 +2177,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 /**
  * Staff Block, show the list of forum staff members
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'lmod' => set to include local moderators as well
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
@@ -2311,7 +2311,7 @@ function sp_staff($parameters, $id, $return_parameters = false)
 /**
  * Article Block, show the list of forum staff members
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'category' => list of categories to choose article from
  *		'limit' => number of articles to show
  *		'type' => 0 latest 1 random
@@ -2474,7 +2474,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 /**
  * Shoutbox Block, show the shoutbox thoughts box
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'shoutbox' => list of shoutboxes to choose from
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
@@ -2657,7 +2657,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 /**
  * Gallery Block, show a gallery box with gallery items
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'limit' => number of gallery items to show
  *		'type' =>
  *		'direction' => 0 horizontal or 1 vertical display in the block
@@ -2749,7 +2749,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
  * Menu Block, creates a sidebar menu block based on the system main menu
  * @todo needs updating .. superfish it?
  *
- * @param array $parameters -  not used in this block
+ * @param mixed[] $parameters -  not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -2796,7 +2796,7 @@ function sp_menu($parameters, $id, $return_parameters = false)
 /**
  * Generic BBC Block, creates a BBC formatted block with parse_bbc
  *
- * @param array $parameters -  not used in this block
+ * @param mixed[] $parameters -  not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -2818,7 +2818,7 @@ function sp_bbc($parameters, $id, $return_parameters = false)
 /**
  * Generic HTML Block, creates a formatted block with HTML
  *
- * @param array $parameters -  not used in this block
+ * @param mixed[] $parameters -  not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -2840,7 +2840,7 @@ function sp_html($parameters, $id, $return_parameters = false)
 /**
  * Generic PHP Block, creates a PHP block to do whatever you can imagine :D
  *
- * @param array $parameters
+ * @param mixed[] $parameters
  *		'textarea' =>
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
