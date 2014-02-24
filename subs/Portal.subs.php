@@ -1264,9 +1264,7 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 
 function sportal_parse_content($body, $type)
 {
-	if (strtolower($body) === 'el psy congroo')
-		echo 'Steins;Gate';
-	elseif ($type == 'bbc')
+	if ($type == 'bbc')
 		echo parse_bbc($body);
 	elseif ($type == 'html')
 		echo un_htmlspecialchars($body);

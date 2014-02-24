@@ -101,7 +101,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl;
 
-		// We have 4 sides...
+		// We have 6 sides...like a cube!
 		$context['sides'] = array(
 			'header' => array(
 				'id' => '5',
@@ -211,8 +211,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	public function action_sportal_admin_block_edit()
 	{
 		global $txt, $context, $modSettings, $boards;
-
-		$db = database();
 
 		// Just in case, the admin could be doing something silly like editing a SP block while SP is disabled. ;)
 		require_once(SUBSDIR . '/PortalBlocks.subs.php');
@@ -346,6 +344,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			else
 				$_POST['parameters'] = array();
 
+			// Simple is clean
 			if (empty($_POST['display_advanced']))
 			{
 				if (!empty($_POST['display_simple']) && in_array($_POST['display_simple'], array('all', 'sportal', 'sforum', 'allaction', 'allboard', 'allpages')))
@@ -355,6 +354,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 				$custom = '';
 			}
+			// Want to see the advanced options
 			else
 			{
 				$display = array();
@@ -383,6 +383,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				$custom = empty($custom) ? '' : implode(',', $custom);
 			}
 
+			// Create all the information we know about this block
 			$context['SPortal']['block'] = array(
 				'id' => $_POST['block_id'],
 				'label' => Util::htmlspecialchars($_POST['block_name'], ENT_QUOTES),
@@ -437,18 +438,23 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			if ($context['SPortal']['block']['type'] == 'sp_php' && !allowedTo('admin_forum'))
 				fatal_lang_error('cannot_admin_forum', false);
 
+			// JS to expand the areas under advanced
 			addInlineJavascript('
 			function sp_collapseObject(id)
 			{
-				mode = document.getElementById("sp_object_" + id).style.display == "" ? 0 : 1;
-				document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? "/selected.png" : "/selected_open.png");
-				document.getElementById("sp_object_" + id).style.display = mode ? "" : "none";
-			}');
+				mode = document.getElementById("sp_object_" + id).style.display;
+				mode = (mode === "" | mode === "block") ? false : true;
+
+				// Make it close smoothly
+				$("#sp_object_" + id).slideToggle(300);
+
+				document.getElementById("sp_collapse_" + id).src = elk_images_url + (!mode ? "/selected_open.png" : "/selected.png");
+			}', true);
 
 			loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
 
+			// Load up the permissions
 			$context['SPortal']['block']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
-
 			if (empty($context['SPortal']['block']['permission_profiles']))
 				fatal_lang_error('error_sp_no_permission_profiles', false);
 
@@ -482,25 +488,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'who' => $txt['who_title'],
 			);
 
-			$request = $db->query('', '
-				SELECT id_board, name
-				FROM {db_prefix}boards
-				ORDER BY name DESC'
-			);
-			$context['display_boards'] = array();
-			while ($row = $db->fetch_assoc($request))
-				$context['display_boards']['b' . $row['id_board']] = $row['name'];
-			$db->free_result($request);
-
-			$request = $db->query('', '
-				SELECT id_page, title
-				FROM {db_prefix}sp_pages
-				ORDER BY title DESC'
-			);
-			$context['display_pages'] = array();
-			while ($row = $db->fetch_assoc($request))
-				$context['display_pages']['p' . $row['id_page']] = $row['title'];
-			$db->free_result($request);
+			// Load up boards and pages for selection in the template
+			sp_block_template_helpers();
 
 			if (empty($context['SPortal']['block']['display']))
 				$context['SPortal']['block']['display'] = array('0');
@@ -553,7 +542,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 					}
 				}
 				// Prepare the Textcontent for BBC, only the first bbc will be correct detected!
-				elseif ($type == 'bbc')
+				elseif ($type === 'bbc')
 				{
 					// ELK support only one bbc correct, multiple bbc do not work at the moment
 					if (!$firstBBCFound)
@@ -606,6 +595,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'];
 		}
 
+		// Want to add a block to the portal
 		if (!empty($_POST['add_block']))
 		{
 			if ($_POST['block_type'] == 'sp_php' && !allowedTo('admin_forum'))
@@ -630,71 +620,31 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			if (!empty($_REQUEST['block_id']))
 				$current_data = current(getBlockInfo(null, $_REQUEST['block_id']));
 
-			if (!empty($_POST['placement']) && (($_POST['placement'] == 'before') || ($_POST['placement'] == 'after')))
+			// Where are we going to place this new block, before, after, no change
+			if (!empty($_POST['placement']) && (($_POST['placement'] === 'before') || ($_POST['placement'] === 'after')))
 			{
 				if (!empty($current_data))
 					$current_row = $current_data['row'];
 				else
 					$current_row = null;
 
-				if ($_POST['placement'] == 'before')
+				// Before or after the chosen block
+				if ($_POST['placement'] === 'before')
 					$row = (int) $_POST['block_row'];
 				else
 					$row = (int) $_POST['block_row'] + 1;
 
 				if (!empty($current_row) && ($row > $current_row))
-				{
-					$row = $row - 1;
-
-					$db->query('', '
-						UPDATE {db_prefix}sp_blocks
-						SET row = row - 1
-						WHERE col = {int:col}
-							AND row > {int:start}
-							AND row <= {int:end}',
-						array(
-							'col' => (int) $_POST['block_column'],
-							'start' => $current_row,
-							'end' => $row,
-						)
-					);
-				}
+					sp_update_block_row($current_row, $row - 1, $_POST['block_column'], true);
 				else
-				{
-					$db->query('', '
-						UPDATE {db_prefix}sp_blocks
-						SET row = row + 1
-						WHERE col = {int:col}
-							AND row >= {int:start}' . (!empty($current_row) ? '
-							AND row < {int:end}' : ''),
-						array(
-							'col' => (int) $_POST['block_column'],
-							'start' => $row,
-							'end' => !empty($current_row) ? $current_row : 0,
-						)
-					);
-				}
+					sp_update_block_row($current_row, $row, $_POST['block_column'], false);
 			}
 			elseif (!empty($_POST['placement']) && $_POST['placement'] == 'nochange')
 				$row = 0;
 			else
 			{
-				$request = $db->query('', '
-					SELECT row
-					FROM {db_prefix}sp_blocks
-					WHERE col = {int:col}' . (!empty($_REQUEST['block_id']) ? '
-						AND id_block != {int:current_id}' : '' ) . '
-					ORDER BY row DESC
-					LIMIT 1',
-					array(
-						'col' => $_POST['block_column'],
-						'current_id' => $_REQUEST['block_id'],
-					)
-				);
-				list ($row) = $db->fetch_row($request);
-				$db->free_result($request);
-
-				$row = $row + 1;
+				$block_id = !empty($_REQUEST['block_id']) ? (int) $_REQUEST['block_id'] : 0;
+				$row = sp_block_nextrow($_POST['block_column'], $block_id);
 			}
 
 			$type_parameters = $_POST['block_type'](array(), 0, true);
@@ -706,7 +656,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 					if (isset($_POST['parameters'][$name]))
 					{
 						// Prepare BBC Content for ELK 2 special case =D
-						if ($type == 'bbc')
+						if ($type === 'bbc')
 						{
 							$value = $_POST['parameters'][$name];
 							require_once(SUBSDIR . '/Post.subs.php');
@@ -732,6 +682,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			else
 				$_POST['parameters'] = array();
 
+			// Standard options
 			if (empty($_POST['display_advanced']))
 			{
 				if (!empty($_POST['display_simple']) && in_array($_POST['display_simple'], array('all', 'sportal', 'sforum', 'allaction', 'allboard', 'allpages')))
@@ -741,6 +692,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 				$custom = '';
 			}
+			// Advanced options
 			else
 			{
 				$display = array();
@@ -802,175 +754,68 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'style' => sportal_parse_style('implode'),
 			);
 
+			// Insert a new block in to the portal
 			if ($context['SPortal']['is_new'])
 			{
 				unset($blockInfo['id']);
-
-				$db->insert('', '
-					{db_prefix}sp_blocks',
-					array(
-						'label' => 'string',
-						'type' => 'string',
-						'col' => 'int',
-						'row' => 'int',
-						'permissions' => 'int',
-						'state' => 'int',
-						'force_view' => 'int',
-						'display' => 'string',
-						'display_custom' => 'string',
-						'style' => 'string',
-					),
-					$blockInfo,
-					array('id_block')
-				);
-
-				$blockInfo['id'] = $db->insert_id('{db_prefix}sp_blocks', 'id_block');
+				$blockInfo['id'] = sp_block_insert($blockInfo);
 			}
+			// Update one that is there
 			else
-			{
-				$block_fields = array(
-					"label = {string:label}",
-					"permissions = {int:permissions}",
-					"state = {int:state}",
-					"force_view = {int:force_view}",
-					"display = {string:display}",
-					"display_custom = {string:display_custom}",
-					"style = {string:style}",
-				);
+				sp_block_update($blockInfo);
 
-				if (!empty($blockInfo['row']))
-					$block_fields[] = "row = {int:row}";
-				else
-					unset($blockInfo['row']);
-
-				$db->query('', '
-					UPDATE {db_prefix}sp_blocks
-					SET ' . implode(', ', $block_fields) . '
-					WHERE id_block = {int:id}', $blockInfo
-				);
-
-				$db->query('', '
-					DELETE FROM {db_prefix}sp_parameters
-					WHERE id_block = {int:id}',
-					array(
-						'id' => $blockInfo['id'],
-					)
-				);
-			}
-
+			// Save any parameters for the block
 			if (!empty($_POST['parameters']))
-			{
-				$parameters = array();
-				foreach ($_POST['parameters'] as $variable => $value)
-					$parameters[] = array(
-						'id_block' => $blockInfo['id'],
-						'variable' => $variable,
-						'value' => $value,
-					);
-
-				$db->insert('', '
-					{db_prefix}sp_parameters',
-					array('id_block' => 'int', 'variable' => 'string', 'value' => 'string',),
-					$parameters,
-					array()
-				);
-			}
+				sp_block_insert_parameters($_POST['parameters']);
 
 			redirectexit('action=admin;area=portalblocks');
 		}
 	}
 
 	/**
-	 * Function for moving a block.
+	 * Function for moving a block
+	 *
+	 * - Moves a block to a new row and/or a new column
+	 *
 	 */
 	public function action_sportal_admin_block_move()
 	{
-		$db = database();
-
 		checkSession('get');
+
+		// Not moving yet
 		$target_side = null;
 		$block_id = null;
 
+		// What block is being moved?
 		if (empty($_REQUEST['block_id']))
 			fatal_lang_error('error_sp_id_empty', false);
 		else
 			$block_id = (int) $_REQUEST['block_id'];
 
+		// Can't move outside our known columns 1-6
 		if (empty($_REQUEST['col']) || $_REQUEST['col'] < 1 || $_REQUEST['col'] > 6)
 			fatal_lang_error('error_sp_side_wrong', false);
 		else
 			$target_side = (int) $_REQUEST['col'];
 
+		// Specific row requestetd?
 		if (empty($_REQUEST['row']))
-		{
-			$request = $db->query('', '
-				SELECT MAX(row)
-				FROM {db_prefix}sp_blocks
-				WHERE col = {int:target_side}
-				LIMIT {int:limit}',
-				array(
-					'target_side' => $target_side,
-					'limit' => 1,
-				)
-			);
-			list ($target_row) = $db->fetch_row($request);
-			$db->free_result($request);
-
-			$target_row += 1;
-		}
+			$target_row = sp_block_nextrow($target_side);
 		else
 			$target_row = (int) $_REQUEST['row'];
 
-		$request = $db->query('', '
-			SELECT col, row
-			FROM {db_prefix}sp_blocks
-			WHERE id_block = {int:block_id}
-			LIMIT {int:limit}',
-			array(
-				'block_id' => $block_id,
-				'limit' => 1,
-			)
-		);
-		list ($current_side, $current_row) = $db->fetch_row($request);
-		$db->free_result($request);
+		// Get the blocks current position in the portal
+		list ($current_side, $current_row)  = sp_block_get_position($block_id);
 
+		// Is a move needed, new row, new column?
 		if ($current_side != $target_side || $current_row + 1 != $target_row)
 		{
+			// Shift the column
 			if ($current_side != $target_side)
-			{
-				$current_row = 100;
-				$db->query('', '
-					UPDATE {db_prefix}sp_blocks
-					SET col = {int:target_side}, row = {int:temp_row}
-					WHERE id_block = {int:block_id}',
-					array(
-						'target_side' => $target_side,
-						'temp_row' => $current_row,
-						'block_id' => $block_id,
-					)
-				);
-			}
+				sp_block_move_col($block_id, $target_side);
 
-			$db->query('', '
-				UPDATE {db_prefix}sp_blocks
-				SET row = row + 1
-				WHERE col = {int:target_side}
-					AND row >= {int:target_row}',
-				array(
-					'target_side' => $target_side,
-					'target_row' => $target_row,
-				)
-			);
-
-			$db->query('', '
-				UPDATE {db_prefix}sp_blocks
-				SET row = {int:target_row}
-				WHERE id_block = {int:block_id}',
-				array(
-					'target_row' => $target_row,
-					'block_id' => $block_id,
-				)
-			);
+			// Position it in the column
+			sp_blocks_move_row($block_id, $target_side, $target_row);
 
 			foreach (array_unique(array($current_side, $target_side)) as $side)
 				fixColumnRows($side);
@@ -985,8 +830,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	public function action_sportal_admin_block_delete()
 	{
 		global $context;
-
-		$db = database();
 
 		// Check if he can?
 		checkSession('get');
@@ -1009,22 +852,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				fatal_lang_error('cannot_admin_forum', false);
 		}
 
-		// We don't need it anymore.
-		$db->query('', '
-			DELETE FROM {db_prefix}sp_blocks
-			WHERE id_block = {int:id}',
-			array(
-				'id' => $_REQUEST['block_id'],
-			)
-		);
 
-		$db->query('', '
-			DELETE FROM {db_prefix}sp_parameters
-			WHERE id_block = {int:id}',
-			array(
-				'id' => $_REQUEST['block_id'],
-			)
-		);
+		// We don't need it anymore.
+		sp_block_delete($_REQUEST['block_id']);
 
 		// Fix column rows.
 		fixColumnRows($_REQUEST['col']);

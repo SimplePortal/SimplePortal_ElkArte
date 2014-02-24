@@ -1014,3 +1014,330 @@ function sp_delete_profiles($remove_ids = array())
 		)
 	);
 }
+
+/**
+ * Loads boards and pages for template selection
+ *
+ * - Returns the results in $context for the template
+ */
+function sp_block_template_helpers()
+{
+	global $context;
+
+	$db = database();
+
+	// Get a list of board names for use in the template
+	$request = $db->query('', '
+		SELECT id_board, name
+		FROM {db_prefix}boards
+		ORDER BY name DESC'
+	);
+	$context['display_boards'] = array();
+	while ($row = $db->fetch_assoc($request))
+		$context['display_boards']['b' . $row['id_board']] = $row['name'];
+	$db->free_result($request);
+
+	// Get all the pages loaded in the system for template use
+	$request = $db->query('', '
+		SELECT id_page, title
+		FROM {db_prefix}sp_pages
+		ORDER BY title DESC'
+	);
+	$context['display_pages'] = array();
+	while ($row = $db->fetch_assoc($request))
+		$context['display_pages']['p' . $row['id_page']] = $row['title'];
+	$db->free_result($request);
+}
+
+/**
+ * Updates the position of the block in the portal (column and row in column)
+ *
+ * - Makes room above or below a position where a new block is inserted by renumbering
+ * - returns nothing
+ *
+ * @param int $current_row
+ * @param int $row
+ * @param int $col
+ * @param boolean $decrement
+ */
+function sp_update_block_row($current_row, $row, $col, $decrement = true)
+{
+	$db = database();
+
+	if ($decrement)
+	{
+		$db->query('', '
+			UPDATE {db_prefix}sp_blocks
+			SET row = row - 1
+			WHERE col = {int:col}
+				AND row > {int:start}
+				AND row <= {int:end}',
+			array(
+				'col' => (int) $col,
+				'start' => $current_row,
+				'end' => $row,
+			)
+		);
+	}
+	else
+	{
+		$db->query('', '
+			UPDATE {db_prefix}sp_blocks
+			SET row = row + 1
+			WHERE col = {int:col}
+				AND row >= {int:start}' . (!empty($current_row) ? '
+				AND row < {int:end}' : ''),
+			array(
+				'col' => (int) $col,
+				'start' => $row,
+				'end' => !empty($current_row) ? $current_row : 0,
+			)
+		);
+	}
+}
+
+/**
+ * Fetches the rows from a specifed column and returns the values
+ *
+ * - If a current block ID is not specifed the next available row number in
+ * the specified column is returned
+ * - If a block id is specified, its row number + 1 is returned
+ *
+ * @param int $block_column
+ * @param int $block_id
+ */
+function sp_block_nextrow($block_column, $block_id = 0)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT
+			row
+		FROM {db_prefix}sp_blocks
+		WHERE col = {int:col}' . (!empty($block_id) ? '
+			AND id_block != {int:current_id}' : '' ) . '
+		ORDER BY row DESC
+		LIMIT 1',
+		array(
+			'col' => $block_column,
+			'current_id' => $block_id,
+		)
+	);
+	list ($row) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $row + 1;
+}
+
+/**
+ * Inserts a new block to the portal
+ *
+ * @param mixed[] $blockInfo
+ */
+function sp_block_insert($blockInfo)
+{
+	$db = database();
+
+	$db->insert('', '
+		{db_prefix}sp_blocks',
+		array(
+			'label' => 'string', 'type' => 'string', 'col' => 'int', 'row' => 'int', 'permissions' => 'int',
+			'state' => 'int', 'force_view' => 'int', 'display' => 'string', 'display_custom' => 'string', 'style' => 'string',
+		),
+		$blockInfo,
+		array('id_block')
+	);
+
+	return $db->insert_id('{db_prefix}sp_blocks', 'id_block');
+}
+
+/**
+ * Updates an existing portal block with new values
+ *
+ * - Removes all parameters storred with the box in anticiaption of new
+ * ones being supplied
+ *
+ * @param mixed[] $blockInfo
+ */
+function sp_block_update($blockInfo)
+{
+	$db = database();
+
+	// The fields in the database
+	$block_fields = array(
+		"label = {string:label}",
+		"permissions = {int:permissions}",
+		"state = {int:state}",
+		"force_view = {int:force_view}",
+		"display = {string:display}",
+		"display_custom = {string:display_custom}",
+		"style = {string:style}",
+	);
+
+	if (!empty($blockInfo['row']))
+		$block_fields[] = "row = {int:row}";
+	else
+		unset($blockInfo['row']);
+
+	// Update all the blocks fields
+	$db->query('', '
+		UPDATE {db_prefix}sp_blocks
+		SET ' . implode(', ', $block_fields) . '
+		WHERE id_block = {int:id}', $blockInfo
+	);
+
+	// Remove any parameters it has
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_parameters
+		WHERE id_block = {int:id}',
+		array(
+			'id' => $blockInfo['id'],
+		)
+	);
+}
+
+/**
+ * Inserts parameters for a specific block
+ *
+ * @param mixed[] $new_parameters
+ */
+function sp_block_insert_parameters($new_parameters)
+{
+	$db = database();
+
+	$parameters = array();
+	foreach ($new_parameters as $variable => $value)
+		$parameters[] = array(
+			'id_block' => $blockInfo['id'],
+			'variable' => $variable,
+			'value' => $value,
+		);
+
+	$db->insert('', '
+		{db_prefix}sp_parameters',
+		array('id_block' => 'int', 'variable' => 'string', 'value' => 'string',),
+		$parameters,
+		array()
+	);
+}
+
+/**
+ * Returns the current column and row for a given block id
+ *
+ * @param int $block_id
+ */
+function sp_block_get_position($block_id)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT col, row
+		FROM {db_prefix}sp_blocks
+		WHERE id_block = {int:block_id}
+		LIMIT 1',
+		array(
+			'block_id' => $block_id,
+		)
+	);
+	list ($current_side, $current_row) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return array($current_side,$current_row);
+}
+
+/**
+ * Move a block to the end of a new column
+ *
+ * @param int $block_id
+ * @param int $target_side
+ */
+function sp_block_move_col($block_id, $target_side)
+{
+	$db = database();
+
+	// Moving to a new column, lets place it at the end
+	$current_row = 100;
+
+	$db->query('', '
+		UPDATE {db_prefix}sp_blocks
+		SET col = {int:target_side}, row = {int:temp_row}
+		WHERE id_block = {int:block_id}',
+		array(
+			'target_side' => $target_side,
+			'temp_row' => $current_row,
+			'block_id' => $block_id,
+		)
+	);
+}
+
+/**
+ * Adds the portal block to the new row postion
+ *
+ * - Opens up space in the column by shift all rows below the insertion point
+ * down one
+ * - Adds the block ID to the specified column and row
+ *
+ * @param int $block_id
+ * @param int $target_side
+ * @param int $target_row
+ */
+function sp_blocks_move_row($block_id, $target_side, $target_row)
+{
+	$db = database();
+
+	// Shift all the rows below the insertion point down one
+	$db->query('', '
+		UPDATE {db_prefix}sp_blocks
+		SET row = row + 1
+		WHERE col = {int:target_side}
+			AND row >= {int:target_row}',
+		array(
+			'target_side' => $target_side,
+			'target_row' => $target_row,
+		)
+	);
+
+	// Set the new block to the now available row position
+	$db->query('', '
+		UPDATE {db_prefix}sp_blocks
+		SET row = {int:target_row}
+		WHERE id_block = {int:block_id}',
+		array(
+			'target_row' => $target_row,
+			'block_id' => $block_id,
+		)
+	);
+}
+
+/**
+ * Remove a block from the portal
+ *
+ * - removes the block from the portal
+ * - removes the blocks parameters
+ *
+ * @param int $block_id
+ */
+function sp_block_delete($block_id)
+{
+	$db = database();
+
+	$block_id = (int) $block_id;
+
+	// No block
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_blocks
+		WHERE id_block = {int:id}',
+		array(
+			'id' => $block_id,
+		)
+	);
+
+	// No parameters
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_parameters
+		WHERE id_block = {int:id}',
+		array(
+			'id' => $block_id,
+		)
+	);
+}
