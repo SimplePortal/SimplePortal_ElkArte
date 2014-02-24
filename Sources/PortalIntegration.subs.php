@@ -434,3 +434,14 @@ function sp_integrate_redirect(&$setLocation, &$refresh)
 			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?((?:page)=[^#"]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
 	}
 }
+
+/**
+ * A single check for the sake of remove yet another code edit. :P
+ */
+function sp_integrate_boardindex()
+{
+	global $context;
+
+	if (!empty($_GET) && $_GET !== array('action' => 'forum'))
+		$context['robot_no_index'] = true;
+}

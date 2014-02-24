@@ -15,13 +15,6 @@
 	<id>[SiNaN]:SimplePortal</id>
 	<version>2.4</version>
 
-	<file name="CONTROLLERDIR/BoardIndex.controller.php">
-		<operation error="ignore">
-			<search position="replace"><![CDATA[if (!empty($_GET))]]></search>
-			<add><![CDATA[if (!empty($_GET) && $_GET !== array('action' => 'forum'))]]></add>
-		</operation>
-	</file>
-
 	<file name="SOURCEDIR/Load.php">
 		<operation>
 			<search position="replace"><![CDATA[	// Verify the id_theme... no foul play.]]></search>

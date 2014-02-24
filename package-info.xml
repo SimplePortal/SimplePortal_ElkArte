@@ -29,6 +29,7 @@
 		<code>settings.php</code>
 		<hook hook="integrate_theme_include" file="LANGUAGEDIR/SPortal.english.php" />
 		<hook hook="integrate_frontpage" function="sportal_init" file="SUBSDIR/Portal.subs.php" />
+		<hook hook="integrate_boardindex_after" function="sp_integrate_boardindex" file="SUBSDIR/Portal.subs.php" />
 		<hook hook="integrate_actions" function="sp_integrate_actions" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_admin_areas" function="sp_integrate_admin_areas" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_load_permissions" function="sp_integrate_load_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
@@ -44,6 +45,7 @@
 		<readme type="inline">This will uninstall SimplePortal 2.4 for Elkarte.</readme>
 		<hook reverse="true" hook="integrate_theme_include" file="LANGUAGEDIR/SPortal.english.php" />
 		<hook reverse="true" hook="integrate_frontpage" function="sportal_init" file="SUBSDIR/Portal.subs.php" />
+		<hook reverse="true" hook="integrate_boardindex_after" function="sp_integrate_boardindex" file="SUBSDIR/Portal.subs.php" />
 		<hook reverse="true" hook="integrate_actions" function="sp_integrate_actions" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_admin_areas" function="sp_integrate_admin_areas" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_load_permissions" function="sp_integrate_load_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
