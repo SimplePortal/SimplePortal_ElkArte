@@ -157,7 +157,7 @@ $sp_tables = array(
 			array('name' => 'last_update', 'type' => 'int', 'size' => 10, 'default' => 0),
 		),
 		'indexes' => array(
-			array('type' => 'primary','columns' => array('id_shoutbox')),
+			array('type' => 'primary', 'columns' => array('id_shoutbox')),
 		),
 	),
 	'sp_shouts' => array(
@@ -170,7 +170,7 @@ $sp_tables = array(
 			array('name' => 'body', 'type' => 'text'),
 		),
 		'indexes' => array(
-			array('type' => 'primary','columns' => array('id_shout')),
+			array('type' => 'primary', 'columns' => array('id_shout')),
 		),
 	),
 );
@@ -213,7 +213,7 @@ $db->insert('ignore',
 	array('id_function')
 );
 
-$result = $db->query('','
+$result = $db->query('', '
 	SELECT id_block
 	FROM {db_prefix}sp_blocks
 	LIMIT 1',
@@ -286,7 +286,7 @@ if (empty($has_block))
 	);
 }
 
-$result = $db->query('','
+$result = $db->query('', '
 	SELECT id_profile
 	FROM {db_prefix}sp_profiles
 	WHERE type = {int:type}

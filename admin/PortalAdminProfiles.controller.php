@@ -295,7 +295,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 				foreach ($fields as $name => $type)
 					$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
 
-				$db->query('','
+				$db->query('', '
 					UPDATE {db_prefix}sp_profiles
 					SET ' . implode(', ', $update_fields) . '
 					WHERE id_profile = {int:id}',

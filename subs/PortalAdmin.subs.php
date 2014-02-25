@@ -341,9 +341,9 @@ function sp_count_categories()
  *
  * - Returns an indexed array of the categories
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int|null $start
+ * @param int|null $items_per_page
+ * @param string|null $sort
  */
 function sp_load_categories($start = null, $items_per_page = null, $sort = null)
 {
@@ -414,8 +414,8 @@ function sp_check_duplicate_category($id, $namespace)
  *
  * If adding a new one, will return the id of the new category
  *
- * @param array $fields
- * @param array $data
+ * @param mixed[] $fields field name to type for use in query
+ * @param mixed[] $data field name to value for use in query
  * @param boolean $is_new
  */
 function sp_update_category($data, $is_new = false)
@@ -823,7 +823,7 @@ function sp_load_pages($start, $items_per_page, $sort)
 /**
  * Removes a page or group of pages by id
  *
- * @param int[] $article_ids
+ * @param int[] $page_ids
  */
 function sp_delete_pages($page_ids = array())
 {
@@ -1017,13 +1017,13 @@ function sp_load_profiles($start, $items_per_page, $sort)
 /**
  * Removes a permission group by id
  *
- * @param int[] $article_ids
+ * @param int[] $remove_ids
  */
 function sp_delete_profiles($remove_ids = array())
 {
 	$db = database();
 
-	$db->query('','
+	$db->query('', '
 		DELETE FROM {db_prefix}sp_profiles
 		WHERE id_profile IN ({array_int:profiles})',
 		array(

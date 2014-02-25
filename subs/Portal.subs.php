@@ -815,7 +815,7 @@ function sp_loadColors($users = array())
  * @param string $alt
  * @param int|null $width
  * @param int|null $height
- * @param string|true $title
+ * @param string|boolean $title
  * @param int|null $id
  */
 function sp_embed_image($name, $alt = '', $width = null, $height = null, $title = true, $id = null)
@@ -970,7 +970,7 @@ function sportal_parse_style($action, $setting = '', $process = false)
  * @param boolean $active true to only return items that are active
  * @param boolean $allowed true to check permission access to the item
  * @param string $sort string passed to the order by parameter
- * @param int $category_id|null id of the category
+ * @param int|null $category_id id of the category
  */
 function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title', $category_id = null)
 {
@@ -1141,7 +1141,7 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 /**
  * Loads all the comments that an article has generated
  *
- * @param int $article_id
+ * @param int|null $article_id
  */
 function sportal_get_comments($article_id = null)
 {
