@@ -521,7 +521,7 @@ function template_block_select_type()
 	foreach($context['SPortal']['block_types'] as $index => $type)
 	{
 		$this_block = isset($context['SPortal']['block_inuse'][$type['function']]) ? $context['SPortal']['block_inuse'][$type['function']] : false;
-		$this_title = !empty($this_block) ? $txt['sp-adminBlockInuse'] . ': ' . $context['location'][$this_block['column']] . (!empty($this_block['state']) ? '(' . $txt['sp-blocksActive'] . ')' : '') : '';
+		$this_title = !empty($this_block) ? sprintf($txt['sp-adminBlockInuse'], $context['location'][$this_block['column']]) . ': ' . (!empty($this_block['state']) ? '(' . $txt['sp-blocksActive'] . ')' : '') : '';
 
 		// 3 tidy columns will work out nice
 		if ($index != 0 && $index % 3 == 0)
