@@ -963,6 +963,15 @@ function sportal_parse_style($action, $setting = '', $process = false)
 	return $style;
 }
 
+/**
+ * Loads an article by id, or articles by namespace
+ *
+ * @param int|string|null $article_id id of an article or string for the articles in a namespace
+ * @param boolean $active true to only return items that are active
+ * @param boolean $allowed true to check permission access to the item
+ * @param string $sort string passed to the order by parameter
+ * @param int $category_id|null id of the category
+ */
 function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title', $category_id = null)
 {
 	global $scripturl, $context;
@@ -972,6 +981,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 	$query = array();
 	$parameters = array('sort' => $sort);
 
+	// Load up an article or namspace
 	if (!empty($article_id) && is_int($article_id))
 	{
 		$query[] = 'spa.id_article = {int:article_id}';
@@ -982,16 +992,22 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 		$query[] = 'spa.namespace = {string:namespace}';
 		$parameters['namespace'] = $article_id;
 	}
+
+	// Want articles only from a specific category
 	if (!empty($category_id))
 	{
 		$query[] = 'spa.id_category = {int:category_id}';
 		$parameters['category_id'] = (int) $category_id;
 	}
+
+	// Checking access?
 	if (!empty($allowed))
 	{
 		$query[] = sprintf($context['SPortal']['permissions']['query'], 'spa.permissions');
 		$query[] = sprintf($context['SPortal']['permissions']['query'], 'spc.permissions');
 	}
+
+	// Its an active article and category?
 	if (!empty($active))
 	{
 		$query[] = 'spa.status = {int:article_status}';
@@ -1000,6 +1016,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 		$parameters['category_status'] = 1;
 	}
 
+	// Make the request
 	$request = $db->query('', '
 		SELECT
 			spa.id_article, spa.id_category, spc.name, spc.namespace AS category_namespace,
@@ -1047,9 +1064,18 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 	}
 	$db->free_result($request);
 
+	// Return one or all
 	return !empty($article_id) ? current($return) : $return;
 }
 
+/**
+ * Loads a category by id, or categorys by namespace
+ *
+ * @param int|string|null $category_id
+ * @param boolean $active
+ * @param boolean $allowed
+ * @param string $sort
+ */
 function sportal_get_categories($category_id = null, $active = false, $allowed = false, $sort = 'name')
 {
 	global $scripturl, $context;
@@ -1059,6 +1085,7 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 	$query = array();
 	$parameters = array('sort' => $sort);
 
+	// Asking for a specific category or the namespace
 	if (!empty($category_id) && is_int($category_id))
 	{
 		$query[] = 'id_category = {int:category_id}';
@@ -1069,14 +1096,19 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 		$query[] = 'namespace = {string:namespace}';
 		$parameters['namespace'] = $category_id;
 	}
+
+	// Check permissions to access this category
 	if (!empty($allowed))
 		$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
+
+	// Check if the category is even active
 	if (!empty($active))
 	{
 		$query[] = 'status = {int:status}';
 		$parameters['status'] = 1;
 	}
 
+	// Lets see what we can find
 	$request = $db->query('', '
 		SELECT
 			id_category, namespace, name, description,
@@ -1102,9 +1134,15 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 	}
 	$db->free_result($request);
 
+	// Return the id or the whole batch
 	return !empty($category_id) ? current($return) : $return;
 }
 
+/**
+ * Loads all the comments that an article has generated
+ *
+ * @param int $article_id
+ */
 function sportal_get_comments($article_id = null)
 {
 	global $scripturl, $user_info;
@@ -1145,6 +1183,12 @@ function sportal_get_comments($article_id = null)
 	return $return;
 }
 
+/**
+ * Creates a new comment response to a published article
+ *
+ * @param int $article_id id of the article commented on
+ * @param string $body text of the comment
+ */
 function sportal_create_comment($article_id, $body)
 {
 	global $user_info;
@@ -1170,9 +1214,16 @@ function sportal_create_comment($article_id, $body)
 		array('id_comment')
 	);
 
+	// Increase the comment count
 	sportal_recount_comments($article_id);
 }
 
+/**
+ * Edits an article comment that has already been made
+ *
+ * @param int $comment_id comment id to edit
+ * @param string $body replacement text
+ */
 function sportal_modify_comment($comment_id, $body)
 {
 	$db = database();
@@ -1188,10 +1239,17 @@ function sportal_modify_comment($comment_id, $body)
 	);
 }
 
+/**
+ * Removes an comment from an article
+ *
+ * @param int $article_id article id, needed for the counter
+ * @param int $comment_id comment it
+ */
 function sportal_delete_comment($article_id, $comment_id)
 {
 	$db = database();
 
+	// Poof ... gone
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_comments
 		WHERE id_comment = {int:comment_id}',
@@ -1200,13 +1258,20 @@ function sportal_delete_comment($article_id, $comment_id)
 		)
 	);
 
+	// One less comment
 	sportal_recount_comments($article_id);
 }
 
+/**
+ * Recounts all comments made on an article and updates the DB with the new value
+ *
+ * @param int $article_id
+ */
 function sportal_recount_comments($article_id)
 {
 	$db = database();
 
+	// How many comments were made for this article
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_comments
@@ -1220,6 +1285,7 @@ function sportal_recount_comments($article_id)
 	list ($comments) = $db->fetch_row($request);
 	$db->free_result($request);
 
+	// Update the article comment count
 	$db->query('', '
 		UPDATE {db_prefix}sp_articles
 		SET comments = {int:comments}

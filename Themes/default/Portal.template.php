@@ -11,7 +11,7 @@
  */
 
 /**
- * Used to display articles
+ * Used to display articles on the portal
  */
 function template_portal_index()
 {

@@ -493,6 +493,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		// Save away
 		sp_save_article($article_info, $is_new);
+
 		redirectexit('action=admin;area=portalarticles');
 	}
 
