@@ -336,7 +336,6 @@ input.shoutbox_input {
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 #spAnnouncements {
-	height: 18ex;
 	overflow: auto;
 	padding: 0 4px;
 }

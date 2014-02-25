@@ -48,6 +48,7 @@ $txt['articleavatar'] = 'Display Authors Avatar';
 
 // Blocks area
 $txt['sp-adminBlockListName'] = 'Block List';
+$txt['sp-adminBlockInuse'] = 'Used in %s Block';
 $txt['sp-adminBlockListDesc'] = 'This page displays a list of all blocks which have been created for the portal or the forum.';
 $txt['sp-adminBlockAddName'] = 'Add Block';
 $txt['sp-adminBlockAddDesc'] = 'This page enables new blocks to be created and added to the portal page or the forum.';
@@ -219,7 +220,7 @@ $txt['sp_param_sp_staff_lmod'] = 'Disable Local Moderators';
 $txt['sp_param_sp_articles_category'] = 'Category';
 $txt['sp_param_sp_articles_limit'] = 'Articles to Display';
 $txt['sp_param_sp_articles_type'] = 'Display Type';
-$txt['sp_param_sp_articles_image'] = 'Image';
+$txt['sp_param_sp_articles_length'] = 'Maximum Characters';
 $txt['sp_param_sp_shoutbox_shoutbox'] = 'Shoutbox to Display';
 $txt['sp_param_sp_gallery_limit'] = 'Items to Display';
 $txt['sp_param_sp_gallery_type'] = 'Display';
