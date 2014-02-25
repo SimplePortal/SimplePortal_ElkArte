@@ -10,6 +10,9 @@
  * @version 2.4
  */
 
+/**
+ * Used to view articles on the portal
+ */
 function template_view_articles()
 {
 	global $context, $txt;
@@ -23,7 +26,7 @@ function template_view_articles()
 	if (empty($context['articles']))
 	{
 		echo '
-		<div class="windowbg2">
+		<div class="windowbg">
 			<div class="sp_content_padding">', $txt['error_sp_no_articles'], '</div>
 		</div>';
 	}
@@ -31,7 +34,7 @@ function template_view_articles()
 	foreach ($context['articles'] as $article)
 	{
 		echo '
-		<div class="windowbg2">
+		<div class="windowbg">
 			<div class="sp_content_padding">
 				<h4>', $article['link'], '</h4>
 				<span>', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '</span>
@@ -114,9 +117,9 @@ function template_view_article()
 			<div class="windowbg2">
 				<div class="sp_content_padding">
 					<form action="', $context['article']['href'], '" method="post" accept-charset="UTF-8">
-						<textarea name="body" rows="5" cols="50" style="', $context['browser']['is_ie8'] ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 99%', ';">', !empty($context['article']['comment']['body']) ? $context['article']['comment']['body'] : '', '</textarea>
+						<textarea name="body" rows="5" cols="50" style="', isBrowser('is_ie8') ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 99%', ';">', !empty($context['article']['comment']['body']) ? $context['article']['comment']['body'] : '', '</textarea>
 						<div class="sp_center">
-							<input type="submit" name="submit" value="', !empty($context['article']['comment']) ? $txt['sp_modify'] : $txt['sp_submit'], '" class="button_submit" />
+							<input type="submit" name="submit" value="', !empty($context['article']['comment']) ? $txt['sp_modify'] : $txt['sp_submit'], '" class="right_submit" />
 						</div>
 						<input type="hidden" name="comment" value="', !empty($context['article']['comment']['id']) ? $context['article']['comment']['id'] : 0, '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

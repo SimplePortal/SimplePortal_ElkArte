@@ -661,11 +661,11 @@ function sp_duplicate_articles($article_id, $namespace)
  */
 function sp_save_article($article_info, $is_new = false, $update_counts = true)
 {
-	global $context;
+	global $context, $user_info;
 
 	$db = database();
 
-	// Our article database looks like this, so shall you comply
+	// Our base article database looks like this, so shall you comply
 	$fields = array(
 		'id_category' => 'int',
 		'namespace' => 'string',
@@ -681,6 +681,20 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 	{
 		// New will set this
 		unset($article_info['id']);
+
+		// If new we set these one time fields
+		$fields = array_merge($fields, array(
+			'id_member' => 'int',
+			'member_name' => 'string',
+			'date' => 'int',
+		));
+
+		// And populate them with data
+		$article_info = array_merge($article_info, array(
+			'id_member' => $user_info['id'],
+			'member_name' => $user_info['name'],
+			'date' => time(),
+		));
 
 		// Add the new article to the system
 		$db->insert('', '
@@ -702,9 +716,9 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 			UPDATE {db_prefix}sp_articles
 			SET ' . implode(', ', $update_fields) . '
 			WHERE id_article = {int:id}',
-			array (
-				'id' => $article_info['id'],
-			)
+			array_merge(array(
+				'id' => $article_info['id']),
+				$article_info)
 		);
 	}
 
@@ -734,6 +748,8 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 			);
 		}
 	}
+
+	return $article_info['id'];
 }
 
 /**

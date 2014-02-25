@@ -45,11 +45,11 @@ class Sportal_Controller extends Action_Controller
 	}
 
 	/**
-	 * Loads article preview for display with the portal index template
+	 * Loads article previews for display with the portal index template
 	 */
 	public function action_sportal_index()
 	{
-		global $context;
+		global $context, $modSettings;
 
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC');
 
@@ -57,8 +57,8 @@ class Sportal_Controller extends Action_Controller
 		foreach ($context['articles'] as $article)
 		{
 			// Just the preview
-			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
-				$article['body'] = Util::substr($article['body'], 0, $cutoff);
+			if (!empty($modSettings['articlelength']))
+				$article['body'] = shorten_text($article['body'], $modSettings['articlelength'], true);
 
 			$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
 			$context['articles'][$article['id']]['date'] = standardTime($article['date']);

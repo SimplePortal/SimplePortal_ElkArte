@@ -537,7 +537,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
  */
 function sp_topStatsMember($parameters, $id, $return_parameters = false)
 {
-	global $context, $settings, $txt, $scripturl, $user_info, $user_info, $modSettings, $color_profile;
+	global $context, $txt, $scripturl, $user_info, $user_info, $modSettings, $color_profile;
 	static $sp_topStatsSystem;
 
 	$db = database();
@@ -728,6 +728,18 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	else
 		$where = "";
 
+	// Going to need these
+	if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
+	{
+		$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
+		$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
+	}
+	else
+	{
+		$avatar_width = '';
+		$avatar_height = '';
+	}
+
 	// Okay load the data
 	$request = $db->query('', '
 		SELECT
@@ -760,17 +772,6 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 			continue;
 
 		$colorids[$row['id_member']] = $row['id_member'];
-
-		if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
-		{
-			$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
-			$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
-		}
-		else
-		{
-			$avatar_width = '';
-			$avatar_height = '';
-		}
 
 		// Setup the row :P
 		$output = '';
@@ -850,6 +851,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 										</td>
 									</tr>';
 	}
+
 	echo '
 								</table>';
 }
@@ -1187,7 +1189,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	$start = !empty($parameters['start']) ? (int) $parameters['start'] : 0;
 	$length = isset($parameters['length']) ? (int) $parameters['length'] : 250;
 	$avatars = !empty($parameters['avatar']);
-	$per_page = !empty($parameters['per_page']) ? (int) $parameters['per_page'] : 0;
+	$per_page = !empty($paramers['per_page']) ? (int) $parameters['per_page'] : 0;
 
 	$limit = max(0, $limit);
 	$start = max(0, $start);
@@ -1883,7 +1885,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
  */
 function sp_rssFeed($parameters, $id, $return_parameters = false)
 {
-	global $context, $txt;
+	global $txt;
 
 	$block_parameters = array(
 		'url' => 'text',
@@ -2309,19 +2311,20 @@ function sp_staff($parameters, $id, $return_parameters = false)
 }
 
 /**
- * Article Block, show the list of forum staff members
+ * Article Block, show the list of articles in the system
  *
  * @param mixed[] $parameters
  *		'category' => list of categories to choose article from
  *		'limit' => number of articles to show
  *		'type' => 0 latest 1 random
- *		'image' => type of image to show with the post, poster avatar or cat image
+ *		'length' => length for the body text preview
+ *
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_articles($parameters, $id, $return_parameters = false)
 {
-	global $modSettings, $scripturl, $txt, $color_profile;
+	global $modSettings, $scripturl, $txt, $color_profile, $context;
 
 	$db = database();
 
@@ -2329,7 +2332,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 		'category' => array(0 => $txt['sp_all']),
 		'limit' => 'int',
 		'type' => 'select',
-		'image' => 'select',
+		'length' => 'int',
 	);
 
 	if ($return_parameters)
@@ -2343,31 +2346,49 @@ function sp_articles($parameters, $id, $return_parameters = false)
 		return $block_parameters;
 	}
 
+	// Maybe useful ... maybe not !
+	if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
+	{
+		$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
+		$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
+	}
+	else
+	{
+		$avatar_width = '';
+		$avatar_height = '';
+	}
+
+	// Set up for the query
 	$category = empty($parameters['category']) ? 0 : (int) $parameters['category'];
 	$limit = empty($parameters['limit']) ? 5 : (int) $parameters['limit'];
 	$type = empty($parameters['type']) ? 0 : 1;
-	$image = empty($parameters['image']) ? 0 : (int) $parameters['image'];
+	$length = isset($parameters['length']) ? (int) $parameters['length'] : 250;
+
+	// Permissions
+	$query[] = sprintf($context['SPortal']['permissions']['query'], 'spa.permissions');
+	$query[] = sprintf($context['SPortal']['permissions']['query'], 'spc.permissions');
 
 	$request = $db->query('', '
 		SELECT
-			m.id_topic, m.subject, m.poster_name, c.picture, c.name,
-			mem.id_member, mem.real_name, mem.avatar,
-			at.id_attach, at.attachment_type, at.filename
-		FROM {db_prefix}sp_articles AS a
-			INNER JOIN {db_prefix}sp_categories AS c ON (c.id_category = a.id_category)
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_message)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+			spc.name, spc.namespace AS category_namespace,
+			mem.avatar, at.id_attach, at.attachment_type, at.filename,
+			IFNULL(spa.id_member, 0) AS id_author, IFNULL(mem.real_name, spa.member_name) AS author_name,
+			spa.body, spa.title, spa.member_name, spa.namespace AS article_namespace, spa.id_member,
+			spa.type, spa.date, spa.status, spa.id_article, spa.id_category
+		FROM {db_prefix}sp_articles AS spa
+			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = spa.id_member)
 			LEFT JOIN {db_prefix}attachments AS at ON (at.id_member = mem.id_member)
-		WHERE {query_see_board}
-			AND a.status = {int:approved}' . (!empty($category) ? '
-			AND a.id_category = {int:category}' : '') . '
+		WHERE
+			spa.status = {int:approved}' . (!empty($category) ? '
+			AND spa.id_category = {int:category}' : '') . '
+			AND ' . implode(' AND ', $query) . '
 		ORDER BY {raw:type}
 		LIMIT {int:limit}',
 		array(
 			'approved' => 1,
 			'category' => $category,
-			'type' => $type ? 'RAND()' : 'm.poster_time DESC',
+			'type' => $type ? 'RAND()' : 'spa.date DESC',
 			'limit' => $limit,
 		)
 	);
@@ -2378,31 +2399,24 @@ function sp_articles($parameters, $id, $return_parameters = false)
 		if (!empty($row['id_member']))
 			$colorids[$row['id_member']] = $row['id_member'];
 
-		if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
-		{
-			$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
-			$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
-		}
-		else
-		{
-			$avatar_width = '';
-			$avatar_height = '';
-		}
-
 		$articles[] = array(
-			'id' => $row['id_topic'],
-			'name' => $row['subject'],
-			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
-			'poster' => array(
-				'id' => $row['id_member'],
-				'name' => $row['real_name'],
-				'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
-				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
+			'id' => $row['id_article'],
+			'name' => $row['title'],
+			'body' => $row['body'],
+			'preview' => shorten_text($row['body'], $length, true),
+			'href' => $scripturl . '?article=' . $row['article_namespace'],
+			'link' => '<a href="' . $scripturl . '?article=' . $row['article_namespace'] . '">' . $row['title'] . '</a>',
+			'category' => array(
+				'id' => $row['id_category'],
+				'name' => $row['name'],
+				'href' => $scripturl . '?category=' . $row['category_namespace'],
+				'link' => '<a href="' . $scripturl . '?category=' . $row['category_namespace'] . '">' . $row['name'] . '</a>',
 			),
-			'image' => array(
-				'href' => $row['picture'],
-				'image' => '<img src="' . $row['picture'] . '" alt="' . $row['name'] . '" />',
+			'poster' => array(
+				'id' => $row['id_author'],
+				'name' => $row['author_name'],
+				'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
+				'link' => $row['id_author'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>') : $row['author_name'],
 			),
 			'avatar' => array(
 				'name' => $row['avatar'],
@@ -2414,6 +2428,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 	}
 	$db->free_result($request);
 
+	// No articles in the system or none they can see
 	if (empty($articles))
 	{
 		echo '
@@ -2421,6 +2436,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 		return;
 	}
 
+	// Doing the color thing
 	if (!empty($colorids) && sp_loadColors($colorids) !== false)
 	{
 		foreach ($articles as $k => $p)
@@ -2430,7 +2446,8 @@ function sp_articles($parameters, $id, $return_parameters = false)
 		}
 	}
 
-	if (empty($image))
+	// No image
+	if (!empty($image))
 	{
 		echo '
 								<ul class="sp_list">';
@@ -2442,10 +2459,11 @@ function sp_articles($parameters, $id, $return_parameters = false)
 		echo '
 								</ul>';
 	}
+	// Or the avatar view
 	else
 	{
 		echo '
-								<table class="sp_fullwidth sp_articles">';
+								<table class="sp_fullwidth">';
 
 		foreach ($articles as $article)
 		{
@@ -2453,12 +2471,14 @@ function sp_articles($parameters, $id, $return_parameters = false)
 									<tr>
 										<td class="sp_articles sp_center">';
 
-			if (!empty($article['avatar']['href']) && $image == 1)
-				echo '<a href="', $scripturl, '?action=profile;u=', $article['poster']['id'], '"><img src="', $article['avatar']['href'], '" alt="', $article['poster']['name'], '" width="40" /></a>';
-			elseif (!empty($article['image']['href']) && $image == 2)
-				echo '<img src="', $article['image']['href'], '" alt="', $article['name'], '" width="40" />';
+			if (!empty($article['avatar']['href']))
+				echo '
+											<a href="', $scripturl, '?action=profile;u=', $article['poster']['id'], '">
+												<img src="', $article['avatar']['href'], '" alt="', $article['poster']['name'], '" width="40" />
+											</a>';
 
-			echo '</td>
+			echo '
+										</td>
 										<td>
 											<span class="sp_articles_title">', $article['poster']['link'], '</span><br />
 											', $article['link'], '

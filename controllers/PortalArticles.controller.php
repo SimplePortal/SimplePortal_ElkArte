@@ -48,8 +48,8 @@ class Article_Controller extends Action_Controller
 
 		foreach ($context['articles'] as $article)
 		{
-			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
-				$article['body'] = Util::substr($article['body'], 0, $cutoff);
+			if (!empty($modSettings['articlelength']))
+				$article['body'] = shorten_text($article['body'], $modSettings['articlelength'], true);
 
 			$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
 			$context['articles'][$article['id']]['date'] = standardTime($article['date']);
@@ -66,7 +66,8 @@ class Article_Controller extends Action_Controller
 
 	/**
 	 * Display a chosen article
-	 * Update the stats, like #views etc
+	 *
+	 * - Update the stats, like #views etc
 	 */
 	public function action_sportal_article()
 	{
