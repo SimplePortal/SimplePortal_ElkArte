@@ -4,12 +4,15 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2013 SimplePortal Team
+ * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
  * @version 2.4
  */
 
+/**
+ * The all template
+ */
 function template_shoutbox_all()
 {
 	template_shoutbox_all_default();
