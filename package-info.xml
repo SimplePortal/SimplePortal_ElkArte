@@ -28,31 +28,35 @@
 		<database>database.php</database>
 		<code>settings.php</code>
 		<hook hook="integrate_theme_include" file="LANGUAGEDIR/SPortal.english.php" />
-		<hook hook="integrate_load_theme" function="sportal_init" file="SOURCEDIR/Portal.subs.php" />
+		<hook hook="integrate_frontpage" function="sportal_init" file="SUBSDIR/Portal.subs.php" />
+		<hook hook="integrate_current_action" function="sp_integrate_current_action" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_boardindex_after" function="sp_integrate_boardindex" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_actions" function="sp_integrate_actions" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_admin_areas" function="sp_integrate_admin_areas" file="SOURCEDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_load_permissions" function="sp_integrate_load_permissions" file="SOURCEDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_whos_online" function="sp_integrate_whos_online" file="SOURCEDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_frontpage" function="sp_integrate_frontpage" file="SOURCEDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_quickhelp" function="sp_integrate_quickhelp" file="SOURCEDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_buffer" function="sp_integrate_exit" file="SOURCEDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SOURCEDIR/PortalIntegration.subs.php"/>
-		<hook hook="integrate_redirect" function="sp_integrate_redirect" file="SOURCEDIR/PortalIntegration.subs.php"/>
+		<hook hook="integrate_admin_areas" function="sp_integrate_admin_areas" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_load_permissions" function="sp_integrate_load_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_whos_online" function="sp_integrate_whos_online" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_frontpage" function="sp_integrate_frontpage" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_quickhelp" function="sp_integrate_quickhelp" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_buffer" function="sp_integrate_exit" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_redirect" function="sp_integrate_redirect" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
 	<uninstall for="1.0 Beta - 1.0.99">
 		<readme type="inline">This will uninstall SimplePortal 2.4 for Elkarte.</readme>
 		<hook reverse="true" hook="integrate_theme_include" file="LANGUAGEDIR/SPortal.english.php" />
-		<hook reverse="true" hook="integrate_load_theme" function="sportal_init" />
-		<hook reverse="true" hook="integrate_actions" function="sp_integrate_actions" />
-		<hook reverse="true" hook="integrate_admin_areas" function="sp_integrate_admin_areas" />
-		<hook reverse="true" hook="integrate_load_permissions" function="sp_integrate_load_permissions" />
-		<hook reverse="true" hook="integrate_whos_online" function="sp_integrate_whos_online" />
-		<hook reverse="true" hook="integrate_frontpage" function="sp_integrate_frontpage" />
-		<hook reverse="true" hook="integrate_quickhelp" function="sp_integrate_quickhelp" />
-		<hook reverse="true" hook="integrate_buffer" function="sp_integrate_exit" />
-		<hook reverse="true" hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" />
-		<hook reverse="true" hook="integrate_redirect" function="sp_integrate_redirect" />
+		<hook reverse="true" hook="integrate_current_action" function="sp_integrate_current_action" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_frontpage" function="sportal_init" file="SUBSDIR/Portal.subs.php" />
+		<hook reverse="true" hook="integrate_boardindex_after" function="sp_integrate_boardindex" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_actions" function="sp_integrate_actions" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_admin_areas" function="sp_integrate_admin_areas" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_load_permissions" function="sp_integrate_load_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_whos_online" function="sp_integrate_whos_online" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_frontpage" function="sp_integrate_frontpage" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_quickhelp" function="sp_integrate_quickhelp" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_buffer" function="sp_integrate_exit" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_redirect" function="sp_integrate_redirect" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<modification reverse="true">modification.xml</modification>
 		<remove-file name="BOARDDIR/PortalStandalone.php" />
 		<remove-file name="CONTROLLERDIR/PortalArticles.controller.php" />
