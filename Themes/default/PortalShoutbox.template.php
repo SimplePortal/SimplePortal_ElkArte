@@ -72,7 +72,7 @@ function template_shoutbox_embed($shoutbox)
 	<form action="" method="post">
 		<div class="shoutbox_container">
 			<div class="shoutbox_info">
-				<div id="shoutbox_load_', $shoutbox['id'], '" style="float: right; display: none;"><img src="', $settings['sp_images_url'], '/loading.gif" alt="" /></div>
+				<div id="shoutbox_load_', $shoutbox['id'], '" style="float: right; display: none;"><i class="fa fa-spinner fa-spin" alt="loading"></i></div>
 				<a href="', $scripturl, '?action=shoutbox;shoutbox_id=', $shoutbox['id'], '" onclick="sp_refresh_shout(', $shoutbox['id'], ', last_refresh_', $shoutbox['id'], '); return false;">', sp_embed_image('refresh'), '</a>
 				<a href="', $scripturl, '?action=shoutbox;shoutbox_id=', $shoutbox['id'], '">', sp_embed_image('history'), '</a>';
 

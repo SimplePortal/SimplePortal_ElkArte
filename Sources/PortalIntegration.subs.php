@@ -347,7 +347,7 @@ function sp_integrate_quickhelp()
 }
 
 /**
- * Integration hook integrate_buffer, called from Subs.php
+ * Integration hook integrate_buffer, called from ob_exit via call_integration_buffer
  * Used to modify the output buffer before its sent
  *
  * @param string $tourniquet
