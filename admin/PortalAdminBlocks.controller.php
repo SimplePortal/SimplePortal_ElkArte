@@ -51,9 +51,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			'statechange' => array($this, 'action_sportal_admin_state_change'),
 		);
 
-		// The default action will show the block list
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
-		$context['sub_action'] = $subAction;
+		// Start up the controller, provide a hook since we can
+		$action = new Action('portal_blocks');
 
 		// Tabs for the menu
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -88,9 +87,11 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			),
 		);
 
-		// Call the right function for this sub-action, The default action will show the block list
-		$action = new Action();
-		$action->initialize($subActions, 'list');
+		// The default action will show the block list
+		$subAction = $action->initialize($subActions, 'list');
+		$context['sub_action'] = $subAction;
+
+		// Call the right function for this sub-action
 		$action->dispatch($subAction);
 	}
 

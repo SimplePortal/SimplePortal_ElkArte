@@ -39,8 +39,8 @@ class ManagePortalProfile_Controller extends Action_Controller
 			'deletepermission' =>  array($this, 'action_sportal_admin_permission_profiles_delete', 'permission' => 'sp_manage_profiles'),
 		);
 
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'listpermission';
-		$context['sub_action'] = $subAction;
+		// Start up the controller, provide a hook since we can
+		$action = new Action('portal_profile');
 
 		// Leave some breadcrumbs so we know our way back
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -55,9 +55,11 @@ class ManagePortalProfile_Controller extends Action_Controller
 			),
 		);
 
+		// Default to the listpermission action
+		$subAction = $action->initialize($subActions, 'listpermission');
+		$context['sub_action'] = $subAction;
+
 		// Call the right function for this sub-action, if you have permission
-		$action = new Action();
-		$action->initialize($subActions, 'listpermission');
 		$action->dispatch($subAction);
 	}
 

@@ -46,12 +46,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 			'delete' => array($this, 'action_sportal_admin_article_delete'),
 		);
 
-		// By default we want to list the articles
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
-		$context['sub_action'] = $subAction;
+		// Start up the controller, provide a hook since we can
+		$action = new Action('portal_articles');
 
 		// Set up the tab data
-		$context['sub_action'] = $subAction;
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['sp_admin_articles_title'],
 			'help' => 'sp_ArticlesArea',
@@ -64,9 +62,11 @@ class ManagePortalArticles_Controller extends Action_Controller
 			),
 		);
 
+		// By default we want to list articles
+		$subAction = $action->initialize($subActions, 'list');
+		$context['sub_action'] = $subAction;
+
 		// Call the right function for this sub-action
-		$action = new Action();
-		$action->initialize($subActions, 'list');
 		$action->dispatch($subAction);
 	}
 

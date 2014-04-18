@@ -132,8 +132,8 @@ class Shoutbox_Controller extends Action_Controller
 			'cache' => $context['SPortal']['shoutbox']['caching'],
 			'can_moderate' => $can_moderate,
 		);
-		$context['SPortal']['shouts_history'] = sportal_get_shouts($shoutbox_id, $shout_parameters);
 
+		$context['SPortal']['shouts_history'] = sportal_get_shouts($shoutbox_id, $shout_parameters);
 		$context['SPortal']['shoutbox_id'] = $shoutbox_id;
 		$context['sub_template'] = 'shoutbox_all';
 		$context['page_title'] = $context['SPortal']['shoutbox']['name'];

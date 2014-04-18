@@ -43,9 +43,8 @@ class ManagePortalCategories_Controller extends Action_Controller
 			'delete' => array($this, 'action_sportal_admin_category_delete'),
 		);
 
-		// Default to list the categories
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
-		$context['sub_action'] = $subAction;
+		// Start up the controller, provide a hook since we can
+		$action = new Action('portal_categories');
 
 		// Set up the tabs
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -60,9 +59,11 @@ class ManagePortalCategories_Controller extends Action_Controller
 			),
 		);
 
+		// Default to list the categories
+		$subAction = $action->initialize($subActions, 'list');
+		$context['sub_action'] = $subAction;
+
 		// Call the right function for this sub-action.
-		$action = new Action();
-		$action->initialize($subActions, 'list');
 		$action->dispatch($subAction);
 	}
 

@@ -44,9 +44,8 @@ class ManagePortalPages_Controller extends Action_Controller
 			'delete' => array($this, 'action_sportal_admin_page_delete'),
 		);
 
-		// Default to the list action
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
-		$context['sub_action'] = $subAction;
+		// Start up the controller, provide a hook since we can
+		$action = new Action('portal_page');
 
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['sp_admin_pages_title'],
@@ -60,9 +59,11 @@ class ManagePortalPages_Controller extends Action_Controller
 			),
 		);
 
+		// Default to the list action
+		$subAction = $action->initialize($subActions, 'list');
+		$context['sub_action'] = $subAction;
+
 		// Go!
-		$action = new Action();
-		$action->initialize($subActions, 'list');
 		$action->dispatch($subAction);
 	}
 

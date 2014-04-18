@@ -46,9 +46,8 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			'blockredirect' => array($this, 'action_sportal_admin_shoutbox_block_redirect'),
 		);
 
-		// Default the action to list if none or no valid option is given
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
-		$context['sub_action'] = $subAction;
+		// Start up the controller, provide a hook since we can
+		$action = new Action('portal_shoutbox');
 
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['sp_admin_shoutbox_title'],
@@ -62,9 +61,11 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			),
 		);
 
+		// Default the action to list if none or no valid option is given
+		$subAction = $action->initialize($subActions, 'list');
+		$context['sub_action'] = $subAction;
+
 		// Shout it on out
-		$action = new Action();
-		$action->initialize($subActions, 'list');
 		$action->dispatch($subAction);
 	}
 

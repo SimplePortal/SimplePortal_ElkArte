@@ -88,13 +88,10 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 									', $member_info['post_group'], '<br />';
 
 		echo '
-									', $member_info['group_icons'], '<br />';
-
-		echo '
+									', $member_info['group_icons'], '
 									<br />
-									<ul class="sp_list">';
-
-		echo '
+									<br />
+									<ul class="sp_list">
 										<li>', sp_embed_image('dot'), ' <strong>', $txt['posts'], ':</strong> ', $member_info['posts'], '</li>';
 
 		if (!empty($modSettings['karmaMode']))
@@ -119,14 +116,9 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 
 		echo '
 										<li>', sp_embed_image('dot'), ' <a href="', $scripturl, '?action=unread">', $txt['unread_topics_visit'], '</a></li>
-										<li>', sp_embed_image('dot'), ' <a href="', $scripturl, '?action=unreadreplies">', $txt['unread_replies'], '</a></li>';
-
-		echo '
+										<li>', sp_embed_image('dot'), ' <a href="', $scripturl, '?action=unreadreplies">', $txt['unread_replies'], '</a></li>
 									</ul>
-									<br />';
-
-		echo '
-									', sp_embed_image('arrow'), ' <a href="', $scripturl, '?action=profile">', $txt['profile'], '</a> ', sp_embed_image('arrow'), ' <a href="', $scripturl, '?action=logout;sesc=', $context['session_id'], '">', $txt['logout'], '</a>';
+									<br />', sp_embed_image('arrow'), ' <a href="', $scripturl, '?action=profile">', $txt['profile'], '</a> ', sp_embed_image('arrow'), ' <a href="', $scripturl, '?action=logout;sesc=', $context['session_id'], '">', $txt['logout'], '</a>';
 	}
 
 	echo '
@@ -187,6 +179,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 	{
 		echo '
 								', $txt['error_sp_no_members_found'];
+		
 		return;
 	}
 

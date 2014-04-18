@@ -62,8 +62,8 @@ class ManagePortalConfig_Controller extends Action_Controller
 			'articlesettings' => array($this, 'action_sportal_admin_article_settings'),
 		);
 
-		// Set the default to the information tab
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'information';
+		// Start up the controller, provide a hook since we can
+		$action = new Action('portal_main');
 
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['sp-adminConfiguration'],
@@ -71,9 +71,10 @@ class ManagePortalConfig_Controller extends Action_Controller
 			'description' => $txt['sp-adminConfigurationDesc'],
 		);
 
+		// Set the default to the information tab
+		$subAction = $action->initialize($subActions, 'information');
+
 		// Right then, off you go
-		$action = new Action();
-		$action->initialize($subActions, 'information');
 		$action->dispatch($subAction);
 	}
 
