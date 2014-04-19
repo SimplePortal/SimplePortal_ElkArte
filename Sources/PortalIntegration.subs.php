@@ -29,6 +29,10 @@ function sp_integrate_actions(&$actions)
 	$actions['forum'] = array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_boardindex');
 	$actions['portal'] = array('PortalMain.controller.php', 'Sportal_Controller', 'action_sportal_main');
 	$actions['shoutbox'] = array('PortalShoutbox.controller.php', 'Shoutbox_Controller', 'action_sportal_shoutbox');
+
+	// Load SimplePortal.
+	require_once(SUBSDIR . '/Portal.subs.php');
+	sportal_init();
 }
 
 /**
@@ -389,7 +393,7 @@ function sp_integrate_buffer($tourniquet)
  */
 function sp_integrate_menu_buttons(&$buttons)
 {
-	global $txt, $scripturl, $modSettings;
+	global $txt, $scripturl, $modSettings, $context;
 
 	loadLanguage('SPortal');
 
