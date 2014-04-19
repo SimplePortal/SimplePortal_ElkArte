@@ -42,7 +42,7 @@ class Article_Controller extends Action_Controller
 	 */
 	public function action_sportal_articles()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $scripturl, $txt, $modSettings;
 
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC');
 
