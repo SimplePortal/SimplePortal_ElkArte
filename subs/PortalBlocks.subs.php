@@ -179,7 +179,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 	{
 		echo '
 								', $txt['error_sp_no_members_found'];
-		
+
 		return;
 	}
 
@@ -2133,16 +2133,14 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 	echo '
 								<form method="post" action="" accept-charset="UTF-8">
 									<div class="sp_center">
-										<div class="styled-select">
-											<select name="theme" onchange="sp_theme_select(this)">';
+										<select name="theme" onchange="sp_theme_select(this)">';
 
 	foreach ($available_themes as $theme)
 		echo '
-												<option value="', $theme['id'], '"', $theme['selected'] ? ' selected="selected"' : '', '>', $theme['name'], '</option>';
+											<option value="', $theme['id'], '"', $theme['selected'] ? ' selected="selected"' : '', '>', $theme['name'], '</option>';
 
 	echo '
-											</select>
-										</div>
+										</select>
 										<br /><br />
 										<img src="', $available_themes[$current_theme]['thumbnail_href'], '" alt="', $available_themes[$current_theme]['name'], '" id="sp_ts_thumb" />
 										<br /><br />
