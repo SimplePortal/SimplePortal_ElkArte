@@ -33,10 +33,12 @@ function sportal_init($standalone = false)
 	// Not running standalone then we need to load in some template information
 	if (!$standalone)
 	{
+		// Load the portal css and the default css if its not yet loaded.
 		loadTemplate(false, 'portal');
 
+		// rtl css as well?
 		if (!empty($context['right_to_left']))
-			loadTemplate(false, 'portal_rtl');
+			loadCSSFile('portal_rtl.css');
 
 		if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], array('admin', 'helpadmin')))
 			loadLanguage('SPortalAdmin', sp_languageSelect('SPortalAdmin'));

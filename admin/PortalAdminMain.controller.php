@@ -54,6 +54,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
 		require_once(SUBSDIR . '/Portal.subs.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
+		loadCSSFile('portal.css');
 
 		$subActions = array(
 			'information' => array($this, 'action_sportal_information'),
