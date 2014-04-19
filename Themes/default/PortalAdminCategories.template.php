@@ -45,16 +45,14 @@ function template_categories_edit()
 							<label for="category_permissions">', $txt['sp_admin_categories_col_permissions'], ':</label>
 						</dt>
 						<dd>
-						<div class="styled-select">
 							<select name="permissions" id="category_permissions">';
 
 	foreach ($context['category']['permission_profiles'] as $profile)
 		echo '
-									<option value="', $profile['id'], '"', $profile['id'] == $context['category']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+								<option value="', $profile['id'], '"', $profile['id'] == $context['category']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
 
 	echo '
-								</select>
-						</div>
+							</select>
 						</dd>
 						<dt>
 							<label for="category_status">', $txt['sp_admin_categories_col_status'], ':</label>

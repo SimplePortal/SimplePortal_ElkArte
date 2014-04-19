@@ -48,10 +48,13 @@ function template_view_articles()
 	</div>';
 }
 
+/**
+ * Template for viewing a specific article in the system
+ * Also used to preivew an article from the new article form
+ */
 function template_view_article()
 {
 	global $context, $txt;
-
 
 	echo '
 	<div id="sp_view_article">
@@ -59,7 +62,6 @@ function template_view_article()
 			', $context['article']['title'], '
 		</h3>
 		<div class="windowbg">
-			<span class="topslice"><span></span></span>
 			<div class="sp_content_padding">
 				<span>', sprintf($txt['sp_posted_in_on_by'], $context['article']['category']['link'], $context['article']['date'], $context['article']['author']['link']), '</span>
 				<div>';
@@ -71,6 +73,7 @@ function template_view_article()
 			</div>
 		</div>';
 
+	// Just previewing the new article?
 	if (empty($context['preview']))
 	{
 		echo '

@@ -12,7 +12,7 @@
 
 function template_pages_edit()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	// Reviewing the page before submitting?
 	if (!empty($context['SPortal']['preview']))
@@ -52,39 +52,34 @@ function template_pages_edit()
 							<label for="page_type">', $txt['sp_admin_pages_col_type'], ':</label>
 						</dt>
 						<dd>
-							<div class="styled-select">
-								<select name="type" id="page_type" onchange="sp_update_editor();">';
+							<select name="type" id="page_type" onchange="sp_update_editor(\'page_type\');">';
 
 	$content_types = array('bbc', 'html', 'php');
 	foreach ($content_types as $type)
 		echo '
-									<option value="', $type, '"', $context['SPortal']['page']['type'] == $type ? ' selected="selected"' : '', '>', $txt['sp_pages_type_' . $type], '</option>';
+								<option value="', $type, '"', $context['SPortal']['page']['type'] == $type ? ' selected="selected"' : '', '>', $txt['sp_pages_type_' . $type], '</option>';
 
 	echo '
-								</select>
-							</div>
+							</select>
 						</dd>
 						<dt>
 							<label for="page_permissions">', $txt['sp_admin_pages_col_permissions'], ':</label>
 						</dt>
 						<dd>
-							<div class="styled-select">
-								<select name="permissions" id="page_permissions">';
+							<select name="permissions" id="page_permissions">';
 
 	foreach ($context['SPortal']['page']['permission_profiles'] as $profile)
 		echo '
-									<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['page']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+								<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['page']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
 
 	echo '
-								</select>
-							</div>
+							</select>
 						</dd>
 						<dt>
 							<label for="page_blocks">', $txt['sp_admin_pages_col_blocks'], ':</label>
 						</dt>
 						<dd>
-							<div class="styled-select">
-								<select name="blocks[]" id="page_blocks" size="7" multiple="multiple">';
+							<select name="blocks[]" id="page_blocks" size="7" multiple="multiple">';
 
 	foreach ($context['sides'] as $side => $label)
 	{
@@ -92,20 +87,19 @@ function template_pages_edit()
 			continue;
 
 		echo '
-									<optgroup label="', $label, '">';
+								<optgroup label="', $label, '">';
 
 		foreach ($context['page_blocks'][$side] as $block)
 		{
 			echo '
-										<option value="', $block['id'], '"', $block['shown'] ? ' selected="selected"' : '', '>', $block['label'], '</option>';
+									<option value="', $block['id'], '"', $block['shown'] ? ' selected="selected"' : '', '>', $block['label'], '</option>';
 		}
 
 		echo '
-									</optgroup>';
+								</optgroup>';
 	}
 
 	echo '
-								</div>
 							</select>
 						</dd>
 						<dt>
@@ -161,16 +155,14 @@ function template_pages_edit()
 			if ($type == 'default')
 			{
 				echo '
-							<div class="styled-select">
-								<select name="', $section, '_default_class" id="', $section, '_default_class">';
+							<select name="', $section, '_default_class" id="', $section, '_default_class">';
 
 				foreach ($style_parameters[$section] as $class)
 					echo '
-									<option value="', $class, '"', $context['SPortal']['page']['style'][$section . '_default_class'] == $class ? ' selected="selected"' : '', '>', $class, '</option>';
+								<option value="', $class, '"', $context['SPortal']['page']['style'][$section . '_default_class'] == $class ? ' selected="selected"' : '', '>', $class, '</option>';
 
 				echo '
-								</select>
-							</div>';
+							</select>';
 			}
 			else
 				echo '
@@ -204,23 +196,5 @@ function template_pages_edit()
 		document.getElementById("title_custom_class").disabled = document.getElementById("no_title").checked;
 		document.getElementById("title_custom_style").disabled = document.getElementById("no_title").checked;
 		document.getElementById("body_default_class").disabled = document.getElementById("no_body").checked;
-
-		function sp_update_editor()
-		{
-			var new_state = document.getElementById("page_type").value;
-			if (new_state == "bbc")
-			{
-				document.getElementById("sp_rich_bbc").style.display = "";
-				document.getElementById("sp_rich_smileys").style.display = "";
-			}
-			else
-			{
-				if (oEditorHandle_content.bRichTextEnabled)
-					oEditorHandle_content.toggleView();
-
-				document.getElementById("sp_rich_bbc").style.display = "none";
-				document.getElementById("sp_rich_smileys").style.display = "none";
-			}
-		}
 	// ]]></script>';
 }
