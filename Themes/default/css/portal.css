@@ -485,8 +485,10 @@ dl.sp_form dt a img, #sp_add_articles_list_header a img {
 	padding-top: 1.5em;
 }
 #sp_rich_editor {
-	padding-left: 2em;
 	padding-top: 1em;
+    margin: 0 auto;
+    max-width: 97%;
+    width: 60em;
 }
 #sp_text_editor {
 	padding: 1em;
@@ -501,4 +503,7 @@ dl.sp_form dt a img, #sp_add_articles_list_header a img {
 
 #sp_view_comments {
   margin-top: 1em;
+}
+#category_description {
+	width: 75%;
 }
