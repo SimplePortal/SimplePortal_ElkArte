@@ -210,3 +210,26 @@ function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_them
 
 	this.oSmileyPopupWindow.document.close();
 }
+
+/**
+ * When using html or php, disable the editor so it does not "fight" with what
+ * the user wants to enter.
+ */
+function sp_update_editor(select)
+{
+	var new_state = document.getElementById(select).value,
+		instance = $("textarea").sceditor("instance");
+
+	// Going back to BBC
+	if (new_state === "bbc")
+	{
+		// Start the editor again
+		elk_editor();
+	}
+	else
+	{
+		// Update the the original text area with current editor contents and stop the editor
+		instance.updateOriginal();
+		instance.destroy();
+	}
+}
