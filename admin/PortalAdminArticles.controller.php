@@ -371,9 +371,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$editor_options = array(
 			'id' => 'content',
 			'value' => $context['article']['body'],
-			'width' => '95%',
-			'height' => '200px',
-			'preview_type' => 0,
+			'width' => '100%',
+			'height' => '295px',
+			'preview_type' => 2,
 		);
 		create_control_richedit($editor_options);
 		$context['post_box_name'] = $editor_options['id'];
@@ -404,7 +404,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 */
 	private function _sportal_admin_article_edit_save()
 	{
-		global $context, $txt;
+		global $context, $txt, $modSettings;
 
 		// No errors, yet.
 		$article_errors = Error_Context::context('article', 0);
