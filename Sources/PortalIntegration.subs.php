@@ -279,7 +279,7 @@ function sp_integrate_whos_online($actions)
 }
 
 /**
- * Frontpage hook, integrate_frontpage, called from the site dispatcher,
+ * Frontpage hook, integrate_action_frontpage, called from the site dispatcher,
  * used to replace the default action with a new one
  *
  * @param string $default_action
@@ -291,6 +291,9 @@ function sp_integrate_frontpage(&$default_action)
 	// Portal is active
 	if (empty($context['disable_sp']))
 	{
+		require_once(SUBSDIR . '/Portal.subs.php');
+		sportal_init();
+
 		$file = null;
 		$function = null;
 
@@ -441,6 +444,7 @@ function sp_integrate_redirect(&$setLocation, &$refresh)
 
 /**
  * A single check for the sake of remove yet another code edit. :P
+ * integrate_action_boardindex_after
  */
 function sp_integrate_boardindex()
 {
