@@ -8,6 +8,63 @@
  * @version 2.4
  */
 
+/**
+ * Used to collapse an individual block
+ *
+ * @param {string} id
+ */
+function sp_collapseBlock(id)
+{
+	$("#sp_block_" + id).slideToggle(300).promise().done(function() {
+		var mode = false;
+
+		if ($("#sp_block_" + id).is(":visible"))
+			mode = true;
+
+		// Save the choice, one way for guest, or theme options for members
+		if (elk_member_id === 0)
+			document.cookie = "sp_block_" + id + "=" + (mode ? 0 : 1);
+		else
+			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null);
+
+		// Swap the class to change the icon
+		$("#sp_collapse_" + id).attr("class", mode ? "collapse" : "expand");
+	});
+}
+
+/**
+ * Used to collapse side (if enabled)
+ *
+ * @param {string} id
+ */
+function sp_collapseSide(id)
+{
+	var sp_sides = [];
+
+	sp_sides[1] = "sp_left";
+	sp_sides[4] = "sp_right";
+
+	mode = document.getElementById(sp_sides[id]).style.display === "" ? 0 : 1;
+
+	// Guests use a cookie, members a theme option to remember the choice
+	if (elk_member_id === 0)
+		document.cookie = sp_sides[id] + "=" + (mode ? 0 : 1);
+	else
+		elk_setThemeOption(sp_sides[id], mode ? 0 : 1, null);
+
+	// Update the side expand/collapse image
+	document.getElementById("sp_collapse_side" + id).src = sp_images_url + (mode ? "/collapse.png" : "/expand.png");
+
+	// Hide the side with a touch of animation
+	$('#' + sp_sides[id]).toggle(400);
+}
+
+/**
+ * Used to collapse the smiley box in the shoutbox
+ *
+ * @param {string} id
+ * @param {boolean} has_image
+ */
 function sp_collapse_object(id, has_image)
 {
 	var mode = document.getElementById("sp_object_" + id).style.display === '' ? 0 : 1;
@@ -21,6 +78,7 @@ function sp_collapse_object(id, has_image)
 function sp_image_resize()
 {
 	var possible_images = document.getElementsByTagName("img");
+
 	for (var i = 0; i < possible_images.length; i++)
 	{
 		if (possible_images[i].className !== "bbc_img sp_article")
@@ -184,7 +242,7 @@ function elk_prepareScriptUrl(sUrl)
 
 function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_theme_url, elk_smileys_url)
 {
-	if (this.oSmileyPopupWindow !== null && 'closed' in this.oSmileyPopupWindow && !this.oSmileyPopupWindow.closed)
+	if (this.oSmileyPopupWindow !== undefined && 'closed' in this.oSmileyPopupWindow && !this.oSmileyPopupWindow.closed)
 	{
 		this.oSmileyPopupWindow.focus();
 		return;
