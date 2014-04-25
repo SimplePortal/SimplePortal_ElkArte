@@ -200,7 +200,7 @@ function template_block($block)
  */
 function template_block_default($block)
 {
-	global $context, $modSettings, $settings;
+	global $context, $modSettings;
 
 	if (empty($block['style']['no_title']))
 	{
@@ -209,7 +209,11 @@ function template_block_default($block)
 
 		if (empty($block['force_view']))
 			echo '
-			<a class="sp_float_right" href="javascript:void(0);" onclick="sp_collapseBlock(\'', $block['id'], '\')"><img id="sp_collapse_', $block['id'], '" src="', $settings['images_url'], $block['collapsed'] ? '/expand.png' : '/collapse.png', '" alt="*" /></a>';
+			<span id="category_toggle">&nbsp;
+				<a href="javascript:sp_collapseBlock(\'', $block['id'], '\')">
+					<span id="sp_collapse_', $block['id'], '" class="', $block['collapsed'] ? 'expand' : 'collapse', '"></span>
+				</a>
+			</span>';
 
 		echo '
 			', parse_bbc($block['label']), '
