@@ -149,53 +149,7 @@ function sportal_init_headers()
 
 	// Javascipt to open/collapse blocks as the user wants
 	$javascript = '
-	var sp_images_url = "' . $settings['sp_images_url'] . '";
-
-	// Used to collapse an individual block
-	function sp_collapseBlock(id)
-	{
-		$("#sp_block_" + id).slideToggle(300).promise().done(function() {
-			var mode = false;
-			if ($("#sp_block_" + id).is(":visible"))
-				mode = true;';
-
-	if ($context['user']['is_guest'])
-		$javascript .= '
-			document.cookie = "sp_block_" + id + "=" + (mode ? 0 : 1);';
-	else
-		$javascript .= '
-			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null);';
-
-	$javascript .= '
-			$("#sp_collapse_" + id).attr("src", elk_images_url + (mode ? "/collapse.png" : "/expand.png"));
-		});
-	}';
-
-	// Allow for left / right side collapsing
-	if (empty($modSettings['sp_disable_side_collapse']))
-	{
-		$javascript .= '
-	// Used to collapse side (if enabled)
-	function sp_collapseSide(id)
-	{
-		var sp_sides = new Array();
-
-		sp_sides[1] = "sp_left";
-		sp_sides[4] = "sp_right";
-		mode = document.getElementById(sp_sides[id]).style.display == "" ? 0 : 1;' . ($context['user']['is_guest'] ? '
-		document.cookie = sp_sides[id] + "=" + (mode ? 0 : 1);' : '
-		elk_setThemeOption(sp_sides[id], mode ? 0 : 1, null, "' . $context['session_id'] . '");') . '
-
-		// Update the side expand/collapse image
-		document.getElementById("sp_collapse_side" + id).src = sp_images_url + (mode ? "/collapse.png" : "/expand.png");
-
-		// Hide the side with a touch of animation
-		$(\'#\' + sp_sides[id]).toggle(400);
-
-		' . (isBrowser('is_ie8') ? '
-		document.getElementById("sp_center").style.width = "100%";' : '') . '
-	}';
-	}
+	var sp_images_url = "' . $settings['sp_images_url'] . '";';
 
 	if ($modSettings['sp_resize_images'])
 	{
@@ -621,10 +575,7 @@ function sp_languageSelect($template_name)
 
 	// Make sure we have $settings - if not we're in trouble and need to find it!
 	if (empty($settings['default_theme_dir']))
-	{
-		require_once(SOURCEDIR . '/ScheduledTasks.php');
 		loadEssentialThemeData();
-	}
 
 	// For each file open it up and write it out!
 	$allTemplatesExists = array();
@@ -652,7 +603,7 @@ function sp_languageSelect($template_name)
 		$already_loaded[$template] = 'english';
 		foreach ($attempts as $k => $file)
 		{
-			if (file_exists($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php'))
+			if (file_exists($file[0] . '/languages/' . $file[2] . '/' . $file[1] . '.' . $file[2] . '.php'))
 			{
 				$already_loaded[$template] = '';
 				$allTemplatesExists[$template] = true;
@@ -671,6 +622,7 @@ function sp_languageSelect($template_name)
 
 	// Everthing is fine, let's go back :D
 	$already_loaded[$template_name] = '';
+
 	return '';
 }
 
