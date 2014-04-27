@@ -503,3 +503,7 @@ dl.sp_form dt a img, #sp_add_articles_list_header a img {
 #category_description {
 	width: 75%;
 }
+/* Drag sort lists show the move cursor and up/down arrow content */
+#sp_manage_blocks td:nth-child(-n+2) {
+	cursor: move;
+}

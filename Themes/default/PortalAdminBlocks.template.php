@@ -22,28 +22,20 @@ function template_block_list()
 	echo '
 	<div id="sp_manage_blocks">';
 
-	if ($context['block_move'])
-		echo '
-		<div class="information">
-			<p>', $context['move_title'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=portalblocks">', $txt['sp-blocks_cancel_moving'], '</a>', '</p>
-		</div>';
-
 	// Show each portal area with the blocks in each one
 	foreach($context['sides'] as $id => $side)
 	{
+		$sortables[] = '#side_' . $side['id'];
+
 		echo '
 		<h3 class="category_header">
 			<a class="sp_float_right" href="', $scripturl, '?action=admin;area=portalblocks;sa=add;col=', $side['id'], '">', sp_embed_image('add', sprintf($txt['sp-blocksCreate'], $side['label'])), '</a>
 			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=', $side['help'], '" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 			<a href="', $scripturl, '?action=admin;area=portalblocks;sa=', $id, '">', $side['label'], ' ', $txt['sp-blocksBlocks'], '</a>
 		</h3>
-		<table class="table_grid">
+		<table class="table_grid" >
 			<thead>
 				<tr class="table_head">';
-
-		if ($context['block_move'])
-			echo '
-					<th scope="col" class="first_th" width="5%">', $txt['sp-adminColumnMove'], '</th>';
 
 		foreach ($context['columns'] as $column)
 			echo '
@@ -52,41 +44,24 @@ function template_block_list()
 		echo '
 				</tr>
 			</thead>
-			<tbody>';
+			<tbody id="side_', $side['id'] ,'" class="sortme">';
 
 		if (empty($context['blocks'][$side['name']]))
 		{
 			echo '
 				<tr class="windowbg">
-					<td class="sp_center noticebox" colspan="4">', $txt['error_sp_no_block'], '</td>
+					<td class="sp_center noticebox" colspan="4"></td>
 				</tr>';
 		}
 
 		foreach($context['blocks'][$side['name']] as $block)
 		{
 			echo '
-				<tr class="windowbg">';
-
-			if ($context['block_move'])
-				echo '
-				<td class="sp_center">', $block['id'] != $context['block_move'] ? $block['move_insert'] : '', '</td>';
-
-			echo '
-					<td>', $block['id'] == $context['block_move'] ? '<strong>' . $block['label'] . '</strong>' : $block['label'], '</td>
+				<tr id="block_',$block['id'],'" class="windowbg">
+					<td>', $block['label'], '</td>
 					<td>', $block['type_text'], '</td>
 					<td class="sp_center">', implode(' ', $block['actions']), '</td>
 				</tr>';
-		}
-
-		if ($context['block_move'] && (empty($side['last']) || $context['block_move'] != $side['last']))
-		{
-			echo '
-			<tr class="windowbg">
-				<td class="sp_center"><a href="', $scripturl, '?action=admin;area=portalblocks;sa=move;block_id=', $context['block_move'], ';col=', $side['id'], ';', $context['session_var'], '=', $context['session_id'], '">', sp_embed_image('arrow', $txt['sp-blocks_move_here']), '</a></td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>';
 		}
 
 		echo '
@@ -94,8 +69,25 @@ function template_block_list()
 		</table>';
 	}
 
+	// Engage sortable to allow drag/drop arrangement of the blocks
+	// @todo if you empty a side, you can't drop a block back in it without a page refresh
 	echo '
-	</div>';
+	</div>
+	<script>
+		// Set up our sortable call
+		$().elkSortable({
+			sa: "blockorder",
+			error: "' . $txt['admin_order_error'] . '",
+			title: "' . $txt['admin_order_title'] . '",
+			token: {token_var: "' . $context['admin-sort_token_var'] . '", token_id: "' . $context['admin-sort_token'] . '"},
+			tag: "' . implode(',', $sortables) . '",
+			connect: ".sortme",
+			containment: "#sp_manage_blocks",
+			href: "?action=admin;area=portalblocks",
+			placeholder: "ui-state-highlight",
+			axis: "y",
+		});
+	</script>';
 }
 
 /**

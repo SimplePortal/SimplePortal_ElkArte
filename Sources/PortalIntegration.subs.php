@@ -470,3 +470,14 @@ function sp_integrate_current_action(&$current_action)
 	if(empty($context['disable_sp']) && ((isset($_GET['board']) || isset($_GET['topic']) || in_array($context['current_action'], array('unread', 'unreadreplies', 'recent', 'stats', 'who'))) && in_array($modSettings['sp_portal_mode'], array(1, 3))))
 		$current_action = 'forum';
 }
+
+/**
+ * Add in to the xml array our sortable action
+ * integrate_sa_xmlhttp
+ *
+ * @param array $subActions
+ */
+function sp_integrate_xmlhttp(&$subActions)
+{
+	$subActions['blockorder'] = array('controller' => 'ManagePortalBlocks_Controller', 'file' => 'PortalAdminBlocks.controller.php', 'function' => 'action_blockorder', 'permission' => 'admin_forum');
+}

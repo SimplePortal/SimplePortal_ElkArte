@@ -142,8 +142,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			),
 		);
 
-		$context['block_move'] = isset($_GET['sa']) && $_GET['sa'] == 'select' && !empty($_GET['block_id']) ? (int) $_GET['block_id'] : 0;
-
 		$sides = array('header', 'left', 'top', 'bottom', 'right', 'footer');
 
 		// Are we viewing any of the sub lists for an individual side?
@@ -164,7 +162,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			'label' => array(
 				'width' => '40%',
 				'label' => $txt['sp-adminColumnName'],
-				'class' => !$context['block_move'] ? 'first_th' : '',
+				'class' => 'first_th',
 			),
 			'type' => array(
 				'width' => '40%',
@@ -187,21 +185,13 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				$context['blocks'][$side['name']][$block_id]['actions'] = array(
 					'state_icon' => empty($block['state']) ? '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';type=block;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('deactive', $txt['sp-blocksActivate']) . '</a>' : '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';type=block;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('active', $txt['sp-blocksDeactivate']) . '</a>',
 					'edit' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=edit;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
-					'move' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=select;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('move', $txt['sp-adminColumnMove']) . '</a>',
 					'delete' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=delete;block_id=' . $block['id'] . ';col=' . $block['column'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp-deleteblock'] . '\');">' . sp_embed_image('delete') . '</a>',
 				);
-
-				if ($context['block_move'])
-				{
-					$context['blocks'][$side['name']][$block_id]['move_insert'] = '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=move;block_id=' . $context['block_move'] . ';col=' . $block['column'] . ';row=' . $block['row'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('arrow', $txt['sp-blocks_move_here']) . '</a>';
-
-					if ($context['block_move'] == $block_id)
-						$context['move_title'] = sprintf($txt['sp-blocks_select_destination'], htmlspecialchars($block['label']));
-				}
 			}
 		}
 
 		// Call the sub template.
+		createToken('admin-sort', 'post');
 		$context['sub_template'] = 'block_list';
 		$context['page_title'] = $txt['sp-adminBlockListName'];
 	}
@@ -767,10 +757,126 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	}
 
 	/**
+	 * Reorders the blocks in response to a D&D ajax request
+	 */
+	public function action_blockorder()
+	{
+		global $context, $txt;
+
+		// Start off with nothing
+		$context['xml_data'] = array();
+		$errors = array();
+		$order = array();
+		$tokens = array();
+
+		// Chances are
+		loadLanguage('Errors');
+		loadLanguage('SPortalAdmin');
+
+		// You have to be allowed to do this
+		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_session = validateSession();
+		if (empty($validation_session) && $validation_token === true)
+		{
+			// No questions that we are reordering the blocks
+			if (isset($_POST['order'], $_POST['received'], $_POST['moved']))
+			{
+				require_once(SUBSDIR . '/PortalAdmin.subs.php');
+				require_once(SUBSDIR . '/Portal.subs.php');
+
+				$target_side = (int) str_replace('side_', '', $_POST['received']);
+				$block_id = (int) str_replace('block_', '', $_POST['moved']);
+				list ($current_side, ) = sp_block_get_position($block_id);
+
+				// The block ids arrive in 1-n view order ...
+				$blocks = array();
+				foreach ($_POST['block'] as $id)
+					$blocks[] = $id;
+
+				// Find where the moved block is in the block stack
+				$moved_key = array_search($block_id, $blocks);
+				if ($moved_key !== false)
+				{
+					// Find the details about the blocks above and below our moved one
+					if ($moved_key !== 0)
+						list ($check_above_side, $check_above_row) = sp_block_get_position($blocks[$moved_key - 1]);
+					if ($moved_key + 1 < count($blocks))
+						list ($check_below_side, $check_below_row) = sp_block_get_position($blocks[$moved_key + 1]);
+
+					// The block above is in the same side, so we place it after that block
+					if (isset($check_above_side) && $check_above_side == $target_side)
+						$target_row = $check_above_row + 1;
+					// The block above is not in the same side, but the block below is, move it above that one
+					elseif (isset($check_below_side) && $check_below_side == $target_side)
+						$target_row = $check_below_row;
+					// Perhaps the first in what was an empty side or "other"
+					else
+						$target_row = sp_block_nextrow($target_side);
+
+					// Is the block moving sides?
+					if ($current_side != $target_side)
+						sp_block_move_col($block_id, $target_side);
+
+					// Position it in right row in the side
+					sp_blocks_move_row($block_id, $target_side, $target_row);
+
+					// Update the sides that may have been affected
+					foreach (array_unique(array($current_side, $target_side)) as $side)
+						fixColumnRows($side);
+
+					$order[] = array(
+						'value' => $txt['sp-blocks_success_moving'],
+					);
+				}
+				else
+					$errors[] = array('value' => $txt['sp-blocks_fail_moving']);
+			}
+		}
+		// Failed validation, tough to be you
+		else
+		{
+			if (!empty($validation_session))
+				$errors[] = array('value' => $txt[$validation_session]);
+
+			if (empty($validation_token))
+				$errors[] = array('value' => $txt['token_verify_fail']);
+		}
+
+		// New generic token for use
+		createToken('admin-sort', 'post');
+		$tokens = array(
+			array(
+				'value' => $context['admin-sort_token'],
+				'attributes' => array('type' => 'token'),
+			),
+			array(
+				'value' => $context['admin-sort_token_var'],
+				'attributes' => array('type' => 'token_var'),
+			),
+		);
+
+		// Return the response
+		$context['sub_template'] = 'generic_xml';
+		$context['xml_data'] = array(
+			'orders' => array(
+				'identifier' => 'order',
+				'children' => $order,
+			),
+			'tokens' => array(
+				'identifier' => 'token',
+				'children' => $tokens,
+			),
+			'errors' => array(
+				'identifier' => 'error',
+				'children' => $errors,
+			),
+		);
+	}
+
+	/**
 	 * Function for moving a block
 	 *
 	 * - Moves a block to a new row and/or a new column
-	 *
 	 */
 	public function action_sportal_admin_block_move()
 	{

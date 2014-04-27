@@ -69,6 +69,10 @@ $txt['sp-deleteblock'] = 'Are you sure you want to delete this block?';
 $txt['sp-blocks_select_destination'] = 'Select destination for block \'<strong>%1$s</strong>\'';
 $txt['sp-blocks_move_here'] = 'Move block here';
 $txt['sp-blocks_cancel_moving'] = 'Cancel moving';
+$txt['sp-blocks_success_moving'] = 'The block was sucessfuly moved';
+$txt['sp-blocks_fail_moving'] = 'There was an error trying to move the block';
+
+
 
 // Add/Edit blocks
 $txt['sp-blocksSelectType'] = 'Select Block Type';
