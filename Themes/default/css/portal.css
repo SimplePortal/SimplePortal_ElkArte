@@ -177,6 +177,14 @@ tsp_shop_divider {
 #sp_menu li:hover ul  {
 	display: block;
 }
+#sp_menu a .pm_indicator {
+	font-size: 0.643em;
+}
+#sp_menu a .avatar {
+	width: 25px;
+	height: 25px;
+	vertical-align: middle;
+}
 
 .sp_article_icon {
 	margin: 5px 10px 0 0;
@@ -471,7 +479,7 @@ dl.sp_form dd {
 dl.sp_form img, #sp_add_articles_list_header img {
 	margin: 0 0.2em 0 0;
 }
-dl.sp_form dt a img, #sp_add_articles_list_header a img {
+#sp_add_articles_list_header a img {
 	position: relative;
 	top: 2px;
 }

@@ -156,8 +156,8 @@ function template_block_edit()
 
 		if (!empty($helptxt['sp_param_' . $context['SPortal']['block']['type'] . '_' . $name]))
 			echo '
-							<a href="', $scripturl, '?action=quickhelp;help=sp_param_', $context['SPortal']['block']['type'] , '_' , $name, '" onclick="return reqOverlayDiv(this.href);" class="help">
-								<img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" />
+							<a class="help" href="', $scripturl, '?action=quickhelp;help=sp_param_', $context['SPortal']['block']['type'] , '_' , $name, '" onclick="return reqOverlayDiv(this.href);">
+								<img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" />
 							</a>';
 
 		echo '
@@ -384,7 +384,11 @@ function template_block_edit()
 		}
 
 		echo '
-						<a href="', $scripturl, '?action=helpadmin;help=sp-blocksCustomDisplayOptions" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a> <label for="display_custom">', $txt['sp_display_custom'], ':</label> <input type="text" name="display_custom" id="display_custom" value="', $context['SPortal']['block']['display_custom'], '" class="input_text" />
+						<a class="help" href="', $scripturl, '?action=helpadmin;help=sp-blocksCustomDisplayOptions" onclick="return reqWin(this.href);">
+							<img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" />
+						</a>
+						<label for="display_custom">', $txt['sp_display_custom'], ': </label>
+						<input class="input_text" type="text" name="display_custom" id="display_custom" value="', $context['SPortal']['block']['display_custom'], '" />
 					</div>
 					<div class="sp_button_container">
 						<input type="submit" name="add_block" value="', !$context['SPortal']['is_new'] ? $txt['sp-blocksEdit'] : $txt['sp-blocksAdd'], '" class="right_submit" />
