@@ -510,6 +510,8 @@ $txt['permissionname_sp_manage_shoutbox'] = 'Manage portal shoutboxes';
 $txt['permissionhelp_sp_manage_shoutbox'] = 'This permission allows users to manage SimplePortal shoutboxes.';
 $txt['permissionname_sp_manage_profiles'] = 'Manage portal profiles';
 $txt['permissionhelp_sp_manage_profiles'] = 'This permission allows users to manage SimplePortal profiles.';
+$txt['permissionname_sp_manage_settings'] = 'Manage portal settings';
+$txt['permissionhelp_sp_manage_settings'] = 'This permission allows users to manage SimplePortal settings.';
 
 // Compatibility strings
 $txt['sp-adminCatHelp'] = 'Here you can manage and configure SimplePortal.';
