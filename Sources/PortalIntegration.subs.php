@@ -45,8 +45,9 @@ function sp_integrate_admin_areas(&$admin_areas)
 {
 	global $txt;
 
-	loadLanguage('SPortalAdmin');
-	loadLanguage('SPortal');
+	require_once(SUBSDIR . '/Portal.subs.php');
+	loadLanguage('SPortalAdmin', sp_languageSelect('SPortal'));
+	loadLanguage('SPortal', sp_languageSelect('SPortal'));
 
 	$temp = $admin_areas;
 	$admin_areas = array();
@@ -202,7 +203,9 @@ function sp_integrate_whos_online($actions)
 
 	$db = database();
 	$data = null;
-	loadLanguage('SPortal');
+
+	require_once(SUBSDIR . '/Portal.subs.php');
+	loadLanguage('SPortal', sp_languageSelect('SPortal'));
 
 	// This may miss if its needed for the first action ... need to improve the hook or find another location
 	if ($modSettings['sp_portal_mode'] == 1)
@@ -398,7 +401,8 @@ function sp_integrate_menu_buttons(&$buttons)
 {
 	global $txt, $scripturl, $modSettings, $context;
 
-	loadLanguage('SPortal');
+	require_once(SUBSDIR . '/Portal.subs.php');
+	loadLanguage('SPortal', sp_languageSelect('SPortal'));
 
 	// Define the new menu item(s)
 	$buttons = elk_array_insert($buttons, 'home', array(
