@@ -26,7 +26,7 @@ function template_portal_index()
 		<h3 class="category_header">
 			', $article['link'], '
 		</h3>
-		<div class="windowbg2">
+		<div class="windowbg sp_block_section">
 			<div class="sp_content_padding">
 				<span>', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '</span>
 				<p>', $article['preview'], '<a href="', $article['href'], '">...</a></p>
@@ -68,10 +68,10 @@ function template_portal_above()
 	if (!empty($context['SPortal']['blocks'][5]))
 	{
 		echo '
-	<div id="sp_header">';
+	<div id="sp_header" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][5] as $block)
-			template_block($block);
+			template_block($block, 5);
 
 		echo '
 	</div>';
@@ -85,27 +85,30 @@ function template_portal_above()
 	if (!empty($modSettings['showleft']) && !empty($context['SPortal']['blocks'][1]))
 	{
 		echo '
-			<td id="sp_left"', !empty($modSettings['leftwidth']) ? ' width="' . $modSettings['leftwidth'] . '"' : '', $context['SPortal']['sides'][1]['collapsed'] && empty($modSettings['sp_disable_side_collapse']) ? ' style="display: none;"' : '', '>';
+			<td id="sp_left"', !empty($modSettings['leftwidth']) ? ' style="width:' . $modSettings['leftwidth'] . 'px"' : '', $context['SPortal']['sides'][1]['collapsed'] && empty($modSettings['sp_disable_side_collapse']) ? ' style="display: none;"' : '', '>
+				<div id="sp_left_div" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][1] as $block)
-			template_block($block);
+			template_block($block, 1);
 
 		echo '
+				</div>
 			</td>';
 	}
 
 	// Followed by all the Top Blocks
 	echo '
-			<td id="sp_center">';
+			<td id="sp_center">
+				<div id="sp_top_div" class="sp_column">';
 
 	if (!empty($context['SPortal']['blocks'][2]))
 	{
 		foreach ($context['SPortal']['blocks'][2] as $block)
-			template_block($block);
+			template_block($block, 2);
 
 		if (empty($context['SPortal']['on_portal']))
 			echo '
-				<br class="sp_side_clear" />';
+					<br class="sp_side_clear" />';
 	}
 }
 
@@ -116,30 +119,38 @@ function template_portal_below()
 {
 	global $context, $modSettings;
 
+	// Close the top block section, begin the bottom
+	echo '
+				</div>
+				<div id="sp_bottom_div" class="sp_column">';
+
 	// Output all the Bottom blocks
 	if (!empty($context['SPortal']['blocks'][3]))
 	{
 		if (empty($context['SPortal']['on_portal']) || !empty($context['SPortal']['blocks'][2]) || !empty($modSettings['articleactive']))
 			echo '
-				<br class="sp_side_clear" />';
+					<br class="sp_side_clear" />';
 
 		foreach ($context['SPortal']['blocks'][3] as $block)
-			template_block($block);
+			template_block($block, 3);
 	}
 
 	echo '
+				</div>
 			</td>';
 
 	// And now all the Right Blocks
 	if (!empty($modSettings['showright']) && !empty($context['SPortal']['blocks'][4]))
 	{
 		echo '
-			<td id="sp_right"', !empty($modSettings['rightwidth']) ? ' width="' . $modSettings['rightwidth'] . '"' : '', $context['SPortal']['sides'][4]['collapsed'] && empty($modSettings['sp_disable_side_collapse']) ? ' style="display: none;"' : '', '>';
+			<td id="sp_right"', !empty($modSettings['rightwidth']) ? ' style="width:' . $modSettings['rightwidth'] . 'px"' : '', $context['SPortal']['sides'][4]['collapsed'] && empty($modSettings['sp_disable_side_collapse']) ? ' style="display: none;"' : '', '>
+				<div id="sp_right_div" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][4] as $block)
-			template_block($block);
+			template_block($block, 4);
 
 		echo '
+				</div>
 			</td>';
 	}
 
@@ -151,14 +162,13 @@ function template_portal_below()
 	if (!empty($context['SPortal']['blocks'][6]))
 	{
 		echo '
-	<div id="sp_footer">';
+	<div id="sp_footer" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][6] as $block)
-			template_block($block);
+			template_block($block, 6);
 
 		echo '
-	</div>
-	<br />';
+	</div>';
 	}
 }
 
@@ -167,13 +177,15 @@ function template_portal_below()
  *
  * @param mixed[] $block
  */
-function template_block($block)
+function template_block($block, $side)
 {
 	global $context, $modSettings, $txt;
 
+	// Make sure that we have some valid block data.
 	if (empty($block) || empty($block['type']))
 		return;
 
+	// Board news gets special formating, really intended to be at the top of a column
 	if ($block['type'] === 'sp_boardNews')
 	{
 		echo '
@@ -190,7 +202,7 @@ function template_block($block)
 	if (isset($txt['sp_custom_block_title_' . $block['id']]))
 		$block['label'] = $txt['sp_custom_block_title_' . $block['id']];
 
-	template_block_default($block);
+	template_block_default($block, $side);
 }
 
 /**
@@ -198,42 +210,44 @@ function template_block($block)
  *
  * @param mixed[] $block
  */
-function template_block_default($block)
+function template_block_default($block, $side = 1)
 {
 	global $context, $modSettings;
 
+		echo '
+					<div class="sp_block_container" id="block_' . $block['id'] . ',' . $side . '">';
+
+	// Show a title bar or not, some blocks have their own bars
 	if (empty($block['style']['no_title']))
 	{
 		echo '
-		<h3 class="', $block['style']['title']['class'], '">';
+						<h3 class="', $block['style']['title']['class'], ' sp_drag_header">';
 
 		if (empty($block['force_view']))
 			echo '
-			<span id="category_toggle">&nbsp;
-				<a href="javascript:sp_collapseBlock(\'', $block['id'], '\')">
-					<span id="sp_collapse_', $block['id'], '" class="', $block['collapsed'] ? 'expand' : 'collapse', '"></span>
-				</a>
-			</span>';
+							<span class="category_toggle">&nbsp;
+								<a href="javascript:sp_collapseBlock(\'', $block['id'], '\')">
+									<span id="sp_collapse_', $block['id'], '" class="', $block['collapsed'] ? 'expand' : 'collapse', '"></span>
+								</a>
+							</span>';
 
 		echo '
-			', parse_bbc($block['label']), '
-		</h3>';
+							', parse_bbc($block['label']), '
+						</h3>';
 	}
 
 	echo '
-	<div id="sp_block_' . $block['id'] . '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['articleactive'])) ? '_last' : '', '" ', $block['collapsed'] && empty($block['force_view']) ? ' style="display: none;"' : '', '>';
-
-	echo '
-		<div', empty($block['style']['body']['class']) ? '' : ' class="' . $block['style']['body']['class'] . '"', '>';
-
-	echo '
-			<div class="', $block['type'] != 'sp_menu' ? 'sp_block' : 'sp_content_padding', '"', !empty($block['style']['body']['style']) ? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
+						<div id="sp_block_' . $block['id'] . '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['articleactive'])) ? '_last' : '', '" ', $block['collapsed'] && empty($block['force_view']) ? ' style="display: none;"' : '', '>
+							<div', empty($block['style']['body']['class']) ? '' : ' class="' . $block['style']['body']['class'] . '"', '>
+								<div class="', $block['type'] != 'sp_menu' ? 'sp_block' : 'sp_content_padding', '"', !empty($block['style']['body']['style']) ? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
 
 	// Call the block routine
 	$block['type']($block['parameters'], $block['id']);
 
+	// Close this block up
 	echo '
-			</div>
-		</div>
-	</div>';
+								</div>
+							</div>
+						</div>
+					</div>';
 }
