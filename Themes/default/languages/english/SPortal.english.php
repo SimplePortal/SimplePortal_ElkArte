@@ -152,3 +152,9 @@ $txt['error_sp_no_block'] = 'There aren\'t any blocks created yet.';
 $txt['error_sp_flood_spsbp'] = 'Your last shout was less than %1$d seconds ago. Please try again later.';
 $txt['error_sp_flood_spsbp'] = 'Your last shout was less than %1$d seconds ago. Please try again later.';
 $txt['error_sp_id_empty'] = 'Sorry, an invalid type was supplied.';
+
+// Portal arrangement
+$txt['portal_order_title'] = 'Ordering Error';
+$txt['portal_order_error'] = 'An error occurred while processing your arrangement';
+$txt['sp-blocks_success_arrange'] = 'The blocks have been sucessfuly arranged';
+$txt['sp-blocks_fail_arrange'] = 'The blocks were not moved';

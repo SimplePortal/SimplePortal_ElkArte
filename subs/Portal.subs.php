@@ -79,7 +79,7 @@ function sportal_init($standalone = false)
 		if (ELK !== 'SSI')
 			require_once(BOARDDIR . '/SSI.php');
 
-		// portal specific templates and language
+		// Portal specific templates and language
 		loadTemplate('Portal');
 		loadLanguage('SPortal', sp_languageSelect('SPortal'));
 
@@ -137,7 +137,7 @@ function sportal_init($standalone = false)
  */
 function sportal_init_headers()
 {
-	global $context, $settings, $modSettings;
+	global $settings, $modSettings, $txt, $user_info;
 	static $initialized;
 
 	// If already loaded just return
@@ -147,9 +147,30 @@ function sportal_init_headers()
 	// Load up some javascript!
 	loadJavascriptFile('portal.js?sp24');
 
-	// Javascipt to open/collapse blocks as the user wants
+	// We use sortable for the front page
+	$modSettings['jquery_include_ui'] = true;
+
 	$javascript = '
 	var sp_images_url = "' . $settings['sp_images_url'] . '";';
+
+	// Javascipt to allow D&D ordering of the front page blocks, not for guests
+	if (empty($_REQUEST['action']) && !($user_info['is_guest'] || $user_info['id'] == 0))
+		$javascript .= '
+			// Set up our sortable call
+			$().elkSortable({
+				sa: "userblockorder",
+				error: "' . $txt['portal_order_error'] . '",
+				title: "' . $txt['portal_order_title'] . '",
+				handle: ".sp_drag_header",
+				tag: ".sp_column",
+				opacity: 0.9,
+				connect: ".sp_column",
+				containment: "#sp_main",
+				tolerance: "pointer",
+				href: "/",
+				placeholder: "ui-state-highlight",
+				axis: "",
+			});';
 
 	if ($modSettings['sp_resize_images'])
 	{
@@ -232,8 +253,34 @@ function sportal_load_blocks()
 		),
 	);
 
+	// Get the blocks in the system
 	$blocks = getBlockInfo(null, null, true, true, true);
-	$context['SPortal']['blocks'] = array();
+
+	// If the member has arranged the blocks, display them like that
+	if (!empty($options['sp_block_layout']))
+	{
+		$layout = unserialize($options['sp_block_layout']);
+
+		foreach ($layout as $id => $column)
+		{
+			if (empty($column) || !$context['SPortal']['sides'][$id]['active'])
+				continue;
+
+			foreach ($column as $item)
+			{
+				if (empty($blocks[$item]))
+					continue;
+
+				$blocks[$item]['style'] = sportal_parse_style('explode', $blocks[$item]['style'], true);
+				$context['SPortal']['blocks'][$id][] = $blocks[$item];
+				unset($blocks[$item]);
+			}
+		}
+	}
+
+	if (!isset($context['SPortal']['blocks']))
+		$context['SPortal']['blocks'] = array();
+
 	foreach ($blocks as $block)
 	{
 		if (!$context['SPortal']['sides'][$block['column']]['active'])

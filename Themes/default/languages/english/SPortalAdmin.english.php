@@ -72,8 +72,6 @@ $txt['sp-blocks_cancel_moving'] = 'Cancel moving';
 $txt['sp-blocks_success_moving'] = 'The block was sucessfuly moved';
 $txt['sp-blocks_fail_moving'] = 'There was an error trying to move the block';
 
-
-
 // Add/Edit blocks
 $txt['sp-blocksSelectType'] = 'Select Block Type';
 $txt['sp-blocksAdd'] = 'Add Block';
