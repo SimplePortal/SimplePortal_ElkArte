@@ -358,7 +358,7 @@ function sp_integrate_quickhelp()
 
 /**
  * Integration hook integrate_buffer, called from ob_exit via call_integration_buffer
- * Used to modify the output buffer before its sent
+ * Used to modify the output buffer before its sent, here we add in our copyright
  *
  * @param string $tourniquet
  */
@@ -366,17 +366,17 @@ function sp_integrate_buffer($tourniquet)
 {
 	global $sportal_version, $context, $modSettings;
 
-	$fix = str_replace('{version}', $sportal_version, '<a href="http://www.simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-2013, SimplePortal</a>');
+	$fix = str_replace('{version}', $sportal_version, '<a href="http://www.simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-2014, SimplePortal</a>');
 
 	if ((ELK == 'SSI' && empty($context['standalone'])) || !Template_Layers::getInstance()->hasLayers() || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
 		return $tourniquet;
 
 	// Append our cp notice at the end of the line
 	$finds = array(
-		'ElkArte &copy; 2013</a>',
+		'ElkArte &copy; 2012 - 2014</a>',
 	);
 	$replaces = array(
-		'ElkArte &copy; 2013</a>' . $fix,
+		'ElkArte &copy; 2012 - 2014</a> | ' . $fix,
 	);
 
 	$tourniquet = str_replace($finds, $replaces, $tourniquet);
@@ -422,7 +422,7 @@ function sp_integrate_menu_buttons(&$buttons)
  * @param boolean $refresh
  * @uses redirectexit_callback in subs.php
  */
-function sp_integrate_redirect(&$setLocation, &$refresh)
+function sp_integrate_redirect(&$setLocation)
 {
 	global $modSettings, $context, $scripturl;
 
@@ -484,4 +484,5 @@ function sp_integrate_current_action(&$current_action)
 function sp_integrate_xmlhttp(&$subActions)
 {
 	$subActions['blockorder'] = array('controller' => 'ManagePortalBlocks_Controller', 'file' => 'PortalAdminBlocks.controller.php', 'function' => 'action_blockorder', 'permission' => 'admin_forum');
+	$subActions['userblockorder'] = array('controller' => 'Sportal_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalMain.controller.php', 'function' => 'action_userblockorder');
 }
