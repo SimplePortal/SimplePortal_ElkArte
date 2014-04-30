@@ -1346,7 +1346,8 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	{
 		echo '
 				<h3 class="category_header">
-					<span class="sp_float_left sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
+					<span class="sp_float_left sp_article_icon">', $news['icon'], '</span>
+					<a href="', $news['href'], '" >', $news['subject'], '</a>
 				</h3>
 				<div class="windowbg sp_article_content">
 					<div class="sp_content_padding">';
@@ -2131,7 +2132,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 		updateMemberData($user_info['id'], array('id_theme' => $_POST['theme'] == -1 ? 0 : (int) $_POST['theme']));
 
 	echo '
-								<form method="post" action="" accept-charset="UTF-8">
+								<form method="post" accept-charset="UTF-8">
 									<div class="sp_center">
 										<select name="theme" onchange="sp_theme_select(this)">';
 

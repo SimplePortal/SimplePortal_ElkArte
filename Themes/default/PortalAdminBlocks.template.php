@@ -33,7 +33,7 @@ function template_block_list()
 			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=', $side['help'], '" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 			<a href="', $scripturl, '?action=admin;area=portalblocks;sa=', $id, '">', $side['label'], ' ', $txt['sp-blocksBlocks'], '</a>
 		</h3>
-		<table class="table_grid" >
+		<table class="table_grid">
 			<thead>
 				<tr class="table_head">';
 
