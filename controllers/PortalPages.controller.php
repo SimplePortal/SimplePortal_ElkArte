@@ -64,20 +64,24 @@ class Pages_Controller extends Action_Controller
 
 		$db = database();
 
+		// Use the requested page id
 		$page_id = !empty($_REQUEST['page']) ? $_REQUEST['page'] : 0;
 
+		// Make sure the request is valid and clean
 		if (is_int($page_id))
 			$page_id = (int) $page_id;
 		else
 			$page_id = Util::htmlspecialchars($page_id, ENT_QUOTES);
 
+		// Fetch the page
 		$context['SPortal']['page'] = sportal_get_pages($page_id, true, true);
-
 		if (empty($context['SPortal']['page']['id']))
 			fatal_lang_error('error_sp_page_not_found', false);
 
+		// Fetch any style assocated with the page
 		$context['SPortal']['page']['style'] = sportal_parse_style('explode', $context['SPortal']['page']['style'], true);
 
+		// Increase the view counter
 		if (empty($_SESSION['last_viewed_page']) || $_SESSION['last_viewed_page'] != $context['SPortal']['page']['id'])
 		{
 			$db->query('', '
@@ -92,6 +96,7 @@ class Pages_Controller extends Action_Controller
 			$_SESSION['last_viewed_page'] = $context['SPortal']['page']['id'];
 		}
 
+		// Prep the template for display
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?page=' . $page_id,
 			'name' => $context['SPortal']['page']['title'],
