@@ -1346,8 +1346,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	{
 		echo '
 				<h3 class="category_header">
-					<span class="sp_float_left sp_article_icon">', $news['icon'], '</span>
-					<a href="', $news['href'], '" >', $news['subject'], '</a>
+					<span class="sp_float_left sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
 				</h3>
 				<div class="windowbg sp_article_content">
 					<div class="sp_content_padding">';
@@ -1463,7 +1462,6 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
 
 	// Let ssi get the attachments
 	$items = ssi_recentAttachments($limit, $type, 'array');
-
 	if (empty($items))
 	{
 		echo '
@@ -1484,27 +1482,35 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
 		}
 	}
 
+	// Build the output for display
 	echo '
 								<table class="sp_auto_align">', $direction ? '
 									<tr>' : '';
 
+	// For each image that was returned from ssi
 	foreach ($items as $item)
 	{
-		echo!$direction ? '
-									<tr>' : '', '
+		echo !$direction ? '
+									<tr>' : '';
+
+		echo '
 										<td>
 											<div class="sp_image smalltext">', ($showLink ? '
-												<a href="' . $item['file']['href'] . '">' . $item['file']['filename'] . '</a><br />' : ''), '
+												<a href="' . $item['file']['href'] . '">' . str_replace(array('_', '-'), ' ', $item['file']['filename']) . '</a><br />' : ''), '
 												', $item['file']['image']['link'], '<br />', ($showDownloads ? '
 												' . $txt['downloads'] . ': ' . $item['file']['downloads'] . '<br />' : ''), ($showPoster ? '
 												' . $txt['posted_by'] . ': ' . $item['member']['link'] : ''), '
 											</div>
-										</td>', !$direction ? '
+										</td>';
+
+		echo !$direction ? '
 									</tr>' : '';
 	}
 
 	echo $direction ? '
-									</tr>' : '', '
+									</tr>' : '';
+
+	echo '
 								</table>';
 }
 
@@ -2132,7 +2138,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 		updateMemberData($user_info['id'], array('id_theme' => $_POST['theme'] == -1 ? 0 : (int) $_POST['theme']));
 
 	echo '
-								<form method="post" accept-charset="UTF-8">
+								<form method="post" action="" accept-charset="UTF-8">
 									<div class="sp_center">
 										<select name="theme" onchange="sp_theme_select(this)">';
 
