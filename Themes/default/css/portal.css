@@ -121,6 +121,12 @@ th.sp_center {
 	line-height: 1.4em;
 	padding: 5px;
 }
+.sp_image a img {
+	max-width: 125px;
+	max-height: 125px;
+	display: block;
+	margin: auto;
+}
 .sp_search {
 	width: 95%;
 }
