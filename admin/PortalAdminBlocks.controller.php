@@ -586,7 +586,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				$error = $validator->validation_errors();
 
 				if ($error)
-					fatal_lang_error($error, false);
+					fatal_error($error[0], false);
 			}
 
 			if (!empty($_REQUEST['block_id']))
