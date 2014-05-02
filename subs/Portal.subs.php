@@ -421,7 +421,11 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 	}
 
 	if (!empty($_GET['page']) && (empty($context['current_action']) || $context['current_action'] == 'portal'))
+	{
+		if (empty($context['SPortal']['permissions']))
+			sportal_load_permissions();
 		$page_info = sportal_get_pages($_GET['page'], true, true);
+	}
 
 	// Some variables for ease.
 	$action = !empty($context['current_action']) ? $context['current_action'] : '';
@@ -1298,6 +1302,14 @@ function sportal_recount_comments($article_id)
 	);
 }
 
+/**
+ * Load a page by ID
+ *
+ * @param int $page_id
+ * @param boolean $active
+ * @param boolean $allowed
+ * @param string $sort
+ */
 function sportal_get_pages($page_id = null, $active = false, $allowed = false, $sort = 'title')
 {
 	global $context, $scripturl;
@@ -1307,28 +1319,33 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 	$query = array();
 	$parameters = array('sort' => $sort);
 
+	// Page id or Page Namespace
 	if (!empty($page_id) && is_int($page_id))
 	{
 		$query[] = 'id_page = {int:page_id}';
-		$parameters['page_id'] = (int) $page_id;
+		$parameters['page_id'] = $page_id;
 	}
 	elseif (!empty($page_id))
 	{
 		$query[] = 'namespace = {string:namespace}';
 		$parameters['namespace'] = $page_id;
 	}
+
+	// Use permissions?
 	if (!empty($allowed))
 		$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
+
+	// Only active pages?
 	if (!empty($active))
 	{
 		$query[] = 'status = {int:status}';
 		$parameters['status'] = 1;
 	}
 
+	// Make the page request
 	$request = $db->query('', '
 		SELECT
-			id_page, namespace, title, body, type,
-			permissions, views, style, status
+			id_page, namespace, title, body, type, permissions, views, style, status
 		FROM {db_prefix}sp_pages' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}', $parameters
