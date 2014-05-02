@@ -514,3 +514,6 @@ $txt['permissionhelp_sp_manage_settings'] = 'This permission allows users to man
 // Compatibility strings
 $txt['sp-adminCatHelp'] = 'Here you can manage and configure SimplePortal.';
 $txt['sp-adminCatDesc'] = 'Here you can manage and configure SimplePortal.';
+
+// Errors
+$txt['sp_form_errors_detected'] = 'The following error or errors occurred while saving or editing:';
