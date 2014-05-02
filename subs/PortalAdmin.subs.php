@@ -839,6 +839,59 @@ function sp_delete_pages($page_ids = array())
 }
 
 /**
+ * Saves or updates an page
+ *
+ * - add items as a new page is is_new is true otherwise updates and existing one
+ *
+ * @param mixed[] $page_info array of feilds details to save/update
+ * @param boolean $is_new true for new insertion, false to update
+ */
+function sp_save_page($page_info, $is_new = false)
+{
+	$db = database();
+
+	// Our base page database looks like this, so shall you
+	$fields = array(
+		'namespace' => 'string',
+		'title' => 'string',
+		'body' => 'string',
+		'type' => 'string',
+		'permissions' => 'int',
+		'style' => 'string',
+		'status' => 'int',
+	);
+
+	// Brand new, insert it
+	if ($is_new)
+	{
+		unset($page_info['id']);
+
+		$db->insert('', '
+			{db_prefix}sp_pages',
+			$fields,
+			$page_info,
+			array('id_page')
+		);
+		$page_info['id'] = $db->insert_id('{db_prefix}sp_pages', 'id_page');
+	}
+	// The editing so we update what was there
+	else
+	{
+		$update_fields = array();
+		foreach ($fields as $name => $type)
+			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+
+		$db->query('', '
+			UPDATE {db_prefix}sp_pages
+			SET ' . implode(', ', $update_fields) . '
+			WHERE id_page = {int:id}', $page_info
+		);
+	}
+
+	return $page_info['id'];
+}
+
+/**
  * Returns the total count of shoutboxes in the system
  */
 function sp_count_shoutbox()
