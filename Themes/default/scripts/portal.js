@@ -279,15 +279,16 @@ function sp_update_editor(select)
 		instance = $("textarea").sceditor("instance");
 
 	// Going back to BBC
-	if (new_state === "bbc")
+	if (new_state === "bbc" && instance === undefined)
 	{
 		// Start the editor again
 		elk_editor();
 	}
-	else
+	else if (new_state !== "bbc" && instance !== undefined)
 	{
 		// Update the the original text area with current editor contents and stop the editor
-		instance.updateOriginal();
+		if (new_state === 'html')
+			instance.updateOriginal();
 		instance.destroy();
 	}
 }
