@@ -331,7 +331,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 				$context['article_errors'] = array(
 					'errors' => $article_errors->prepareErrors(),
 					'type' => $article_errors->getErrorType() == 0 ? 'minor' : 'serious',
-					'title' => $txt['ban_errors_detected'],
+					'title' => $txt['sp_form_errors_detected'],
 				);
 			else
 				$context['preview'] = true;
@@ -372,7 +372,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			'id' => 'content',
 			'value' => $context['article']['body'],
 			'width' => '100%',
-			'height' => '295px',
+			'height' => '225px',
 			'preview_type' => 2,
 		);
 		create_control_richedit($editor_options);
@@ -394,6 +394,13 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'];
 		$context['sub_template'] = 'articles_edit';
+
+		// Set the editor box to the right mode
+		addInlineJavascript('
+			$(window).load(function() {
+				diewithfire = window.setTimeout(function() {sp_update_editor(\'page_type\');}, 200);
+			});
+		');
 	}
 
 	/**
