@@ -14,17 +14,14 @@ function template_pages_edit()
 {
 	global $context, $scripturl, $txt;
 
-	// Reviewing the page before submitting?
-	if (!empty($context['SPortal']['preview']))
-	{
-		echo '
-	<div class="sp_auto_align" style="width: 90%; padding-bottom: 1em;">';
-
-		template_view_page();
-
-		echo '
+	// Previewing the page before submitting?
+	echo '
+	<div id="preview_section" class="forumposts"', !empty($context['SPortal']['preview']) ? '' : ' style="display: none;"', '>',
+		!empty($context['SPortal']['preview']) ? template_view_page() : '', '
 	</div>';
-	}
+
+	// If there were errors creating the page, show them.
+	template_show_error('pages_errors');
 
 	// Adding or editing a page
 	echo '
@@ -34,7 +31,7 @@ function template_pages_edit()
 				', $context['SPortal']['is_new'] ? $txt['sp_admin_pages_add'] : $txt['sp_admin_pages_edit'], '
 			</h3>
 			<div class="windowbg">
-				<div class="sp_content_padding">
+				<div class="editor_wrapper">
 					<dl class="sp_form">
 						<dt>
 							<label for="page_title">', $txt['sp_admin_pages_col_title'], ':</label>
@@ -114,13 +111,10 @@ function template_pages_edit()
 						<dd>
 						</dd>
 					</dl>
-					<div id="sp_rich_editor">
-						<div id="sp_rich_bbc"', $context['SPortal']['page']['type'] != 'bbc' ? ' style="display: none;"' : '', '></div>
-						<div id="sp_rich_smileys"', $context['SPortal']['page']['type'] != 'bbc' ? ' style="display: none;"' : '', '></div>
-						<div>', template_control_richedit($context['post_box_name'], 'sp_rich_smileys', 'sp_rich_bbc'), '</div>
-					</div>
+					<div>', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message'), '</div>
 					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
 					<input type="submit" name="preview" value="', $txt['sp_admin_pages_preview'], '" class="right_submit" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>';
 
@@ -188,7 +182,6 @@ function template_pages_edit()
 				</div>
 			</div>
 			<input type="hidden" name="page_id" value="', $context['SPortal']['page']['id'], '" />
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
 	</div>
 	<script type="text/javascript"><!-- // --><![CDATA[
