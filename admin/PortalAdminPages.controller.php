@@ -74,7 +74,7 @@ class ManagePortalPages_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
-		// build the listoption array to display the categories
+		// Build the listoption array to display the categories
 		$listOptions = array(
 			'id' => 'portal_pages',
 			'title' => $txt['sp_admin_articles_list'],
@@ -175,7 +175,7 @@ class ManagePortalPages_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
+							return \'<input type="checkbox" name="remove[]" value="\' . $rowData[\'id\'] . \'" class="input_check" />\';
 						'),
 						'class' => 'centertext',
 					),
@@ -236,16 +236,18 @@ class ManagePortalPages_Controller extends Action_Controller
 	 */
 	public function action_sportal_admin_page_edit()
 	{
-		global $txt, $context, $modSettings, $options;
-
-		$db = database();
-
-		require_once(SUBSDIR . '/Editor.subs.php');
-		require_once(SUBSDIR . '/Post.subs.php');
+		global $txt, $context, $options;
 
 		$context['SPortal']['is_new'] = empty($_REQUEST['page_id']);
 
-		if (!empty($_REQUEST['content_mode']) && $_POST['type'] == 'bbc')
+		$pages_errors = Error_Context::context('pages', 0);
+
+		// Some help will be needed
+		require_once(SUBSDIR . '/Editor.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
+
+		// Convert this to BBC?
+		if (!empty($_REQUEST['content_mode']) && $_POST['type'] === 'bbc')
 		{
 			require_once(SUBSDIR . 'Html2BBC.class.php');
 			$bbc_converter = new Convert_BBC($_REQUEST['content']);
@@ -255,6 +257,7 @@ class ManagePortalPages_Controller extends Action_Controller
 			$_POST['content'] = $_REQUEST['content'];
 		}
 
+		// Its our own cubicle
 		$context['sides'] = array(
 			5 => $txt['sp-positionHeader'],
 			1 => $txt['sp-positionLeft'],
@@ -301,209 +304,15 @@ class ManagePortalPages_Controller extends Action_Controller
 			);
 		}
 
-		if (!empty($_POST['submit']))
+		// Saving the work?
+		if (!empty($_POST['submit']) && !$pages_errors->hasErrors())
 		{
 			checkSession();
-
-			if (!isset($_POST['title']) || Util::htmltrim(Util::htmlspecialchars($_POST['title'], ENT_QUOTES)) === '')
-				fatal_lang_error('sp_error_page_name_empty', false);
-
-			if (!isset($_POST['namespace']) || Util::htmltrim(Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES)) === '')
-				fatal_lang_error('sp_error_page_namespace_empty', false);
-
-			$result = $db->query('', '
-				SELECT id_page
-				FROM {db_prefix}sp_pages
-				WHERE namespace = {string:namespace}
-					AND id_page != {int:current}
-				LIMIT {int:limit}',
-				array(
-					'limit' => 1,
-					'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
-					'current' => (int) $_POST['page_id'],
-				)
-			);
-			list ($has_duplicate) = $db->fetch_row($result);
-			$db->free_result($result);
-
-			if (!empty($has_duplicate))
-				fatal_lang_error('sp_error_page_namespace_duplicate', false);
-
-			if (preg_match('~[^A-Za-z0-9_]+~', $_POST['namespace']) != 0)
-				fatal_lang_error('sp_error_page_namespace_invalid_chars', false);
-
-			if (preg_replace('~[0-9]+~', '', $_POST['namespace']) === '')
-				fatal_lang_error('sp_error_page_namespace_numeric', false);
-
-			if ($_POST['type'] == 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
-			{
-				require_once(SUBSDIR . '/DataValidator.class.php');
-
-				$validator = new Data_Validator();
-				$validator->validation_rules(array('content' => 'php_syntax'));
-				$validator->validate(array('content' => $_POST['content']));
-				$error = $validator->validation_errors();
-
-				if ($error)
-					fatal_lang_error($error, false);
-			}
-
-			if (!empty($_POST['blocks']) && is_array($_POST['blocks']))
-			{
-				foreach ($_POST['blocks'] as $id => $block)
-					$_POST['blocks'][$id] = (int) $block;
-			}
-			else
-				$_POST['blocks'] = array();
-
-			$fields = array(
-				'namespace' => 'string',
-				'title' => 'string',
-				'body' => 'string',
-				'type' => 'string',
-				'permissions' => 'int',
-				'style' => 'string',
-				'status' => 'int',
-			);
-
-			$page_info = array(
-				'id' => (int) $_POST['page_id'],
-				'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
-				'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
-				'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
-				'type' => in_array($_POST['type'], array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
-				'permissions' => (int) $_POST['permissions'],
-				'style' => sportal_parse_style('implode'),
-				'status' => !empty($_POST['status']) ? 1 : 0,
-			);
-
-			if ($page_info['type'] == 'bbc')
-				preparsecode($page_info['body']);
-
-			if ($context['SPortal']['is_new'])
-			{
-				unset($page_info['id']);
-
-				$db->insert('', '
-					{db_prefix}sp_pages',
-					$fields,
-					$page_info,
-					array('id_page')
-				);
-				$page_info['id'] = $db->insert_id('{db_prefix}sp_pages', 'id_page');
-			}
-			else
-			{
-				$update_fields = array();
-				foreach ($fields as $name => $type)
-					$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
-
-				$db->query('', '
-					UPDATE {db_prefix}sp_pages
-					SET ' . implode(', ', $update_fields) . '
-					WHERE id_page = {int:id}', $page_info
-				);
-			}
-
-			$to_show = array();
-			$not_to_show = array();
-			$changes = array();
-
-			foreach ($context['page_blocks'] as $page_blocks)
-			{
-				foreach ($page_blocks as $block)
-				{
-					if ($block['shown'] && !in_array($block['id'], $_POST['blocks']))
-						$not_to_show[] = $block['id'];
-					elseif (!$block['shown'] && in_array($block['id'], $_POST['blocks']))
-						$to_show[] = $block['id'];
-				}
-			}
-
-			foreach ($to_show as $id)
-			{
-				if ((empty($blocks[$id]['display']) && empty($blocks[$id]['display_custom'])) || $blocks[$id]['display'] == 'sportal')
-				{
-					$changes[$id] = array(
-						'display' => 'portal,p' . $page_info['id'],
-						'display_custom' => '',
-					);
-				}
-				elseif (in_array($blocks[$id]['display'], array('allaction', 'allboard')))
-				{
-					$changes[$id] = array(
-						'display' => '',
-						'display_custom' => $blocks[$id]['display'] . ',p' . $page_info['id'],
-					);
-				}
-				elseif (in_array('-p' . $page_info['id'], explode(',', $blocks[$id]['display_custom'])))
-				{
-					$changes[$id] = array(
-						'display' => $blocks[$id]['display'],
-						'display_custom' => implode(',', array_diff(explode(',', $blocks[$id]['display_custom']), array('-p' . $page_info['id']))),
-					);
-				}
-				elseif (empty($blocks[$id]['display_custom']))
-				{
-					$changes[$id] = array(
-						'display' => implode(',', array_merge(explode(',', $blocks[$id]['display']), array('p' . $page_info['id']))),
-						'display_custom' => '',
-					);
-				}
-				else
-				{
-					$changes[$id] = array(
-						'display' => $blocks[$id]['display'],
-						'display_custom' => implode(',', array_merge(explode(',', $blocks[$id]['display_custom']), array('p' . $page_info['id']))),
-					);
-				}
-			}
-
-			foreach ($not_to_show as $id)
-			{
-				if (count(array_intersect(array($blocks[$id]['display'], $blocks[$id]['display_custom']), array('sforum', 'allpages', 'all'))) > 0)
-				{
-					$changes[$id] = array(
-						'display' => '',
-						'display_custom' => $blocks[$id]['display'] . $blocks[$id]['display_custom'] . ',-p' . $page_info['id'],
-					);
-				}
-				elseif (empty($blocks[$id]['display_custom']))
-				{
-					$changes[$id] = array(
-						'display' => implode(',', array_diff(explode(',', $blocks[$id]['display']), array('p' . $page_info['id']))),
-						'display_custom' => '',
-					);
-				}
-				else
-				{
-					$changes[$id] = array(
-						'display' => implode(',', array_diff(explode(',', $blocks[$id]['display']), array('p' . $page_info['id']))),
-						'display_custom' => implode(',', array_diff(explode(',', $blocks[$id]['display_custom']), array('p' . $page_info['id']))),
-					);
-				}
-			}
-
-			foreach ($changes as $id => $data)
-			{
-				$db->query('', '
-					UPDATE {db_prefix}sp_blocks
-					SET
-						display = {string:display},
-						display_custom = {string:display_custom}
-					WHERE id_block = {int:id}',
-					array(
-						'id' => $id,
-						'display' => $data['display'],
-						'display_custom' => $data['display_custom'],
-					)
-				);
-			}
-
-			redirectexit('action=admin;area=portalpages');
+			$this->_sportal_admin_page_edit_save();
 		}
 
-		if (!empty($_POST['preview']))
+		// Doing a quick look before you save or you messed up?
+		if (!empty($_POST['preview']) || $pages_errors->hasErrors())
 		{
 			$context['SPortal']['page'] = array(
 				'id' => $_POST['page_id'],
@@ -516,12 +325,22 @@ class ManagePortalPages_Controller extends Action_Controller
 				'status' => !empty($_POST['status']),
 			);
 
-			if ($context['SPortal']['page']['type'] == 'bbc')
+			if ($context['SPortal']['page']['type'] === 'bbc')
 				preparsecode($context['SPortal']['page']['body']);
 
 			loadTemplate('PortalPages');
-			$context['SPortal']['preview'] = true;
+
+			// Showing errors or a preview?
+			if ($pages_errors->hasErrors())
+				$context['pages_errors'] = array(
+					'errors' => $pages_errors->prepareErrors(),
+					'type' => $pages_errors->getErrorType() == 0 ? 'minor' : 'serious',
+					'title' => $txt['sp_form_errors_detected'],
+				);
+			else
+				$context['SPortal']['preview'] = true;
 		}
+		// New page, set up with a random page ID
 		elseif ($context['SPortal']['is_new'])
 		{
 			$context['SPortal']['page'] = array(
@@ -535,16 +354,18 @@ class ManagePortalPages_Controller extends Action_Controller
 				'status' => 1,
 			);
 		}
+		// Used page :P
 		else
 		{
 			$_REQUEST['page_id'] = (int) $_REQUEST['page_id'];
 			$context['SPortal']['page'] = sportal_get_pages($_REQUEST['page_id']);
 		}
 
-		if ($context['SPortal']['page']['type'] == 'bbc')
+		if ($context['SPortal']['page']['type'] === 'bbc')
 			$context['SPortal']['page']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($context['SPortal']['page']['body']));
 
-		if ($context['SPortal']['page']['type'] != 'bbc')
+		// No wizzy mode if they don't need it
+		if ($context['SPortal']['page']['type'] !== 'bbc')
 		{
 			$temp_editor = !empty($options['wysiwyg_default']);
 			$options['wysiwyg_default'] = false;
@@ -553,9 +374,9 @@ class ManagePortalPages_Controller extends Action_Controller
 		$editorOptions = array(
 			'id' => 'content',
 			'value' => $context['SPortal']['page']['body'],
-			'width' => '95%',
-			'height' => '200px',
-			'preview_type' => 0,
+			'width' => '100%',
+			'height' => '225px',
+			'preview_type' => 2,
 		);
 		create_control_richedit($editorOptions);
 		$context['post_box_name'] = $editorOptions['id'];
@@ -571,6 +392,225 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp_admin_pages_add'] : $txt['sp_admin_pages_edit'];
 		$context['sub_template'] = 'pages_edit';
+
+		// Set the editor box as needed
+		addInlineJavascript('
+			$(window).load(function() {
+				diewithfire = window.setTimeout(function() {sp_update_editor(\'page_type\');}, 200);
+			});
+		');
+	}
+
+	/**
+	 * Does the actual saving of the page data
+	 *
+	 * - validates the data is safe to save
+	 * - updates existing pages or creates new ones
+	 */
+	private function _sportal_admin_page_edit_save()
+	{
+		global $txt, $context, $modSettings;
+
+		// No errors, yet.
+		$pages_errors = Error_Context::context('pages', 0);
+
+		$db = database();
+
+		// Use our standard validation functions in a few spots
+		require_once(SUBSDIR . '/DataValidator.class.php');
+		$validator = new Data_Validator();
+
+		// Clean and Review the post data for compliance
+		$validator->sanitation_rules(array(
+			'title' => 'trim|Util::htmlspecialchars',
+			'namespace' => 'trim|Util::htmlspecialchars',
+			'permissions' => 'intval',
+			'type' => 'trim',
+			'content' => 'trim'
+		));
+		$validator->validation_rules(array(
+			'title' => 'required',
+			'namespace' => 'alpha_numeric|required',
+			'type' => 'required',
+			'content' => 'required'
+		));
+		$validator->text_replacements(array(
+			'title' => $txt['sp_error_page_name_empty'],
+			'namespace' => $txt['sp_error_page_namespace_empty'],
+			'content' => $txt['sp_admin_pages_col_body'],
+		));
+
+		// If you messed this up, back you go
+		if (!$validator->validate($_POST))
+		{
+			foreach ($validator->validation_errors() as $id => $error)
+				$pages_errors->addError($error);
+
+			return $this->action_sportal_admin_page_edit();
+		}
+
+		// Can't have the same name in the same space twice
+		$result = $db->query('', '
+			SELECT id_page
+			FROM {db_prefix}sp_pages
+			WHERE namespace = {string:namespace}
+				AND id_page != {int:current}
+			LIMIT {int:limit}',
+			array(
+				'limit' => 1,
+				'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
+				'current' => (int) $_POST['page_id'],
+			)
+		);
+		list ($has_duplicate) = $db->fetch_row($result);
+		$db->free_result($result);
+
+		if (!empty($has_duplicate))
+			$pages_errors->addError('sp_error_page_namespace_duplicate');
+
+		// Can't have a simple numeric namesapce
+		if (preg_replace('~[0-9]+~', '', $_POST['namespace']) === '')
+			$pages_errors->addError('sp_error_page_namespace_numeric');
+
+		// Running some php code, then we need to validate its legit code
+		if ($_POST['type'] === 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
+		{
+			$validator_php = new Data_Validator();
+			$validator_php->validation_rules(array('content' => 'php_syntax'));
+
+			// Bad PHP code
+			if (!$validator_php->validate(array('content' => $_POST['content'])))
+				$pages_errors->addError($validator_php->validation_errors());
+		}
+
+		// None shall pass ... with errors
+		if ($pages_errors->hasErrors())
+			return $this->action_sportal_admin_page_edit();
+
+		// If you made it this far, we are going to save the work
+		if (!empty($_POST['blocks']) && is_array($_POST['blocks']))
+		{
+			foreach ($_POST['blocks'] as $id => $block)
+				$_POST['blocks'][$id] = (int) $block;
+		}
+		else
+			$_POST['blocks'] = array();
+
+		// The data for the fields
+		$page_info = array(
+			'id' => (int) $_POST['page_id'],
+			'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
+			'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
+			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
+			'type' => in_array($_POST['type'], array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
+			'permissions' => (int) $_POST['permissions'],
+			'style' => sportal_parse_style('implode'),
+			'status' => !empty($_POST['status']) ? 1 : 0,
+		);
+
+		if ($page_info['type'] === 'bbc')
+			preparsecode($page_info['body']);
+
+		// Save away
+		sp_save_page($page_info, $context['SPortal']['is_new']);
+
+		$to_show = array();
+		$not_to_show = array();
+		$changes = array();
+
+		foreach ($context['page_blocks'] as $page_blocks)
+		{
+			foreach ($page_blocks as $block)
+			{
+				if ($block['shown'] && !in_array($block['id'], $_POST['blocks']))
+					$not_to_show[] = $block['id'];
+				elseif (!$block['shown'] && in_array($block['id'], $_POST['blocks']))
+					$to_show[] = $block['id'];
+			}
+		}
+
+		foreach ($to_show as $id)
+		{
+			if ((empty($blocks[$id]['display']) && empty($blocks[$id]['display_custom'])) || $blocks[$id]['display'] == 'sportal')
+			{
+				$changes[$id] = array(
+					'display' => 'portal,p' . $page_info['id'],
+					'display_custom' => '',
+				);
+			}
+			elseif (in_array($blocks[$id]['display'], array('allaction', 'allboard')))
+			{
+				$changes[$id] = array(
+					'display' => '',
+					'display_custom' => $blocks[$id]['display'] . ',p' . $page_info['id'],
+				);
+			}
+			elseif (in_array('-p' . $page_info['id'], explode(',', $blocks[$id]['display_custom'])))
+			{
+				$changes[$id] = array(
+					'display' => $blocks[$id]['display'],
+					'display_custom' => implode(',', array_diff(explode(',', $blocks[$id]['display_custom']), array('-p' . $page_info['id']))),
+				);
+			}
+			elseif (empty($blocks[$id]['display_custom']))
+			{
+				$changes[$id] = array(
+					'display' => implode(',', array_merge(explode(',', $blocks[$id]['display']), array('p' . $page_info['id']))),
+					'display_custom' => '',
+				);
+			}
+			else
+			{
+				$changes[$id] = array(
+					'display' => $blocks[$id]['display'],
+					'display_custom' => implode(',', array_merge(explode(',', $blocks[$id]['display_custom']), array('p' . $page_info['id']))),
+				);
+			}
+		}
+
+		foreach ($not_to_show as $id)
+		{
+			if (count(array_intersect(array($blocks[$id]['display'], $blocks[$id]['display_custom']), array('sforum', 'allpages', 'all'))) > 0)
+			{
+				$changes[$id] = array(
+					'display' => '',
+					'display_custom' => $blocks[$id]['display'] . $blocks[$id]['display_custom'] . ',-p' . $page_info['id'],
+				);
+			}
+			elseif (empty($blocks[$id]['display_custom']))
+			{
+				$changes[$id] = array(
+					'display' => implode(',', array_diff(explode(',', $blocks[$id]['display']), array('p' . $page_info['id']))),
+					'display_custom' => '',
+				);
+			}
+			else
+			{
+				$changes[$id] = array(
+					'display' => implode(',', array_diff(explode(',', $blocks[$id]['display']), array('p' . $page_info['id']))),
+					'display_custom' => implode(',', array_diff(explode(',', $blocks[$id]['display_custom']), array('p' . $page_info['id']))),
+				);
+			}
+		}
+
+		// Update the blocks as needed
+		foreach ($changes as $id => $data)
+		{
+			$db->query('', '
+				UPDATE {db_prefix}sp_blocks
+				SET
+					display = {string:display},
+					display_custom = {string:display_custom}
+				WHERE id_block = {int:id}',
+				array(
+					'id' => $id,
+					'display' => $data['display'],
+					'display_custom' => $data['display_custom'],
+				)
+			);
+		}
+
+		redirectexit('action=admin;area=portalpages');
 	}
 
 	/**
