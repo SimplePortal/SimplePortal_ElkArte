@@ -28,9 +28,32 @@ function template_portal_index()
 		</h3>
 		<div class="windowbg sp_block_section">
 			<div class="sp_content_padding">
-				<span>', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '</span>
+ 				<div class="sp_article_detail">';
+
+		if (!empty($article['author']['avatar']['image']))
+			echo $article['author']['avatar']['image'];
+
+		echo '
+					<span>
+						', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']);
+
+		if (!empty($article['author']['avatar']['image']))
+			echo '
+						<br />';
+		else
+			echo '
+					</span>
+					<span class="sp_float_right">';
+
+		echo '
+						', sprintf($article['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['views']) ,', ', sprintf($article['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '
+					</span>
+				</div>
+				<hr />
 				<p>', $article['preview'], '<a href="', $article['href'], '">...</a></p>
-				<span>', sprintf($article['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['views']) ,', ', sprintf($article['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '</span>
+				<div class="sp_article_extra">
+					<a href="', $article['href'], '">', $txt['sp_read_more'], '</a> | <a href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
+				</div>
 			</div>
 		</div>';
 	}
@@ -176,8 +199,9 @@ function template_portal_below()
  * Generic template to wrap blocks
  *
  * @param mixed[] $block
+ * @param int $side
  */
-function template_block($block, $side)
+function template_block($block, $side = -1)
 {
 	global $context, $modSettings, $txt;
 
@@ -209,8 +233,9 @@ function template_block($block, $side)
  * Wrap a block in our default wrapper
  *
  * @param mixed[] $block
+ * @param int $block
  */
-function template_block_default($block, $side = 1)
+function template_block_default($block, $side)
 {
 	global $context, $modSettings;
 
