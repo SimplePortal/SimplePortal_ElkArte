@@ -479,7 +479,7 @@ function sp_integrate_current_action(&$current_action)
  * Add in to the xml array our sortable action
  * integrate_sa_xmlhttp
  *
- * @param array $subActions
+ * @param mixed[] $subActions
  */
 function sp_integrate_xmlhttp(&$subActions)
 {
