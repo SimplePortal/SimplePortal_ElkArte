@@ -50,8 +50,6 @@ function sportal_init($standalone = false)
 			else
 				$settings['sp_images_url'] = $settings['default_theme_url'] . '/images/sp';
 		}
-
-		$context['SPortal']['on_portal'] = getShowInfo(0, 'portal', '');
 	}
 
 	// Portal not enabled then bow out now
@@ -105,10 +103,6 @@ function sportal_init($standalone = false)
 				'name' => $context['forum_name'],
 			);
 
-		// If you want to remove Forum link when it is alone, take out the following two comment lines.
-		//if (empty($context['linktree'][1]))
-		//	$context['linktree'] = array();
-
 		if (!empty($context['linktree']) && $modSettings['sp_portal_mode'] == 1)
 		{
 			foreach ($context['linktree'] as $key => $tree)
@@ -116,8 +110,6 @@ function sportal_init($standalone = false)
 					$context['linktree'][$key]['url'] = str_replace('#c', '?action=forum#c', $tree['url']);
 		}
 	}
-
-	$context['standalone'] = $standalone;
 
 	// Load the headers if necessary.
 	sportal_init_headers();
@@ -127,6 +119,9 @@ function sportal_init($standalone = false)
 
 	// Play with our blocks
 	sportal_load_blocks();
+
+	$context['standalone'] = $standalone;
+	$context['SPortal']['on_portal'] = getShowInfo(0, 'portal', '');
 
 	if (!Template_Layers::getInstance()->hasLayers(true) && !in_array('portal', Template_Layers::getInstance()->getLayers()))
 		Template_Layers::getInstance()->add('portal');
@@ -979,7 +974,7 @@ function sportal_parse_style($action, $setting = '', $process = false)
  */
 function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title', $category_id = null)
 {
-	global $scripturl, $context;
+	global $scripturl, $context, $modSettings, $color_profile;
 
 	$db = database();
 
@@ -1024,20 +1019,37 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 	// Make the request
 	$request = $db->query('', '
 		SELECT
-			spa.id_article, spa.id_category, spc.name, spc.namespace AS category_namespace,
-			IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name,
-			spa.namespace AS article_namespace, spa.title, spa.body, spa.type, spa.date, spa.status,
-			spa.permissions AS article_permissions, spc.permissions AS category_permissions,
-			spa.views, spa.comments
+			spa.id_article, spa.id_category, spa.namespace AS article_namespace, spa.title, spa.body,
+			spa.type, spa.date, spa.status, spa.permissions AS article_permissions, spa.views, spa.comments,
+			spc.permissions AS category_permissions, spc.name, spc.namespace AS category_namespace,
+			m.avatar, IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name,
+			a.id_attach, a.attachment_type, a.filename
 		FROM {db_prefix}sp_articles AS spa
 			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
-			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spa.id_member)' . (!empty($query) ? '
+			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spa.id_member)
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}', $parameters
 	);
 	$return = array();
+	$member_ids = array();
 	while ($row = $db->fetch_assoc($request))
 	{
+		if (!empty($row['id_author']))
+			$member_ids[$row['id_author']] = $row['id_author'];
+
+		// Set up avatar to the right size, per forum settings
+		if ($modSettings['avatar_action_too_large'] === 'option_html_resize' || $modSettings['avatar_action_too_large'] === 'option_js_resize')
+		{
+			$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
+			$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
+		}
+		else
+		{
+			$avatar_width = '';
+			$avatar_height = '';
+		}
+
 		$return[$row['id_article']] = array(
 			'id' => $row['id_article'],
 			'category' => array(
@@ -1053,6 +1065,12 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 				'name' => $row['author_name'],
 				'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
 				'link' => $row['id_author'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>') : $row['author_name'],
+				'avatar' => array(
+					'name' => $row['avatar'],
+					'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" class="avatar" border="0" />' : '') : (stristr($row['avatar'], 'http://') ? '<img src="' . $row['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" class="avatar" border="0" />' : '<img src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar']) . '" alt="" class="avatar" border="0" />'),
+					'href' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : '') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
+					'url' => $row['avatar'] == '' ? '' : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar'])
+				),
 			),
 			'article_id' => $row['article_namespace'],
 			'title' => $row['title'],
@@ -1068,6 +1086,16 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 		);
 	}
 	$db->free_result($request);
+
+	// Use color profiles?
+	if (!empty($member_ids) && sp_loadColors($member_ids) !== false)
+	{
+		foreach ($return as $key => $value)
+		{
+			if (!empty($color_profile[$value['author']['id']]['link']))
+				$return[$key]['author']['link'] = $color_profile[$value['author']['id']]['link'];
+		}
+	}
 
 	// Return one or all
 	return !empty($article_id) ? current($return) : $return;
@@ -1158,9 +1186,12 @@ function sportal_get_comments($article_id = null)
 		SELECT
 			spc.id_comment, IFNULL(spc.id_member, 0) AS id_author,
 			IFNULL(m.real_name, spc.member_name) AS author_name,
-			spc.body, spc.log_time
+			spc.body, spc.log_time,
+			m.avatar,
+			a.id_attach, a.attachment_type, a.filename
 		FROM {db_prefix}sp_comments AS spc
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spc.id_member)
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
 		WHERE spc.id_article = {int:article_id}
 		ORDER BY spc.id_comment',
 		array(
@@ -1168,8 +1199,23 @@ function sportal_get_comments($article_id = null)
 		)
 	);
 	$return = array();
+	$member_ids = array();
 	while ($row = $db->fetch_assoc($request))
 	{
+		if (!empty($row['id_author']))
+			$member_ids[$row['id_author']] = $row['id_author'];
+
+		if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
+		{
+			$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
+			$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
+		}
+		else
+		{
+			$avatar_width = '';
+			$avatar_height = '';
+		}
+
 		$return[$row['id_comment']] = array(
 			'id' => $row['id_comment'],
 			'body' => parse_bbc($row['body']),
@@ -1179,11 +1225,27 @@ function sportal_get_comments($article_id = null)
 				'name' => $row['author_name'],
 				'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
 				'link' => $row['id_author'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>') : $row['author_name'],
+				'avatar' => array(
+					'name' => $row['avatar'],
+					'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" class="avatar" border="0" />' : '') : (stristr($row['avatar'], 'http://') ? '<img src="' . $row['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" class="avatar" border="0" />' : '<img src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar']) . '" alt="" class="avatar" border="0" />'),
+					'href' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : '') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
+					'url' => $row['avatar'] == '' ? '' : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar'])
+				),
 			),
 			'can_moderate' => allowedTo('sp_admin') || allowedTo('sp_manage_articles') || (!$user_info['is_guest'] && $user_info['id'] == $row['id_author']),
 		);
 	}
 	$db->free_result($request);
+
+	// Colorization
+	if (!empty($member_ids) && sp_loadColors($member_ids) !== false)
+	{
+		foreach ($return as $key => $value)
+		{
+			if (!empty($color_profile[$value['author']['id']]['link']))
+				$return[$key]['author']['link'] = $color_profile[$value['author']['id']]['link'];
+		}
+	}
 
 	return $return;
 }
