@@ -57,7 +57,6 @@ $txt['sp_calendar_upcomingEvents'] = 'Upcoming Events';
 $txt['sp_calendar_holidays'] = 'Holidays';
 $txt['sp_calendar_birthdays'] = 'Birthdays';
 $txt['sp-pollViewTopic'] = 'View Topic';
-$txt['sp-read_more'] = 'Read More';
 $txt['sp-downloadsSize'] = 'Size';
 $txt['sp-average_posts'] = 'Average Posts';
 $txt['sp-average_topics'] = 'Average Topics';

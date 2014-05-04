@@ -1260,6 +1260,9 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		if (!empty($length))
 			$row['body'] = shorten_text($row['body'], $length, true);
 
+		censorText($row['subject']);
+		censorText($row['body']);
+
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
 		// Link the ellipsis if the body has been shortened.
@@ -1279,9 +1282,6 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		if (empty($modSettings['messageIconChecks_disable']) && !isset($icon_sources[$row['icon']]))
 			$icon_sources[$row['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['icon'] . '.png') ? 'images_url' : 'default_images_url';
 
-		censorText($row['subject']);
-		censorText($row['body']);
-
 		if ($modSettings['sp_resize_images'])
 			$row['body'] = str_ireplace('class="bbc_img', 'class="bbc_img sp_article', $row['body']);
 
@@ -1298,7 +1298,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 			'views' => $row['num_views'],
 			'body' => $row['body'],
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $txt['sp-read_more'] . '</a>',
+			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $txt['sp_read_more'] . '</a>',
 			'replies' => $row['num_replies'],
 			'comment_href' => !empty($row['locked']) ? '' : $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';num_replies=' . $row['num_replies'],
 			'comment_link' => !empty($row['locked']) ? '' : '| <a href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';num_replies=' . $row['num_replies'] . '">' . $txt['ssi_write_comment'] . '</a>',
