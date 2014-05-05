@@ -184,7 +184,7 @@ function template_pages_edit()
 			<input type="hidden" name="page_id" value="', $context['SPortal']['page']['id'], '" />
 		</form>
 	</div>
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		document.getElementById("title_default_class").disabled = document.getElementById("no_title").checked;
 		document.getElementById("title_custom_class").disabled = document.getElementById("no_title").checked;
 		document.getElementById("title_custom_style").disabled = document.getElementById("no_title").checked;

@@ -460,7 +460,7 @@ function template_block_edit()
 		}
 
 		echo '
-					<script type="text/javascript"><!-- // --><![CDATA[
+					<script><!-- // --><![CDATA[
 						document.getElementById("title_default_class").disabled = document.getElementById("no_title").checked;
 						document.getElementById("title_custom_class").disabled = document.getElementById("no_title").checked;
 						document.getElementById("title_custom_style").disabled = document.getElementById("no_title").checked;

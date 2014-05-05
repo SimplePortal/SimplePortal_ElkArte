@@ -43,9 +43,9 @@ function template_information()
 				</div>
 			</div>
 		</div>
-		<script type="text/javascript" src="http://www.simpleportal.net/sp/current-version.js"></script>
-		<script type="text/javascript" src="http://www.simpleportal.net/sp/latest-news.js"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script src="http://www.simpleportal.net/sp/current-version.js"></script>
+		<script src="http://www.simpleportal.net/sp/latest-news.js"></script>
+		<script><!-- // --><![CDATA[
 			function spSetAnnouncements()
 			{
 				if (typeof(window.spAnnouncements) == "undefined" || typeof(window.spAnnouncements.length) == "undefined")

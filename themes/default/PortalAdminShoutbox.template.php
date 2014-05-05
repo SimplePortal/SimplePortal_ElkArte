@@ -60,7 +60,7 @@ function template_shoutbox_edit()
 								</ul>
 							</fieldset>
 							<a href="javascript:void(0);" onclick="document.getElementById(\'moderators\').style.display = \'block\'; document.getElementById(\'moderators_groups_link\').style.display = \'none\'; return false;" id="moderators_groups_link" style="display: none;">[ ', $txt['avatar_select_permission'], ' ]</a>
-							<script type="text/javascript"><!-- // --><![CDATA[
+							<script"><!-- // --><![CDATA[
 								document.getElementById("moderators").style.display = "none";
 								document.getElementById("moderators_groups_link").style.display = "";
 							// ]]></script>
@@ -181,8 +181,8 @@ function template_shoutbox_prune()
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
 	</div>
-	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?fin20"></script>
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?fin20"></script>
+	<script><!-- // --><![CDATA[
 		var oAddBuddySuggest = new smc_AutoSuggest({
 			sSelf: \'oAddBuddySuggest\',
 			sSessionId: \'', $context['session_id'], '\',
