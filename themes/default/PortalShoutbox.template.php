@@ -73,11 +73,11 @@ function template_shoutbox_embed($shoutbox)
 		<div class="shoutbox_container">
 			<div class="shoutbox_info">
 				<div id="shoutbox_load_', $shoutbox['id'], '" style="float: right; display: none;"><i class="fa fa-spinner fa-spin"></i></div>
-				<a href="', $scripturl, '?action=shoutbox;shoutbox_id=', $shoutbox['id'], '" onclick="sp_refresh_shout(', $shoutbox['id'], ', last_refresh_', $shoutbox['id'], '); return false;">', sp_embed_image('refresh'), '</a>
-				<a href="', $scripturl, '?action=shoutbox;shoutbox_id=', $shoutbox['id'], '">', sp_embed_image('history'), '</a>';
+				<a ', sp_embed_class('refresh'), ' href="', $scripturl, '?action=shoutbox;shoutbox_id=', $shoutbox['id'], '" onclick="sp_refresh_shout(', $shoutbox['id'], ', last_refresh_', $shoutbox['id'], '); return false;"></a>
+				<a ', sp_embed_class('history'), ' href="', $scripturl, '?action=shoutbox;shoutbox_id=', $shoutbox['id'], '"></a>';
 
 	if ($context['can_shout'])
-		echo ' <a href="#smiley" onclick="sp_collapse_object(\'sb_smiley_', $shoutbox['id'], '\', false); return false;">', sp_embed_image('smiley'), '</a> <a href="#style" onclick="sp_collapse_object(\'sb_style_', $shoutbox['id'], '\', false); return false;">', sp_embed_image('style'), '</a>';
+		echo ' <a ', sp_embed_class('smiley'), ' href="#smiley" onclick="sp_collapse_object(\'sb_smiley_', $shoutbox['id'], '\', false); return false;"></a> <a ', sp_embed_class('style'), ' href="#style" onclick="sp_collapse_object(\'sb_style_', $shoutbox['id'], '\', false); return false;"></a>';
 
 	echo '
 			</div>';

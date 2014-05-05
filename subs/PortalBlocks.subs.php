@@ -265,7 +265,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 
 		foreach ($stats['users_online'] as $user)
 			echo '
-										<li class="sp_list_indent">', sp_embed_image($user['name'] == 'H' ? 'tux' : 'user'), ($user['name'] == 'Blue' && ($user['link'] = str_replace('>Blue<', '>Purple<', $user['link'])) ? '' : ''), ' ', $user['hidden'] ? '<em>' . $user['link'] . '</em>' : $user['link'], '</li>';
+										<li ', sp_embed_class($user['name'] == 'H' ? 'tux' : 'user', '', 'sp_list_indent'), '>', $user['hidden'] ? '<em>' . $user['link'] . '</em>' : $user['link'], '</li>';
 
 		echo '
 									</ul>
@@ -304,7 +304,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 
 		foreach ($stats['users_online_today'] as $user)
 			echo '
-										<li class="sp_list_indent">', sp_embed_image($user['name'] == 'H' ? 'tux' : 'user'), ' ', $user['hidden'] ? '<em>' . $user['link'] . '</em>' : $user['link'], '</li>';
+										<li ', sp_embed_class($user['name'] == 'H' ? 'tux' : 'user', '', 'sp_list_indent'), '>', $user['hidden'] ? '<em>' . $user['link'] . '</em>' : $user['link'], '</li>';
 
 		echo '
 									</ul>
@@ -940,9 +940,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
 		foreach ($items as $item)
 			echo '
 									<tr>
-										<td class="sp_recent_icon sp_center">
-											', sp_embed_image(empty($parameters['type']) ? 'post' : 'topic'), '
-										</td>
+										<td ', sp_embed_class(empty($parameters['type']) ? 'post' : 'topic', '', 'sp_recent_icon sp_center' ), '</td>
 										<td class="sp_recent_subject">
 											<a href="', $item['href'], '">', $item['subject'], '</a>
 											', $item['new'] ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>', '<br />[', $item['board']['link'], ']
@@ -1573,7 +1571,9 @@ function sp_attachmentRecent($parameters, $id, $return_parameters = false)
 
 	foreach ($items as $item)
 		echo '
-									<li>', sp_embed_image('attach'), ' <a href="', $item['file']['href'], '">', $item['file']['filename'], '</a></li>
+									<li ', sp_embed_class('attach'), '>
+										<a href="', $item['file']['href'], '">', $item['file']['filename'], '</a>
+									</li>
 									<li class="smalltext">', $txt['downloads'], ': ', $item['file']['downloads'], '</li>
 									<li class="smalltext">', $txt['filesize'], ': ', $item['file']['filesize'], '</li>';
 
@@ -1691,7 +1691,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 
 				foreach ($day['holidays'] as $key => $holiday)
 					echo '
-									<li class="sp_list_indent">', sp_embed_image('holiday'), ' ', $holiday, '</li>';
+									<li ', sp_embed_class('holiday', '', 'sp_list_indent'), '>', $holiday, '</li>';
 			}
 
 			if (!empty($day['birthdays']))
@@ -1701,7 +1701,9 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 
 				foreach ($day['birthdays'] as $member)
 					echo '
-									<li class="sp_list_indent">', sp_embed_image('birthday'), ' <a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a></li>';
+									<li ', sp_embed_class('birthday', '', 'sp_list_indent'), '>
+										<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>
+									</li>';
 			}
 
 			if (!empty($day['events']))
@@ -1711,7 +1713,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 
 				foreach ($day['events'] as $event)
 					echo '
-									<li class="sp_list_indent">', sp_embed_image('event'), ' ', $event['link'], '</li>';
+									<li ', sp_embed_class('event', '', 'sp_list_indent'), '>', $event['link'], '</li>';
 			}
 
 			echo '
@@ -1846,7 +1848,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 
 			foreach ($calendar_array['todayHolidays'] as $key => $holiday)
 				echo '
-									<li>', sp_embed_image('holiday'), ' ', $holiday, '</li>';
+									<li ', sp_embed_class('holiday'), '>', $holiday, '</li>';
 		}
 
 		if (!empty($calendar_array['todayBirthdays']))
@@ -1857,7 +1859,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 
 			foreach ($calendar_array['todayBirthdays'] as $member)
 				echo '
-									<li>', sp_embed_image('birthday'), ' <a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a></li>';
+									<li ', sp_embed_class('birthday'), '><a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a></li>';
 		}
 
 		if (!empty($calendar_array['todayEvents']))
@@ -1868,7 +1870,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 
 			foreach ($calendar_array['todayEvents'] as $event)
 				echo '
-									<li>', sp_embed_image('event'), ' ', $event['link'], !$show_titles ? ' - ' . standardTime(forum_time(), '%d %b') : '', '</li>';
+									<li ', sp_embed_class('event'), '>', $event['link'], !$show_titles ? ' - ' . standardTime(forum_time(), '%d %b') : '', '</li>';
 		}
 
 		if (!empty($calendar_array['futureEvents']))
@@ -1884,7 +1886,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 
 				foreach ($events as $event)
 					echo '
-									<li>', sp_embed_image('event'), ' ', $event['link'], ' - ', $currentDay, '</li>';
+									<li ', sp_embed_class('event'), '>', $event['link'], ' - ', $currentDay, '</li>';
 			}
 		}
 
@@ -2022,7 +2024,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 		{
 			if ($show_title && !empty($item['link']))
 				echo '
-										<li class="sp_list_top">', sp_embed_image('post'), ' <strong>', $item['link'], '</strong>', ($show_date && !empty($item['date']) ? ' - ' . $item['date'] : ''), '</li>';
+										<li ', sp_embed_class('post', '', 'sp_list_top'), '><strong>', $item['link'], '</strong>', ($show_date && !empty($item['date']) ? ' - ' . $item['date'] : ''), '</li>';
 			echo '
 										<li', empty($item['is_last']) ? ' class="sp_list_divider"' : '', '>', $item['content'], '</li>';
 		}
@@ -2322,9 +2324,8 @@ function sp_staff($parameters, $id, $return_parameters = false)
 										<td class="sp_staff sp_center">', !empty($staff['avatar']['href']) ? '
 											<a href="' . $scripturl . '?action=profile;u=' . $staff['id'] . '"><img src="' . $staff['avatar']['href'] . '" alt="' . $staff['name'] . '" width="40" /></a>' : '', '
 										</td>
-										<td class="sp_staff_info', $staff_count != ++$count ? ' sp_staff_divider' : '', '">
-											', sp_embed_image($icons[$staff['type']]), ' ', $staff['link'], '<br />
-											', $staff['group'], '
+										<td ', sp_embed_class($icons[$staff['type']], '', 'sp_staff_info'. $staff_count != ++$count ? ' sp_staff_divider' : ''), '>',
+											$staff['link'], '<br />', $staff['group'], '
 										</td>
 									</tr>';
 

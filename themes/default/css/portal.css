@@ -661,3 +661,17 @@ dl.sp_form img, #sp_add_articles_list_header img {
 .portalaverages:before {background-position: 0 -252px;}
 .board:before {background-position: 0 -270px;}
 .topic:before {background-position: 0 -288px;}
+.post:before {background-position: 0 -306px;}
+.event:before {background-position: 0 -324px;}
+.holiday:before {background-position: 0 -342px;}
+.birthday:before {background-position: 0 -360px;}
+.admin:before {background-position: 0 -378px;}
+.gmod:before {background-position: 0 -396px;}
+.lmod:before {background-position: 0 -414px;}
+.user:before {background-position: 0 -432px;}
+.tux:before {background-position: 0 -450px;}
+.attach:before {background-position: 0 -468px;}
+.refresh:before {background-position: 0 -486px;}
+.history:before {background-position: 0 -504px;}
+.smiley:before {background-position: 0 -522px;}
+.style:before {background-position: 0 -540px;}
