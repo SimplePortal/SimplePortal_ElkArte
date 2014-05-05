@@ -65,7 +65,7 @@ th.sp_center {
 .sp_list {
 	list-style-type: none;
 	text-align: left;
-	padding: 0 0 0 5px;
+	padding: 0 0 0 2px;
 	line-height: 1.5em;
 	margin: 0;
 }
@@ -264,7 +264,7 @@ table.sp_block {
 	margin: 2px 0 4px 0;
 	border: 1px solid #ccc;
 	border-radius: 0 0 5px 5px;
-	box-shadow: 0px 6px 2px -6px rgba(0,0,0,0.5);
+	box-shadow: 5px 6px 3px -5px rgba(0,0,0,0.5);
 	overflow: auto;
 }
 
@@ -536,10 +536,12 @@ dl.sp_form img, #sp_add_articles_list_header img {
 #category_description {
 	width: 75%;
 }
-/* Drag sort lists show the move cursor and up/down arrow content */
+
+/* Drag sort block list, show the move cursor */
 #sp_manage_blocks td:nth-child(-n+2) {
 	cursor: move;
 }
+
 /* some jquery ui styles we may need */
 .ui-state-highlight {
 	height: 40px;
@@ -547,6 +549,7 @@ dl.sp_form img, #sp_add_articles_list_header img {
 	border: 1px dashed #ccc;
 	background-image: linear-gradient(to bottom, #fafafa, #fff);
 }
+
 /* jQuery Dialog Box */
 .ui-helper-clearfix:before, .ui-helper-clearfix:after {
 	border-collapse: collapse;
@@ -606,6 +609,7 @@ dl.sp_form img, #sp_add_articles_list_header img {
 	width: 100%;
 	height: 100%;
 }
+
 /* Upshrink image in the block headers */
 .category_toggle {
 	display: block;
@@ -625,3 +629,35 @@ dl.sp_form img, #sp_add_articles_list_header img {
 	margin-left: -58px;
 	padding: 47px 50px;
 }
+
+
+/* "dot" images as a sprite
+------------------------------------------------- */
+.dot:before {
+	background-image: url(../images/sp/dots.png);
+	background-repeat: no-repeat;
+	content: "";
+	display: inline-block;
+	height: 18px;
+	width: 18px;
+	padding-right: .25em;
+	vertical-align: text-bottom;
+}
+/* formatting for compactness */
+.dotdelete:before {background-position: 0 0;}
+.dot1:before {background-position: 0 -18px;}
+.dot2:before {background-position: 0 -36px;}
+.dot3:before {background-position: 0 -54px;}
+.dot4:before {background-position: 0 -72px;}
+.dot5:before {background-position: 0 -90px;}
+.dot6:before {background-position: 0 -108px;}
+.dot7:before {background-position: 0 -126px;}
+.dot8:before {background-position: 0 -144px;}
+.dotrss:before {background-position: 0 -162px;}
+.collapse:before {background-position: 0 -180px;}
+.expand:before {background-position: 0 -198px;}
+.arrow:before {background-position: 0 -216px;}
+.portalstats:before {background-position: 0 -234px;}
+.portalaverages:before {background-position: 0 -252px;}
+.board:before {background-position: 0 -270px;}
+.topic:before {background-position: 0 -288px;}

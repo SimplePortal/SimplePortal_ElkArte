@@ -77,11 +77,11 @@ function template_portal_above()
 
 		if ($context['SPortal']['sides'][1]['active'])
 			echo '
-		<a href="#side" onclick="return sp_collapseSide(1)">', sp_embed_image($context['SPortal']['sides'][1]['collapsed'] ? 'expand' : 'collapse', '', null, null, true, 'sp_collapse_side1'), '</a>';
+		<a id="sp_collapse_side1" class="dot ', $context['SPortal']['sides'][1]['collapsed'] ? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(1)"></a>';
 
 		if ($context['SPortal']['sides'][4]['active'])
 			echo '
-		<a href="#side" onclick="return sp_collapseSide(4)">', sp_embed_image($context['SPortal']['sides'][4]['collapsed'] ? 'expand' : 'collapse', '', null, null, true, 'sp_collapse_side4'), '</a>';
+		<a id="sp_collapse_side4" class="dot ', $context['SPortal']['sides'][1]['collapsed'] ? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(4)"></a>';
 
 		echo '
 	</div>';

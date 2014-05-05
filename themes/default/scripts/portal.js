@@ -53,7 +53,7 @@ function sp_collapseSide(id)
 		elk_setThemeOption(sp_sides[id], mode ? 0 : 1, null);
 
 	// Update the side expand/collapse image
-	document.getElementById("sp_collapse_side" + id).src = sp_images_url + (mode ? "/collapse.png" : "/expand.png");
+	document.getElementById("sp_collapse_side" + id).className = (mode ? "dot collapse" : "dot expand");
 
 	// Hide the side with a touch of animation
 	$('#' + sp_sides[id]).toggle(400);

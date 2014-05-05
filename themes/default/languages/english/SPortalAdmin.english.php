@@ -49,7 +49,7 @@ $txt['articleavatar'] = 'Display Authors Avatar';
 // Blocks area
 $txt['sp-adminBlockListName'] = 'Block List';
 $txt['sp-adminBlockInuse'] = 'Used in %s Block';
-$txt['sp-adminBlockListDesc'] = 'This page displays a list of all blocks which have been created for the portal or the forum.';
+$txt['sp-adminBlockListDesc'] = 'This page displays a list of all blocks which have been created for the portal or the forum. To move a block to a new location you use a simple drag and drop action.';
 $txt['sp-adminBlockAddName'] = 'Add Block';
 $txt['sp-adminBlockAddDesc'] = 'This page enables new blocks to be created and added to the portal page or the forum.';
 $txt['sp-adminBlockLeftListDesc'] = 'This page displays a list of all left side blocks which have been created. These blocks can be modified by selecting the appropriate options.';

@@ -870,6 +870,62 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 }
 
 /**
+ * Builds an sprite class tag for use in templates
+ *
+ * @param string $name
+ * @param string $alt
+ * @param int|null $width
+ * @param int|null $height
+ * @param string|boolean $title
+ * @param int|null $id
+ */
+function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'dot')
+{
+	global $modSettings, $txt;
+	static $default_title, $randomizer;
+
+	loadLanguage('SPortal', sp_languageSelect('SPortal'));
+
+	// Some default title text settings for our standard sprites
+	if (!isset($default_title))
+	{
+		$default_title = array(
+			'dot' => $txt['sp-dot'],
+			'stars' => $txt['sp-star'],
+			'arrow' => $txt['sp-arrow'],
+			'modify' => $txt['modify'],
+			'delete' => $txt['delete'],
+			'delete_small' => $txt['delete'],
+			'history' => $txt['sp_shoutbox_history'],
+			'refresh' => $txt['sp_shoutbox_refresh'],
+			'smiley' => $txt['sp_shoutbox_smiley'],
+			'style' => $txt['sp_shoutbox_style'],
+			'bin' => $txt['sp_shoutbox_prune'],
+			'move' => $txt['sp_move'],
+		);
+	}
+
+	// Use a default title text if available and none was supplied
+	if (empty($title) && isset($default_title[$name]))
+		$title = $default_title[$name];
+	else
+		$title = $name;
+
+	// dots / start using colors
+	if (in_array($name, array('dot', 'star')) && empty($modSettings['sp_disable_random_bullets']))
+	{
+		// Loop through the dot colors
+		if (!isset($randomizer) || $randomizer > 7)
+			$randomizer = 0;
+		$randomizer++;
+		$name = $name . $randomizer;
+	}
+
+	// Build the attributes
+	return 'class ="' . $spriteclass . ' ' . $name . ' ' . $extraclass .'" title="' . $title . '"';
+}
+
+/**
  * Implodes or Expands a set of style attributes
  *
  * @param string $action implode or explode
@@ -1630,8 +1686,8 @@ function sportal_get_shouts($shoutbox, $parameters)
 
 		$shouts[$shout['id']] += array(
 			'is_me' => preg_match('~^<div\sclass="meaction">\* ' . preg_quote($shout['author']['name'], '~') . '.+</div>$~', $shout['text']) != 0,
-			'delete_link' => $can_delete ? '<a href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('delete_small') . '</a> ' : '',
-			'delete_link_js' => $can_delete ? '<a href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="sp_delete_shout(' . $shoutbox . ', ' . $shout['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false;">' . sp_embed_image('delete_small') . '</a> ' : '',
+			'delete_link' => $can_delete ? '<a class="dot dotdelete" href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"></a> ' : '',
+			'delete_link_js' => $can_delete ? '<a class="dot dotdelete" href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="sp_delete_shout(' . $shoutbox . ', ' . $shout['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false;"></a> ' : '',
 		);
 
 		$shouts[$shout['id']]['text'] = str_replace(':jade:', '<img src="http://www.simpleportal.net/sp/cheerleader.png" alt="Jade!" />', $shouts[$shout['id']]['text']);

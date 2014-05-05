@@ -35,16 +35,26 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 	if ($context['user']['is_guest'])
 	{
 		echo '
-									<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/sha256.js"></script>
-									<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', ' >
-										<table>
+									<script src="' . $settings['default_theme_url'] . '/scripts/sha256.js"></script>
+									<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', ' >
+									<table>
 											<tr>
-												<td class="sp_right"><label for="sp_user">', $txt['username'], ':</label>&nbsp;</td>
-												<td><input type="text" id="sp_user" name="user" size="9" value="', !empty($user_info['username']) ? $user_info['username'] : '', '" /></td>
-											</tr><tr>
-												<td class="sp_right"><label for="sp_passwrd">', $txt['password'], ':</label>&nbsp;</td>
-												<td><input type="password" name="passwrd" id="sp_passwrd" size="9" /></td>
-											</tr><tr>
+												<td class="sp_right">
+													<label for="sp_user">', $txt['username'], ':</label>&nbsp;
+												</td>
+												<td>
+													<input type="text" id="sp_user" name="user" size="9" value="', !empty($user_info['username']) ? $user_info['username'] : '', '" />
+												</td>
+											</tr>
+											<tr>
+												<td class="sp_right">
+													<label for="sp_passwrd">', $txt['password'], ':</label>&nbsp;
+												</td>
+												<td>
+													<input type="password" name="passwrd" id="sp_passwrd" size="9" />
+												</td>
+											</tr>
+											<tr>
 												<td>
 													<select name="cookielength">
 														<option value="60">', $txt['one_hour'], '</option>
@@ -54,14 +64,21 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 														<option value="-1" selected="selected">', $txt['forever'], '</option>
 													</select>
 												</td>
-												<td><input type="submit" value="', $txt['login'], '" class="button_submit" /></td>
+												<td>
+													<input type="submit" value="', $txt['login'], '" class="button_submit" />
+												</td>
 											</tr>
 										</table>
 										<input type="hidden" name="hash_passwrd" value="" />
-									</form>', sprintf($txt['welcome_guest'], $txt['guest_title']);
+										<input type="hidden" name="old_hash_passwrd" value="" />
+										<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+										<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
+									</form>', sprintf($txt[$context['can_register'] ? 'welcome_guest_register' : 'welcome_guest'], $txt['guest_title'], $scripturl . '?action=login');
 	}
+	// A logged in member then
 	else
 	{
+		// load up the members details
 		loadMemberData($user_info['id']);
 		loadMemberContext($user_info['id'], true);
 
@@ -78,7 +95,8 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 
 		if (!empty($member_info['avatar']['image']))
 			echo '
-									<a href="', $scripturl, '?action=profile;u=', $member_info['id'], '">', $member_info['avatar']['image'], '</a><br /><br />';
+									<a href="', $scripturl, '?action=profile;u=', $member_info['id'], '">', $member_info['avatar']['image'], '</a>
+									<br /><br />';
 
 		if (!empty($member_info['group']))
 			echo '
@@ -92,12 +110,12 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 									<br />
 									<br />
 									<ul class="sp_list">
-										<li>', sp_embed_image('dot'), ' <strong>', $txt['posts'], ':</strong> ', $member_info['posts'], '</li>';
+										<li ', sp_embed_class('dot'), '><strong>', $txt['posts'], ':</strong> ', $member_info['posts'], '</li>';
 
 		if (!empty($modSettings['karmaMode']))
 		{
 			echo '
-										<li>', sp_embed_image('dot'), ' <strong>', $modSettings['karmaLabel'], '</strong> ';
+										<li ', sp_embed_class('dot'), '><strong>', $modSettings['karmaLabel'], '</strong> ';
 
 			if ($modSettings['karmaMode'] == 1)
 				echo $member_info['karma']['total'];
@@ -110,15 +128,15 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 		if (allowedTo('pm_read'))
 		{
 			echo '
-										<li>', sp_embed_image('dot'), ' <strong>', $txt['sp-usertmessage'], ':</strong> <a href="', $scripturl, '?action=pm">', $context['user']['messages'], '</a></li>
-										<li>', sp_embed_image('dot'), ' <strong>', $txt['sp-usernmessage'], ':</strong> ', $context['user']['unread_messages'], '</li>';
+										<li ', sp_embed_class('dot'), '><strong>', $txt['sp-usertmessage'], ':</strong> <a href="', $scripturl, '?action=pm">', $context['user']['messages'], '</a></li>
+										<li ', sp_embed_class('dot'), '><strong>', $txt['sp-usernmessage'], ':</strong> ', $context['user']['unread_messages'], '</li>';
 		}
 
 		echo '
-										<li>', sp_embed_image('dot'), ' <a href="', $scripturl, '?action=unread">', $txt['unread_topics_visit'], '</a></li>
-										<li>', sp_embed_image('dot'), ' <a href="', $scripturl, '?action=unreadreplies">', $txt['unread_replies'], '</a></li>
+										<li ', sp_embed_class('dot'), '><a href="', $scripturl, '?action=unread">', $txt['unread_topics_visit'], '</a></li>
+										<li ', sp_embed_class('dot'), '><a href="', $scripturl, '?action=unreadreplies">', $txt['unread_replies'], '</a></li>
 									</ul>
-									<br />', sp_embed_image('arrow'), ' <a href="', $scripturl, '?action=profile">', $txt['profile'], '</a> ', sp_embed_image('arrow'), ' <a href="', $scripturl, '?action=logout;sesc=', $context['session_id'], '">', $txt['logout'], '</a>';
+									<br /><a class="dot arrow" href="', $scripturl, '?action=profile">', $txt['profile'], '</a><a class="dot arrow" href="', $scripturl, '?action=logout;sesc=', $context['session_id'], '">', $txt['logout'], '</a>';
 	}
 
 	echo '
@@ -197,7 +215,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 
 	foreach ($members as $member)
 		echo '
-									<li>', sp_embed_image('dot'), ' ', $member['link'], ' - ', $member['date'], '</li>';
+									<li ', sp_embed_class('dot'), '>', $member['link'], ' - ', $member['date'], '</li>';
 
 	echo '
 								</ul>';
@@ -227,20 +245,20 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 
 	echo '
 								<ul class="sp_list">
-									<li>', sp_embed_image('dot'), ' ', $txt['guests'], ': ', $stats['num_guests'], '</li>';
+									<li ', sp_embed_class('dot'), '> ', $txt['guests'], ': ', $stats['num_guests'], '</li>';
 
 	if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] < 3 || allowedTo('admin_forum')))
 		echo '
-									<li>', sp_embed_image('dot'), ' ', $txt['spiders'], ': ', $stats['num_spiders'], '</li>';
+									<li ', sp_embed_class('dot'), '> ', $txt['spiders'], ': ', $stats['num_spiders'], '</li>';
 
 	echo '
-									<li>', sp_embed_image('dot'), ' ', $txt['hidden'], ': ', $stats['num_users_hidden'], '</li>
-									<li>', sp_embed_image('dot'), ' ', $txt['users'], ': ', $stats['num_users_online'], '</li>';
+									<li ', sp_embed_class('dot'), '> ', $txt['hidden'], ': ', $stats['num_users_hidden'], '</li>
+									<li ', sp_embed_class('dot'), '> ', $txt['users'], ': ', $stats['num_users_online'], '</li>';
 
 	if (!empty($stats['users_online']))
 	{
 		echo '
-									<li>', sp_embed_image('dot'), ' ', allowedTo('who_view') && !empty($modSettings['who_enabled']) ? '<a href="' . $scripturl . '?action=who">' : '', $txt['online_users'], allowedTo('who_view') && !empty($modSettings['who_enabled']) ? '</a>' : '', ':</li>
+									<li ', sp_embed_class('dot'), '> ', allowedTo('who_view') && !empty($modSettings['who_enabled']) ? '<a href="' . $scripturl . '?action=who">' : '', $txt['online_users'], allowedTo('who_view') && !empty($modSettings['who_enabled']) ? '</a>' : '', ':</li>
 								</ul>
 								<div class="sp_online_flow">
 									<ul class="sp_list">';
@@ -279,7 +297,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 
 		echo '
 								<ul class="sp_list">
-									<li>', sp_embed_image('dot'), ' ', $txt['sp-online_today'], ': ', $stats['num_users_online_today'], '</li>
+									<li ', sp_embed_class('dot'), '> ', $txt['sp-online_today'], ': ', $stats['num_users_online_today'], '</li>
 								</ul>
 								<div class="sp_online_flow">
 									<ul class="sp_list">';
@@ -344,12 +362,12 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 
 	echo '
 								<ul class="sp_list">
-									<li>', sp_embed_image('stats'), ' ', $txt['total_members'], ': <a href="', $scripturl . '?action=mlist">', comma_format($totals['members']), '</a></li>
-									<li>', sp_embed_image('stats'), ' ', $txt['total_posts'], ': ', comma_format($totals['posts']), '</li>
-									<li>', sp_embed_image('stats'), ' ', $txt['total_topics'], ': ', comma_format($totals['topics']), '</li>
-									<li>', sp_embed_image('stats'), ' ', $txt['total_cats'], ': ', comma_format($totals['categories']), '</li>
-									<li>', sp_embed_image('stats'), ' ', $txt['total_boards'], ': ', comma_format($totals['boards']), '</li>
-									<li>', sp_embed_image('stats'), ' ', $txt['most_online'], ': ', comma_format($modSettings['mostOnline']), '</li>
+									<li ', sp_embed_class('portalstats'), '>', $txt['total_members'], ': <a href="', $scripturl . '?action=mlist">', comma_format($totals['members']), '</a></li>
+									<li ', sp_embed_class('portalstats'), '>', $txt['total_posts'], ': ', comma_format($totals['posts']), '</li>
+									<li ', sp_embed_class('portalstats'), '>', $txt['total_topics'], ': ', comma_format($totals['topics']), '</li>
+									<li ', sp_embed_class('portalstats'), '>', $txt['total_cats'], ': ', comma_format($totals['categories']), '</li>
+									<li ', sp_embed_class('portalstats'), '>', $txt['total_boards'], ': ', comma_format($totals['boards']), '</li>
+									<li ', sp_embed_class('portalstats'), '>', $txt['most_online'], ': ', comma_format($modSettings['mostOnline']), '</li>
 								</ul>';
 
 	if ($averages)
@@ -357,10 +375,10 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 		echo '
 								<hr />
 								<ul class="sp_list">
-									<li>', sp_embed_image('averages'), ' ', $txt['sp-average_posts'], ': ', comma_format($totals['average_posts']), '</li>
-									<li>', sp_embed_image('averages'), ' ', $txt['sp-average_topics'], ': ', comma_format($totals['average_topics']), '</li>
-									<li>', sp_embed_image('averages'), ' ', $txt['sp-average_members'], ': ', comma_format($totals['average_members']), '</li>
-									<li>', sp_embed_image('averages'), ' ', $txt['sp-average_online'], ': ', comma_format($totals['average_online']), '</li>
+									<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_posts'], ': ', comma_format($totals['average_posts']), '</li>
+									<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_topics'], ': ', comma_format($totals['average_topics']), '</li>
+									<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_members'], ': ', comma_format($totals['average_members']), '</li>
+									<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_online'], ': ', comma_format($totals['average_online']), '</li>
 								</ul>';
 	}
 }
@@ -973,14 +991,17 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
 		return;
 	}
 	else
-		$topics[count($topics) - 1]['is_last'] = true;
+	{
+		end($topics);
+		$topics[key($topics)]['is_last'] = true;
+	}
 
 	echo '
 								<ul class="sp_list">';
 
 	foreach ($topics as $topic)
 		echo '
-									<li class="sp_list_top">', sp_embed_image('topic'), ' ', $topic['link'], '</li>
+									<li ', sp_embed_class('topic', '' , 'sp_list_top'), '>', $topic['link'], '</li>
 									<li class="sp_list_indent', empty($topic['is_last']) ? ' sp_list_bottom' : '', ' smalltext">', $txt['replies'], ': ', $topic['num_replies'], ' | ', $txt['views'], ': ', $topic['num_views'], '</li>';
 
 	echo '
@@ -1017,14 +1038,17 @@ function sp_topBoards($parameters, $id, $return_parameters = false)
 		return;
 	}
 	else
-		$boards[count($boards) - 1]['is_last'] = true;
+	{
+		end($boards);
+		$boards[key($boards)]['is_last'] = true;
+	}
 
 	echo '
 								<ul class="sp_list">';
 
 	foreach ($boards as $board)
 		echo '
-									<li class="sp_list_top">', sp_embed_image('board'), ' ', $board['link'], '</li>
+									<li ', sp_embed_class('board', '', 'sp_list_top'), '>', $board['link'], '</li>
 									<li class="sp_list_indent', empty($board['is_last']) ? ' sp_list_bottom' : '', ' smalltext">', $txt['topics'], ': ', $board['num_topics'], ' | ', $txt['posts'], ': ', $board['num_posts'], '</li>';
 
 	echo '
@@ -1132,7 +1156,7 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 
 		foreach ($poll['options'] as $option)
 			echo '
-									<li>', sp_embed_image('dot'), ' ', $option['option'], '</li>
+									<li ', sp_embed_class('dot'), '> ', $option['option'], '</li>
 									<li class="sp_list_indent"><strong>', $option['votes'], '</strong> (', $option['percent'], '%)</li>';
 
 		echo '
@@ -2014,7 +2038,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 
 		foreach ($items as $item)
 			echo '
-									<li>', sp_embed_image('dot_feed'), ' ', $item['link'], ($show_date && !empty($item['date']) ? ' - ' . $item['date'] : ''), '</li>';
+									<li ', sp_embed_class('dot_feed'), '> ', $item['link'], ($show_date && !empty($item['date']) ? ' - ' . $item['date'] : ''), '</li>';
 
 		echo '
 								</ul>';
@@ -2452,7 +2476,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 
 		foreach ($articles as $article)
 			echo '
-									<li>', sp_embed_image('topic'), ' ', $article['link'], '</li>';
+									<li ', sp_embed_class('topic'), '>', $article['link'], '</li>';
 
 		echo '
 								</ul>';
@@ -2789,7 +2813,8 @@ function sp_menu($parameters, $id, $return_parameters = false)
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
 		echo '
-									<li>', sp_embed_image('dot'), ' <a title="', strip_tags($button['title']), '" href="', $button['href'], '">', ($button['active_button'] ? '<strong>' : ''), $button['title'], ($button['active_button'] ? '</strong>' : ''), '</a>';
+									<li ', sp_embed_class('dot'), '>
+										<a title="', strip_tags($button['title']), '" href="', $button['href'], '">', ($button['active_button'] ? '<strong>' : ''), $button['title'], ($button['active_button'] ? '</strong>' : ''), '</a>';
 
 		if (!empty($button['sub_buttons']))
 		{
@@ -2798,7 +2823,8 @@ function sp_menu($parameters, $id, $return_parameters = false)
 
 			foreach ($button['sub_buttons'] as $sub_button)
 				echo '
-											<li class="sp_list_indent">', sp_embed_image('dot'), ' <a title="', $sub_button['title'], '" href="', $sub_button['href'], '">', $sub_button['title'], '</a></li>';
+											<li ', sp_embed_class('dot', '', 'sp_list_indent'), '>
+												<a title="', $sub_button['title'], '" href="', $sub_button['href'], '">', $sub_button['title'], '</a></li>';
 
 			echo '
 										</ul>';
