@@ -198,8 +198,6 @@ class ManagePortalCategories_Controller extends Action_Controller
 	/**
 	 * Callback for createList(),
 	 * Returns the number of categories in the system
-	 *
-	 * @param int $messageID
 	 */
 	public function list_spCountCategories()
 	{

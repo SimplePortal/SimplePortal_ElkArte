@@ -414,7 +414,6 @@ function sp_check_duplicate_category($id, $namespace)
  *
  * If adding a new one, will return the id of the new category
  *
- * @param mixed[] $fields field name to type for use in query
  * @param mixed[] $data field name to value for use in query
  * @param boolean $is_new
  */
@@ -959,7 +958,7 @@ function sp_load_shoutbox($start, $items_per_page, $sort)
 /**
  * Removes a shoutbox or group of shoutboxes by id
  *
- * @param int[] $article_ids
+ * @param int[] $shoutbox_ids
  */
 function sp_delete_shoutbox($shoutbox_ids = array())
 {

@@ -767,7 +767,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		$context['xml_data'] = array();
 		$errors = array();
 		$order = array();
-		$tokens = array();
 
 		// Chances are
 		loadLanguage('Errors');

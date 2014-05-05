@@ -237,8 +237,6 @@ class ManagePortalArticles_Controller extends Action_Controller
 	/**
 	 * Callback for createList(),
 	 * Returns the number of articles in the system
-	 *
-	 * @param int $messageID
 	 */
 	public function list_spCountArticles()
 	{

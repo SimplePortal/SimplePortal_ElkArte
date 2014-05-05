@@ -233,7 +233,7 @@ function template_block($block, $side = -1)
  * Wrap a block in our default wrapper
  *
  * @param mixed[] $block
- * @param int $block
+ * @param int $side
  */
 function template_block_default($block, $side)
 {

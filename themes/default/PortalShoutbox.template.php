@@ -62,7 +62,7 @@ function template_shoutbox_all_default()
 /**
  * Embeds a shoutbox block on a page
  *
- * @param int $shoutbox
+ * @param mixed[] $shoutbox
  */
 function template_shoutbox_embed($shoutbox)
 {

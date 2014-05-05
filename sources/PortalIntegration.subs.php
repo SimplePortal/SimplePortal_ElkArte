@@ -419,7 +419,6 @@ function sp_integrate_menu_buttons(&$buttons)
  * Redirection hook, integrate_redirect, called from subs.php redirectexit()
  *
  * @param string $setLocation
- * @param boolean $refresh
  * @uses redirectexit_callback in subs.php
  */
 function sp_integrate_redirect(&$setLocation)

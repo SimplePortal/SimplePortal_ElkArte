@@ -873,11 +873,9 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
  * Builds an sprite class tag for use in templates
  *
  * @param string $name
- * @param string $alt
- * @param int|null $width
- * @param int|null $height
- * @param string|boolean $title
- * @param int|null $id
+ * @param string $title
+ * @param string| $extaclass
+ * @param string $spriteclass
  */
 function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'dot')
 {
@@ -1505,6 +1503,17 @@ function sportal_parse_content($body, $type)
 	}
 }
 
+/**
+ * Returns the details system profiles
+ *
+ * What is does:
+ * - If no profile id is supplied, all profiles are returned
+ * - If type = 1 (generally the case), the profile group permsissions are returned
+ *
+ * @param int|null $profile_id
+ * @param int type $type
+ * @param string $sort
+ */
 function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_profile')
 {
 	global $txt;
@@ -1519,6 +1528,7 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_prof
 		$query[] = 'id_profile = {int:profile_id}';
 		$parameters['profile_id'] = (int) $profile_id;
 	}
+
 	if (isset($type))
 	{
 		$query[] = 'type = {int:type}';
@@ -1544,6 +1554,7 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_prof
 			'value' => $row['value'],
 		);
 
+		// Get the permisssions
 		if ($row['type'] == 1)
 		{
 			list ($groups_allowed, $groups_denied) = explode('|', $row['value']);
@@ -1802,7 +1813,7 @@ function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
  * Use true to increment by 1
  *
  * @param int $shoutbox_id
- * @param int|boolean $num_shouts
+ * @param int $num_shouts
  */
 function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
 {

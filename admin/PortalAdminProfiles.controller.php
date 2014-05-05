@@ -212,8 +212,6 @@ class ManagePortalProfile_Controller extends Action_Controller
 	/**
 	 * Callback for createList(),
 	 * Returns the number of permission profiles
-	 *
-	 * @param int $messageID
 	 */
 	public function list_spCountProfiles()
 	{

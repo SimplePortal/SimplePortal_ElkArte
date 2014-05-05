@@ -16,7 +16,7 @@ if (!defined('ELK'))
 /**
  * User info block, shows avatar, group, icons, posts, karma, etc
  *
- * @param mixed[] $parameters, not used in this block
+ * @param mixed[] $parameters not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -146,7 +146,8 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 /**
  * Latest member block, shows name and join date for X latest members
  *
- * @param mixed[] $parameters 'limit' => number of members to show
+ * @param mixed[] $parameters
+ *		'limit' => number of members to show
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -224,7 +225,8 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 /**
  * Who's online block, shows count of users online names
  *
- * @param mixed[] $parameters 'online_today' => shows all users that were online today (requires user online today addon)
+ * @param mixed[] $parameters
+ *		'online_today' => shows all users that were online today (requires user online today addon)
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -315,7 +317,8 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 /**
  * Board Stats block, shows count of users online names
  *
- * @param mixed[] $parameters 'averages' => Will calculate the daily average (posts, topics, registrations, etc)
+ * @param mixed[] $parameters
+ *		'averages' => Will calculate the daily average (posts, topics, registrations, etc)
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -999,7 +1002,7 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
 
 	foreach ($topics as $topic)
 		echo '
-									<li ', sp_embed_class('topic', '' , 'sp_list_top'), '>', $topic['link'], '</li>
+									<li ', sp_embed_class('topic', '', 'sp_list_top'), '>', $topic['link'], '</li>
 									<li class="sp_list_indent', empty($topic['is_last']) ? ' sp_list_bottom' : '', ' smalltext">', $txt['replies'], ': ', $topic['num_replies'], ' | ', $txt['views'], ': ', $topic['num_views'], '</li>';
 
 	echo '
@@ -1405,7 +1408,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 /**
  * Quick Search Block, Displays a quick search box
  *
- * @param mixed[] $parameters, not used in this block
+ * @param mixed[] $parameters not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -1431,7 +1434,7 @@ function sp_quickSearch($parameters, $id, $return_parameters = false)
 /**
  * News Block, Displays the forum news
  *
- * @param mixed[] $parameters, not used in this block
+ * @param mixed[] $parameters not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
