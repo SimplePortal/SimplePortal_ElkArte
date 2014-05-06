@@ -160,7 +160,7 @@ function sportal_init_headers()
 				tag: ".sp_column",
 				opacity: 0.9,
 				connect: ".sp_column",
-				containment: "#sp_main",
+				containment: "#main_content_section",
 				tolerance: "pointer",
 				href: "/",
 				placeholder: "ui-state-highlight",
@@ -258,7 +258,7 @@ function sportal_load_blocks()
 
 		foreach ($layout as $id => $column)
 		{
-			if (empty($column) || !$context['SPortal']['sides'][$id]['active'])
+			if (empty($column) || empty($id) || !$context['SPortal']['sides'][$id]['active'])
 				continue;
 
 			foreach ($column as $item)
@@ -270,6 +270,8 @@ function sportal_load_blocks()
 				$context['SPortal']['blocks'][$id][] = $blocks[$item];
 				unset($blocks[$item]);
 			}
+
+			$context['SPortal']['blocks']['custom_arrange'] = true;
 		}
 	}
 
@@ -294,6 +296,29 @@ function sportal_load_blocks()
 
 		$context['SPortal']['sides'][$side['id']]['collapsed'] = $context['user']['is_guest'] ? !empty($_COOKIE['sp_' . $side['name']]) : !empty($options['sp_' . $side['name']]);
 	}
+}
+
+/**
+ * If a member has arranged blocks in some bizare fashion, this will reset the layout to
+ * the default one
+ */
+function resetMemberLayout()
+{
+	global $settings, $user_info;
+
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}themes
+		WHERE id_theme = {int:current_theme}
+			AND variable = {string:theme_variable}
+			AND id_member = {int:id_member}',
+		array(
+			'current_theme' => $settings['theme_id'],
+			'theme_variable' => 'sp_block_layout',
+			'id_member' => $user_info['id'],
+		)
+	);
 }
 
 /**
@@ -1511,7 +1536,7 @@ function sportal_parse_content($body, $type)
  * - If type = 1 (generally the case), the profile group permsissions are returned
  *
  * @param int|null $profile_id
- * @param int type $type
+ * @param int $type
  * @param string $sort
  */
 function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_profile')

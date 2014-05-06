@@ -24,8 +24,24 @@ class Sportal_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
+		require_once(SUBSDIR . '/Action.class.php');
+
 		// Where do you want to go today? :P
-		$this->action_sportal_index();
+		$subActions = array(
+			'index' => array($this, 'action_sportal_index'),
+			'credits' => array($this, 'action_sportal_credits'),
+			'resetlayout' => array($this, 'action_sportal_resetLayout'),
+			'userorder' => array($this, 'action_userblockorder'),
+		);
+
+		// We like action, so lets get ready for some
+		$action = new Action('');
+
+		// Get the subAction, or just go to action_sportal_index
+		$subAction = $action->initialize($subActions, 'index');
+
+		// Finally go to where we want to go
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -68,19 +84,32 @@ class Sportal_Controller extends Action_Controller
 	}
 
 	/**
-	 * Displays the credit page outside of the admin area
+	 * Displays the credit page outside of the admin area,
+	 *
+	 * - Forwards to admin controller to display credits outside the admin area
 	 */
 	public function action_sportal_credits()
 	{
-		global $context, $txt;
-
-		require_once(ADMINDIR . '/PortalAdminMain.php');
 		loadLanguage('SPortalAdmin', sp_languageSelect('SPortalAdmin'));
 
-		sportal_information(false);
+		require_once(ADMINDIR . '/PortalAdminMain.controller.php');
+		$adminmain = new ManagePortalConfig_Controller();
+		$adminmain->action_sportal_information(false);
+	}
 
-		$context['page_title'] = $txt['sp-info_title'];
-		$context['sub_template'] = 'information';
+	/**
+	 * Reset a users custom portal block arrangement
+	 */
+	public function action_sportal_resetLayout()
+	{
+		checkSession('request');
+
+		// Remove the block layout settings
+		require_once(SUBSDIR . '/Portal.subs.php');
+		resetMemberLayout();
+
+		// Redirect to the main page
+		redirectexit();
 	}
 
 	/**
@@ -109,7 +138,7 @@ class Sportal_Controller extends Action_Controller
 			// No questions that we are rearranging the blocks
 			if (isset($_POST['order'], $_POST['received'], $_POST['moved']))
 			{
-				$column_numbers = array('sp_left_div' => 1, 'sp_top_div' => 2, 'sp_bottom_div' => 3, 'sp_right_div' => 4, 'sp_header_div' => 5, 'sp_footer_div' => 6);
+				$column_numbers = array('sp_left_div' => 1, 'sp_top_div' => 2, 'sp_bottom_div' => 3, 'sp_right_div' => 4, 'sp_header' => 5, 'sp_footer' => 6);
 
 				// What block was drag and dropped? e.g. block_2,4
 				list ($block_moved, ) = explode(',', $_POST['moved']);

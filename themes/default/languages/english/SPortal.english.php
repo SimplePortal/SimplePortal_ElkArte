@@ -159,3 +159,4 @@ $txt['portal_order_title'] = 'Ordering Error';
 $txt['portal_order_error'] = 'An error occurred while processing your arrangement';
 $txt['sp-blocks_success_arrange'] = 'The blocks have been sucessfuly arranged';
 $txt['sp-blocks_fail_arrange'] = 'The blocks were not moved';
+$txt['sp_reset blocks'] = 'Reset Block Arrangement';

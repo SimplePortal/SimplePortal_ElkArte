@@ -67,7 +67,7 @@ function template_portal_index()
  */
 function template_portal_above()
 {
-	global $context, $modSettings;
+	global $context, $modSettings, $scripturl, $txt;
 
 	// Allowing side collasping? if so show the buttons
 	if (empty($modSettings['sp_disable_side_collapse']) && ($context['SPortal']['sides'][1]['active'] || $context['SPortal']['sides'][4]['active']))
@@ -82,6 +82,10 @@ function template_portal_above()
 		if ($context['SPortal']['sides'][4]['active'])
 			echo '
 		<a id="sp_collapse_side4" class="dot ', $context['SPortal']['sides'][1]['collapsed'] ? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(4)"></a>';
+
+		if (!empty($context['SPortal']['blocks']['custom_arrange']))
+			echo '
+		<a id="sp_reset_blocks" class="dot dotdelete" title="', $txt['sp_reset blocks'], '" href="' . $scripturl . '?action=portal;sa=resetlayout;' . $context['session_var'] . '=' . $context['session_id'] . '"></a>';
 
 		echo '
 	</div>';
