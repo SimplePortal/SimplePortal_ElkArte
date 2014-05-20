@@ -132,7 +132,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 					),
 					'data' => array(
 						'db' => 'status_image',
-						'class' => "centertext",
+						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'status',
@@ -152,7 +152,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 								'id' => true,
 							),
 						),
-						'class' => "centertext",
+						'class' => 'centertext',
 						'style' => "width: 40px",
 					),
 				),

@@ -158,7 +158,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 								'id' => true,
 							),
 						),
-						'class' => "centertext",
+						'class' => 'centertext',
 						'style' => "width: 65px",
 					),
 				),
