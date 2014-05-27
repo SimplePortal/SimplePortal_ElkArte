@@ -156,7 +156,7 @@
 		</operation>
 	</file>
 
-	<file name="$themedir/scripts/script.js">
+	<file name="THEMEDIR/scripts/script.js">
 		<operation>
 			<search position="replace"><![CDATA['#c']]></search>
 			<add><![CDATA['?action=forum#c']]></add>
