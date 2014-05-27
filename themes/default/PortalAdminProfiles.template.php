@@ -15,12 +15,11 @@ function template_permission_profiles_edit()
 	global $context, $scripturl, $txt;
 
 	echo '
-	<div id="sp_edit_profile">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalprofiles;sa=editpermission" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
 			<h3 class="category_header">
 				', $context['page_title'], '
 			</h3>
-			<div class="windowbg2">
+			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">
 						<dt>
@@ -62,13 +61,12 @@ function template_permission_profiles_edit()
 							</table>
 						</dd>
 					</dl>
-					<div class="submitbutton">
+				</div>
+			</div>
+								<div class="submitbutton">
 						<input type="submit" name="submit" value="', $context['page_title'], '" class="button_submit" />
 						<input type="hidden" name="profile_id" value="', $context['profile']['id'], '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					</div>
-				</div>
-			</div>
-		</form>
-	</div>';
+		</form>';
 }
