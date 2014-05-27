@@ -120,6 +120,9 @@ th.sp_center {
 	text-align: center;
 	line-height: 1.4em;
 	padding: 5px;
+	min-width: 150px;
+	min-height: 200px;
+	border: 1px solid #ccc;
 }
 .sp_image a img {
 	max-width: 125px;
@@ -221,27 +224,27 @@ tsp_shop_divider {
 .sp_comment_detail span {
 	line-height: 25px;
 }
-
 #sp_main {
 	width: 100%;
-	border-spacing: 4px;
 	table-layout: fixed;
+}
+#sp_left_div {
+	padding-right: .5em;
+}
+#sp_right_div {
+	padding-left: .5em;
+}
+#sp_bottom_div {
+	margin-top: -1.5em;
 }
 #sp_header, #sp_footer {
 	vertical-align: top;
 	margin: 0 0.4em;
 }
-#sp_left {
-	vertical-align: top;
-}
-#sp_right {
-	vertical-align: top;
-}
-#sp_center {
+#sp_left, #sp_right, #sp_center {
 	vertical-align: top;
 }
 div.sp_block {
-	overflow: auto;
 	padding: 0 0.5em;
 }
 .sp_block_container {
@@ -261,7 +264,7 @@ table.sp_block {
 }
 .sp_block_section, .sp_block_section_last {
 	background: transparent;
-	margin: 2px 0 4px 0;
+	margin: 2px 0 .7em 0;
 	border: 1px solid #ccc;
 	border-radius: 0 0 5px 5px;
 	box-shadow: 5px 6px 3px -5px rgba(0,0,0,0.5);
@@ -415,6 +418,9 @@ input.shoutbox_input {
 #sp_edit_block ul.sp_display_list li {
 	float: left;
 	width: 50%;
+}
+#sp_edit_block select#boards {
+	height: auto;
 }
 
 #sp_manage_articles table.table_grid {
