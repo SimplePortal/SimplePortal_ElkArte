@@ -227,6 +227,7 @@ tsp_shop_divider {
 #sp_main {
 	width: 100%;
 	table-layout: fixed;
+	margin-bottom: 2em;
 }
 #sp_left_div {
 	padding-right: .5em;
