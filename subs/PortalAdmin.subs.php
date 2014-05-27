@@ -1223,7 +1223,7 @@ function sp_block_insert($blockInfo)
 /**
  * Updates an existing portal block with new values
  *
- * - Removes all parameters storred with the box in anticiaption of new
+ * - Removes all parameters stored with the box in anticiaption of new
  * ones being supplied
  *
  * @param mixed[] $blockInfo
@@ -1285,7 +1285,7 @@ function sp_block_insert_parameters($new_parameters, $id_block)
 
 	$db->insert('', '
 		{db_prefix}sp_parameters',
-		array('id_block' => 'int', 'variable' => 'string', 'value' => 'string',),
+		array('id_block' => 'int', 'variable' => 'string', 'value' => 'string'),
 		$parameters,
 		array()
 	);

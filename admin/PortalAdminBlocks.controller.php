@@ -567,12 +567,14 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'];
 		}
 
-		// Want to add a block to the portal
+		// Want to add / edit a block oo the portal
 		if (!empty($_POST['add_block']))
 		{
+			// Only the admin can do php here
 			if ($_POST['block_type'] == 'sp_php' && !allowedTo('admin_forum'))
 				fatal_lang_error('cannot_admin_forum', false);
 
+			// Make sure the block name is something safe
 			if (!isset($_POST['block_name']) || Util::htmltrim(Util::htmlspecialchars($_POST['block_name']), ENT_QUOTES) === '')
 				fatal_lang_error('error_sp_name_empty', false);
 
@@ -589,6 +591,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 					fatal_error($error[0], false);
 			}
 
+			// If we have a block ID passed, we must be editing, so the the blocks current data
 			if (!empty($_REQUEST['block_id']))
 				$current_data = current(getBlockInfo(null, $_REQUEST['block_id']));
 
@@ -625,12 +628,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			{
 				foreach ($type_parameters as $name => $type)
 				{
+					// Prepare BBC Content for ELK
 					if (isset($_POST['parameters'][$name]))
-					{
-						// Prepare BBC Content for ELK
-						if ($type === 'bbc')
-							$this->_prepare_parameters($type, $name);
-					}
+						$this->_prepare_parameters($type, $name);
 				}
 			}
 			else
@@ -728,6 +728,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 	/**
 	 * Preparse the post parameters for use
+	 *
+	 * - Cleans them as needed an places them back in $_POST
 	 *
 	 * @param string $type
 	 * @param string $name
