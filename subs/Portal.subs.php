@@ -213,7 +213,7 @@ function sportal_load_permissions()
  */
 function sportal_load_blocks()
 {
-	global $context, $modSettings, $options;
+	global $context, $modSettings, $options, $settings;
 
 	$context['SPortal']['sides'] = array(
 		5 => array(
@@ -254,24 +254,30 @@ function sportal_load_blocks()
 	// If the member has arranged the blocks, display them like that
 	if (!empty($options['sp_block_layout']))
 	{
-		$layout = unserialize($options['sp_block_layout']);
+		$layout = @unserialize($options['sp_block_layout']);
 
-		foreach ($layout as $id => $column)
+		// If some bad arrangement data found its way in
+		if ($layout === false)
+			resetMemberLayout();
+		else
 		{
-			if (empty($column) || empty($id) || !$context['SPortal']['sides'][$id]['active'])
-				continue;
-
-			foreach ($column as $item)
+			foreach ($layout as $id => $column)
 			{
-				if (empty($blocks[$item]))
+				if (empty($column) || empty($id) || !$context['SPortal']['sides'][$id]['active'])
 					continue;
 
-				$blocks[$item]['style'] = sportal_parse_style('explode', $blocks[$item]['style'], true);
-				$context['SPortal']['blocks'][$id][] = $blocks[$item];
-				unset($blocks[$item]);
-			}
+				foreach ($column as $item)
+				{
+					if (empty($blocks[$item]))
+						continue;
 
-			$context['SPortal']['blocks']['custom_arrange'] = true;
+					$blocks[$item]['style'] = sportal_parse_style('explode', $blocks[$item]['style'], true);
+					$context['SPortal']['blocks'][$id][] = $blocks[$item];
+					unset($blocks[$item]);
+				}
+
+				$context['SPortal']['blocks']['custom_arrange'] = true;
+			}
 		}
 	}
 
