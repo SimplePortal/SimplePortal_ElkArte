@@ -231,23 +231,31 @@ class ManagePortalProfile_Controller extends Action_Controller
 		return sp_load_profiles($start, $items_per_page, $sort);
 	}
 
+	/**
+	 * Add or edit a portal wide permissions profile
+	 */
 	public function action_sportal_admin_permission_profiles_edit()
 	{
 		global $context, $txt;
 
 		$db = database();
 
+		// New or an edit?
 		$context['is_new'] = empty($_REQUEST['profile_id']);
 
+		// Saving the form
 		if (!empty($_POST['submit']))
 		{
+			// Security first
 			checkSession();
 
+			// Always clean the name
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 				fatal_lang_error('sp_error_profile_name_empty', false);
 
 			$groups_allowed = $groups_denied = '';
 
+			// If specific member groups were picked, build the allow/deny arrays
 			if (!empty($_POST['membergroups']) && is_array($_POST['membergroups']))
 			{
 				$groups_allowed = $groups_denied = array();
@@ -264,12 +272,14 @@ class ManagePortalProfile_Controller extends Action_Controller
 				$groups_denied = implode(',', $groups_denied);
 			}
 
+			// Our database fields
 			$fields = array(
 				'type' => 'int',
 				'name' => 'string',
 				'value' => 'string',
 			);
 
+			// Add the data to place in the fields
 			$profile_info = array(
 				'id' => (int) $_POST['profile_id'],
 				'type' => 1,
@@ -277,6 +287,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 				'value' => implode('|', array($groups_allowed, $groups_denied)),
 			);
 
+			// New we simply insert
 			if ($context['is_new'])
 			{
 				unset($profile_info['id']);
@@ -289,6 +300,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 				);
 				$profile_info['id'] = $db->insert_id('{db_prefix}sp_profiles', 'id_profile');
 			}
+			// Or and edit, we do a little update
 			else
 			{
 				$update_fields = array();
@@ -306,6 +318,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			redirectexit('action=admin;area=portalprofiles');
 		}
 
+		// Not saving, then its time to show the permission form
 		if ($context['is_new'])
 		{
 			$context['profile'] = array(
@@ -322,7 +335,6 @@ class ManagePortalProfile_Controller extends Action_Controller
 		}
 
 		$context['profile']['groups'] = sp_load_membergroups();
-
 		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_profiles_add'] : $txt['sp_admin_profiles_edit'];
 		$context['sub_template'] = 'permission_profiles_edit';
 	}

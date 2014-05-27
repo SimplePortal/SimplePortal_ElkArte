@@ -1772,21 +1772,33 @@ function sportal_get_shoutbox_count($shoutbox_id)
 	return $total_shouts;
 }
 
+/**
+ * Adds a new shout to a given box
+ *
+ * - Prevents guest from adding a shout
+ * - Checks the shout total and archives if over the display limit for the box
+ * 
+ * @param int $shoutbox
+ * @param string $shout
+ */
 function sportal_create_shout($shoutbox, $shout)
 {
 	global $user_info;
 
 	$db = database();
 
+	// If a guest shouts in the woods, and no one is there to here them
 	if ($user_info['is_guest'])
 		return false;
 
+	// What, it not like we can shout to nothing
 	if (empty($shoutbox))
 		return false;
 
 	if (trim(strip_tags(parse_bbc($shout, false), '<img>')) === '')
 		return false;
 
+	// Add the shout
 	$db->insert('', '
 		{db_prefix}sp_shouts',
 		array('id_shoutbox' => 'int', 'id_member' => 'int', 'member_name' => 'string', 'log_time' => 'int', 'body' => 'string',),
@@ -1794,6 +1806,7 @@ function sportal_create_shout($shoutbox, $shout)
 		array('id_shout')
 	);
 
+	// To many shouts in the box, then its archive maintance time
 	$shoutbox['num_shouts']++;
 	if ($shoutbox['num_shouts'] > $shoutbox['num_max'])
 	{
@@ -1819,6 +1832,13 @@ function sportal_create_shout($shoutbox, $shout)
 		sportal_update_shoutbox($shoutbox['id'], true);
 }
 
+/**
+ * Removes a shout from the shoutbox by id
+ *
+ * @param int $shoutbox_id
+ * @param int[]|int $shouts
+ * @param boolean $prune
+ */
 function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
 {
 	$db = database();
@@ -1826,6 +1846,7 @@ function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
 	if (!is_array($shouts))
 		$shouts = array($shouts);
 
+	// Remove it
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_shouts
 		WHERE id_shout IN ({array_int:shouts})',
@@ -1834,6 +1855,7 @@ function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
 		)
 	);
 
+	// Update the view
 	sportal_update_shoutbox($shoutbox_id, $prune ? count($shouts) - 1 : count($shouts));
 }
 

@@ -15,6 +15,7 @@ if (!defined('ELK'))
 
 /**
  * Portal controller.
+ * 
  * This class handles requests that allow viewing the main portal or the portal credits
  */
 class Sportal_Controller extends Action_Controller
