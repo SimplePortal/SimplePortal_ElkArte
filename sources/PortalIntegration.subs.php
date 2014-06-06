@@ -364,19 +364,23 @@ function sp_integrate_quickhelp()
  */
 function sp_integrate_buffer($tourniquet)
 {
-	global $sportal_version, $context, $modSettings;
+	global $sportal_version, $context, $modSettings, $forum_version;
 
-	$fix = str_replace('{version}', $sportal_version, '<a href="http://www.simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-2014, SimplePortal</a>');
+	$fix = str_replace('{version}', $sportal_version, '<a href="http://www.simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-2014</a>');
 
 	if ((ELK == 'SSI' && empty($context['standalone'])) || !Template_Layers::getInstance()->hasLayers() || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
 		return $tourniquet;
 
+	// Don't display copyright for things like SSI.
+	if (!isset($forum_version))
+		return;
+
 	// Append our cp notice at the end of the line
 	$finds = array(
-		'ElkArte &copy; 2012 - 2014</a>',
+		sprintf('powered by %1$s</a> | ', $forum_version),
 	);
 	$replaces = array(
-		'ElkArte &copy; 2012 - 2014</a> | ' . $fix,
+		sprintf('powered by %1$s</a> | ', $forum_version) . $fix . ' | ',
 	);
 
 	$tourniquet = str_replace($finds, $replaces, $tourniquet);
