@@ -551,7 +551,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
  */
 function sp_topStatsMember($parameters, $id, $return_parameters = false)
 {
-	global $context, $txt, $scripturl, $user_info, $user_info, $modSettings, $color_profile;
+	global $context, $txt, $scripturl, $user_info, $modSettings, $color_profile;
 	static $sp_topStatsSystem;
 
 	$db = database();
@@ -969,7 +969,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
  */
 function sp_topTopics($parameters, $id, $return_parameters = false)
 {
-	global $txt, $user_info, $user_info, $topics;
+	global $txt, $user_info, $topics;
 
 	$block_parameters = array(
 		'type' => 'select',
@@ -1019,7 +1019,7 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
  */
 function sp_topBoards($parameters, $id, $return_parameters = false)
 {
-	global $txt, $user_info, $user_info, $boards;
+	global $txt, $user_info, $boards;
 
 	$block_parameters = array(
 		'limit' => 'int',
@@ -2712,7 +2712,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
  */
 function sp_gallery($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $txt, $scripturl;
+	global $scripturl, $txt;
 	static $mod;
 
 	$block_parameters = array(
