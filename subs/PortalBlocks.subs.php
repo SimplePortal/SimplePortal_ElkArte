@@ -173,12 +173,14 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $block_parameters;
 
-	require_once(SUBSDIR . '/Members.subs');
+	// Load in the latest members
+	require_once(SUBSDIR . '/Members.subs.php');
 	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
+	$rows = recentMembers($limit);
 
+	// Get them ready for color ids and the template
 	$members = array();
 	$colorids = array();
-	$rows = recentMembers($limit);
 	foreach ($rows as $row)
 	{
 		if (!empty($row['id_member']))
@@ -233,7 +235,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
  */
 function sp_whosOnline($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $modSettings, $txt;
+	global $scripturl, $modSettings, $txt, $context;
 
 	$block_parameters = array(
 		'online_today' => 'check'
@@ -242,6 +244,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $block_parameters;
 
+	// Interface with the online today addon?
 	$online_today = !empty($parameters['online_today']);
 
 	$stats = ssi_whosOnline('array');
@@ -250,6 +253,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 								<ul class="sp_list">
 									<li ', sp_embed_class('dot'), '> ', $txt['guests'], ': ', $stats['num_guests'], '</li>';
 
+	// Spiders
 	if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] < 3 || allowedTo('admin_forum')))
 		echo '
 									<li ', sp_embed_class('dot'), '> ', $txt['spiders'], ': ', $stats['num_spiders'], '</li>';
@@ -258,6 +262,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 									<li ', sp_embed_class('dot'), '> ', $txt['hidden'], ': ', $stats['num_users_hidden'], '</li>
 									<li ', sp_embed_class('dot'), '> ', $txt['users'], ': ', $stats['num_users_online'], '</li>';
 
+	// Show the users online, if any
 	if (!empty($stats['users_online']))
 	{
 		echo '
@@ -282,32 +287,26 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 								<div class="sp_fullwidth sp_center">', $txt['error_sp_no_online'], '</div>';
 	}
 
-	if ($online_today && file_exists(SUBSDIR . '/MembersOnlineToday.subs.php'))
+	// Does the online today addon exist
+	if ($online_today && !empty($modSettings['onlinetoday']) && file_exists(SUBSDIR . '/OnlineToday.class.php'))
 	{
-		require_once(SUBSDIR . '/MembersOnlineToday.subs.php');
+		require_once(SUBSDIR . '/OnlineToday.class.php');
+		$context['info_center_callbacks'] = array();
+		OnlineToday::get();
 
-		$membersOnlineTodayOptions = array(
-			'sort' => 'login_time',
-			'reverse_sort' => true,
-			'period' => 'current_day',
-			'canview' => 'registered',
-		);
-
-		$stats += getMembersOnlineTodayStats($membersOnlineTodayOptions);
-
-		if (empty($stats['num_users_online_today']))
+		if (empty($context['num_onlinetoday']))
 			return;
 
 		echo '
 								<ul class="sp_list">
-									<li ', sp_embed_class('dot'), '> ', $txt['sp-online_today'], ': ', $stats['num_users_online_today'], '</li>
+									<li ', sp_embed_class('dot'), '> ', $txt['sp-online_today'], ': ', $context['num_onlinetoday'], '</li>
 								</ul>
 								<div class="sp_online_flow">
 									<ul class="sp_list">';
 
-		foreach ($stats['users_online_today'] as $user)
+		foreach ($context['onlinetoday'] as $user)
 			echo '
-										<li ', sp_embed_class($user['name'] == 'H' ? 'tux' : 'user', '', 'sp_list_indent'), '>', $user['hidden'] ? '<em>' . $user['link'] . '</em>' : $user['link'], '</li>';
+										<li ', sp_embed_class('user', '', 'sp_list_indent'), '>', $user, '</li>';
 
 		echo '
 									</ul>
