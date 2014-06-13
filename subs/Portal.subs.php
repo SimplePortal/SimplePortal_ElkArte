@@ -213,7 +213,7 @@ function sportal_load_permissions()
  */
 function sportal_load_blocks()
 {
-	global $context, $modSettings, $options;
+	global $context, $modSettings, $options, $settings;
 
 	$context['SPortal']['sides'] = array(
 		5 => array(
@@ -1263,7 +1263,7 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
  */
 function sportal_get_comments($article_id = null)
 {
-	global $scripturl, $user_info, $modSettings;
+	global $scripturl, $user_info;
 
 	$db = database();
 

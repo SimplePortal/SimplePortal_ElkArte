@@ -32,6 +32,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 	echo '
 								<div class="sp_center sp_fullwidth">';
 
+	// Show the guests a login area
 	if ($context['user']['is_guest'])
 	{
 		echo '
@@ -128,15 +129,25 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 		if (allowedTo('pm_read'))
 		{
 			echo '
-										<li ', sp_embed_class('dot'), '><strong>', $txt['sp-usertmessage'], ':</strong> <a href="', $scripturl, '?action=pm">', $context['user']['messages'], '</a></li>
-										<li ', sp_embed_class('dot'), '><strong>', $txt['sp-usernmessage'], ':</strong> ', $context['user']['unread_messages'], '</li>';
+										<li ', sp_embed_class('dot'), '>
+											<strong>', $txt['sp-usertmessage'], ':</strong> <a href="', $scripturl, '?action=pm">', $context['user']['messages'], '</a>
+										</li>
+										<li ', sp_embed_class('dot'), '>
+											<strong>', $txt['sp-usernmessage'], ':</strong> ', $context['user']['unread_messages'], '
+										</li>';
 		}
 
 		echo '
-										<li ', sp_embed_class('dot'), '><a href="', $scripturl, '?action=unread">', $txt['unread_topics_visit'], '</a></li>
-										<li ', sp_embed_class('dot'), '><a href="', $scripturl, '?action=unreadreplies">', $txt['unread_replies'], '</a></li>
+										<li ', sp_embed_class('dot'), '>
+											<a href="', $scripturl, '?action=unread">', $txt['unread_topics_visit'], '</a>
+										</li>
+										<li ', sp_embed_class('dot'), '>
+											<a href="', $scripturl, '?action=unreadreplies">', $txt['unread_replies'], '</a>
+										</li>
 									</ul>
-									<br /><a class="dot arrow" href="', $scripturl, '?action=profile">', $txt['profile'], '</a><a class="dot arrow" href="', $scripturl, '?action=logout;sesc=', $context['session_id'], '">', $txt['logout'], '</a>';
+									<br />
+									<a class="dot arrow" href="', $scripturl, '?action=profile">', $txt['profile'], '</a>
+									<a class="dot arrow" href="', $scripturl, '?action=logout;sesc=', $context['session_id'], '">', $txt['logout'], '</a>';
 	}
 
 	echo '
@@ -155,8 +166,6 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 {
 	global $scripturl, $txt, $color_profile;
 
-	$db = database();
-
 	$block_parameters = array(
 		'limit' => 'int',
 	);
@@ -164,22 +173,13 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $block_parameters;
 
+	require_once(SUBSDIR . '/Members.subs');
 	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
 
-	$request = $db->query('', '
-		SELECT id_member, real_name, date_registered
-		FROM {db_prefix}members
-		WHERE is_activated = {int:is_activated}
-		ORDER BY id_member DESC
-		LIMIT {int:limit}',
-		array(
-			'is_activated' => 1,
-			'limit' => $limit,
-		)
-	);
 	$members = array();
 	$colorids = array();
-	while ($row = $db->fetch_assoc($request))
+	$rows = recentMembers($limit);
+	foreach ($rows as $row)
 	{
 		if (!empty($row['id_member']))
 			$colorids[$row['id_member']] = $row['id_member'];
@@ -192,8 +192,8 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 			'date' => standardTime($row['date_registered'], '%d %b'),
 		);
 	}
-	$db->free_result($request);
 
+	// No recent members, supose it could happen
 	if (empty($members))
 	{
 		echo '
@@ -202,6 +202,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 		return;
 	}
 
+	// Using member profile colors
 	if (!empty($colorids) && sp_loadColors($colorids) !== false)
 	{
 		foreach ($members as $k => $p)
@@ -551,7 +552,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
  */
 function sp_topStatsMember($parameters, $id, $return_parameters = false)
 {
-	global $context, $txt, $scripturl, $user_info, $modSettings, $color_profile;
+	global $context, $txt, $scripturl, $user_info, $user_info, $modSettings, $color_profile;
 	static $sp_topStatsSystem;
 
 	$db = database();
@@ -969,7 +970,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
  */
 function sp_topTopics($parameters, $id, $return_parameters = false)
 {
-	global $txt, $user_info, $topics;
+	global $txt, $user_info, $user_info, $topics;
 
 	$block_parameters = array(
 		'type' => 'select',
@@ -1019,7 +1020,7 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
  */
 function sp_topBoards($parameters, $id, $return_parameters = false)
 {
-	global $txt, $user_info, $boards;
+	global $txt, $user_info, $user_info, $boards;
 
 	$block_parameters = array(
 		'limit' => 'int',
@@ -1255,6 +1256,8 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		$limit = count($posts);
 		$start = !empty($_REQUEST['news' . $id]) ? (int) $_REQUEST['news' . $id] : 0;
 
+		// $clean_url = preg_replace('~news' . $id . '=[^;]+~', '', $_SERVER['REQUEST_URL']);
+		// http://simpleportal.net/index.php?topic=11022.msg66021#msg66021
 		$clean_url = preg_replace('~news' . $id . '=\d+;?~', '', $_SERVER['REQUEST_URL']);
 		$current_url = $clean_url . (strpos($clean_url, '?') !== false ? (in_array(substr($clean_url, -1), array(';', '?')) ? '' : ';') : '?');
 	}
@@ -2712,7 +2715,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
  */
 function sp_gallery($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $txt;
+	global $scripturl, $txt, $scripturl;
 	static $mod;
 
 	$block_parameters = array(
