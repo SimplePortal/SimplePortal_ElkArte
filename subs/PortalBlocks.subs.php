@@ -326,8 +326,6 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 {
 	global $scripturl, $modSettings, $txt;
 
-	$db = database();
-
 	$block_parameters = array(
 		'averages' => 'check',
 	);
@@ -339,28 +337,24 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 
 	loadLanguage('Stats');
 
+	// Basic totals are easy
 	$totals = ssi_boardStats('array');
 
 	// Get the averages from the activity log, its the most recent snapshot
 	if ($averages)
 	{
-		$result = $db->query('', '
-			SELECT
-				SUM(posts) AS posts, SUM(topics) AS topics, SUM(registers) AS registers,
-				SUM(most_on) AS most_on, MIN(date) AS date, SUM(hits) AS hits
-			FROM {db_prefix}log_activity',
-			array(
-			)
+		require_once(SUBSDIR . '/Stats.subs.php');
+		$averages = getAverages();
+
+		// The number of days the forum has been up...
+		$total_days_up = ceil((time() - strtotime($averages['date'])) / (60 * 60 * 24));
+
+		$totals += array(
+			'average_members' => comma_format(round($averages['registers'] / $total_days_up, 2)),
+			'average_posts' => comma_format(round($averages['posts'] / $total_days_up, 2)),
+			'average_topics' => comma_format(round($averages['topics'] / $total_days_up, 2)),
+			'average_online' => comma_format(round($averages['most_on'] / $total_days_up, 2)),
 		);
-		$row = $db->fetch_assoc($result);
-		$db->free_result($result);
-
-		$total_days_up = ceil((time() - strtotime($row['date'])) / (60 * 60 * 24));
-
-		$totals['average_posts'] = comma_format(round($row['posts'] / $total_days_up, 2));
-		$totals['average_topics'] = comma_format(round($row['topics'] / $total_days_up, 2));
-		$totals['average_members'] = comma_format(round($row['registers'] / $total_days_up, 2));
-		$totals['average_online'] = comma_format(round($row['most_on'] / $total_days_up, 2));
 	}
 
 	echo '
@@ -373,6 +367,7 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 									<li ', sp_embed_class('portalstats'), '>', $txt['most_online'], ': ', comma_format($modSettings['mostOnline']), '</li>
 								</ul>';
 
+	// And the averages if required
 	if ($averages)
 	{
 		echo '
