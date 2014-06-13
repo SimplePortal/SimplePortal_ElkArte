@@ -107,7 +107,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(ADMINDIR . '/ManagePermissions.controller.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Initialize the form
 		$this->_initGeneralSettingsForm();
@@ -167,7 +167,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(ADMINDIR . '/ManagePermissions.controller.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Initialize the form
 		$this->_initBlockSettingsForm();
@@ -260,7 +260,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(ADMINDIR . '/ManagePermissions.controller.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		// Initialize the form
 		$this->_initArticleSettingsForm();
