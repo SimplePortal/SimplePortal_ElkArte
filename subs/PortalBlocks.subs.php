@@ -430,7 +430,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 
 		$request = $db->query('', '
 			SELECT
-				mem.id_member, mem.real_name, COUNT(*) as posts,
+				mem.id_member, mem.real_name, COUNT(*) as posts, mem.email_address,
 				mem.avatar, a.id_attach, a.attachment_type, a.filename
 			FROM {db_prefix}messages AS m
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
@@ -446,11 +446,12 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 			)
 		);
 	}
+	// Or from the start of time
 	else
 	{
 		$request = $db->query('', '
 			SELECT
-				m.id_member, m.real_name, m.posts, m.avatar,
+				m.id_member, m.real_name, m.posts, m.avatar, m.email_address,
 				a.id_attach, a.attachment_type, a.filename
 			FROM {db_prefix}members AS m
 				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
@@ -463,6 +464,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 	}
 	$members = array();
 	$colorids = array();
+	// Load the member data
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row['id_member']))
@@ -485,16 +487,18 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 			'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 			'posts' => comma_format($row['posts']),
-			'avatar' => array(
-				'name' => $row['avatar'],
-				'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" class="avatar" border="0" />' : '') : (stristr($row['avatar'], 'http://') ? '<img src="' . $row['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" class="avatar" border="0" />' : '<img src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar']) . '" alt="" class="avatar" border="0" />'),
-				'href' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : '') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
-				'url' => $row['avatar'] == '' ? '' : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar'])
-			),
+			'avatar' => determineAvatar(array(
+				'avatar' => $row['avatar'],
+				'filename' => $row['filename'],
+				'id_attach' => $row['id_attach'],
+				'email_address' => $row['email_address'],
+				'attachment_type' => $row['attachment_type'],
+			)),
 		);
 	}
 	$db->free_result($request);
 
+	// No results, say so
 	if (empty($members))
 	{
 		echo '
@@ -502,6 +506,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 		return;
 	}
 
+	// Profile colors?
 	if (!empty($colorids) && sp_loadColors($colorids) !== false)
 	{
 		foreach ($members as $k => $p)
@@ -511,6 +516,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 		}
 	}
 
+	// And output the block
 	echo '
 								<table class="sp_fullwidth">';
 
@@ -574,7 +580,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	if (empty($sp_topStatsSystem))
 	{
 		/*
-		 * The system setup array, order depend on the $txt array of the select name
+		 * The system setup array, the order depends on the $txt array of the select name
 		 *
 		 * 'mod_id' - Only used as information
 		 * 'field' - The members field that should be loaded.  Please don't forget to add mem. before the field names
@@ -594,6 +600,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 				'order' => 'mem.total_time_logged_in',
 				'output_function' => create_function('&$row', '
 					global $txt;
+
 					// Figure out the days, hours and minutes.
 					$timeDays = floor($row["total_time_logged_in"] / 86400);
 					$timeHours = floor(($row["total_time_logged_in"] % 86400) / 3600);
@@ -602,8 +609,10 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 					$timelogged = "";
 					if ($timeDays > 0)
 						$timelogged .= $timeDays . $txt["totalTimeLogged5"];
+
 					if ($timeHours > 0)
 						$timelogged .= $timeHours . $txt["totalTimeLogged6"];
+
 					$timelogged .= floor(($row["total_time_logged_in"] % 3600) / 60) . $txt["totalTimeLogged7"];
 					$row["timelogged"] = $timelogged;
 				'),
@@ -673,23 +682,15 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	// Standard Variables
 	$type = !empty($parameters['type']) ? $parameters['type'] : 0;
 	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
-	$limit = empty($limit) ? 5 : $limit;
 	$sort_asc = !empty($parameters['sort_asc']);
 
-	// Time is in days :D, but i need seconds :P
+	// Time is in days, but we need seconds
 	$last_active_limit = !empty($parameters['last_active_limit']) ? $parameters['last_active_limit'] * 86400 : 0;
 	$enable_label = !empty($parameters['enable_label']);
 	$list_label = !empty($parameters['list_label']) ? $parameters['list_label'] : '';
 
-	// Setup current Block Type
-	$current_system = !empty($sp_topStatsSystem[$type]) ? $sp_topStatsSystem[$type] : array();
-
-	// What how could this happen?
-	if (empty($current_system))
-	{
-		echo $txt['sp_topstats_unknown_type'];
-		return;
-	}
+	// Setup current block type
+	$current_system = $sp_topStatsSystem[$type];
 
 	// Possible to output?
 	if (empty($current_system['enabled']))
@@ -698,24 +699,18 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		return;
 	}
 
-	// This are the important fields, without the array have an mistake and it will not work :X
-	if (empty($current_system['field']) || empty($current_system['order']))
-	{
-		echo $context['user']['is_admin'] ? $txt['sp_topstats_type_error'] : $txt['sp_topstats_unknown_type'];
-		return;
-	}
-
-	// Switch the reverse? (It's a reverse to reverse the already reverse, fun beside :P)
+	// Sort in reverse?
 	$sort_asc = !empty($current_system['reverse']) ? !$sort_asc : $sort_asc;
 
-	// Create the where statement :)
+	// Build the where statement
 	$where = array();
 
-	// Some cached data available?
+	// If this is already cached, use it
 	$chache_id = 'sp_chache_' . $id . '_topStatsMember';
 	if (empty($modSettings['sp_disableChache']) && !empty($modSettings[$chache_id]))
 	{
 		$data = explode(';', $modSettings[$chache_id]);
+
 		if ($data[0] == $type && $data[1] == $limit && !empty($data[2]) == $sort_asc && $data[3] > time() - 300) // 5 Minute cache
 			$where[] = 'mem.id_member IN (' . $data[4] . ')';
 		else
@@ -728,6 +723,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		$timeLimit = time() - $last_active_limit;
 		$where[] = "lastLogin > $timeLimit";
 	}
+
 	if (!empty($current_system['where']))
 		$where[] = $current_system['where'];
 
@@ -737,7 +733,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	else
 		$where = "";
 
-	// Going to need these
+	// Member avatars
 	if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
 	{
 		$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
@@ -749,10 +745,10 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		$avatar_height = '';
 	}
 
-	// Okay load the data
+	// Finaly make the query with the parameters we built
 	$request = $db->query('', '
 		SELECT
-			mem.id_member, mem.real_name, mem.avatar,
+			mem.id_member, mem.real_name, mem.avatar, mem.email_address,
 			a.id_attach, a.attachment_type, a.filename,
 			{raw:field}
 		FROM {db_prefix}members as mem
@@ -761,28 +757,28 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		ORDER BY {raw:order} {raw:sort}
 		LIMIT {int:limit}',
 		array(
-			'limit' => $context['common_stats']['total_members'] > 100 ? ($limit + 5) : $limit, // Prevent delete of user if the cache is available :D
+			// Prevent delete of user if the cache was available
+			'limit' => $context['common_stats']['total_members'] > 100 ? ($limit + 5) : $limit,
 			'field' => $current_system['field'],
 			'where' => $where,
 			'order' => $current_system['order'],
 			'sort' => ($sort_asc ? 'ASC' : 'DESC'),
 		)
 	);
-
 	$members = array();
 	$colorids = array();
 	$count = 1;
 	$chache_member_ids = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		// Collect some to cache data =)
+		// Collect some to cache data
 		$chache_member_ids[$row['id_member']] = $row['id_member'];
 		if ($count++ > $limit)
 			continue;
 
 		$colorids[$row['id_member']] = $row['id_member'];
 
-		// Setup the row :P
+		// Setup the row
 		$output = '';
 
 		// Prepare some data of the row?
@@ -801,18 +797,20 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 			'name' => $row['real_name'],
 			'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-			'avatar' => array(
-				'name' => $row['avatar'],
-				'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" class="avatar" border="0" />' : '') : (stristr($row['avatar'], 'http://') ? '<img src="' . $row['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" class="avatar" border="0" />' : '<img src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar']) . '" alt="" class="avatar" border="0" />'),
-				'href' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : '') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
-				'url' => $row['avatar'] == '' ? '' : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar'])
-			),
+			'avatar' => determineAvatar(array(
+				'avatar' => $row['avatar'],
+				'filename' => $row['filename'],
+				'id_attach' => $row['id_attach'],
+				'email_address' => $row['email_address'],
+				'attachment_type' => $row['attachment_type'],
+			)),
 			'output' => $output,
 			'complete_row' => $row,
 		);
 	}
 	$db->free_result($request);
 
+	// No one found, let them know
 	if (empty($members))
 	{
 		echo '
@@ -826,7 +824,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		$toCache = array($type, $limit, ($sort_asc ? 1 : 0), time(), implode(',', $chache_member_ids));
 		updateSettings(array($chache_id => implode(';', $toCache)));
 	}
-	// One time error, if this happen the cache need an update (Next reload is mystical fixed)
+	// One time error, if this happens the cache needs an update
 	elseif (!empty($modSettings[$chache_id]))
 		updateSettings(array($chache_id => '0;0;0;1000;0'));
 
@@ -839,13 +837,16 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		}
 	}
 
+	// Finally, output the block
 	echo '
 								<table class="sp_fullwidth">';
 
 	if ($enable_label)
 		echo '
 									<tr>
-										<td class="sp_top_poster sp_center" colspan="2"><strong>', $list_label, '</strong></td>
+										<td class="sp_top_poster sp_center" colspan="2">
+											<strong>', $list_label, '</strong>
+										</td>
 									</tr>';
 
 	foreach ($members as $member)
@@ -853,7 +854,9 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 		echo '
 									<tr>
 										<td class="sp_top_poster sp_center">', !empty($member['avatar']['href']) ? '
-											<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '"><img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" width="40" /></a>' : '', '
+											<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '">
+												<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" width="40" />
+											</a>' : '', '
 										</td>
 										<td>
 											', $member['link'], '<br />', $member['output'], '
@@ -1258,7 +1261,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 
 	$request = $db->query('', '
 		SELECT
-			m.icon, m.subject, m.body, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
+			m.icon, m.subject, m.body, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.email_address,
 			t.num_replies, t.id_topic, m.id_member, m.smileys_enabled, m.id_msg, t.locked, mem.avatar,
 			a.id_attach, a.attachment_type, a.filename, t.num_views
 		FROM {db_prefix}topics AS t
@@ -1333,12 +1336,13 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 			),
 			'locked' => !empty($row['locked']),
 			'is_last' => false,
-			'avatar' => array(
-				'name' => $row['avatar'],
-				'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" class="avatar" border="0" />' : '') : (stristr($row['avatar'], 'http://') ? '<img src="' . $row['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" class="avatar" border="0" />' : '<img src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar']) . '" alt="" class="avatar" border="0" />'),
-				'href' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : '') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
-				'url' => $row['avatar'] == '' ? '' : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar'])
-			),
+			'avatar' => determineAvatar(array(
+				'avatar' => $row['avatar'],
+				'filename' => $row['filename'],
+				'id_attach' => $row['id_attach'],
+				'email_address' => $row['email_address'],
+				'attachment_type' => $row['attachment_type'],
+			)),
 		);
 	}
 	$db->free_result($request);
@@ -2250,7 +2254,8 @@ function sp_staff($parameters, $id, $return_parameters = false)
 
 	$request = $db->query('', '
 		SELECT
-				m.id_member, m.real_name, m.avatar, mg.group_name,
+				m.id_member, m.real_name, m.avatar, m.email_address,
+				mg.group_name,
 				a.id_attach, a.attachment_type, a.filename
 		FROM {db_prefix}members AS m
 				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
@@ -2291,12 +2296,13 @@ function sp_staff($parameters, $id, $return_parameters = false)
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 			'group' => $row['group_name'],
 			'type' => $row['type'],
-			'avatar' => array(
-				'name' => $row['avatar'],
-				'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" class="avatar" border="0" />' : '') : (stristr($row['avatar'], 'http://') ? '<img src="' . $row['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" class="avatar" border="0" />' : '<img src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar']) . '" alt="" class="avatar" border="0" />'),
-				'href' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : '') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
-				'url' => $row['avatar'] == '' ? '' : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar'])
-			),
+			'avatar' => determineAvatar(array(
+				'avatar' => $row['avatar'],
+				'filename' => $row['filename'],
+				'id_attach' => $row['id_attach'],
+				'email_address' => $row['email_address'],
+				'attachment_type' => $row['attachment_type'],
+			)),
 		);
 	}
 	$db->free_result($request);
@@ -2394,8 +2400,8 @@ function sp_articles($parameters, $id, $return_parameters = false)
 	$request = $db->query('', '
 		SELECT
 			spc.name, spc.namespace AS category_namespace,
-			mem.avatar, at.id_attach, at.attachment_type, at.filename,
-			IFNULL(spa.id_member, 0) AS id_author, IFNULL(mem.real_name, spa.member_name) AS author_name,
+			mem.avatar, mem.email_address, IFNULL(spa.id_member, 0) AS id_author, IFNULL(mem.real_name, spa.member_name) AS author_name,
+			at.id_attach, at.attachment_type, at.filename,
 			spa.body, spa.title, spa.member_name, spa.namespace AS article_namespace, spa.id_member,
 			spa.type, spa.date, spa.status, spa.id_article, spa.id_category
 		FROM {db_prefix}sp_articles AS spa
@@ -2441,12 +2447,13 @@ function sp_articles($parameters, $id, $return_parameters = false)
 				'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
 				'link' => $row['id_author'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>') : $row['author_name'],
 			),
-			'avatar' => array(
-				'name' => $row['avatar'],
-				'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" class="avatar" border="0" />' : '') : (stristr($row['avatar'], 'http://') ? '<img src="' . $row['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" class="avatar" border="0" />' : '<img src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar']) . '" alt="" class="avatar" border="0" />'),
-				'href' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : '') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
-				'url' => $row['avatar'] == '' ? '' : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar'])
-			),
+			'avatar' => determineAvatar(array(
+				'avatar' => $row['avatar'],
+				'filename' => $row['filename'],
+				'id_attach' => $row['id_attach'],
+				'email_address' => $row['email_address'],
+				'attachment_type' => $row['attachment_type'],
+			)),
 		);
 	}
 	$db->free_result($request);
