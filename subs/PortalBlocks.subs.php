@@ -1026,8 +1026,8 @@ function sp_topBoards($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $block_parameters;
 
+	// Use ssi to get the top boards
 	$limit = !empty($parameters['limit']) ? $parameters['limit'] : 5;
-
 	$boards = ssi_topBoards($limit, 'array');
 
 	if (empty($boards))
@@ -1047,8 +1047,12 @@ function sp_topBoards($parameters, $id, $return_parameters = false)
 
 	foreach ($boards as $board)
 		echo '
-									<li ', sp_embed_class('board', '', 'sp_list_top'), '>', $board['link'], '</li>
-									<li class="sp_list_indent', empty($board['is_last']) ? ' sp_list_bottom' : '', ' smalltext">', $txt['topics'], ': ', $board['num_topics'], ' | ', $txt['posts'], ': ', $board['num_posts'], '</li>';
+									<li ', sp_embed_class('board', '', 'sp_list_top'), '>',
+										$board['link'], '
+									</li>
+									<li class="sp_list_indent', empty($board['is_last']) ? ' sp_list_bottom' : '', ' smalltext">',
+										$txt['topics'], ': ', $board['num_topics'], ' | ', $txt['posts'], ': ', $board['num_posts'], '
+									</li>';
 
 	echo '
 								</ul>';
@@ -1082,6 +1086,7 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 	$type = !empty($parameters['type']) ? (int) $parameters['type'] : 0;
 	$boardsAllowed = boardsAllowedTo('poll_view');
 
+	// Can't view polls on any board, let them know
 	if (empty($boardsAllowed))
 	{
 		loadLanguage('Errors');
@@ -1127,6 +1132,7 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 
 	$poll = ssi_showPoll($topic, 'array');
 
+	// Let them vote?
 	if ($poll['allow_vote'])
 	{
 		echo '
@@ -1147,6 +1153,7 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 									<input type="hidden" name="poll" value="', $poll['id'], '" />
 								</form>';
 	}
+	// Or just view the results
 	elseif ($poll['allow_view_results'])
 	{
 		echo '
@@ -1163,6 +1170,7 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 									<li class="sp_center"><a href="', $scripturl, '?topic=', $poll['topic'], '.0">', $txt['sp-pollViewTopic'], '</a></li>
 								</ul>';
 	}
+	// Nothing is always an option
 	else
 		echo '
 								', $txt['poll_cannot_see'];
@@ -1466,7 +1474,7 @@ function sp_news($parameters, $id, $return_parameters = false)
  */
 function sp_attachmentImage($parameters, $id, $return_parameters = false)
 {
-	global $txt, $color_profile;
+	global $txt, $color_profile, $scripturl;
 
 	$block_parameters = array(
 		'limit' => 'int',
@@ -1488,6 +1496,8 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
 
 	// Let ssi get the attachments
 	$items = ssi_recentAttachments($limit, $type, 'array');
+
+	// No attachments, at least none that they can see
 	if (empty($items))
 	{
 		echo '
@@ -1514,18 +1524,21 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
 									<tr>' : '';
 
 	// For each image that was returned from ssi
-	foreach ($items as $item)
+	foreach ($items as $id => $item)
 	{
 		echo !$direction ? '
 									<tr>' : '';
 
 		echo '
 										<td>
-											<div class="sp_image smalltext">', ($showLink ? '
-												<a href="' . $item['file']['href'] . '">' . str_replace(array('_', '-'), ' ', $item['file']['filename']) . '</a><br />' : ''), '
-												', $item['file']['image']['link'], '<br />', ($showDownloads ? '
-												' . $txt['downloads'] . ': ' . $item['file']['downloads'] . '<br />' : ''), ($showPoster ? '
-												' . $txt['posted_by'] . ': ' . $item['member']['link'] : ''), '
+											<div class="sp_image smalltext">',
+												($showLink ? '<a href="' . $item['file']['href'] . '">' . str_replace(array('_', '-'), ' ', $item['file']['filename']) . '</a><br />' : '') . '
+												<a id="link_' . $id . '" href="' . $scripturl . '?action=dlattach;topic=' . $item['topic']['id'] . '.0;attach=' . $id . ';image">
+												<img id="thumb_' . $id . '" src="' . $scripturl . '?action=dlattach;topic=' . $item['topic']['id'] . '.0;attach=' . $item['file']['image']['id'] . ';image" alt="' . $item['file']['filename'] . '" /></a>
+												<br />',
+												($showLink ? '<div class="sp_image_topic">' . $item['topic']['link'] . '</div>' : '') .
+												($showDownloads ? $txt['downloads'] . ': ' . $item['file']['downloads'] . '<br />' : ''),
+												($showPoster ? $txt['posted_by'] . ': ' . $item['member']['link'] : ''), '
 											</div>
 										</td>';
 
