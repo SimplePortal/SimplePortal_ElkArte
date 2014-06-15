@@ -292,3 +292,29 @@ function sp_update_editor(select)
 		instance.destroy();
 	}
 }
+
+/**
+ * Used by the theme selection block to swap the preview image
+ * @param {type} obj
+ */
+function sp_theme_select(obj)
+{
+	var id = obj.options[obj.selectedIndex].value;
+	document.getElementById("sp_ts_thumb").src = sp_ts_thumbs[id];
+}
+
+/**
+ * Used to swap the day on the calendar to update the days events
+ * @param {type} id
+ */
+function sp_collapseCalendar(id)
+{
+	new_day = "sp_calendar_" + id;
+
+	if (new_day === current_day)
+		return false;
+
+	document.getElementById(current_day).style.display = "none";
+	document.getElementById(new_day).style.display = "";
+	current_day = new_day;
+}
