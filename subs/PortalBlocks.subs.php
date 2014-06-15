@@ -1743,17 +1743,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 	echo '
 								<div class="sp_center smalltext" id="sp_calendar_0" style="display: none;">', $txt['error_sp_no_items_day'], '</div>';
 
-	addInlineJavascript('
-		var current_day = "sp_calendar_' . $curPage['day'] . '";
-		function sp_collapseCalendar(id)
-		{
-			new_day = "sp_calendar_" + id;
-			if (new_day == current_day)
-				return false;
-			document.getElementById(current_day).style.display = "none";
-			document.getElementById(new_day).style.display = "";
-			current_day = new_day;
-		}', true);
+	addInlineJavascript('var current_day = "sp_calendar_' . $curPage['day'] . '";', true);
 }
 
 /**
@@ -2210,14 +2200,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 		$javascript .= '
 		sp_ts_thumbs[' . $id . '] = "' . $theme_data['thumbnail_href'] . '";';
 
-	$javascript .= '
-		function sp_theme_select(obj)
-		{
-			var id = obj.options[obj.selectedIndex].value;
-			document.getElementById("sp_ts_thumb").src = sp_ts_thumbs[id];
-		}';
-
-	addInlineJavascript($javascript, array('defer' => true));
+	addInlineJavascript($javascript, true);
 }
 
 /**
@@ -2243,11 +2226,12 @@ function sp_staff($parameters, $id, $return_parameters = false)
 
 	require_once(SUBSDIR . '/Members.subs.php');
 
+	// Including local board moderators
 	if (empty($parameters['lmod']))
 	{
 		$request = $db->query('', '
 			SELECT id_member
-			FROM {db_prefix}moderators AS mods',
+			FROM {db_prefix}moderators',
 			array(
 			)
 		);
@@ -2270,12 +2254,12 @@ function sp_staff($parameters, $id, $return_parameters = false)
 
 	$request = $db->query('', '
 		SELECT
-				m.id_member, m.real_name, m.avatar, m.email_address,
-				mg.group_name,
-				a.id_attach, a.attachment_type, a.filename
+			m.id_member, m.real_name, m.avatar, m.email_address,
+			mg.group_name,
+			a.id_attach, a.attachment_type, a.filename
 		FROM {db_prefix}members AS m
-				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
-				LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN m.id_group = {int:reg_group_id} THEN m.id_post_group ELSE m.id_group END)
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
+			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN m.id_group = {int:reg_group_id} THEN m.id_post_group ELSE m.id_group END)
 		WHERE m.id_member IN ({array_int:staff_list})',
 		array(
 			'staff_list' => $all_staff,
@@ -2369,9 +2353,7 @@ function sp_staff($parameters, $id, $return_parameters = false)
  */
 function sp_articles($parameters, $id, $return_parameters = false)
 {
-	global $modSettings, $scripturl, $txt, $color_profile, $context;
-
-	$db = database();
+	global $modSettings, $scripturl, $txt, $color_profile;
 
 	$block_parameters = array(
 		'category' => array(0 => $txt['sp_all']),
@@ -2409,70 +2391,14 @@ function sp_articles($parameters, $id, $return_parameters = false)
 	$type = empty($parameters['type']) ? 0 : 1;
 	$length = isset($parameters['length']) ? (int) $parameters['length'] : 250;
 
-	// Permissions
-	$query[] = sprintf($context['SPortal']['permissions']['query'], 'spa.permissions');
-	$query[] = sprintf($context['SPortal']['permissions']['query'], 'spc.permissions');
+	$articles = sportal_get_articles(null, true, true, $type ? 'RAND()' : 'spa.date DESC', $category, $limit);
 
-	$request = $db->query('', '
-		SELECT
-			spc.name, spc.namespace AS category_namespace,
-			mem.avatar, mem.email_address, IFNULL(spa.id_member, 0) AS id_author, IFNULL(mem.real_name, spa.member_name) AS author_name,
-			at.id_attach, at.attachment_type, at.filename,
-			spa.body, spa.title, spa.member_name, spa.namespace AS article_namespace, spa.id_member,
-			spa.type, spa.date, spa.status, spa.id_article, spa.id_category
-		FROM {db_prefix}sp_articles AS spa
-			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = spa.id_member)
-			LEFT JOIN {db_prefix}attachments AS at ON (at.id_member = mem.id_member)
-		WHERE
-			spa.status = {int:approved}' . (!empty($category) ? '
-			AND spa.id_category = {int:category}' : '') . '
-			AND ' . implode(' AND ', $query) . '
-		ORDER BY {raw:type}
-		LIMIT {int:limit}',
-		array(
-			'approved' => 1,
-			'category' => $category,
-			'type' => $type ? 'RAND()' : 'spa.date DESC',
-			'limit' => $limit,
-		)
-	);
-	$articles = array();
 	$colorids = array();
-	while ($row = $db->fetch_assoc($request))
+	foreach ($articles as $article)
 	{
-		if (!empty($row['id_member']))
-			$colorids[$row['id_member']] = $row['id_member'];
-
-		$articles[] = array(
-			'id' => $row['id_article'],
-			'name' => $row['title'],
-			'body' => $row['body'],
-			'preview' => shorten_text($row['body'], $length, true),
-			'href' => $scripturl . '?article=' . $row['article_namespace'],
-			'link' => '<a href="' . $scripturl . '?article=' . $row['article_namespace'] . '">' . $row['title'] . '</a>',
-			'category' => array(
-				'id' => $row['id_category'],
-				'name' => $row['name'],
-				'href' => $scripturl . '?category=' . $row['category_namespace'],
-				'link' => '<a href="' . $scripturl . '?category=' . $row['category_namespace'] . '">' . $row['name'] . '</a>',
-			),
-			'poster' => array(
-				'id' => $row['id_author'],
-				'name' => $row['author_name'],
-				'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
-				'link' => $row['id_author'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>') : $row['author_name'],
-			),
-			'avatar' => determineAvatar(array(
-				'avatar' => $row['avatar'],
-				'filename' => $row['filename'],
-				'id_attach' => $row['id_attach'],
-				'email_address' => $row['email_address'],
-				'attachment_type' => $row['attachment_type'],
-			)),
-		);
+		if (!empty($article['author']['id']))
+			$colorids[$article['author']['id']] = $article['author']['id'];
 	}
-	$db->free_result($request);
 
 	// No articles in the system or none they can see
 	if (empty($articles))
@@ -2487,54 +2413,43 @@ function sp_articles($parameters, $id, $return_parameters = false)
 	{
 		foreach ($articles as $k => $p)
 		{
-			if (!empty($color_profile[$p['poster']['id']]['link']))
-				$articles[$k]['poster']['link'] = $color_profile[$p['poster']['id']]['link'];
+			if (!empty($color_profile[$p['author']['id']]['link']))
+				$articles[$k]['author']['link'] = $color_profile[$p['author']['id']]['link'];
 		}
 	}
 
-	// No image
-	if (!empty($image))
+	echo '
+							<table class="sp_fullwidth">';
+
+	foreach ($articles as $article)
 	{
 		echo '
-								<ul class="sp_list">';
+								<tr class="sp_articles_row">
+									<td class="sp_articles sp_center">';
 
-		foreach ($articles as $article)
+		// If we have an avatar to show, show it
+		if (!empty($article['author']['avatar']['href']))
 			echo '
-									<li ', sp_embed_class('topic'), '>', $article['link'], '</li>';
+										<a href="', $scripturl, '?action=profile;u=', $article['author']['id'], '">
+											<img src="', $article['author']['avatar']['href'], '" alt="', $article['author']['name'], '" width="40" />
+										</a>';
 
 		echo '
-								</ul>';
+									</td>
+									<td>
+										<span class="sp_articles_title">', $article['author']['link'], '</span><br />
+										', $article['link'], '
+									</td>
+									<td>',
+										parse_bbc(un_htmlspecialchars(shorten_text($article['body'], $length, true))),
+									'</td>
+								</tr>
+								<tr><td colspan="3" class="sp_articles_row"></td></tr>';
 	}
-	// Or the avatar view
-	else
-	{
-		echo '
-								<table class="sp_fullwidth">';
 
-		foreach ($articles as $article)
-		{
-			echo '
-									<tr>
-										<td class="sp_articles sp_center">';
+	echo '
+							</table>';
 
-			if (!empty($article['avatar']['href']))
-				echo '
-											<a href="', $scripturl, '?action=profile;u=', $article['poster']['id'], '">
-												<img src="', $article['avatar']['href'], '" alt="', $article['poster']['name'], '" width="40" />
-											</a>';
-
-			echo '
-										</td>
-										<td>
-											<span class="sp_articles_title">', $article['poster']['link'], '</span><br />
-											', $article['link'], '
-										</td>
-									</tr>';
-		}
-
-		echo '
-								</table>';
-	}
 }
 
 /**
