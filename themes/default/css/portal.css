@@ -81,6 +81,7 @@ th.sp_center {
 }
 .sp_list_divider {
 	border-bottom: 1px solid #DDD;
+	padding: 8px 0;
 }
 
 
@@ -121,8 +122,15 @@ th.sp_center {
 	line-height: 1.4em;
 	padding: 5px;
 	min-width: 150px;
-	min-height: 200px;
+	min-height: 225px;
 	border: 1px solid #ccc;
+}
+.sp_image_topic {
+	overflow: hidden;
+	max-width: 150px;
+	text-overflow: ellipsis;
+	white-space: pre;
+	font-style: italic;
 }
 .sp_image a img {
 	max-width: 125px;
@@ -157,7 +165,7 @@ tsp_shop_divider {
 .sp_shop {
 	width: 40px;
 }
-.sp_blog_title, .sp_articles_title {
+.sp_blog_title, .sp_articles_title, .sp_articles_row {
 	border-bottom: 1px dashed #AAA;
 }
 
