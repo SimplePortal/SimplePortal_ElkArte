@@ -109,6 +109,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		require_once(ADMINDIR . '/ManageServer.controller.php');
 		require_once(SUBSDIR . '/SettingsForm.class.php');
 
+
 		// Initialize the form
 		$this->_initGeneralSettingsForm();
 		$config_vars = $this->_generalSettingsForm->settings();

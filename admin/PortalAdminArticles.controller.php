@@ -230,7 +230,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$context['default_list'] = 'portal_articles';
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.class.php');
+		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
