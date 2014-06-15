@@ -1535,7 +1535,7 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
 												($showLink ? '<a href="' . $item['file']['href'] . '">' . str_replace(array('_', '-'), ' ', $item['file']['filename']) . '</a><br />' : '') . '
 												<a id="link_' . $id . '" href="' . $scripturl . '?action=dlattach;topic=' . $item['topic']['id'] . '.0;attach=' . $id . ';image">
 												<img id="thumb_' . $id . '" src="' . $scripturl . '?action=dlattach;topic=' . $item['topic']['id'] . '.0;attach=' . $item['file']['image']['id'] . ';image" alt="' . $item['file']['filename'] . '" /></a>
-												<br />',
+												<br />' .
 												($showLink ? '<div class="sp_image_topic">' . $item['topic']['link'] . '</div>' : '') .
 												($showDownloads ? $txt['downloads'] . ': ' . $item['file']['downloads'] . '<br />' : ''),
 												($showPoster ? $txt['posted_by'] . ': ' . $item['member']['link'] : ''), '
@@ -1576,6 +1576,7 @@ function sp_attachmentRecent($parameters, $id, $return_parameters = false)
 
 	$items = ssi_recentAttachments($limit, array(), 'array');
 
+	// No items they can see
 	if (empty($items))
 	{
 		echo '
@@ -1639,6 +1640,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 	);
 	$calendar_data = getCalendarGrid($curPage['month'], $curPage['year'], $calendarOptions);
 
+	// Output the calendar block
 	echo '
 								<table class="sp_acalendar smalltext">
 									<tr>
@@ -1751,7 +1753,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 			document.getElementById(current_day).style.display = "none";
 			document.getElementById(new_day).style.display = "";
 			current_day = new_day;
-		}');
+		}', true);
 }
 
 /**
@@ -1786,6 +1788,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 	$show_holiday = !empty($parameters['holidays']);
 	$show_titles = false;
 
+	// If they are not showing anything, not much to do !
 	if (!$show_event && !$show_birthday && !$show_holiday)
 	{
 		echo '
@@ -1802,24 +1805,30 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 		'todayHolidays' => array()
 	);
 
+	// Load calendar events
 	if ($show_event)
 	{
+		// Just todays events or looking forward a few days?
 		if (!empty($event_future))
 			$event_future_date = date("Y-m-d", ($now + $event_future * 86400));
 		else
 			$event_future_date = $today_date;
 
+		// Load them in
 		$events = sp_loadCalendarData('getEvents', $today_date, $event_future_date);
-
 		ksort($events);
 
 		$displayed = array();
 		foreach ($events as $day => $day_events)
+		{
 			foreach ($day_events as $event_key => $event)
+			{
 				if (in_array($event['id'], $displayed))
 					unset($events[$day][$event_key]);
 				else
 					$displayed[] = $event['id'];
+			}
+		}
 
 		if (!empty($events[$today_date]))
 		{
@@ -1834,18 +1843,21 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 		}
 	}
 
+	// Load in todays birthdays
 	if ($show_birthday)
 	{
 		$calendar_array['todayBirthdays'] = current(sp_loadCalendarData('getBirthdays', $today_date));
 		$show_titles = !empty($show_event) || !empty($show_holiday);
 	}
 
+	// Load in any holidays
 	if ($show_holiday)
 	{
 		$calendar_array['todayHolidays'] = current(sp_loadCalendarData('getHolidays', $today_date));
 		$show_titles = !empty($show_event) || !empty($show_birthday);
 	}
 
+	// Done collecting information, show what we found
 	if (empty($calendar_array['todayEvents']) && empty($calendar_array['futureEvents']) && empty($calendar_array['todayBirthdays']) && empty($calendar_array['todayHolidays']))
 	{
 		echo '
@@ -1952,6 +1964,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 	$count = !empty($parameters['count']) ? (int) $parameters['count'] : 5;
 	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 150;
 
+	// Need a feed name to load it
 	if (empty($feed))
 	{
 		echo '
@@ -1963,27 +1976,39 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 
 	require_once(SUBSDIR . '/Package.subs.php');
 	$data = fetch_web_data($feed);
+	$data_save = $data;
 
-	if (function_exists('mb_convert_encoding'))
+	// Convert it to UTF8 if we can and its not already
+	preg_match('~encoding="([^"]*)"~', $data, $charset);
+	if (!empty($charset[1]) && $charset != 'UTF-8')
 	{
-		preg_match('~encoding="([^"]*)"~', $data, $charset);
+		// Use iconv if its available
+		if (function_exists('iconv'))
+			$data = @iconv($charset[1], 'UTF-8' . '//TRANSLIT//IGNORE', $data);
 
-		if (!empty($charset[1]) && $charset != 'UTF-8')
-			$data = mb_convert_encoding($data, 'UTF-8', $charset[1]);
-	}
-	elseif (function_exists('iconv'))
-	{
-		preg_match('~encoding="([^"]*)"~', $data, $charset);
+		// No iconv or a false response from it
+		if (!function_exists('iconv') || ($data == false))
+		{
+			// PHP (some 5.4 versions) mishandles //TRANSLIT//IGNORE and returns false: see https://bugs.php.net/bug.php?id=61484
+			if ($data == false)
+				$data = $data_save;
 
-		if (!empty($charset[1]) && $charset != 'UTF-8')
-			$data = iconv($charset[1], 'UTF-8', $data);
+			if (function_exists('mb_convert_encoding'))
+			{
+				// Replace unknown characters with a space
+				@ini_set('mbstring.substitute_character', '32');
+				$data = @mb_convert_encoding($data, 'UTF-8', $charset[1]);
+			}
+			elseif (function_exists('recode_string'))
+				$data = @recode_string($charset[1] . '..' . 'UTF-8', $data);
+		}
 	}
 
 	$data = str_replace(array("\n", "\r", "\t"), '', $data);
-	$data = preg_replace('~<\!\[CDATA\[(.+?)\]\]>~eu', '\'#cdata_escape_encode#\' . Util::\'htmlspecialchars\'(\'$1\')', $data);
+	$data = preg_replace('~<\!\[CDATA\[(.+?)\]\]>~eu', '\'#cdata_escape_encode#\' . Util::htmlspecialchars(\'$1\')', $data);
 
+	// Find all the feed items
 	preg_match_all('~<item>(.+?)</item>~', $data, $items);
-
 	foreach ($items[1] as $item_id => $item)
 	{
 		if ($item_id === $count)
@@ -2000,6 +2025,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 		}
 	}
 
+	// Nothing, say its invalid
 	if (empty($rss))
 	{
 		echo '
@@ -2007,6 +2033,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 		return;
 	}
 
+	// Add all the items to an array
 	$items = array();
 	foreach ($rss as $item)
 	{
@@ -2017,11 +2044,12 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 			'title' => $item['title'],
 			'href' => $item['link'],
 			'link' => $item['title'] == '' ? '' : ($item['link'] == '' ? $item['title'] : '<a href="' . $item['link'] . '" target="_blank" class="new_win">' . $item['title'] . '</a>'),
-			'content' => $limit > 0 && Util::strlen($item['description']) > $limit ? Util::substr($item['description'], 0, $limit) . '&hellip;' : $item['description'],
+			'content' => $limit > 0 ? un_htmlspecialchars(shorten_text($item['description'], $limit, true)) : $item['description'],
 			'date' => !empty($item['pubdate']) ? standardTime(strtotime($item['pubdate']), '%d %B') : '',
 		);
 	}
 
+	// No items in the feed
 	if (empty($items))
 	{
 		echo '
