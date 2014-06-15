@@ -2103,8 +2103,6 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 {
 	global $modSettings, $user_info, $settings, $language, $txt;
 
-	$db = database();
-
 	$block_parameters = array();
 
 	if ($return_parameters)
@@ -2112,43 +2110,18 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 
 	loadLanguage('Profile');
 	loadLanguage('ManageThemes');
+	require_once(SUBSDIR . '/Themes.subs.php');
 
 	if (!empty($_SESSION['id_theme']) && (!empty($modSettings['theme_allow']) || allowedTo('admin_forum')))
 		$current_theme = (int) $_SESSION['id_theme'];
 	else
 		$current_theme = $user_info['theme'];
 
+	// Load in all the themes in the system
 	$current_theme = empty($current_theme) ? -1 : $current_theme;
-	$available_themes = array();
-	if (!empty($modSettings['knownThemes']))
-	{
-		$request = $db->query('', '
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE variable IN ({string:name}, {string:theme_url}, {string:theme_dir}, {string:images_url})
-				AND id_theme IN ({array_string:known_themes})
-				AND id_theme != {int:default_theme}',
-			array(
-				'default_theme' => 0,
-				'name' => 'name',
-				'theme_url' => 'theme_url',
-				'theme_dir' => 'theme_dir',
-				'images_url' => 'images_url',
-				'known_themes' => explode(',', $modSettings['knownThemes']),
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			if (!isset($available_themes[$row['id_theme']]))
-				$available_themes[$row['id_theme']] = array(
-					'id' => $row['id_theme'],
-					'selected' => $current_theme == $row['id_theme'],
-				);
-			$available_themes[$row['id_theme']][$row['variable']] = $row['value'];
-		}
-		$db->free_result($request);
-	}
+	$available_themes = installedThemes();
 
+	// Set the guest theme
 	if (!isset($available_themes[$modSettings['theme_guests']]))
 	{
 		$available_themes[0] = array(
@@ -2168,6 +2141,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 
 		$settings['images_url'] = &$theme_data['images_url'];
 
+		// Set the description in thier language if available
 		if (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php'))
 			include($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php');
 		elseif (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php'))
@@ -2181,6 +2155,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 		$available_themes[$id_theme]['thumbnail_href'] = $txt['theme_thumbnail_href'];
 		$available_themes[$id_theme]['description'] = $txt['theme_description'];
 
+		// Set the name, keep it short so it does not break our list
 		$available_themes[$id_theme]['name'] = preg_replace('~\stheme$~i', '', $theme_data['name']);
 		if (Util::strlen($available_themes[$id_theme]['name']) > 18)
 			$available_themes[$id_theme]['name'] = Util::substr($available_themes[$id_theme]['name'], 0, 18) . '&hellip;';
@@ -2215,7 +2190,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 
 	foreach ($available_themes as $theme)
 		echo '
-											<option value="', $theme['id'], '"', $theme['selected'] ? ' selected="selected"' : '', '>', $theme['name'], '</option>';
+											<option value="', $theme['id'], '"', $theme['id'] == $current_theme ? ' selected="selected"' : '', '>', $theme['name'], '</option>';
 
 	echo '
 										</select>
@@ -2229,20 +2204,20 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 								</form>';
 
 	$javascript = '
-		var sp_ts_thumbs = new Array();';
+		var sp_ts_thumbs = [];';
 
 	foreach ($available_themes as $id => $theme_data)
 		$javascript .= '
-			sp_ts_thumbs[' . $id - '] = "' . $theme_data['thumbnail_href'] . '";';
+		sp_ts_thumbs[' . $id . '] = "' . $theme_data['thumbnail_href'] . '";';
 
 	$javascript .= '
-			function sp_theme_select(obj)
-			{
-				var id = obj.options[obj.selectedIndex].value;
-				document.getElementById("sp_ts_thumb").src = sp_ts_thumbs[id];
-			}';
+		function sp_theme_select(obj)
+		{
+			var id = obj.options[obj.selectedIndex].value;
+			document.getElementById("sp_ts_thumb").src = sp_ts_thumbs[id];
+		}';
 
-	addInlineJavascript($javascript);
+	addInlineJavascript($javascript, array('defer' => true));
 }
 
 /**
