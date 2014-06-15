@@ -1056,8 +1056,9 @@ function sportal_parse_style($action, $setting = '', $process = false)
  * @param boolean $allowed true to check permission access to the item
  * @param string $sort string passed to the order by parameter
  * @param int|null $category_id id of the category
+ * @param int|null $limit limit the number of results
  */
-function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title', $category_id = null)
+function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title', $category_id = null, $limit = null)
 {
 	global $scripturl, $context, $modSettings, $color_profile;
 
@@ -1101,20 +1102,25 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 		$parameters['category_status'] = 1;
 	}
 
+	// Limits?
+	if (!empty($limit))
+		$parameters['limit'] = $limit;
+
 	// Make the request
 	$request = $db->query('', '
 		SELECT
 			spa.id_article, spa.id_category, spa.namespace AS article_namespace, spa.title, spa.body,
 			spa.type, spa.date, spa.status, spa.permissions AS article_permissions, spa.views, spa.comments,
 			spc.permissions AS category_permissions, spc.name, spc.namespace AS category_namespace,
-			m.avatar, IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name,
+			m.avatar, IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name, m.email_address,
 			a.id_attach, a.attachment_type, a.filename
 		FROM {db_prefix}sp_articles AS spa
 			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spa.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY {raw:sort}', $parameters
+		ORDER BY {raw:sort}' . (!empty($limit) ? '
+		LIMIT {int:limit}' : ''), $parameters
 	);
 	$return = array();
 	$member_ids = array();
@@ -1150,12 +1156,13 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 				'name' => $row['author_name'],
 				'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
 				'link' => $row['id_author'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>') : $row['author_name'],
-				'avatar' => array(
-					'name' => $row['avatar'],
-					'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" class="avatar" border="0" />' : '') : (stristr($row['avatar'], 'http://') ? '<img src="' . $row['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" class="avatar" border="0" />' : '<img src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar']) . '" alt="" class="avatar" border="0" />'),
-					'href' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : '') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
-					'url' => $row['avatar'] == '' ? '' : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar'])
-				),
+				'avatar' => determineAvatar(array(
+					'avatar' => $row['avatar'],
+					'filename' => $row['filename'],
+					'id_attach' => $row['id_attach'],
+					'email_address' => $row['email_address'],
+					'attachment_type' => $row['attachment_type'],
+				)),
 			),
 			'article_id' => $row['article_namespace'],
 			'title' => $row['title'],
@@ -1777,7 +1784,7 @@ function sportal_get_shoutbox_count($shoutbox_id)
  *
  * - Prevents guest from adding a shout
  * - Checks the shout total and archives if over the display limit for the box
- * 
+ *
  * @param int $shoutbox
  * @param string $shout
  */
