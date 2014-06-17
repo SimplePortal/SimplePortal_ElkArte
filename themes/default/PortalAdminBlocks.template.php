@@ -401,7 +401,7 @@ function template_block_edit()
 	$style_types = array('default' => 'DefaultClass', 'class' => 'CustomClass', 'style' => 'CustomStyle');
 	$style_parameters = array(
 		'title' => array('category_header', 'secondary_header'),
-		'body' => array('windowbg', 'windowbg2', 'information', 'roundframe'),
+		'body' => array('portalbg', 'portalbg2', 'information', 'roundframe'),
 	);
 
 	// Style options for the block, but not boardNews

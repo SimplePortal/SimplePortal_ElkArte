@@ -84,7 +84,6 @@ th.sp_center {
 	padding: 8px 0;
 }
 
-
 .sp_online_flow {
 	max-height: 150px;
 	height: auto !important;
@@ -258,6 +257,7 @@ div.sp_block {
 }
 .sp_block_container {
 	overflow: auto;
+	padding: 0 2px;
 }
 
 table.sp_block {
@@ -276,8 +276,14 @@ table.sp_block {
 	margin: 2px 0 .7em 0;
 	border: 1px solid #ccc;
 	border-radius: 0 0 5px 5px;
-	box-shadow: 5px 6px 3px -5px rgba(0,0,0,0.5);
+	box-shadow: 4px 6px 3px -5px rgba(0,0,0,0.5);
 	overflow: auto;
+}
+.portalbg {
+	padding: 10px 0;
+}
+.portalbg2 {
+	padding: 10px 0;
 }
 
 body {

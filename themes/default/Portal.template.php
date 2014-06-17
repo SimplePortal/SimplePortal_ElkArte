@@ -26,7 +26,7 @@ function template_portal_index()
 		<h3 class="category_header">
 			', $article['link'], '
 		</h3>
-		<div class="windowbg sp_block_section">
+		<div class="sp_block_section">
 			<div class="sp_content_padding">
  				<div class="sp_article_detail">';
 

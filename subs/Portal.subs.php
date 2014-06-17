@@ -1008,7 +1008,7 @@ function sportal_parse_style($action, $setting = '', $process = false)
 				'title_default_class' => 'category_header',
 				'title_custom_class' => '',
 				'title_custom_style' => '',
-				'body_default_class' => 'windowbg',
+				'body_default_class' => 'portalbg',
 				'body_custom_class' => '',
 				'body_custom_style' => '',
 				'no_title' => false,

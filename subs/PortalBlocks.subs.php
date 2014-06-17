@@ -1289,9 +1289,12 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	$colorids = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		// Shorten the text if needed and run it through the parser
+		// Shorten the text if needed and try and fix the errors it causes.
 		if (!empty($length))
+		{
 			$row['body'] = shorten_text($row['body'], $length, true);
+			preparsecode($row['body']);
+		}
 
 		censorText($row['subject']);
 		censorText($row['body']);
@@ -1382,7 +1385,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 				<h3 class="category_header">
 					<span class="sp_float_left sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
 				</h3>
-				<div class="windowbg sp_article_content">
+				<div class="sp_article_content">
 					<div class="sp_content_padding">';
 
 		if ($avatars && $news['avatar']['name'] !== null && !empty($news['avatar']['href']))
@@ -2373,6 +2376,8 @@ function sp_articles($parameters, $id, $return_parameters = false)
 		return $block_parameters;
 	}
 
+	require_once(SUBSDIR . '/Post.subs.php');
+
 	// Maybe useful ... maybe not !
 	if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
 	{
@@ -2423,6 +2428,11 @@ function sp_articles($parameters, $id, $return_parameters = false)
 
 	foreach ($articles as $article)
 	{
+		// Shorten, fix the errors in doing so, parse it
+		$article['body'] = shorten_text($article['body'], $length, true);
+		preparsecode($article['body']);
+		$article['body'] = parse_bbc(un_htmlspecialchars($article['body']));
+
 		echo '
 								<tr class="sp_articles_row">
 									<td class="sp_articles sp_center">';
@@ -2441,10 +2451,12 @@ function sp_articles($parameters, $id, $return_parameters = false)
 										', $article['link'], '
 									</td>
 									<td>',
-										parse_bbc(un_htmlspecialchars(shorten_text($article['body'], $length, true))),
+										$article['body'],
 									'</td>
 								</tr>
-								<tr><td colspan="3" class="sp_articles_row"></td></tr>';
+								<tr>
+									<td colspan="3" class="sp_articles_row"></td>
+								</tr>';
 	}
 
 	echo '
@@ -2553,6 +2565,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 
 	if ($context['can_shout'])
 	{
+		// Set up the smiley tags for the shoutbox
 		$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'];
 		$shoutbox['smileys'] = array('normal' => array(), 'popup' => array());
 		if (empty($modSettings['smiley_enable']))
@@ -2615,6 +2628,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 				$shoutbox['smileys'][$location][$n - 1]['last'] = true;
 		}
 
+		// Basic shoutbox bbc we allow
 		$shoutbox['bbc'] = array(
 			'bold' => array('code' => 'b', 'before' => '[b]', 'after' => '[/b]', 'description' => $editortxt['Bold']),
 			'italicize' => array('code' => 'i', 'before' => '[i]', 'after' => '[/i]', 'description' => $editortxt['Italic']),
@@ -2663,7 +2677,8 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 	$type = empty($parameters['type']) ? 0 : 1;
 	$direction = empty($parameters['direction']) ? 0 : 1;
 
-	// right now we only know about one gallery
+	// right now we only know about one gallery, but more may be added, maybe even ones we can
+	// tell folks about :P
 	if (!isset($mod))
 	{
 		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
@@ -2685,7 +2700,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 		$items = aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC');
 	}
 
-
+	// No items in the gallery?
 	if (empty($items))
 	{
 		echo '
@@ -2693,13 +2708,14 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 		return;
 	}
 
+	// We have gallery items to show!
 	echo '
 								<table class="sp_auto_align">', $direction ? '
 									<tr>' : '';
 
 	foreach ($items as $item)
 	{
-		echo!$direction ? '
+		echo !$direction ? '
 									<tr>' : '', '
 										<td>
 											<div class="sp_image smalltext">';
@@ -2712,7 +2728,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 												', $txt['aeva_views'], ': ', $item['views'], '<br />
 												', $txt['aeva_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
 												', $txt['aeva_in_album'], ': <a href="', $scripturl, 'sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>', $item['is_new'] ?
-					'<br /><span class="new_posts">' . $txt['new'] . '</span>' : '';
+												'<br /><span class="new_posts">' . $txt['new'] . '</span>' : '';
 		}
 
 		echo '
@@ -2728,7 +2744,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 
 /**
  * Menu Block, creates a sidebar menu block based on the system main menu
- * @todo needs updating .. superfish it?
+ * @todo needs updating so it knows right vs left block for the flyout
  *
  * @param mixed[] $parameters -  not used in this block
  * @param int $id - not used in this block
@@ -2747,7 +2763,7 @@ function sp_menu($parameters, $id, $return_parameters = false)
 		setupMenuContext();
 
 	echo '
-								<ul class="sp_list" id="sp_menu">';
+								<ul id="sp_menu" class="sp_list">';
 
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
@@ -2774,6 +2790,17 @@ function sp_menu($parameters, $id, $return_parameters = false)
 
 	echo '
 								</ul>';
+
+	// Superfish the menu
+	$javascript = "
+	$(document).ready(function() {
+		if (use_click_menu)
+			$('#sp_menu').superclick({speed: 150, animation: {opacity:'show', height:'toggle'}, speedOut: 0, activeClass: 'sfhover'});
+		else
+			$('#sp_menu').superfish({delay : 300, speed: 175, hoverClass: 'sfhover'});
+	});";
+
+	addInlineJavascript($javascript, true);
 }
 
 /**
