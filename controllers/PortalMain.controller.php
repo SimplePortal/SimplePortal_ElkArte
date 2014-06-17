@@ -15,7 +15,7 @@ if (!defined('ELK'))
 
 /**
  * Portal controller.
- * 
+ *
  * This class handles requests that allow viewing the main portal or the portal credits
  */
 class Sportal_Controller extends Action_Controller
@@ -75,7 +75,12 @@ class Sportal_Controller extends Action_Controller
 		{
 			// Just the preview
 			if (!empty($modSettings['articlelength']))
+			{
+				require_once(SUBSDIR . '/Post.subs.php');
 				$article['body'] = shorten_text($article['body'], $modSettings['articlelength'], true);
+				preparsecode($article['body']);
+				$article['body'] = un_htmlspecialchars($article['body']);
+			}
 
 			$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
 			$context['articles'][$article['id']]['date'] = standardTime($article['date']);
