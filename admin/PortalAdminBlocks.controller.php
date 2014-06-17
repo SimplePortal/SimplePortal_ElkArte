@@ -410,19 +410,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			if ($context['SPortal']['block']['type'] == 'sp_php' && !allowedTo('admin_forum'))
 				fatal_lang_error('cannot_admin_forum', false);
 
-			// JS to expand the areas under advanced
-			addInlineJavascript('
-			function sp_collapseObject(id)
-			{
-				mode = document.getElementById("sp_object_" + id).style.display;
-				mode = (mode === "" | mode === "block") ? false : true;
-
-				// Make it close smoothly
-				$("#sp_object_" + id).slideToggle(300);
-
-				document.getElementById("sp_collapse_" + id).src = elk_images_url + (!mode ? "/selected_open.png" : "/selected.png");
-			}', true);
-
 			loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
 
 			// Load up the permissions

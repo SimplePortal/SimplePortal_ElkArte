@@ -318,3 +318,18 @@ function sp_collapseCalendar(id)
 	document.getElementById(new_day).style.display = "";
 	current_day = new_day;
 }
+
+/**
+ * Admin Blocks area, used to expand the areas under advanced
+ * @param {type} id
+ */
+function sp_collapseObject(id)
+{
+	mode = document.getElementById("sp_object_" + id).style.display;
+	mode = (mode === "" | mode === "block") ? false : true;
+
+	// Make it close smoothly
+	$("#sp_object_" + id).slideToggle(300);
+
+	document.getElementById("sp_collapse_" + id).src = elk_images_url + (!mode ? "/selected_open.png" : "/selected.png");
+}
