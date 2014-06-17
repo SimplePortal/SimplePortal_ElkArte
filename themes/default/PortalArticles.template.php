@@ -92,7 +92,7 @@ function template_view_article()
 	else
 		echo '
 					</span>
-					<span class="sp_float_right">';
+					<span class="floatright">';
 
 	echo '
 						', sprintf($context['article']['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $context['article']['views']), ', ', sprintf($context['article']['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $context['article']['comments']), '
@@ -139,7 +139,7 @@ function template_view_article()
 
 			if ($comment['can_moderate'])
 				echo '
-						<div class="sp_float_right">
+						<div class="floatright">
 							<a href="', $context['article']['href'], ';modify=', $comment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', sp_embed_image('modify'), '</a>
 							<a href="', $context['article']['href'], ';delete=', $comment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', sp_embed_image('delete'), '</a>
 						</div>';
@@ -162,7 +162,7 @@ function template_view_article()
 				<div class="sp_content_padding">
 					<form action="', $context['article']['href'], '" method="post" accept-charset="UTF-8">
 						<textarea name="body" rows="5" cols="50" style="', isBrowser('is_ie8') ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 99%', ';">', !empty($context['article']['comment']['body']) ? $context['article']['comment']['body'] : '', '</textarea>
-						<div class="sp_center">
+						<div class="centertext">
 							<input type="submit" name="submit" value="', !empty($context['article']['comment']) ? $txt['sp_modify'] : $txt['sp_submit'], '" class="right_submit" />
 						</div>
 						<input type="hidden" name="comment" value="', !empty($context['article']['comment']['id']) ? $context['article']['comment']['id'] : 0, '" />

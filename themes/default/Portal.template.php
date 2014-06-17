@@ -43,7 +43,7 @@ function template_portal_index()
 		else
 			echo '
 					</span>
-					<span class="sp_float_right">';
+					<span class="floatright">';
 
 		echo '
 						', sprintf($article['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['views']) ,', ', sprintf($article['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '
@@ -73,7 +73,7 @@ function template_portal_above()
 	if (empty($modSettings['sp_disable_side_collapse']) && ($context['SPortal']['sides'][1]['active'] || $context['SPortal']['sides'][4]['active']))
 	{
 		echo '
-	<div class="sp_right sp_fullwidth">';
+	<div class="righttext sp_fullwidth">';
 
 		if ($context['SPortal']['sides'][1]['active'])
 			echo '

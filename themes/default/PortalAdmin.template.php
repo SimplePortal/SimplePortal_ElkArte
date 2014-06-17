@@ -18,28 +18,26 @@ function template_information()
 		echo '
 	<div id="sp_admin_main">
 		<div id="admin_main_section">
-			<div id="sp_live_info" class="sp_float_left">
+			<div id="sp_live_info" class="floatleft">
 				<h3 class="category_header hdicon cat_img_talk">
 					', $txt['sp-info_live'], '
 				</h3>
 				<div class="windowbg">
-					<div id="spAnnouncements" style="">', $txt['sp-info_no_live'], '</div>
+					<div id="spAnnouncements">', $txt['sp-info_no_live'], '</div>
 				</div>
 			</div>
-			<div id="sp_general_info" class="sp_float_right">
+			<div id="sp_general_info" class="floatright">
 				<h3 class="category_header hdicon cat_img_config">
 					', $txt['sp-info_general'], '
 				</h3>
-				<div class="windowbg">
-					<div class="sp_content_padding">
-						<strong>', $txt['sp-info_versions'], ':</strong><br />
-						', $txt['sp-info_your_version'], ':
-						<em id="spYourVersion" style="white-space: nowrap;">', $context['sp_version'], '</em><br />
-						', $txt['sp-info_current_version'], ':
-						<em id="spCurrentVersion" style="white-space: nowrap;">??</em><br />
-						<strong>', $txt['sp-info_managers'], ':</strong>
-						', implode(', ', $context['sp_managers']), '
-					</div>
+				<div class="context windowbg">
+					<strong>', $txt['sp-info_versions'], ':</strong><br />
+					', $txt['sp-info_your_version'], ':
+					<em id="spYourVersion" style="white-space: nowrap;">', $context['sp_version'], '</em><br />
+					', $txt['sp-info_current_version'], ':
+					<em id="spCurrentVersion" style="white-space: nowrap;">??</em><br />
+					<strong>', $txt['sp-info_managers'], ':</strong>
+					', implode(', ', $context['sp_managers']), '
 				</div>
 			</div>
 		</div>
@@ -92,14 +90,13 @@ function template_information()
 	}
 
 	echo '
-		<div class="windowbg2 quick_tasks">
-			<div class="sp_content_padding" id="sp_credits">';
+		<div class="quick_tasks" id="sp_credits">';
 
 	foreach ($context['sp_credits'] as $section)
 	{
 		if (isset($section['pretext']))
 			echo '
-				<p>', $section['pretext'], '</p>';
+			<p>', $section['pretext'], '</p>';
 
 		foreach ($section['groups'] as $group)
 		{
@@ -107,26 +104,25 @@ function template_information()
 				continue;
 
 			echo '
-				<p>';
+			<p>';
 
 			if (isset($group['title']))
 				echo '
-					<strong>', $group['title'], ':</strong> ';
+				<strong>', $group['title'], ':</strong> ';
 
 			echo implode(', ', $group['members']), '
-				</p>';
+			</p>';
 		}
 
 
 		if (isset($section['posttext']))
 			echo '
-				<p>', $section['posttext'], '</p>';
+			<p>', $section['posttext'], '</p>';
 	}
 
 	echo '
-				<hr />
-				<p>', sprintf($txt['sp-info_contribute'], 'http://www.simpleportal.net/index.php?page=contribute'), '</p>
-			</div>
+			<hr />
+			<p>', sprintf($txt['sp-info_contribute'], 'http://www.simpleportal.net/index.php?page=contribute'), '</p>
 		</div>
 	</div>';
 }

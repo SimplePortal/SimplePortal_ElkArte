@@ -29,7 +29,7 @@ function template_block_list()
 
 		echo '
 		<h3 class="category_header">
-			<a class="sp_float_right" href="', $scripturl, '?action=admin;area=portalblocks;sa=add;col=', $side['id'], '">', sp_embed_image('add', sprintf($txt['sp-blocksCreate'], $side['label'])), '</a>
+			<a class="floatright" href="', $scripturl, '?action=admin;area=portalblocks;sa=add;col=', $side['id'], '">', sp_embed_image('add', sprintf($txt['sp-blocksCreate'], $side['label'])), '</a>
 			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=', $side['help'], '" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 			<a href="', $scripturl, '?action=admin;area=portalblocks;sa=', $id, '">', $side['label'], ' ', $txt['sp-blocksBlocks'], '</a>
 		</h3>
@@ -50,7 +50,7 @@ function template_block_list()
 		{
 			echo '
 				<tr class="windowbg">
-					<td class="sp_center noticebox" colspan="4"></td>
+					<td class="centertext noticebox" colspan="4"></td>
 				</tr>';
 		}
 
@@ -60,7 +60,7 @@ function template_block_list()
 				<tr id="block_',$block['id'],'" class="windowbg">
 					<td>', $block['label'], '</td>
 					<td>', $block['type_text'], '</td>
-					<td class="sp_center">', implode(' ', $block['actions']), '</td>
+					<td class="centertext">', implode(' ', $block['actions']), '</td>
 				</tr>';
 		}
 
@@ -342,7 +342,7 @@ function template_block_edit()
 			</h3>
 			<div class="windowbg2">
 				<div class="sp_content_padding">
-					<span class="sp_float_right">', $txt['sp-blocksAdvancedOptions'], '<input type="checkbox" name="display_advanced" id="display_advanced" onclick="$(\'#sp_display_advanced\').slideToggle(300); document.getElementById(\'display_simple\').disabled = this.checked;" ', empty($context['SPortal']['block']['display_type']) ? '' : ' checked="checked"', ' class="input_check" /></span>
+					<span class="floatright">', $txt['sp-blocksAdvancedOptions'], '<input type="checkbox" name="display_advanced" id="display_advanced" onclick="$(\'#sp_display_advanced\').slideToggle(300); document.getElementById(\'display_simple\').disabled = this.checked;" ', empty($context['SPortal']['block']['display_type']) ? '' : ' checked="checked"', ' class="input_check" /></span>
 					', $txt['sp-blocksShowBlock'], '
 					<select name="display_simple" id="display_simple"', empty($context['SPortal']['block']['display_type']) ? '' : ' disabled="disabled"', '>';
 
@@ -492,8 +492,7 @@ function template_block_select_type()
 			', $txt['sp-blocksSelectType'], '
 		</h3>
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalblocks;sa=add" method="post" accept-charset="UTF-8">
-			<table>
-				<tr>';
+			<ul class="reset">';
 
 	// For every block type defined in the system
 	foreach($context['SPortal']['block_types'] as $index => $type)
@@ -501,36 +500,21 @@ function template_block_select_type()
 		$this_block = isset($context['SPortal']['block_inuse'][$type['function']]) ? $context['SPortal']['block_inuse'][$type['function']] : false;
 		$this_title = !empty($this_block) ? sprintf($txt['sp-adminBlockInuse'], $context['location'][$this_block['column']]) . ': ' . (!empty($this_block['state']) ? '(' . $txt['sp-blocksActive'] . ')' : '') : '';
 
-		// 3 tidy columns will work out nice
-		if ($index != 0 && $index % 3 == 0)
-		{
-			echo '
-				</tr>
-				<tr>';
-		}
-
 		echo '
-					<td>
-						<div class="windowbg">
-							<div class="sp_content_padding">
+						<li class="windowbg">
 								<input type="radio" name="selected_type[]" id="block_', $type['function'], '" value="', $type['function'], '" class="input_radio" />
 								<strong><label ', (!empty($this_block) ? 'class="sp_block_active" ' : ''), 'for="block_', $type['function'], '" title="', $this_title, '">', $txt['sp_function_' . $type['function'] . '_label'], '</label></strong>
 								<p class="smalltext">', $txt['sp_function_' . $type['function'] . '_desc'], '</p>';
 
 		echo '
-							</div>
-						</div>
-					</td>';
+						</li>
+						';
 	}
 
 	echo '
-				</tr>
-			</table>
-			<div class="windowbg">
-				<div class="sp_center">
+<li>
 					<input type="submit" name="select_type" value="', $txt['sp-blocksSelectType'], '" class="right_submit" />
-				</div>
-			</div>';
+			</li></ul>';
 
 	if (!empty($context['SPortal']['block']['column']))
 		echo '

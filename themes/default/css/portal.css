@@ -16,15 +16,6 @@
 th.sp_center {
 	text-align: center;
 }
-.sp_center {
-	text-align: center;
-}
-.sp_right {
-	text-align: right;
-}
-.sp_left {
-	text-align: left;
-}
 .sp_middle {
 	vertical-align: middle;
 }
@@ -34,17 +25,16 @@ th.sp_center {
 .sp_auto_align {
 	margin: 0 auto;
 }
-.sp_float_left {
-	float: left;
-}
-.sp_float_right {
-	float: right;
-}
 .sp_regular_padding {
 	padding: 5px;
 }
-.sp_content_padding {
+.sp_content {
 	padding: 0 0.8em;
+}
+#sp_credits {
+    border-radius: 7px;
+    box-shadow: none;
+    padding: 0 8px 16px;
 }
 .sp_fullwidth {
 	width: 100%;
@@ -52,9 +42,6 @@ th.sp_center {
 .sp_page_index {
 	float: right;
 	padding-right: 1em;
-}
-.sp_clear {
-	clear: both;
 }
 .sp_side_clear {
 	clear: both;
@@ -155,15 +142,6 @@ th.sp_center {
 table.sp_blog, table.sp_articles, .sp_shop_info {
 	line-height: 1.7em;
 }
-tsp_shop_info {
-	font-size: smaller;
-}
-tsp_shop_divider {
-	border-bottom: 1px dashed #AAA;
-}
-.sp_shop {
-	width: 40px;
-}
 .sp_blog_title, .sp_articles_title, .sp_articles_row {
 	border-bottom: 1px dashed #AAA;
 }
@@ -259,7 +237,9 @@ div.sp_block {
 	overflow: auto;
 	padding: 0 2px;
 }
-
+.sp_block_container h3 {
+	font-size: 1.214em;
+}
 table.sp_block {
 	border-collapse: collapse;
 	border-spacing: 0;
@@ -339,9 +319,6 @@ body {
 	line-height: 1.8em;
 	text-align: center;
 }
-div.shoutbox_input {
-	padding-top: 5px;
-}
 input.shoutbox_input {
 	width: 65%;
 }
@@ -356,9 +333,7 @@ input.shoutbox_input {
 	color: #FF0000;
 }
 
-#sp_index .cat_bar {
-	margin-top: 0.5em;
-}
+
 #sp_view_categories h4 {
 	font-size: 1.1em;
 }
@@ -382,6 +357,9 @@ input.shoutbox_input {
 	padding-left: 6px;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
+#sp_general_info div.windowbg {
+	padding: 0 0.8em;
+}
 #spAnnouncements {
 	overflow: auto;
 	padding: 0 4px;
@@ -394,30 +372,43 @@ input.shoutbox_input {
 	padding: 0.5em 0;
 }
 
-#sp_manage_blocks .titlebg a.sp_float_right {
-	padding-top: 0.5em;
+
+
+
+.sp_content_padding {
+	padding: 0 .8em;
 }
-#sp_manage_blocks table.table_grid {
+#sp_manage_blocks .table_grid {
 	margin-bottom: 0.8em;
 }
-#sp_select_block_type {
-	margin: 0 auto;
+#sp_select_block_type .reset
+{
+	margin: 2px 0;
+	overflow: auto;
 }
-#sp_select_block_type div.sp_content_padding {
-	height: 100px;
-	padding: 0 1em;
-}
-#sp_select_block_type li {
-	float: left;
-	width: 150px;
-	height: 200px;
-}
-#sp_select_block_type table {
-	width: 100%;
-}
-#sp_select_block_type td {
+#sp_select_block_type .windowbg {
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 2px 0.166%;
+	padding: 10px 10px 4px 10px;
+	height: 7em;
 	width: 33%;
-	vertical-align: top;
+	float: left;
+	overflow: auto;
+}
+#sp_select_block_type .windowbg label:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+#sp_select_block_type .smalltext {
+	margin: 6px;
+}
+#sp_select_block_type .windowbg2 {
+	width: 99.66%;
+	margin: 2px 0.166%;
+	padding: 8px 0;
+	float: left;
+	text-align: center;
 }
 #sp_edit_block {
 	margin: 0 auto;
@@ -426,11 +417,11 @@ input.shoutbox_input {
 	padding-top: 0.6em;
 	line-height: 2em;
 }
-#sp_edit_block ul.sp_display_list {
+#sp_edit_block .sp_display_list {
 	overflow: hidden;
 	margin: 0;
 }
-#sp_edit_block ul.sp_display_list li {
+#sp_edit_block .sp_display_list li {
 	float: left;
 	width: 50%;
 }
@@ -545,6 +536,7 @@ dl.sp_form img, #sp_add_articles_list_header img {
 }
 #sp_text_editor textarea {
 	width: 100%;
+	padding: 0.4em;
 }
 #sp_text_editor input {
 	float: right;
@@ -696,3 +688,133 @@ dl.sp_form img, #sp_add_articles_list_header img {
 .history:before {background-position: 0 -504px;}
 .smiley:before {background-position: 0 -522px;}
 .style:before {background-position: 0 -540px;}
+
+
+/* Experimental media querys */
+/*---------------------------*/
+@media screen and (max-width: 105em)
+{
+	#sp_select_block_type .windowbg {
+		height: 9em;
+	}
+}
+@media screen and (max-width: 77em)
+{
+	#sp_select_block_type .windowbg {
+		height: 12em;
+	}
+}
+@media screen and (max-width: 60em)
+{
+	#sp_select_block_type .windowbg {
+		height: 14em;
+	}
+	#sp_edit_block {
+		width: auto;
+		margin: 0;
+	}
+}
+@media screen and (max-width: 48em)
+{
+	#sp_select_block_type .windowbg {
+		width: 49%;
+		margin: 2px 0.5%;
+		height: 10em;
+	}
+	/* Override forum width setting on small screens */
+	div#wrapper {
+		min-width: 100%;
+	}
+	.poster, .keyinfo {
+		float: none;
+		width: auto;
+		padding: 0 8px;
+		text-align: left;
+	}
+	#smflogo, #upper_section .news, .catbg .unreadlink, #author, .messageicon, .poster .reset li, .signature, #admincenter #welcome, #quick_tasks .task {
+		display: none;
+	}
+	#quick_tasks img {
+		height: 24px;
+		width: 24px;
+	}
+	#live_news.floatleft, #supportVersionsTable.floatright, div#upper_section div.user{
+		float: none;
+		width: auto;
+	}
+	.poster>h4 {
+		margin: 8px 48px 8px 0;
+	}
+	.keyinfo>h5>a {
+		display: block;
+		white-space: pre;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		margin: 0 48px 0 0;
+	}
+	#basicinfo .content>img, .poster .reset li.avatar {
+		display: block;
+		float: right;
+		margin: -30px -8px 0 0;
+	}
+	.user>.avatar>img, .poster .reset li.avatar>a>img {
+		max-width: 40px;
+		max-height: 48px;
+	}
+	.postarea, .moderatorbar {
+		margin: 0;
+	}
+	#forumposts .post_separator {
+		display: block;
+	}
+	.dropmenu> li, .buttonlist>ul>li {
+		margin: 5px;
+	}
+	#basicinfo, #detailedinfo {
+		width: auto;
+		float: none;
+	}
+}
+@media screen and (max-width: 32em)
+{
+	#sp_left, #sp_right {
+		position: absolute;
+	}
+	#sp_right {
+		right: 0;
+	}
+	#sp_center {
+		width: 100%;
+	}
+	#sp_collapse_side1, #sp_collapse_side2, #sp_collapse_side3, #sp_collapse_side4 {
+		padding: 6px;
+	}
+	#sp_manage_blocks .table_grid img {
+		padding: 0.5em 0;
+	}
+	#sp_select_block_type .windowbg {
+		width: 99%;
+		height: auto;
+	}
+	#sp_edit_style_title, #sp_edit_style_body {
+		float: none;
+		width: auto;
+	}
+	/* Override content section padding on phones */
+	#guest_form .button_submit, #guest_form select {
+		margin: 1em 0;
+	}
+	#content_section {
+		padding-left: 0;
+	}
+	#content_section div.frame {
+		padding-right: 0;
+	}
+	/* Sort out board index on phones */
+	.table_list .stats, #messageindex thead th:nth-child(3), .table_grid .stats {
+		display: none;
+	}
+	.table_list .lastpost {
+		min-width: 40%;
+	}
+}

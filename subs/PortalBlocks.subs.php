@@ -30,7 +30,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 		return $block_parameters;
 
 	echo '
-								<div class="sp_center sp_fullwidth">';
+								<div class="centertext">';
 
 	// Show the guests a login area
 	if ($context['user']['is_guest'])
@@ -40,7 +40,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 									<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', ' >
 									<table>
 											<tr>
-												<td class="sp_right">
+												<td class="righttext">
 													<label for="sp_user">', $txt['username'], ':</label>&nbsp;
 												</td>
 												<td>
@@ -48,7 +48,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 												</td>
 											</tr>
 											<tr>
-												<td class="sp_right">
+												<td class="righttext">
 													<label for="sp_passwrd">', $txt['password'], ':</label>&nbsp;
 												</td>
 												<td>
@@ -284,7 +284,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 		echo '
 								</ul>
 								<br />
-								<div class="sp_fullwidth sp_center">', $txt['error_sp_no_online'], '</div>';
+								<div class="sp_fullwidth centertext">', $txt['error_sp_no_online'], '</div>';
 	}
 
 	// Does the online today addon exist
@@ -523,7 +523,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 	foreach ($members as $member)
 		echo '
 									<tr>
-										<td class="sp_top_poster sp_center">', !empty($member['avatar']['href']) ? '
+										<td class="sp_top_poster centertext">', !empty($member['avatar']['href']) ? '
 											<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '"><img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" width="40" /></a>' : '', '
 										</td>
 										<td>
@@ -844,7 +844,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	if ($enable_label)
 		echo '
 									<tr>
-										<td class="sp_top_poster sp_center" colspan="2">
+										<td class="sp_top_poster centertext" colspan="2">
 											<strong>', $list_label, '</strong>
 										</td>
 									</tr>';
@@ -853,7 +853,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	{
 		echo '
 									<tr>
-										<td class="sp_top_poster sp_center">', !empty($member['avatar']['href']) ? '
+										<td class="sp_top_poster centertext">', !empty($member['avatar']['href']) ? '
 											<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '">
 												<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" width="40" />
 											</a>' : '', '
@@ -941,12 +941,12 @@ function sp_recent($parameters, $id, $return_parameters = false)
 		foreach ($items as $item)
 			echo '
 									<tr>
-										<td ', sp_embed_class(empty($parameters['type']) ? 'post' : 'topic', '', 'sp_recent_icon sp_center' ), '</td>
+										<td ', sp_embed_class(empty($parameters['type']) ? 'post' : 'topic', '', 'sp_recent_icon centertext' ), '</td>
 										<td class="sp_recent_subject">
 											<a href="', $item['href'], '">', $item['subject'], '</a>
 											', $item['new'] ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>', '<br />[', $item['board']['link'], ']
 										</td>
-										<td class="sp_recent_info sp_right">
+										<td class="sp_recent_info righttext">
 											', $item['poster']['link'], '<br />', $item['time'], '
 										</td>
 									</tr>';
@@ -1146,8 +1146,8 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 										<li><label for="', $option['id'], '">', $option['vote_button'], ' ', $option['option'], '</label></li>';
 
 		echo '
-										<li class="sp_center"><input type="submit" value="', $txt['poll_vote'], '" class="button_submit" /></li>
-										<li class="sp_center"><a href="', $scripturl, '?topic=', $poll['topic'], '.0">', $txt['sp-pollViewTopic'], '</a></li>
+										<li class="centertext"><input type="submit" value="', $txt['poll_vote'], '" class="button_submit" /></li>
+										<li class="centertext"><a href="', $scripturl, '?topic=', $poll['topic'], '.0">', $txt['sp-pollViewTopic'], '</a></li>
 									</ul>
 									<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 									<input type="hidden" name="poll" value="', $poll['id'], '" />
@@ -1167,7 +1167,7 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
 
 		echo '
 									<li><strong>', $txt['poll_total_voters'], ': ', $poll['total_votes'], '</strong></li>
-									<li class="sp_center"><a href="', $scripturl, '?topic=', $poll['topic'], '.0">', $txt['sp-pollViewTopic'], '</a></li>
+									<li class="centertext"><a href="', $scripturl, '?topic=', $poll['topic'], '.0">', $txt['sp-pollViewTopic'], '</a></li>
 								</ul>';
 	}
 	// Nothing is always an option
@@ -1383,14 +1383,14 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	{
 		echo '
 				<h3 class="category_header">
-					<span class="sp_float_left sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
+					<span class="floatleft sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
 				</h3>
 				<div class="sp_article_content">
 					<div class="sp_content_padding">';
 
 		if ($avatars && $news['avatar']['name'] !== null && !empty($news['avatar']['href']))
 			echo '
-						<a href="', $scripturl, '?action=profile;u=', $news['poster']['id'], '"><img src="', $news['avatar']['href'], '" alt="', $news['poster']['name'], '" width="30" class="sp_float_right" /></a>
+						<a href="', $scripturl, '?action=profile;u=', $news['poster']['id'], '"><img src="', $news['avatar']['href'], '" alt="', $news['poster']['name'], '" width="30" class="floatright" /></a>
 						<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], '<br />', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
 		else
 			echo '
@@ -1398,7 +1398,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 
 		echo '
 						<div class="post"><hr />', $news['body'], '</div>
-						<div class="sp_right">', $news['link'], ' ', $news['new_comment'], '</div>
+						<div class="righttext">', $news['link'], ' ', $news['new_comment'], '</div>
 					</div>
 				</div>';
 	}
@@ -1435,7 +1435,7 @@ function sp_quickSearch($parameters, $id, $return_parameters = false)
 
 	echo '
 								<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
-									<div class="sp_center">
+									<div class="centertext">
 										<input type="text" name="search" value="" class="sp_search" /><br />
 										<input type="submit" name="submit" value="', $txt['search'], '" class="button_submit" />
 										<input type="hidden" name="advanced" value="0" />
@@ -1460,7 +1460,7 @@ function sp_news($parameters, $id, $return_parameters = false)
 		return $block_parameters;
 
 	echo '
-								<div class="sp_center sp_fullwidth">', $context['random_news_line'], '</div>';
+								<div class="centertext">', $context['random_news_line'], '</div>';
 }
 
 /**
@@ -1647,14 +1647,14 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 	echo '
 								<table class="sp_acalendar smalltext">
 									<tr>
-										<td class="sp_center" colspan="7">
+										<td class="centertext" colspan="7">
 											', !empty($modSettings['cal_enabled']) ? '<a href="' . $scripturl . '?action=calendar;year=' . $calendar_data['current_year'] . ';month=' . $calendar_data['current_month'] . '">' . $txt['months_titles'][$calendar_data['current_month']] . ' ' . $calendar_data['current_year'] . '</a>' : $txt['months_titles'][$calendar_data['current_month']] . ' ' . $calendar_data['current_year'], '
 										</td>
 									</tr><tr>';
 
 	foreach ($calendar_data['week_days'] as $day)
 		echo '
-										<td class="sp_center">', $txt['days_short'][$day], '</td>';
+										<td class="centertext">', $txt['days_short'][$day], '</td>';
 
 	echo '
 									</tr>';
@@ -1698,7 +1698,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 			elseif (empty($day['holidays']) && empty($day['birthdays']) && empty($day['events']))
 			{
 				echo '
-								<div class="sp_center smalltext" id="sp_calendar_', $day['day'], '">', $txt['error_sp_no_items_day'], '</div>';
+								<div class="centertext smalltext" id="sp_calendar_', $day['day'], '">', $txt['error_sp_no_items_day'], '</div>';
 
 				continue;
 			}
@@ -1709,7 +1709,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 			if (!empty($day['holidays']))
 			{
 				echo '
-									<li class="sp_center"><strong>- ', $txt['sp_calendar_holidays'], ' -</strong></li>';
+									<li class="centertext"><strong>- ', $txt['sp_calendar_holidays'], ' -</strong></li>';
 
 				foreach ($day['holidays'] as $key => $holiday)
 					echo '
@@ -1719,7 +1719,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 			if (!empty($day['birthdays']))
 			{
 				echo '
-									<li class="sp_center"><strong>- ', $txt['sp_calendar_birthdays'], ' -</strong></li>';
+									<li class="centertext"><strong>- ', $txt['sp_calendar_birthdays'], ' -</strong></li>';
 
 				foreach ($day['birthdays'] as $member)
 					echo '
@@ -1731,7 +1731,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 			if (!empty($day['events']))
 			{
 				echo '
-									<li class="sp_center"><strong>- ', $txt['sp_calendar_events'], ' -</strong></li>';
+									<li class="centertext"><strong>- ', $txt['sp_calendar_events'], ' -</strong></li>';
 
 				foreach ($day['events'] as $event)
 					echo '
@@ -1744,7 +1744,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 	}
 
 	echo '
-								<div class="sp_center smalltext" id="sp_calendar_0" style="display: none;">', $txt['error_sp_no_items_day'], '</div>';
+								<div class="centertext smalltext" id="sp_calendar_0" style="display: none;">', $txt['error_sp_no_items_day'], '</div>';
 
 	addInlineJavascript('var current_day = "sp_calendar_' . $curPage['day'] . '";', true);
 }
@@ -2178,7 +2178,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 
 	echo '
 								<form method="post" action="" accept-charset="UTF-8">
-									<div class="sp_center">
+									<div class="centertext">
 										<select name="theme" onchange="sp_theme_select(this)">';
 
 	foreach ($available_themes as $theme)
@@ -2330,7 +2330,7 @@ function sp_staff($parameters, $id, $return_parameters = false)
 	foreach ($staff_list as $staff)
 		echo '
 									<tr>
-										<td class="sp_staff sp_center">', !empty($staff['avatar']['href']) ? '
+										<td class="sp_staff centertext">', !empty($staff['avatar']['href']) ? '
 											<a href="' . $scripturl . '?action=profile;u=' . $staff['id'] . '"><img src="' . $staff['avatar']['href'] . '" alt="' . $staff['name'] . '" width="40" /></a>' : '', '
 										</td>
 										<td ', sp_embed_class($icons[$staff['type']], '', 'sp_staff_info'. $staff_count != ++$count ? ' sp_staff_divider' : ''), '>',
@@ -2435,7 +2435,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 
 		echo '
 								<tr class="sp_articles_row">
-									<td class="sp_articles sp_center">';
+									<td class="sp_articles centertext">';
 
 		// If we have an avatar to show, show it
 		if (!empty($article['author']['avatar']['href']))
