@@ -39,7 +39,7 @@ function template_categories_edit()
 							<label for="category_description">', $txt['sp_admin_categories_col_description'], ':</label>
 						</dt>
 						<dd>
-							<textarea name="description" id="category_description" rows="5" cols="45">', $context['category']['description'], '</textarea>
+							<textarea class="sp_content" name="description" id="category_description" rows="5" cols="45">', $context['category']['description'], '</textarea>
 						</dd>
 						<dt>
 							<label for="category_permissions">', $txt['sp_admin_categories_col_permissions'], ':</label>
