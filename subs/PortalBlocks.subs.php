@@ -74,7 +74,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 										<input type="hidden" name="old_hash_passwrd" value="" />
 										<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 										<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
-									</form>', sprintf($txt[$context['can_register'] ? 'welcome_guest_register' : 'welcome_guest'], $txt['guest_title'], $scripturl . '?action=login');
+									</form>', replaceBasicActionUrl($txt[$context['can_register'] ? 'welcome_guest_register' : 'welcome_guest']);
 	}
 	// A logged in member then
 	else
@@ -1273,7 +1273,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 
 	$request = $db->query('', '
 		SELECT
-			m.icon, m.subject, m.body, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, 
+			m.icon, m.subject, m.body, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
 			t.num_replies, t.id_topic, m.id_member, m.smileys_enabled, m.id_msg, t.locked, mem.avatar, mem.email_address,
 			a.id_attach, a.attachment_type, a.filename, t.num_views
 		FROM {db_prefix}topics AS t
