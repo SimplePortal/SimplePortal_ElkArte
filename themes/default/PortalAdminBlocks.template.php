@@ -70,7 +70,6 @@ function template_block_list()
 	}
 
 	// Engage sortable to allow drag/drop arrangement of the blocks
-	// @todo if you empty a side, you can't drop a block back in it without a page refresh
 	echo '
 	</div>
 	<script>
