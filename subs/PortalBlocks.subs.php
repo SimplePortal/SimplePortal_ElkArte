@@ -111,12 +111,16 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 									<br />
 									<br />
 									<ul class="sp_list">
-										<li ', sp_embed_class('dot'), '><strong>', $txt['posts'], ':</strong> ', $member_info['posts'], '</li>';
+										<li ', sp_embed_class('dot'), '>
+											<strong>', $txt['posts'], ':</strong> ', $member_info['posts'], '
+										</li>';
 
 		if (!empty($modSettings['karmaMode']))
 		{
 			echo '
-										<li ', sp_embed_class('dot'), '><strong>', $modSettings['karmaLabel'], '</strong> ';
+										<li ', sp_embed_class('dot'), '>
+											<strong>', $modSettings['karmaLabel'], '
+										</strong> ';
 
 			if ($modSettings['karmaMode'] == 1)
 				echo $member_info['karma']['total'];
@@ -130,10 +134,10 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 		{
 			echo '
 										<li ', sp_embed_class('dot'), '>
-											<strong>', $txt['sp-usertmessage'], ':</strong> <a href="', $scripturl, '?action=pm">', $context['user']['messages'], '</a>
+											<strong>', $txt['sp-usertmessage'], ': </strong><a href="', $scripturl, '?action=pm">', $context['user']['messages'], '</a>
 										</li>
 										<li ', sp_embed_class('dot'), '>
-											<strong>', $txt['sp-usernmessage'], ':</strong> ', $context['user']['unread_messages'], '
+											<strong>', $txt['sp-usernmessage'], ': </strong> ', $context['user']['unread_messages'], '
 										</li>';
 		}
 
@@ -219,7 +223,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 
 	foreach ($members as $member)
 		echo '
-									<li ', sp_embed_class('dot'), '>', $member['link'], ' - ', $member['date'], '</li>';
+									<li ', sp_embed_class('dot'), '>', $member['link'], ' - <span class="smalltext">', $member['date'], '</span></li>';
 
 	echo '
 								</ul>';
