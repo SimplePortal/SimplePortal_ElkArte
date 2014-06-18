@@ -1049,6 +1049,41 @@ function sportal_parse_style($action, $setting = '', $process = false)
 }
 
 /**
+ * Returns the number of views and comments for a given article
+ *
+ * @param int $id the id of the article
+ */
+function sportal_get_article_views_comments($id)
+{
+	$db = database();
+
+	if (empty($id))
+		return array(0, 0);
+
+	// Make the request
+	$request = $db->query('', '
+		SELECT
+			views, comments
+		FROM {db_prefix}sp_articles
+		WHERE id_article = {int:article_id}
+		LIMIT {int:limit}',
+		array(
+			'article_id' => $id,
+			'limit' => 1,
+		)
+	);
+	$result = array(0, 0);
+	while($row = $db->fetch_assoc($request))
+	{
+		$result[0] = $row['views'];
+		$result[1] = $row['comments'];
+	}
+	$db->free_result($request);
+
+	return $result;
+}
+
+/**
  * Loads an article by id, or articles by namespace
  *
  * @param int|string|null $article_id id of an article or string for the articles in a namespace

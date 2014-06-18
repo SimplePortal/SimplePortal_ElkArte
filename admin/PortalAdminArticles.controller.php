@@ -299,11 +299,14 @@ class ManagePortalArticles_Controller extends Action_Controller
 				$current = sportal_get_articles($_REQUEST['article_id']);
 				$author = $current['author'];
 				$date = standardTime($current['date']);
+				list($views, $comments) = sportal_get_article_views_comments($_REQUEST['article_id']);
 			}
 			else
 			{
 				$author = array('link' => '<a href="' . $scripturl .'?action=profile;u=' . $user_info['id'] . '">' . $user_info['name'] . '</a>');
 				$date = standardTime(time());
+				$views = 0;
+				$comments = 0;
 			}
 
 			$context['article'] = array(
@@ -317,6 +320,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 				'permissions' => $_POST['permissions'],
 				'date' => $date,
 				'status' => !empty($_POST['status']),
+				'views' => $views,
+				'comments' => $comments,
 			);
 
 			if ($context['article']['type'] === 'bbc')
