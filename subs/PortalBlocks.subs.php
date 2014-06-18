@@ -1269,7 +1269,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 
 	$request = $db->query('', '
 		SELECT
-			m.icon, m.subject, m.body, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, mem.email_address,
+			m.icon, m.subject, m.body, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.email_address,
 			t.num_replies, t.id_topic, m.id_member, m.smileys_enabled, m.id_msg, t.locked, mem.avatar,
 			a.id_attach, a.attachment_type, a.filename, t.num_views
 		FROM {db_prefix}topics AS t
@@ -1292,7 +1292,6 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		// Shorten the text if needed and try and fix the errors it causes.
 		if (!empty($length))
 		{
-			require_once(SUBSDIR . '/Post.subs.php');
 			$row['body'] = shorten_text($row['body'], $length, true);
 			preparsecode($row['body']);
 		}
