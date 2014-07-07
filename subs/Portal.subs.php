@@ -118,9 +118,9 @@ function sportal_init($standalone = false)
 	sportal_load_permissions();
 
 	// Play with our blocks
+	$context['standalone'] = $standalone;
 	sportal_load_blocks();
 
-	$context['standalone'] = $standalone;
 	$context['SPortal']['on_portal'] = getShowInfo(0, 'portal', '');
 
 	if (!Template_Layers::getInstance()->hasLayers(true) && !in_array('portal', Template_Layers::getInstance()->getLayers()))
@@ -132,7 +132,7 @@ function sportal_init($standalone = false)
  */
 function sportal_init_headers()
 {
-	global $settings, $modSettings, $txt, $user_info;
+	global $modSettings, $txt, $user_info;
 	static $initialized;
 
 	// If already loaded just return
@@ -144,9 +144,7 @@ function sportal_init_headers()
 
 	// We use sortable for the front page
 	$modSettings['jquery_include_ui'] = true;
-
-	$javascript = '
-	var sp_images_url = "' . $settings['sp_images_url'] . '";';
+	$javascript = '';
 
 	// Javascipt to allow D&D ordering of the front page blocks, not for guests
 	if (empty($_REQUEST['action']) && !($user_info['is_guest'] || $user_info['id'] == 0))
@@ -213,7 +211,7 @@ function sportal_load_permissions()
  */
 function sportal_load_blocks()
 {
-	global $context, $modSettings, $options, $settings;
+	global $context, $modSettings, $options;
 
 	$context['SPortal']['sides'] = array(
 		5 => array(
@@ -459,7 +457,7 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 	$board = !empty($context['current_board']) ? 'b' . $context['current_board'] : '';
 	$topic = !empty($context['current_topic']) ? 't' . $context['current_topic'] : '';
 	$page = !empty($page_info['id']) ? 'p' . $page_info['id'] : '';
-	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && ELK != 'SSI' && $modSettings['sp_portal_mode'] == 1) || !empty($context['standalone']) ? true : false;
+	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] == 1) || !empty($context['standalone']) ? true : false;
 
 	// Will hopefully get larger in the future.
 	$portal_actions = array(
