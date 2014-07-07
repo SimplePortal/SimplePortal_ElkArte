@@ -27,7 +27,7 @@ function sp_integrate_actions(&$actions)
 		return;
 
 	$actions['forum'] = array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_boardindex');
-	$actions['portal'] = array('PortalMain.controller.php', 'Sportal_Controller', 'action_sportal_main');
+	$actions['portal'] = array('PortalMain.controller.php', 'Sportal_Controller', 'action_sportal_index');
 	$actions['shoutbox'] = array('PortalShoutbox.controller.php', 'Shoutbox_Controller', 'action_sportal_shoutbox');
 
 	// Load SimplePortal.
@@ -306,7 +306,7 @@ function sp_integrate_frontpage(&$default_action)
 			// View the portal
 			$file = CONTROLLERDIR . '/PortalMain.controller.php';
 			$controller = 'Sportal_Controller';
-			$function = 'action_sportal_main';
+			$function = 'action_sportal_index';
 		}
 		elseif (!empty($_GET['page']))
 		{
