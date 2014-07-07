@@ -15,7 +15,7 @@ if (!defined('ELK'))
 
 /**
  * SimplePortal Configuration controller class.
- * This class handles the first general, blocks and articles configuration screens
+ * This class handles the general, blocks and articles configuration screens
  */
 class ManagePortalConfig_Controller extends Action_Controller
 {
@@ -55,6 +55,9 @@ class ManagePortalConfig_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Portal.subs.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
 		loadCSSFile('portal.css');
+		
+		// Load the Simple Portal Help file.
+		loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
 
 		$subActions = array(
 			'information' => array($this, 'action_sportal_information'),
