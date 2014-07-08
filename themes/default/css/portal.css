@@ -44,7 +44,9 @@
 	clear: both;
 	line-height: 0.7em;
 }
-
+.sp_drag_header {
+	cursor: move;
+}
 
 .sp_list {
 	list-style-type: none;
