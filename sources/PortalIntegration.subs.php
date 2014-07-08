@@ -291,12 +291,13 @@ function sp_integrate_frontpage(&$default_action)
 {
 	global $modSettings, $context;
 
+	// Need to run init to determine if we are even active
+	require_once(SUBSDIR . '/Portal.subs.php');
+		sportal_init();
+
 	// Portal is active
 	if (empty($context['disable_sp']))
 	{
-		require_once(SUBSDIR . '/Portal.subs.php');
-		sportal_init();
-
 		$file = null;
 		$function = null;
 
@@ -412,6 +413,7 @@ function sp_integrate_menu_buttons(&$buttons)
 	$buttons = elk_array_insert($buttons, 'home', array(
 		'forum' => array(
 			'title' => empty($txt['sp-forum']) ? 'Forum' : $txt['sp-forum'],
+			'data-icon' => '&#xf0c0;',
 			'href' => $scripturl . ($modSettings['sp_portal_mode'] == 1 && empty($context['disable_sp']) ? '?action=forum' : ''),
 			'show' => in_array($modSettings['sp_portal_mode'], array(1, 3)) && empty($context['disable_sp']),
 			'sub_buttons' => array(),
