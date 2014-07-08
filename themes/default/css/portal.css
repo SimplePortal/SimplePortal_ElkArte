@@ -688,6 +688,9 @@ dl.sp_form img, #sp_add_articles_list_header img {
 /*---------------------------*/
 @media screen and (max-width: 32em)
 {
+	body {
+		min-width: 100%;
+	}
 	#sp_left, #sp_right {
 		position: absolute;
 	}
