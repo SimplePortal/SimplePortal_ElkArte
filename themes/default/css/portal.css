@@ -109,6 +109,7 @@
 	min-width: 150px;
 	min-height: 225px;
 	border: 1px solid #ccc;
+	white-space: nowrap;
 }
 .sp_image_topic {
 	overflow: hidden;

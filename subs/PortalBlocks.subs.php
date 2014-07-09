@@ -2700,7 +2700,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 	}
 	elseif ($mod == 'aeva_media')
 	{
-		require_once(SOURCEDIR . '/Aeva-Subs.php');
+		require_once(SUBSDIR . '/Aeva-Subs.php');
 
 		$items = aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC');
 	}
@@ -2728,12 +2728,11 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 		if ($mod == 'aeva_media')
 		{
 			echo '
-												<a href="', $scripturl, 'sa=item;in=', $item['id'], '">', $item['title'], '</a><br />
-												<a href="', $scripturl, 'sa=item;in=', $item['id'], '"><img src="', $scripturl, 'sa=media;in=', $item['id'], ';thumb" alt="" /></a><br />
+												<a href="', $scripturl, '?action=media;sa=item;in=', $item['id'], '">', $item['title'], '</a><br />
+												<a href="', $scripturl, '?action=media;sa=item;in=', $item['id'], '"><img src="', $scripturl, '?action=media;sa=media;in=', $item['id'], ';thumb" alt="" /></a><br />
 												', $txt['aeva_views'], ': ', $item['views'], '<br />
 												', $txt['aeva_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
-												', $txt['aeva_in_album'], ': <a href="', $scripturl, 'sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>', $item['is_new'] ?
-												'<br /><span class="new_posts">' . $txt['new'] . '</span>' : '';
+												', $txt['aeva_in_album'], ': <a href="', $scripturl, '?action=media;sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>';
 		}
 
 		echo '
