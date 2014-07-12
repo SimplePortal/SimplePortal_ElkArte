@@ -27,12 +27,8 @@ function sp_integrate_actions(&$actions)
 		return;
 
 	$actions['forum'] = array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_boardindex');
-	$actions['portal'] = array('PortalMain.controller.php', 'Sportal_Controller', 'action_sportal_index');
+	$actions['portal'] = array('PortalMain.controller.php', 'Sportal_Controller', 'action_index');
 	$actions['shoutbox'] = array('PortalShoutbox.controller.php', 'Shoutbox_Controller', 'action_sportal_shoutbox');
-
-	// Load SimplePortal.
-	require_once(SUBSDIR . '/Portal.subs.php');
-	sportal_init();
 }
 
 /**
@@ -293,7 +289,7 @@ function sp_integrate_frontpage(&$default_action)
 
 	// Need to run init to determine if we are even active
 	require_once(SUBSDIR . '/Portal.subs.php');
-		sportal_init();
+	sportal_init();
 
 	// Portal is active
 	if (empty($context['disable_sp']))
