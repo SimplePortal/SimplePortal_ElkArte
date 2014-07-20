@@ -296,8 +296,19 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		}
 
 		// Want to take a look at how this block will appear, well we try our best
-		if (!empty($_POST['preview_block']))
+		if (!empty($_POST['preview_block']) || isset($_SESSION['sp_error']))
 		{
+			// An error was generated on save, lets set things up like a preview and return to the preivew
+			if (isset($_SESSION['sp_error']))
+			{
+				$context['SPortal']['error'] = $_SESSION['sp_error'];
+				$_POST = $_SESSION['sp_error_post'];
+				$_POST['preview_block'] = true;
+
+				// Clean up
+				unset($_SESSION['sp_error'], $_SESSION['sp_error_post'], $_POST['add_block']);
+			}
+
 			// Just in case, the admin could be doing something silly like editing a SP block while SP is disabled. ;)
 			require_once(BOARDDIR . '/SSI.php');
 			sportal_init_headers();
@@ -575,7 +586,14 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				$error = $validator->validation_errors();
 
 				if ($error)
-					fatal_error($error[0], false);
+				{
+					$_SESSION['sp_error'] = $error[0];
+					$_SESSION['sp_error_post'] = $_POST;
+					redirectexit('action=admin;area=portalblocks;sa=' . $_REQUEST['sa'] . (!empty($_REQUEST['block_id']) ? ';block_id=' . $_REQUEST['block_id'] : ''));
+
+					//action=admin;area=portalblocks;sa=edit;block_id=23;caeb92efed=c4e166665ebec37b95120eb54a76ee0f
+					//fatal_error($error[0], false);
+				}
 			}
 
 			// If we have a block ID passed, we must be editing, so the the blocks current data
@@ -939,7 +957,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			if ($context['SPortal']['block']['type'] == 'sp_php' && !allowedTo('admin_forum'))
 				fatal_lang_error('cannot_admin_forum', false);
 		}
-
 
 		// We don't need it anymore.
 		sp_block_delete($_REQUEST['block_id']);
