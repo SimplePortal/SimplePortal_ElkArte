@@ -405,6 +405,14 @@ function sp_integrate_menu_buttons(&$buttons)
 	require_once(SUBSDIR . '/Portal.subs.php');
 	loadLanguage('SPortal', sp_languageSelect('SPortal'));
 
+	// Set the right portalurl based on what integration mode the portal is using
+	if ($modSettings['sp_portal_mode'] == 1 && empty($context['disable_sp']))
+		$sportalurl = $scripturl . '?action=forum';
+	elseif ($modSettings['sp_portal_mode'] == 3 && empty($context['disable_sp']))
+		$sportalurl = $modSettings['sp_standalone_url'];
+	else
+		$sportalurl = '';
+
 	// Define the new menu item(s)
 	$buttons = elk_array_insert($buttons, 'home', array(
 		'forum' => array(
