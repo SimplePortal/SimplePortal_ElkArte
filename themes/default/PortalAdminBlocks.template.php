@@ -99,6 +99,10 @@ function template_block_edit()
 	// Want to take a look before you save?
 	if (!empty($context['SPortal']['preview']))
 	{
+		if (!empty($context['SPortal']['error']))
+			echo '
+	<div class="errorbox">' , $context['SPortal']['error'], '</div>';
+
 		echo '
 	<div class="sp_auto_align" style="width: ', $context['widths'][$context['SPortal']['block']['column']], ';">';
 

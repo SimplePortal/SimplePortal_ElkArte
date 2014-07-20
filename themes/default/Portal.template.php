@@ -114,7 +114,7 @@ function template_portal_above()
 		echo '
 			<td id="sp_left"', !empty($modSettings['leftwidth']) ? ' style="width:' . $modSettings['leftwidth'] . 'px"' : '', $context['SPortal']['sides'][1]['collapsed'] && empty($modSettings['sp_disable_side_collapse']) ? ' style="display: none;"' : '', '>
 				<div id="sp_left_div" class="sp_column">';
-		
+
 		foreach ($context['SPortal']['blocks'][1] as $block)
 			template_block($block, 1);
 
