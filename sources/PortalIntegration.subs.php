@@ -418,7 +418,7 @@ function sp_integrate_menu_buttons(&$buttons)
 		'forum' => array(
 			'title' => empty($txt['sp-forum']) ? 'Forum' : $txt['sp-forum'],
 			'data-icon' => '&#xf0c0;',
-			'href' => $scripturl . ($modSettings['sp_portal_mode'] == 1 && empty($context['disable_sp']) ? '?action=forum' : ''),
+			'href' => $sportalurl,
 			'show' => in_array($modSettings['sp_portal_mode'], array(1, 3)) && empty($context['disable_sp']),
 			'sub_buttons' => array(),
 		),
