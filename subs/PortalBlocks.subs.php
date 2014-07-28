@@ -44,7 +44,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 													<label for="sp_user">', $txt['username'], ':</label>&nbsp;
 												</td>
 												<td>
-													<input type="text" id="sp_user" name="user" size="9" value="', !empty($user_info['username']) ? $user_info['username'] : '', '" />
+													<input type="text" id="sp_user" name="user" size="8" value="', !empty($user_info['username']) ? $user_info['username'] : '', '" />
 												</td>
 											</tr>
 											<tr>
@@ -52,7 +52,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 													<label for="sp_passwrd">', $txt['password'], ':</label>&nbsp;
 												</td>
 												<td>
-													<input type="password" name="passwrd" id="sp_passwrd" size="9" />
+													<input type="password" name="passwrd" id="sp_passwrd" size="8" />
 												</td>
 											</tr>
 											<tr>
