@@ -49,7 +49,7 @@ class Article_Controller extends Action_Controller
 		foreach ($context['articles'] as $article)
 		{
 			if (!empty($modSettings['articlelength']))
-				$article['body'] = shorten_text($article['body'], $modSettings['articlelength'], true);
+				$article['body'] = Util::shorten_text($article['body'], $modSettings['articlelength'], true);
 
 			$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
 			$context['articles'][$article['id']]['date'] = standardTime($article['date']);

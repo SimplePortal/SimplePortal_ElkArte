@@ -1293,21 +1293,17 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	$colorids = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		// Shorten the text if needed and try and fix the errors it causes.
-		if (!empty($length))
-		{
-			require_once(SUBSDIR . '/Post.subs.php');
-			$row['body'] = shorten_text($row['body'], $length, true);
-			preparsecode($row['body']);
-		}
-
 		censorText($row['subject']);
 		censorText($row['body']);
 
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
-		// Link the ellipsis if the body has been shortened.
-		$row['body'] = preg_replace('~(\.{3})$(?<!\.{4})~', '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">&hellip;</a>', $row['body']);
+		// Shorten the text if needed, link the ellipsis if the body has been shortened.
+		if (!empty($length))
+		{
+			$ellip = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">&hellip;</a>';
+			$row['body'] = Util::shorten_html($row['body'], $length, $ellip, false);
+		}
 
 		if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
 		{
@@ -2042,7 +2038,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 			'title' => $item['title'],
 			'href' => $item['link'],
 			'link' => $item['title'] == '' ? '' : ($item['link'] == '' ? $item['title'] : '<a href="' . $item['link'] . '" target="_blank" class="new_win">' . $item['title'] . '</a>'),
-			'content' => $limit > 0 ? un_htmlspecialchars(shorten_text($item['description'], $limit, true)) : $item['description'],
+			'content' => $limit > 0 ? Util::shorten_text($item['description'], $limit, true) : $item['description'],
 			'date' => !empty($item['pubdate']) ? standardTime(strtotime($item['pubdate']), '%d %B') : '',
 		);
 	}
@@ -2433,10 +2429,9 @@ function sp_articles($parameters, $id, $return_parameters = false)
 
 	foreach ($articles as $article)
 	{
-		// Shorten, fix the errors in doing so, parse it
-		$article['body'] = shorten_text($article['body'], $length, true);
-		preparsecode($article['body']);
-		$article['body'] = parse_bbc(un_htmlspecialchars($article['body']));
+		// Shorten it for the preview
+		$article['body'] = parse_bbc($article['body']);
+		$article['body'] = Util::shorten_html($article['body'], $length);
 
 		echo '
 								<tr class="sp_articles_row">

@@ -77,9 +77,8 @@ class Sportal_Controller extends Action_Controller
 			if (!empty($modSettings['articlelength']))
 			{
 				require_once(SUBSDIR . '/Post.subs.php');
-				$article['body'] = shorten_text($article['body'], $modSettings['articlelength'], true);
+				$article['body'] = Util::shorten_text($article['body'], $modSettings['articlelength'], true);
 				preparsecode($article['body']);
-				$article['body'] = un_htmlspecialchars($article['body']);
 			}
 
 			$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
