@@ -470,6 +470,9 @@ class ManagePortalPages_Controller extends Action_Controller
 		if (preg_replace('~[0-9]+~', '', $_POST['namespace']) === '')
 			$pages_errors->addError('sp_error_page_namespace_numeric');
 
+		if ($_POST['type'] === 'php' && !allowedTo('admin_forum'))
+			fatal_lang_error('cannot_admin_forum', false);
+
 		// Running some php code, then we need to validate its legit code
 		if ($_POST['type'] === 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
 		{

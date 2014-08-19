@@ -568,6 +568,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// Want to add / edit a block oo the portal
 		if (!empty($_POST['add_block']))
 		{
+			checkSession();
+			
 			// Only the admin can do php here
 			if ($_POST['block_type'] == 'sp_php' && !allowedTo('admin_forum'))
 				fatal_lang_error('cannot_admin_forum', false);

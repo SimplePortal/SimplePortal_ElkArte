@@ -109,6 +109,8 @@ function sportal_init($standalone = false)
 				if (strpos($tree['url'], '#c') !== false && strpos($tree['url'], 'action=forum#c') === false)
 					$context['linktree'][$key]['url'] = str_replace('#c', '?action=forum#c', $tree['url']);
 		}
+		else
+			$_GET['action'] = 'portal';
 	}
 
 	// Load the headers if necessary.
@@ -138,6 +140,18 @@ function sportal_init_headers()
 	// If already loaded just return
 	if (!empty($initialized))
 		return;
+
+	// Generate a safe scripturl
+	$safe_scripturl = $scripturl;
+	$current_request = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] : $_SERVER['HTTP_HOST'];
+
+	if (strpos($scripturl, 'www.') !== false && strpos($current_request, 'www.') === false)
+		$safe_scripturl = str_replace('://www.', '://', $scripturl);
+	elseif (strpos($scripturl, 'www.') === false && strpos($current_request, 'www.') !== false)
+		$safe_scripturl = str_replace('://', '://www.', $scripturl);
+
+	// The shoutbox may fail to function in certain cases without using a safe scripturl
+	addJavascriptVar('sp_script_url', $safe_scripturl);
 
 	// Load up some javascript!
 	loadJavascriptFile('portal.js?sp24');
@@ -1501,61 +1515,72 @@ function sportal_recount_comments($article_id)
 function sportal_get_pages($page_id = null, $active = false, $allowed = false, $sort = 'title')
 {
 	global $context, $scripturl;
+	static $cache;
 
 	$db = database();
 
-	$query = array();
-	$parameters = array('sort' => $sort);
-
-	// Page id or Page Namespace
-	if (!empty($page_id) && is_int($page_id))
+	// If we already have the information, just return it
+	$cache_name = implode(':', array($page_id, $active, $allowed));
+	if (isset($cache[$cache_name]))
+		$return = $cache[$cache_name];
+	else
 	{
-		$query[] = 'id_page = {int:page_id}';
-		$parameters['page_id'] = $page_id;
-	}
-	elseif (!empty($page_id))
-	{
-		$query[] = 'namespace = {string:namespace}';
-		$parameters['namespace'] = $page_id;
-	}
+		$query = array();
+		$parameters = array('sort' => $sort);
 
-	// Use permissions?
-	if (!empty($allowed))
-		$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
+		// Page id or Page Namespace
+		if (!empty($page_id) && is_int($page_id))
+		{
+			$query[] = 'id_page = {int:page_id}';
+			$parameters['page_id'] = $page_id;
+		}
+		elseif (!empty($page_id))
+		{
+			$query[] = 'namespace = {string:namespace}';
+			$parameters['namespace'] = Util::htmlspecialchars((string) $page_id, ENT_QUOTES);
+		}
 
-	// Only active pages?
-	if (!empty($active))
-	{
-		$query[] = 'status = {int:status}';
-		$parameters['status'] = 1;
-	}
+		// Use permissions?
+		if (!empty($allowed))
+			$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
 
-	// Make the page request
-	$request = $db->query('', '
-		SELECT
-			id_page, namespace, title, body, type, permissions, views, style, status
-		FROM {db_prefix}sp_pages' . (!empty($query) ? '
-		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY {raw:sort}', $parameters
-	);
-	$return = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$return[$row['id_page']] = array(
-			'id' => $row['id_page'],
-			'page_id' => $row['namespace'],
-			'title' => $row['title'],
-			'href' => $scripturl . '?page=' . $row['namespace'],
-			'link' => '<a href="' . $scripturl . '?page=' . $row['namespace'] . '">' . $row['title'] . '</a>',
-			'body' => $row['body'],
-			'type' => $row['type'],
-			'permissions' => $row['permissions'],
-			'views' => $row['views'],
-			'style' => $row['style'],
-			'status' => $row['status'],
+		// Only active pages?
+		if (!empty($active))
+		{
+			$query[] = 'status = {int:status}';
+			$parameters['status'] = 1;
+		}
+
+		// Make the page request
+		$request = $db->query('', '
+			SELECT
+				id_page, namespace, title, body, type, permissions, views, style, status
+			FROM {db_prefix}sp_pages' . (!empty($query) ? '
+			WHERE ' . implode(' AND ', $query) : '') . '
+			ORDER BY {raw:sort}', $parameters
 		);
+		$return = array();
+		while ($row = $db->fetch_assoc($request))
+		{
+			$return[$row['id_page']] = array(
+				'id' => $row['id_page'],
+				'page_id' => $row['namespace'],
+				'title' => $row['title'],
+				'href' => $scripturl . '?page=' . $row['namespace'],
+				'link' => '<a href="' . $scripturl . '?page=' . $row['namespace'] . '">' . $row['title'] . '</a>',
+				'body' => $row['body'],
+				'type' => $row['type'],
+				'permissions' => $row['permissions'],
+				'views' => $row['views'],
+				'style' => $row['style'],
+				'status' => $row['status'],
+			);
+		}
+		$db->free_result($request);
+
+		// Save this so we don't have to do it again
+		$cache[$cache_name] = $return;
 	}
-	$db->free_result($request);
 
 	return !empty($page_id) ? current($return) : $return;
 }

@@ -268,7 +268,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		$article_errors = Error_Context::context('article', 0);
 
-		// Going to use editor an post functions
+		// Going to use editor and post functions
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Editor.subs.php');
 
@@ -502,6 +502,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			preparsecode($article_info['body']);
 
 		// Save away
+		checkSession();
 		sp_save_article($article_info, $is_new);
 
 		redirectexit('action=admin;area=portalarticles');

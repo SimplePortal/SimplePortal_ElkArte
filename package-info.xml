@@ -39,6 +39,8 @@
 		<hook hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_redirect" function="sp_integrate_redirect" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_sa_xmlhttp" function="sp_integrate_xmlhttp" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_pre_log_stats" function="sp_integrate_pre_log_stats" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_load_illegal_guest_permissions" function="sp_integrate_load_illegal_guest_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
 	<uninstall for="1.0 RC1 - 1.0.99">
@@ -55,6 +57,8 @@
 		<hook reverse="true" hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_redirect" function="sp_integrate_redirect" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_sa_xmlhttp" function="sp_integrate_xmlhttp" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_pre_log_stats" function="sp_integrate_pre_log_stats" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_load_illegal_guest_permissions" function="sp_integrate_load_illegal_guest_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<modification reverse="true">modification.xml</modification>
 		<remove-file name="BOARDDIR/PortalStandalone.php" />
 		<remove-file name="CONTROLLERDIR/PortalArticles.controller.php" />

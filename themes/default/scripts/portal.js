@@ -116,7 +116,7 @@ function sp_submit_shout(shoutbox_id, sSessionVar, sSessionId)
 
 		shout_body = escape(document.getElementById('new_shout_' + shoutbox_id).value.replace(/&#/g, "&#").php_to8bit()).replace(/\+/g, "%2B");
 
-		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=shoutbox;xml', 'shoutbox_id=' + shoutbox_id + '&shout=' + shout_body + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
+		sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;xml', 'shoutbox_id=' + shoutbox_id + '&shout=' + shout_body + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
 
 		document.getElementById('new_shout_' + shoutbox_id).value = '';
 
@@ -130,7 +130,7 @@ function sp_delete_shout(shoutbox_id, shout_id, sSessionVar, sSessionId)
 	{
 		shoutbox_indicator(shoutbox_id, true);
 
-		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=shoutbox;xml', 'shoutbox_id=' + shoutbox_id + '&delete=' + shout_id + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
+		sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;xml', 'shoutbox_id=' + shoutbox_id + '&delete=' + shout_id + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
 
 		return false;
 	}
@@ -142,7 +142,7 @@ function sp_refresh_shout(shoutbox_id, last_refresh)
 	{
 		shoutbox_indicator(shoutbox_id, true);
 
-		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=shoutbox;shoutbox_id=' + shoutbox_id + ';time=' + last_refresh + ';xml', onShoutReceived);
+		getXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;shoutbox_id=' + shoutbox_id + ';time=' + last_refresh + ';xml', onShoutReceived);
 
 		return false;
 	}
@@ -189,9 +189,6 @@ function onShoutReceived(XMLDoc)
 				document.getElementById('shouts_' + shoutbox_id).scrollTop = document.getElementById('shouts_' + shoutbox_id).scrollHeight;
 			else
 				document.getElementById('shouts_' + shoutbox_id).scrollTop = 0;
-
-			var sp_date = new Date();
-			eval("last_refresh_" + shoutbox_id + " = " + Math.round(sp_date.getTime() / 1000, 0) + ";");
 		}
 	}
 

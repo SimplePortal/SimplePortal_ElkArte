@@ -47,6 +47,9 @@ require_once(SUBSDIR . '/PortalBlocks.subs.php');
 loadTemplate('Portal', 'portal');
 sportal_init(true);
 
+// We'll catch you...
+writeLog();
+
 // Articles
 require_once(CONTROLLERDIR . '/PortalMain.controller.php');
 $controller = new Sportal_Controller();

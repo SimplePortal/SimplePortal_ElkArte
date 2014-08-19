@@ -209,6 +209,8 @@ function sp_integrate_whos_online($actions)
 		$txt['who_index'] = sprintf($txt['sp_who_index'], $scripturl);
 		$txt['whoall_forum'] = sprintf($txt['sp_who_forum'], $scripturl);
 	}
+	elseif ($modSettings['sp_portal_mode'] == 3)
+		$txt['whoall_portal'] = sprintf($txt['sp_who_index'], $scripturl);
 
 	// If its a portal action, lets check it out.
 	if (isset($actions['page']))
@@ -480,7 +482,7 @@ function sp_integrate_current_action(&$current_action)
 	if ($current_action == 'home')
 		$current_action = $modSettings['sp_portal_mode'] == 3 && empty($context['standalone']) && empty($context['disable_sp']) ? 'forum' : 'home';
 
-	if(empty($context['disable_sp']) && ((isset($_GET['board']) || isset($_GET['topic']) || in_array($context['current_action'], array('unread', 'unreadreplies', 'recent', 'stats', 'who'))) && in_array($modSettings['sp_portal_mode'], array(1, 3))))
+	if (empty($context['disable_sp']) && ((isset($_GET['board']) || isset($_GET['topic']) || in_array($context['current_action'], array('unread', 'unreadreplies', 'collapse', 'recent', 'stats', 'who'))) && in_array($modSettings['sp_portal_mode'], array(1, 3))))
 		$current_action = 'forum';
 }
 
@@ -494,4 +496,37 @@ function sp_integrate_xmlhttp(&$subActions)
 {
 	$subActions['blockorder'] = array('controller' => 'ManagePortalBlocks_Controller', 'file' => 'PortalAdminBlocks.controller.php', 'function' => 'action_blockorder', 'permission' => 'admin_forum');
 	$subActions['userblockorder'] = array('controller' => 'Sportal_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalMain.controller.php', 'function' => 'action_userblockorder');
+}
+
+/**
+ * Add items to the not stat action array to prevent logging in some cases
+ * @param string $no_stat_actions
+ */
+function sp_integrate_pre_log_stats(&$no_stat_actions)
+{
+	// Don't track stats of portal xml actions.
+	if (($_REQUEST['action'] == 'portal' && isset($_GET['xml'])))
+		$no_stat_actions[] = 'portal';
+}
+
+/**
+ * Add premissions that guest should never be able to have
+ * integrate_load_illegal_guest_permissions called from Permission.subs.php
+ */
+function sp_integrate_load_illegal_guest_permissions()
+{
+	global $context;
+
+	// Guests shouldn't be able to have any portal specific permissions.
+	$context['non_guest_permissions'] = array_merge($context['non_guest_permissions'], array(
+		'sp_admin',
+		'sp_manage_settings',
+		'sp_manage_blocks',
+		'sp_manage_articles',
+		'sp_manage_pages',
+		'sp_manage_shoutbox',
+		'sp_add_article',
+		'sp_auto_article_approval',
+		'sp_remove_article'
+	));
 }

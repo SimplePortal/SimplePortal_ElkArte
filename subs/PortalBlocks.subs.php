@@ -252,7 +252,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 	$online_today = !empty($parameters['online_today']);
 
 	loadLanguage('index', '', false, true);
-	
+
 	$stats = ssi_whosOnline('array');
 
 	echo '
@@ -727,7 +727,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	if (!empty($last_active_limit))
 	{
 		$timeLimit = time() - $last_active_limit;
-		$where[] = "lastLogin > $timeLimit";
+		$where[] = "last_login > $timeLimit";
 	}
 
 	if (!empty($current_system['where']))
@@ -1057,7 +1057,7 @@ function sp_topBoards($parameters, $id, $return_parameters = false)
 										$board['link'], '
 									</li>
 									<li class="sp_list_indent', empty($board['is_last']) ? ' sp_list_bottom' : '', ' smalltext">',
-										$txt['topics'], ': ', $board['num_topics'], ' | ', $txt['posts'], ': ', $board['num_posts'], '
+										(empty($board['num_topics']) && !empty($board['num_posts'])) ? $txt['redirects'] : ($txt['topics'] . ': ' . comma_format($board['num_topics']) . ' | ' . $txt['posts']), ': ', comma_format($board['num_posts']), '
 									</li>';
 
 	echo '
@@ -1904,12 +1904,9 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 
 			foreach ($calendar_array['futureEvents'] as $startdate => $events)
 			{
-				list($year, $month, $day) = explode('-', $startdate);
-				$currentDay = $day . ' ' . $txt['months_short'][(int) $month];
-
 				foreach ($events as $event)
 					echo '
-									<li ', sp_embed_class('event'), '>', $event['link'], ' - ', $currentDay, '</li>';
+									<li ', sp_embed_class('event'), '>', $event['link'], ' - ', timeformat(strtotime($startdate), '%d %b'), '</li>';
 			}
 		}
 
@@ -1956,7 +1953,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
 	$strip_preserve = !empty($parameters['strip_preserve']) ? $parameters['strip_preserve'] : 'br';
 	$strip_preserve = preg_match_all('~[A-Za-z0-9]+~', $strip_preserve, $match) ? $match[0] : array();
 	$count = !empty($parameters['count']) ? (int) $parameters['count'] : 5;
-	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 150;
+	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 0;
 
 	// Need a feed name to load it
 	if (empty($feed))
