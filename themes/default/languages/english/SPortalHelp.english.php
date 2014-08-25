@@ -41,10 +41,12 @@ $helptxt['sp_enableIntegration'] = 'This setting enables blocks inside the forum
 $helptxt['sp_IntegrationHide'] = 'Hide blocks in certain forum sections. The <em>Display blocks in Forum</em> setting must be enabled for this to work.';
 
 // Article settings
-$helptxt['articleactive'] = 'This setting enables articles to be displayed on the portal.';
-$helptxt['articleperpage'] = 'This sets the maximum amount of articles shown per page.';
-$helptxt['articlelength'] = 'This setting allows a limit to be set on the amount of characters an article can display on the portal page. If the article exceeds this limit it will be shortened and have an ellipsis (...) link on the end, which allows the user to view the entire article.';
-$helptxt['articleavatar'] = 'If this setting is enabled the authors avatar will be shown along with each article.';
+$helptxt['sp_articles_index'] = 'This setting enables articles to be displayed on the portal.';
+$helptxt['sp_articles_index_per_page'] = 'This sets the maximum amount of articles shown per page.';
+$helptxt['sp_articles_index_total'] = 'This sets the total number of articles that will be available on the portal index';
+$helptxt['sp_articles_length'] = 'This setting allows a limit to be set on the amount of characters an article can display on the portal page. If the article exceeds this limit it will be shortened and have an ellipsis (...) link on the end, which allows the user to view the entire article.';
+$helptxt['sp_articles_per_page'] = 'This sets the maximum amount of articles shown per page on the article listing';
+$helptxt['sp_articles_comments_per_page'] = 'This sets the maximum amount articles comments per page';
 
 // Blocks area
 $helptxt['sp_BlocksArea'] = 'Blocks are boxes which can be displayed on the portal or inside the forum. This section enables existing blocks to be modified, and new ones to be created.';
@@ -58,9 +60,9 @@ $helptxt['sp-blocksHeaderList'] = 'These blocks are displayed on the top of the 
 $helptxt['sp-blocksFooterList'] = 'These blocks are displayed on the bottom of the portal and forum.';
 
 // Add/Edit blocks
-$helptxt['sp-blocksAdd'] = 'This area enables the selected block to be customised and configured.';
+$helptxt['sp-blocksAdd'] = 'This area enables the selected block to be customized and configured.';
 $helptxt['sp-blocksSelectType'] = 'This area enables blocks to be created for the portal page. Pre-built blocks or custom content blocks can be created easily by selecting the appropriate options.';
-$helptxt['sp-blocksEdit'] = 'This area enables the selected block to be customised and configured.';
+$helptxt['sp-blocksEdit'] = 'This area enables the selected block to be customized and configured.';
 $helptxt['sp-blocksDisplayOptions'] = 'This area allows you to select on which pages block will appear.';
 $helptxt['sp-blocksCustomDisplayOptions'] = 'Custom display options allows a more advanced control over where to display the block with its special syntax.<br /><br />
 <strong>Special actions include:</strong><br /><br />
@@ -73,7 +75,7 @@ $helptxt['sp-blocksCustomDisplayOptions'] = 'Custom display options allows a mor
 <strong>Wavy (~)</strong><br />
 This symbol acts as a wildcard, allowing you to include dynamic actions like ../index.php?issue=* or ../index.php?game=*. Used as ~action<br /><br />
 <strong>Idkin (|)</strong><br />
-Another wildcard sybmol which allows you to specify an exact value for a dynamic action like ../index.php?issue=1.0 or ../index.php?game=xyz. Should be used with wavy and after the action like; ~action|value<br /><br />
+Another wildcard symbol which allows you to specify an exact value for a dynamic action like ../index.php?issue=1.0 or ../index.php?game=xyz. Should be used with wavy and after the action like; ~action|value<br /><br />
 <strong>Negator (-)</strong><br />
 This symbol is to exclude regular and dynamic actions. Should be used before the action name for regular actions and before the wavy for dynamic actions. Used as -action and -~action';
 $helptxt['sp-blocksStyleOptions'] = 'These options allow you to specify CSS styling for each blocks.';
@@ -164,6 +166,7 @@ $helptxt['sp_param_sp_articles_category'] = 'The category to display articles fr
 $helptxt['sp_param_sp_articles_limit'] = 'How many articles to display.';
 $helptxt['sp_param_sp_articles_type'] = 'Displays random articles, or the latest articles.';
 $helptxt['sp_param_sp_articles_length'] = 'If specified, articles exceeding this limit will be shortened and have an ellipsis (...) link placed on the end.';
+$helptxt['sp_param_sp_articles_avatar'] = 'Enables the author avatar to be displayed along with the article.';
 $helptxt['sp_param_sp_gallery_limit'] = 'How many items to display.';
 $helptxt['sp_param_sp_gallery_type'] = 'Displays random or the latest gallery items.';
 $helptxt['sp_param_sp_gallery_direction'] = 'Gallery images can be aligned horizontally or vertically.';
