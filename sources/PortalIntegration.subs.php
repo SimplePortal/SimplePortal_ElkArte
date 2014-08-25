@@ -505,7 +505,7 @@ function sp_integrate_xmlhttp(&$subActions)
 function sp_integrate_pre_log_stats(&$no_stat_actions)
 {
 	// Don't track stats of portal xml actions.
-	if (($_REQUEST['action'] == 'portal' && isset($_GET['xml'])))
+	if (isset($_REQUEST['action']) && ($_REQUEST['action'] === 'portal' && isset($_GET['xml'])))
 		$no_stat_actions[] = 'portal';
 }
 
