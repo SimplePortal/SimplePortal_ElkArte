@@ -167,7 +167,7 @@ class Article_Controller extends Action_Controller
 			if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
 				fatal_lang_error('error_sp_cannot_comment_modify', false);
 
-			require_once(SOURCEDIR . '/Post.subs.php');
+			require_once(SUBSDIR . '/Post.subs.php');
 
 			$context['article']['comment'] = array(
 				'id' => $comment_id,
