@@ -17,6 +17,9 @@ function template_portal_index()
 {
 	global $context, $txt;
 
+	if (empty($context['articles']))
+		return;
+
 	echo '
 	<div id="sp_index">';
 
@@ -60,6 +63,10 @@ function template_portal_index()
 
 	echo '
 	</div>';
+
+	// Pages as well?
+	if (!empty($context['page_index']))
+		template_pagesection();
 }
 
 /**
@@ -154,7 +161,7 @@ function template_portal_below()
 	// Output all the Bottom blocks
 	if (!empty($context['SPortal']['blocks'][3]))
 	{
-		if (empty($context['SPortal']['on_portal']) || !empty($context['SPortal']['blocks'][2]) || !empty($modSettings['articleactive']))
+		if (empty($context['SPortal']['on_portal']) || !empty($context['SPortal']['blocks'][2]) || !empty($modSettings['sp_articles_index']))
 			echo '
 					<br class="sp_side_clear" />';
 
@@ -217,7 +224,7 @@ function template_block($block, $side = -1)
 	if ($block['type'] === 'sp_boardNews')
 	{
 		echo '
-			<div id="sp_block_', $block['id'], '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['articleactive'])) ? '_last' : '', '">';
+			<div id="sp_block_', $block['id'], '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['sp_articles_index'])) ? '_last' : '', '">';
 
 		$block['type']($block['parameters'], $block['id']);
 
@@ -266,7 +273,7 @@ function template_block_default($block, $side)
 	}
 
 	echo '
-						<div id="sp_block_' . $block['id'] . '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['articleactive'])) ? '_last' : '', '" ', $block['collapsed'] && empty($block['force_view']) ? ' style="display: none;"' : '', '>
+						<div id="sp_block_' . $block['id'] . '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['sp_articles_index'])) ? '_last' : '', '" ', $block['collapsed'] && empty($block['force_view']) ? ' style="display: none;"' : '', '>
 							<div', empty($block['style']['body']['class']) ? '' : ' class="' . $block['style']['body']['class'] . '"', '>
 								<div class="', $block['type'] != 'sp_menu' ? 'sp_block' : 'sp_content_padding', '"', !empty($block['style']['body']['style']) ? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
 

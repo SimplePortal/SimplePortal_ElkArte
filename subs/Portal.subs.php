@@ -134,7 +134,7 @@ function sportal_init($standalone = false)
  */
 function sportal_init_headers()
 {
-	global $modSettings, $txt, $user_info;
+	global $modSettings, $txt, $user_info, $scripturl;
 	static $initialized;
 
 	// If already loaded just return
@@ -1106,7 +1106,7 @@ function sportal_get_article_views_comments($id)
  * @param int|null $category_id id of the category
  * @param int|null $limit limit the number of results
  */
-function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title', $category_id = null, $limit = null)
+function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title', $category_id = null, $limit = null, $start = null)
 {
 	global $scripturl, $context, $modSettings, $color_profile;
 
@@ -1152,7 +1152,10 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 
 	// Limits?
 	if (!empty($limit))
+	{
 		$parameters['limit'] = $limit;
+		$parameters['start'] = !empty($start) ? $start : 0;
+	}
 
 	// Make the request
 	$request = $db->query('', '
@@ -1168,7 +1171,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}' . (!empty($limit) ? '
-		LIMIT {int:limit}' : ''), $parameters
+		LIMIT {int:start}, {int:limit}' : ''), $parameters
 	);
 	$return = array();
 	$member_ids = array();
@@ -1239,6 +1242,94 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 
 	// Return one or all
 	return !empty($article_id) ? current($return) : $return;
+}
+
+/**
+ * Returns the count of articles in a given category
+ *
+ * @param ing $catid category identifier
+ */
+function sportal_get_articles_in_cat_count($catid)
+{
+	global $context;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}sp_articles
+		WHERE status = {int:article_status}
+			AND {raw:article_permissions}
+			AND id_category = {int:current_category}
+		LIMIT {int:limit}',
+		array(
+			'article_status' => 1,
+			'article_permissions' => sprintf($context['SPortal']['permissions']['query'], 'permissions'),
+			'current_category' => $catid,
+			'limit' => 1,
+		)
+	);
+	list ($total_articles) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_articles;
+}
+
+/**
+ * Returns the number of articles in the system that a user can see
+ */
+function sportal_get_articles_count()
+{
+	global $context;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}sp_articles AS spa
+			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
+		WHERE spa.status = {int:article_status}
+			AND spc.status = {int:category_status}
+			AND {raw:article_permissions}
+			AND {raw:category_permissions}
+		LIMIT {int:limit}',
+		array(
+			'article_status' => 1,
+			'category_status' => 1,
+			'article_permissions' => sprintf($context['SPortal']['permissions']['query'], 'spa.permissions'),
+			'category_permissions' => sprintf($context['SPortal']['permissions']['query'], 'spc.permissions'),
+			'limit' => 1,
+		)
+	);
+	list ($total_articles) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_articles;
+}
+
+/**
+ * Fetches the number of comments a given article has received
+ *
+ * @param int $id article id
+ */
+function sportal_get_article_comment_count($id)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}sp_comments
+		WHERE id_article = {int:current_article}
+		LIMIT {int:limit}',
+		array(
+			'current_article' => $id,
+			'limit' => 1,
+		)
+	);
+	list ($total_comments) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_comments;
 }
 
 /**
@@ -1318,7 +1409,7 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
  */
 function sportal_get_comments($article_id = null)
 {
-	global $scripturl, $user_info;
+	global $scripturl, $user_info, $modSettings;
 
 	$db = database();
 

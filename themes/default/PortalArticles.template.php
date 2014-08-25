@@ -15,7 +15,7 @@
  */
 function template_view_articles()
 {
-	global $context, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="sp_view_articles">
@@ -60,6 +60,10 @@ function template_view_articles()
 
 	echo '
 	</div>';
+
+	// Pages as well?
+	if (!empty($context['page_index']))
+		template_pagesection();
 }
 
 /**
@@ -155,13 +159,17 @@ function template_view_article()
 			</div>';
 		}
 
+		// Pages as well?
+		if (!empty($context['page_index']))
+			template_pagesection();
+
 		if ($context['article']['can_comment'])
 		{
 			echo '
-			<div class="windowbg2">
+			<div class="windowbg">
 				<div class="sp_content_padding">
 					<form action="', $context['article']['href'], '" method="post" accept-charset="UTF-8">
-						<textarea name="body" rows="5" cols="50" style="', isBrowser('is_ie8') ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 99%', ';">', !empty($context['article']['comment']['body']) ? $context['article']['comment']['body'] : '', '</textarea>
+						<textarea name="body" rows="5" cols="50" style="', isBrowser('is_ie8') ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 100%', ';">', !empty($context['article']['comment']['body']) ? $context['article']['comment']['body'] : '', '</textarea>
 						<div class="centertext">
 							<input type="submit" name="submit" value="', !empty($context['article']['comment']) ? $txt['sp_modify'] : $txt['sp_submit'], '" class="right_submit" />
 						</div>

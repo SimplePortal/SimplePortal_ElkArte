@@ -60,7 +60,7 @@ class Categories_Controller extends Action_Controller
 	 */
 	public function action_sportal_category()
 	{
-		global $context, $scripturl;
+		global $context, $scripturl, $modSettings;
 
 		$category_id = !empty($_REQUEST['category']) ? $_REQUEST['category'] : 0;
 
@@ -74,13 +74,18 @@ class Categories_Controller extends Action_Controller
 		if (empty($context['category']['id']))
 			fatal_lang_error('error_sp_category_not_found', false);
 
-		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', $context['category']['id']);
+		// Set up the pages
+		$total_articles = sportal_get_articles_in_cat_count($context['category']['id']);
+		$per_page = min($total_articles, !empty($modSettings['sp_articles_per_page']) ? $modSettings['sp_articles_per_page'] : 10);
+		$start = !empty($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 
+		if ($total_articles > $per_page)
+			$context['page_index'] = constructPageIndex($context['category']['href'] . ';start=%1$d', $start, $total_articles, $per_page, true);
+
+		// Load the articles in this category
+		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', $context['category']['id'], $per_page, $start);
 		foreach ($context['articles'] as $article)
 		{
-			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
-				$article['body'] = Util::substr($article['body'], 0, $cutoff);
-
 			$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
 			$context['articles'][$article['id']]['date'] = standardTime($article['date']);
 		}

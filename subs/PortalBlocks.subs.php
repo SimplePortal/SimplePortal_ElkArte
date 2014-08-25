@@ -1040,6 +1040,7 @@ function sp_topBoards($parameters, $id, $return_parameters = false)
 	{
 		echo '
 								', $txt['error_sp_no_boards_found'];
+
 		return;
 	}
 	else
@@ -1057,7 +1058,7 @@ function sp_topBoards($parameters, $id, $return_parameters = false)
 										$board['link'], '
 									</li>
 									<li class="sp_list_indent', empty($board['is_last']) ? ' sp_list_bottom' : '', ' smalltext">',
-										(empty($board['num_topics']) && !empty($board['num_posts'])) ? $txt['redirects'] : ($txt['topics'] . ': ' . comma_format($board['num_topics']) . ' | ' . $txt['posts']), ': ', comma_format($board['num_posts']), '
+										(empty($board['num_topics']) && !empty($board['num_posts'])) ? $txt['redirects'] : ($txt['topics'] . ': ' . $board['num_topics'] . ' | ' . $txt['posts']), ': ', $board['num_posts'], '
 									</li>';
 
 	echo '
@@ -2348,19 +2349,21 @@ function sp_staff($parameters, $id, $return_parameters = false)
  *		'limit' => number of articles to show
  *		'type' => 0 latest 1 random
  *		'length' => length for the body text preview
+ *		'avatar' => whether to show the author avatar or not
  *
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
 function sp_articles($parameters, $id, $return_parameters = false)
 {
-	global $modSettings, $scripturl, $txt, $color_profile;
+	global $scripturl, $txt, $color_profile;
 
 	$block_parameters = array(
 		'category' => array(0 => $txt['sp_all']),
 		'limit' => 'int',
 		'type' => 'select',
 		'length' => 'int',
+		'avatar' => 'check',
 	);
 
 	if ($return_parameters)
@@ -2376,23 +2379,12 @@ function sp_articles($parameters, $id, $return_parameters = false)
 
 	require_once(SUBSDIR . '/Post.subs.php');
 
-	// Maybe useful ... maybe not !
-	if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
-	{
-		$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
-		$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
-	}
-	else
-	{
-		$avatar_width = '';
-		$avatar_height = '';
-	}
-
 	// Set up for the query
 	$category = empty($parameters['category']) ? 0 : (int) $parameters['category'];
 	$limit = empty($parameters['limit']) ? 5 : (int) $parameters['limit'];
 	$type = empty($parameters['type']) ? 0 : 1;
 	$length = isset($parameters['length']) ? (int) $parameters['length'] : 250;
+	$avatar = empty($parameters['avatar']) ? 0 : (int) $parameters['avatar'];
 
 	$articles = sportal_get_articles(null, true, true, $type ? 'RAND()' : 'spa.date DESC', $category, $limit);
 
@@ -2421,27 +2413,43 @@ function sp_articles($parameters, $id, $return_parameters = false)
 		}
 	}
 
-	echo '
-							<table class="sp_fullwidth">';
-
-	foreach ($articles as $article)
+	// Not showing avatars, just use a compact link view
+	if (empty($avatar))
 	{
-		// Shorten it for the preview
-		$article['body'] = parse_bbc($article['body']);
-		$article['body'] = Util::shorten_html($article['body'], $length);
+		echo '
+			<ul class="sp_list">';
+
+		foreach ($articles as $article)
+			echo '
+				<li>', sp_embed_image('topic'), ' ', $article['link'], '</li>';
 
 		echo '
+			</ul>';
+	}
+	// Or the full monty!
+	else
+	{
+		echo '
+							<table class="sp_fullwidth">';
+
+		foreach ($articles as $article)
+		{
+			// Shorten it for the preview
+			$article['body'] = parse_bbc($article['body']);
+			$article['body'] = Util::shorten_html($article['body'], $length);
+
+			echo '
 								<tr class="sp_articles_row">
 									<td class="sp_articles centertext">';
 
-		// If we have an avatar to show, show it
-		if (!empty($article['author']['avatar']['href']))
-			echo '
+			// If we have an avatar to show, show it
+			if ($avatar && !empty($article['author']['avatar']['href']))
+				echo '
 										<a href="', $scripturl, '?action=profile;u=', $article['author']['id'], '">
 											<img src="', $article['author']['avatar']['href'], '" alt="', $article['author']['name'], '" width="40" />
 										</a>';
 
-		echo '
+			echo '
 									</td>
 									<td>
 										<span class="sp_articles_title">', $article['author']['link'], '</span><br />
@@ -2454,11 +2462,11 @@ function sp_articles($parameters, $id, $return_parameters = false)
 								<tr>
 									<td colspan="3" class="sp_articles_row"></td>
 								</tr>';
-	}
+		}
 
-	echo '
+		echo '
 							</table>';
-
+	}
 }
 
 /**

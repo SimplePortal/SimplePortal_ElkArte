@@ -91,4 +91,8 @@ function template_view_category()
 
 	echo '
 	</div>';
+
+	// Pages as well?
+	if (!empty($context['page_index']))
+		template_pagesection();
 }

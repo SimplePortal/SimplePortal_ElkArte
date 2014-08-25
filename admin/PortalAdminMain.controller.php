@@ -55,7 +55,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Portal.subs.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
 		loadCSSFile('portal.css');
-		
+
 		// Load the Simple Portal Help file.
 		loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
 
@@ -298,10 +298,13 @@ class ManagePortalConfig_Controller extends Action_Controller
 		$this->_articleSettingsForm = new Settings_Form();
 
 		$config_vars = array(
-			array('check', 'articleactive'),
-			array('int', 'articleperpage'),
-			array('int', 'articlelength'),
-			array('check', 'articleavatar'),
+			array('check', 'sp_articles_index'),
+			array('int', 'sp_articles_index_per_page'),
+			array('int', 'sp_articles_index_total'),
+			array('int', 'sp_articles_length'),
+			'',
+			array('int', 'sp_articles_per_page'),
+			array('int', 'sp_articles_comments_per_page'),
 		);
 
 		return $this->_articleSettingsForm->settings($config_vars);

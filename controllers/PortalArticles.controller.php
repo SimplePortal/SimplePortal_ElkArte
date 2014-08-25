@@ -44,13 +44,19 @@ class Article_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
-		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC');
+		// Set up for pagination
+		$total_articles = sportal_get_articles_count();
+		$per_page = min($total_articles, !empty($modSettings['sp_articles_per_page']) ? $modSettings['sp_articles_per_page'] : 10);
+		$start = !empty($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+
+		if ($total_articles > $per_page)
+			$context['page_index'] = constructPageIndex($scripturl . '?action=portal;sa=articles;start=%1$d', $start, $total_articles, $per_page, true);
+
+		// Fetch the article page
+		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
 
 		foreach ($context['articles'] as $article)
 		{
-			if (!empty($modSettings['articlelength']))
-				$article['body'] = Util::shorten_text($article['body'], $modSettings['articlelength'], true);
-
 			$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
 			$context['articles'][$article['id']]['date'] = standardTime($article['date']);
 		}
@@ -87,8 +93,16 @@ class Article_Controller extends Action_Controller
 		if (empty($context['article']['id']))
 			fatal_lang_error('error_sp_article_not_found', false);
 
+		// Set up for the comment pagination
+		$total_comments = sportal_get_article_comment_count($context['article']['id']);
+		$per_page = min($total_comments, !empty($modSettings['sp_articles_comments_per_page']) ? $modSettings['sp_articles_comments_per_page'] : 20);
+		$start = !empty($_REQUEST['comments']) ? (int) $_REQUEST['comments'] : 0;
+
+		if ($total_comments > $per_page)
+			$context['page_index'] = constructPageIndex($scripturl . '?article=' . $context['article']['article_id'] . ';comments=%1$d', $start, $total_comments, $per_page, true);
+
 		$context['article']['date'] = standardTime($context['article']['date']);
-		$context['article']['comments'] = sportal_get_comments($context['article']['id']);
+		$context['article']['comments'] = sportal_get_comments($context['article']['id'], $per_page, $start);
 		$context['article']['can_comment'] = $context['user']['is_logged'];
 		$context['article']['can_moderate'] = allowedTo('sp_admin') || allowedTo('sp_manage_articles');
 
@@ -100,7 +114,7 @@ class Article_Controller extends Action_Controller
 			$db = database();
 			require_once(SUBSDIR . '/Post.subs.php');
 
-			// prep the body / comment
+			// Prep the body / comment
 			$body = Util::htmlspecialchars(trim($_POST['body']));
 			preparsecode($body);
 

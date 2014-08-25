@@ -40,6 +40,12 @@
 	float: right;
 	padding-right: 1em;
 }
+.sp_previous_start {
+	float: left;
+}
+.sp_next_start {
+	float: right;
+}
 .sp_side_clear {
 	clear: both;
 	line-height: 0.7em;
@@ -197,6 +203,9 @@ table.sp_blog, table.sp_articles, .sp_shop_info {
 }
 .sp_article_detail, .sp_comment_detail {
 	overflow: auto;
+}
+.sp_article_detail {
+	padding-top: .5em;
 }
 .sp_article_extra {
 	text-align: right;
