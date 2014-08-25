@@ -16,7 +16,7 @@
 	<name>SimplePortal</name>
 	<version>2.4</version>
 	<type>modification</type>
-	<install for="1.0 RC1 - 1.0.99">
+	<install for="1.0 RC2 - 1.0.99">
 		<readme type="inline">This will install SimplePortal 2.4 for Elkarte.</readme>
 		<modification>modification.xml</modification>
 		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
@@ -43,7 +43,7 @@
 		<hook hook="integrate_load_illegal_guest_permissions" function="sp_integrate_load_illegal_guest_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
-	<uninstall for="1.0 RC1 - 1.0.99">
+	<uninstall for="1.0 RC2 - 1.0.99">
 		<readme type="inline">This will uninstall SimplePortal 2.4 for Elkarte.</readme>
 		<hook reverse="true" hook="integrate_current_action" function="sp_integrate_current_action" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_action_boardindex_after" function="sp_integrate_boardindex" file="SOURCEDIR/PortalIntegration.subs.php" />
