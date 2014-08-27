@@ -151,7 +151,7 @@ function sportal_init_headers()
 		$safe_scripturl = str_replace('://', '://www.', $scripturl);
 
 	// The shoutbox may fail to function in certain cases without using a safe scripturl
-	addJavascriptVar('sp_script_url', $safe_scripturl);
+	addJavascriptVar(array('sp_script_url' => '\'' . $safe_scripturl . '\''));
 
 	// Load up some javascript!
 	loadJavascriptFile('portal.js?sp24');
