@@ -1105,6 +1105,7 @@ function sportal_get_article_views_comments($id)
  * @param string $sort string passed to the order by parameter
  * @param int|null $category_id id of the category
  * @param int|null $limit limit the number of results
+ * @param int|null $start start number for pages
  */
 function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title', $category_id = null, $limit = null, $start = null)
 {
@@ -1406,8 +1407,10 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
  * Loads all the comments that an article has generated
  *
  * @param int|null $article_id
+ * @param int|null $limit limit the number of results
+ * @param int|null $start start number for pages
  */
-function sportal_get_comments($article_id = null)
+function sportal_get_comments($article_id = null, $limit = null, $start = null)
 {
 	global $scripturl, $user_info, $modSettings;
 
@@ -1424,9 +1427,12 @@ function sportal_get_comments($article_id = null)
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spc.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
 		WHERE spc.id_article = {int:article_id}
-		ORDER BY spc.id_comment',
+		ORDER BY spc.id_comment' . (!empty($limit) ? '
+		LIMIT {int:start}, {int:limit}' : ''),
 		array(
 			'article_id' => (int) $article_id,
+			'limit' => (int) $limit,
+			'start' => (int) $start,
 		)
 	);
 	$return = array();
@@ -1598,7 +1604,7 @@ function sportal_recount_comments($article_id)
 /**
  * Load a page by ID
  *
- * @param int $page_id
+ * @param int|null $page_id
  * @param boolean $active
  * @param boolean $allowed
  * @param string $sort
@@ -1676,6 +1682,12 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 	return !empty($page_id) ? current($return) : $return;
 }
 
+/**
+ * Prepare body text to be of type, html, bbc, php, etc
+ *
+ * @param string $body
+ * @param string $type
+ */
 function sportal_parse_content($body, $type)
 {
 	if ($type == 'bbc')
@@ -1759,6 +1771,13 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_prof
 	return !empty($profile_id) ? current($return) : $return;
 }
 
+/**
+ * Load a shoutboxs parameters by ID
+ *
+ * @param int|null $shoutbox_id
+ * @param boolean $active
+ * @param boolean $allowed
+ */
 function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = false)
 {
 	global $context;

@@ -15,7 +15,7 @@
  */
 function template_view_articles()
 {
-	global $context, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 	<div id="sp_view_articles">
