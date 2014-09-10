@@ -53,7 +53,6 @@
 .sp_drag_header {
 	cursor: move;
 }
-
 .sp_list {
 	list-style-type: none;
 	text-align: left;
@@ -342,7 +341,6 @@ body {
 	color: #FF0000;
 }
 
-
 #sp_view_categories h4 {
 	font-size: 1.1em;
 }
@@ -429,8 +427,9 @@ body {
 	float: left;
 	width: 50%;
 }
-#sp_edit_block #boards {
+select#shoutbox_bbc, select#page_blocks, select#boards {
 	height: auto;
+	max-height: none;
 }
 
 #sp_manage_articles table.table_grid {
