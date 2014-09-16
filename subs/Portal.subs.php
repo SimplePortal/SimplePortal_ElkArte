@@ -964,7 +964,7 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 	}
 
 	// Build the attributes
-	return 'class ="' . $spriteclass . ' ' . $name . ' ' . $extraclass .'" title="' . $title . '"';
+	return 'class="' . $spriteclass . ' ' . $name . (!empty($extraclass) ? ' ' . $extraclass : '') . '" title="' . $title . '"';
 }
 
 /**
