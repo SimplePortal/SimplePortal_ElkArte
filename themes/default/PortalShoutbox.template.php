@@ -96,22 +96,30 @@ function template_shoutbox_embed($shoutbox)
 			echo '
 					<a onclick="sp_showMoreSmileys(\'', $shoutbox['id'], '\', \'', $txt['more_smileys_title'], '\', \'', $txt['more_smileys_pick'], '\', \'', $txt['more_smileys_close_window'], '\', \'', $settings['theme_url'], '\', \'', $settings['smileys_url'], '\'); return false;" href="javascript:void(0);">[', $txt['more_smileys'], ']</a>';
 
-		// bbc box
+		// BBC box
 		echo '
 			</div>
-			<div id="sp_object_sb_style_', $shoutbox['id'], '" style="display: none;">';
+			<div id="sp_object_sb_style_', $shoutbox['id'], '" class="shoutbox_bbc_container" style="display: none;">';
 
+		// For each bbc code we allow in this shoutbox
 		foreach ($shoutbox['bbc'] as $image => $tag)
 		{
 			if (!in_array($tag['code'], $shoutbox['allowed_bbc']))
 				continue;
 
-			if (!isset($tag['after']))
-				echo '<a href="javascript:void(0);" onclick="replaceText(\'', $tag['before'], '\', document.getElementById(\'new_shout_', $shoutbox['id'], '\')); return false;">';
-			else
-				echo '<a href="javascript:void(0);" onclick="surroundText(\'', $tag['before'], '\', \'', $tag['after'], '\', document.getElementById(\'new_shout_', $shoutbox['id'], '\')); return false;">';
+			// Add all enabled shoutbox BBC buttons
+			echo '
+				<a href="#" class="shoutbox-button shoutbox-', $image, '" title="', $tag['description'], '" ';
 
-			echo '<img onmouseover="style_highlight(this, true);" onmouseout="if (window.style_highlight) style_highlight(this, false);" src="', $settings['images_url'], '/bbc/', $image, '.png" align="bottom" width="23" height="22" alt="', $tag['description'], '" title="', $tag['description'], '" style="background-image: url(', $settings['images_url'], '/bbc/bbc_bg.png); margin: 1px 2px 1px 1px;" /></a>';
+			// Set the button click action
+			if (!isset($tag['after']))
+				echo 'onclick="replaceText(\'', $tag['before'], '\', document.getElementById(\'new_shout_', $shoutbox['id'], '\')); return false;">';
+			else
+				echo 'onclick="sp_surroundText(\'', $tag['before'], '\', \'', $tag['after'], '\', document.getElementById(\'new_shout_', $shoutbox['id'], '\')); return false;">';
+
+			echo '
+					<div></div>
+				</a>';
 		}
 
 		echo '
