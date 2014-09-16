@@ -947,7 +947,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
 		foreach ($items as $item)
 			echo '
 									<tr>
-										<td ', sp_embed_class(empty($parameters['type']) ? 'post' : 'topic', '', 'sp_recent_icon centertext' ), '</td>
+										<td ', sp_embed_class(empty($parameters['type']) ? 'post' : 'topic', '', 'sp_recent_icon centertext' ), '></td>
 										<td class="sp_recent_subject">
 											<a href="', $item['href'], '">', $item['subject'], '</a>
 											', $item['new'] ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>', '<br />[', $item['board']['link'], ']
@@ -1237,7 +1237,8 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-		WHERE ' . (empty($board) ? '{query_see_board}
+		WHERE {query_see_board}
+			AND ' . (empty($board) ? 't.id_first_msg >= {int:min_msg_id}' : 't.id_board IN ({array_int:current_board})') . ($modSettings['postmod_active'] ? '
 			AND t.id_first_msg >= {int:min_msg_id}' : 't.id_board IN ({array_int:current_board})') . ($modSettings['postmod_active'] ? '
 			AND t.approved = {int:is_approved}' : '') . '
 			AND (t.locked != {int:locked} OR m.icon != {string:icon})
