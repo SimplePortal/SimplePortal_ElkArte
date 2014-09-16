@@ -105,7 +105,7 @@ $sp_tables = array(
 			array('name' => 'id_page', 'type' => 'int', 'size' => 10, 'auto' => true),
 			array('name' => 'namespace', 'type' => 'tinytext'),
 			array('name' => 'title', 'type' => 'tinytext'),
-			array('name' => 'body', 'type' => 'text'),
+			array('name' => 'body', 'type' => 'mediumtext'),
 			array('name' => 'type', 'type' => 'tinytext'),
 			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
 			array('name' => 'views', 'type' => 'int', 'size' => 10, 'default' => 0),
@@ -329,6 +329,16 @@ if (empty($has_permission_profiles))
 $db_package_log = array();
 foreach ($sp_tables as $sp_table_name => $null)
 	$db_package_log[] = array('remove_table', $db_prefix . $sp_table_name);
+
+// Update the page table to accept more data
+if (empty($modSettings['sp_version']) || $modSettings['sp_version'] < '2.4.1')
+{
+	$dbtbl = db_table();
+	$page_cols = $dbtbl->db_list_columns('{db_prefix}sp_pages', true);
+
+	if (isset($page_cols['body']) && $page_cols['body']['type'] == 'text')
+		$dbtbl->db_change_column('{db_prefix}sp_pages', 'body', array('type' => 'mediumtext'));
+}
 
 if (ELK == 'SSI')
 	echo 'Database changes were carried out successfully.';
