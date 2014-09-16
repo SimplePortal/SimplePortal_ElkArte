@@ -106,6 +106,13 @@ function sp_image_resize()
 	}
 }
 
+/**
+ * Send in a shout for display in a shoutbox
+ *
+ * @param {string} shoutbox_id
+ * @param {string} sSessionVar
+ * @param {string} sSessionId
+ */
 function sp_submit_shout(shoutbox_id, sSessionVar, sSessionId)
 {
 	if (window.XMLHttpRequest)
@@ -124,6 +131,14 @@ function sp_submit_shout(shoutbox_id, sSessionVar, sSessionId)
 	}
 }
 
+/**
+ * Remove a previous entered shout
+ *
+ * @param {string} shoutbox_id
+ * @param {string} shout_id
+ * @param {string} sSessionVar
+ * @param {string} sSessionId
+ */
 function sp_delete_shout(shoutbox_id, shout_id, sSessionVar, sSessionId)
 {
 	if (window.XMLHttpRequest)
@@ -136,6 +151,12 @@ function sp_delete_shout(shoutbox_id, shout_id, sSessionVar, sSessionId)
 	}
 }
 
+/**
+ * Manually refresh the shoutbox ahead of the auto refresh action
+ *
+ * @param {string} shoutbox_id
+ * @param {int} last_refresh
+ */
 function sp_refresh_shout(shoutbox_id, last_refresh)
 {
 	if (window.XMLHttpRequest)
@@ -225,11 +246,6 @@ function sp_show_history_ignored_shout(shout_id)
 {
 	document.getElementById('history_ignored_shout_' + shout_id).style.display = '';
 	document.getElementById('history_ignored_shout_link_' + shout_id).style.display = 'none';
-}
-
-function style_highlight(something, mode)
-{
-	something.style.backgroundImage = 'url(' + elk_images_url + (mode ? '/bbc/bbc_hoverbg.gif)' : '/bbc/bbc_bg.gif)');
 }
 
 function elk_prepareScriptUrl(sUrl)
@@ -329,4 +345,62 @@ function sp_collapseObject(id)
 	$("#sp_object_" + id).slideToggle(300);
 
 	document.getElementById("sp_collapse_" + id).src = elk_images_url + (!mode ? "/selected_open.png" : "/selected.png");
+}
+
+/**
+ * Surrounds the selected text with text1 and text2.
+ *  - If no text is selected, simply appends text1/text2 to the end
+ *
+ * @param {string} text1
+ * @param {string} text2
+ * @param {object} oTextHandle
+ */
+function sp_surroundText(text1, text2, oTextHandle)
+{
+	// Can a text range be created, start off with Internet explorer < 9.
+	if ('caretPos' in oTextHandle && 'createTextRange' in oTextHandle)
+	{
+		var caretPos = oTextHandle.caretPos,
+			temp_length = caretPos.text.length;
+
+		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) === ' ' ? text1 + caretPos.text + text2 + ' ' : text1 + caretPos.text + text2;
+
+		if (temp_length === 0)
+		{
+			caretPos.moveStart('character', -text2.length);
+			caretPos.moveEnd('character', -text2.length);
+			caretPos.select();
+		}
+		else
+			oTextHandle.focus(caretPos);
+	}
+	// Compliant text range wrap.
+	else if ('selectionStart' in oTextHandle)
+	{
+		var begin = oTextHandle.value.substr(0, oTextHandle.selectionStart),
+			selection = oTextHandle.value.substr(oTextHandle.selectionStart, oTextHandle.selectionEnd - oTextHandle.selectionStart),
+			end = oTextHandle.value.substr(oTextHandle.selectionEnd),
+			newCursorPos = oTextHandle.selectionStart,
+			scrollPos = oTextHandle.scrollTop;
+
+		oTextHandle.value = begin + text1 + selection + text2 + end;
+
+		if (oTextHandle.setSelectionRange)
+		{
+			if (selection.length === 0)
+				oTextHandle.setSelectionRange(newCursorPos + text1.length, newCursorPos + text1.length);
+			else
+				oTextHandle.setSelectionRange(newCursorPos, newCursorPos + text1.length + selection.length + text2.length);
+
+			oTextHandle.focus();
+		}
+
+		oTextHandle.scrollTop = scrollPos;
+	}
+	// Just put them on the end, then.
+	else
+	{
+		oTextHandle.value += text1 + text2;
+		oTextHandle.focus(oTextHandle.value.length - 1);
+	}
 }
