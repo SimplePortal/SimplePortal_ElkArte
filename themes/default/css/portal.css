@@ -576,7 +576,7 @@ select#shoutbox_bbc, select#page_blocks, select#boards, select#board {
 dl.sp_form {
 	margin: 0;
 	clear: right;
-	overflow: auto;
+	overflow: hidden;
 }
 dl.sp_form dt {
 	font-weight: normal;
