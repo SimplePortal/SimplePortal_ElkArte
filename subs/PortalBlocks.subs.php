@@ -1220,7 +1220,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	$start = !empty($parameters['start']) ? (int) $parameters['start'] : 0;
 	$length = isset($parameters['length']) ? (int) $parameters['length'] : 250;
 	$avatars = !empty($parameters['avatar']);
-	$per_page = !empty($paramers['per_page']) ? (int) $parameters['per_page'] : 0;
+	$per_page = !empty($parameters['per_page']) ? (int) $parameters['per_page'] : 0;
 
 	$limit = max(0, $limit);
 	$start = max(0, $start);
