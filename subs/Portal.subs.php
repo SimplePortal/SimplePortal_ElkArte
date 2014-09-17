@@ -1711,7 +1711,7 @@ function sportal_parse_content($body, $type)
  * - If type = 1 (generally the case), the profile group permsissions are returned
  *
  * @param int|null $profile_id
- * @param int $type
+ * @param int|null $type
  * @param string $sort
  */
 function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_profile')
@@ -1836,12 +1836,20 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 	return !empty($shoutbox_id) ? current($return) : $return;
 }
 
+/**
+ * Loads all the shouts for a given shoutbox
+ *
+ * @param int $shoutbox id of the shoutbox to get data from
+ * @param mixed[] $parameters
+ * @return type
+ */
 function sportal_get_shouts($shoutbox, $parameters)
 {
-	global $scripturl, $context, $user_info, $modSettings, $options, $txt;
+	global $scripturl, $context, $user_info, $modSettings, $txt;
 
 	$db = database();
 
+	// Set defaults or used what was passed
 	$shoutbox = !empty($shoutbox) ? (int) $shoutbox : 0;
 	$start = !empty($parameters['start']) ? (int) $parameters['start'] : 0;
 	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 20;
@@ -1850,6 +1858,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 	$cache = !empty($parameters['cache']);
 	$can_delete = !empty($parameters['can_moderate']);
 
+	// Cached, use it first
 	if (!empty($start) || !$cache || ($shouts = cache_get_data('shoutbox_shouts-' . $shoutbox, 240)) === null)
 	{
 		$request = $db->query('', '
@@ -1896,6 +1905,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 
 	foreach ($shouts as $shout)
 	{
+		// Private shouts @username: only get shown to the shouter and shoutee, and the admin
 		if (preg_match('~^@(.+?): ~u', $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
 		{
 			unset($shouts[$shout['id']]);
@@ -1908,13 +1918,14 @@ function sportal_get_shouts($shoutbox, $parameters)
 			'delete_link_js' => $can_delete ? '<a class="dot dotdelete" href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="sp_delete_shout(' . $shoutbox . ', ' . $shout['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false;"></a> ' : '',
 		);
 
-		$shouts[$shout['id']]['text'] = str_replace(':jade:', '<img src="http://www.simpleportal.net/sp/cheerleader.png" alt="Jade!" />', $shouts[$shout['id']]['text']);
+		// Prepare for display in the box
 		$shouts[$shout['id']]['time'] = standardTime($shouts[$shout['id']]['time']);
 		$shouts[$shout['id']]['text'] = preg_replace('~(</?)div([^<]*>)~', '$1span$2', $shouts[$shout['id']]['text']);
 		$shouts[$shout['id']]['text'] = preg_replace('~<a([^>]+>)([^<]+)</a>~', '<a$1' . $txt['sp_link'] . '</a>', $shouts[$shout['id']]['text']);
 		$shouts[$shout['id']]['text'] = censorText($shouts[$shout['id']]['text']);
 
-		if (!empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($shout['author']['id'], $context['user']['ignoreusers']))
+		// Ignored user, hide the shout with option to show it
+		if (!empty($modSettings['enable_buddylist']) && in_array($shout['author']['id'], $context['user']['ignoreusers']))
 			$shouts[$shout['id']]['text'] = '<a href="#toggle" id="ignored_shout_link_' . $shout['id'] . '" onclick="sp_show_ignored_shout(' . $shout['id'] . '); return false;">[' . $txt['sp_shoutbox_show_ignored'] . ']</a><span id="ignored_shout_' . $shout['id'] . '" style="display: none;">' . $shouts[$shout['id']]['text'] . '</span>';
 	}
 

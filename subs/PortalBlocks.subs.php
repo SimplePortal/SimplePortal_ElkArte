@@ -2560,6 +2560,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 			$shoutbox['warning'] = $flood;
 	}
 
+	// Can they moderate the shoutbox (delete shouts?)
 	$can_moderate = allowedTo('sp_admin') || allowedTo('sp_manage_shoutbox');
 	if (!$can_moderate && !empty($shoutbox['moderator_groups']))
 		$can_moderate = count(array_intersect($user_info['groups'], $shoutbox['moderator_groups'])) > 0;
