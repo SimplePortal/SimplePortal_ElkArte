@@ -25,7 +25,7 @@ function sp_collapseBlock(id)
 		if (elk_member_id === 0)
 			document.cookie = "sp_block_" + id + "=" + (mode ? 0 : 1);
 		else
-			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null);
+			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null, null);
 
 		// Swap the class to change the icon
 		$("#sp_collapse_" + id).attr("class", mode ? "collapse" : "expand");
@@ -50,7 +50,7 @@ function sp_collapseSide(id)
 	if (elk_member_id === 0)
 		document.cookie = sp_sides[id] + "=" + (mode ? 0 : 1);
 	else
-		elk_setThemeOption(sp_sides[id], mode ? 0 : 1, null);
+		elk_setThemeOption(sp_sides[id], mode ? 0 : 1, null, null);
 
 	// Update the side expand/collapse image
 	document.getElementById("sp_collapse_side" + id).className = (mode ? "dot collapse" : "dot expand");
