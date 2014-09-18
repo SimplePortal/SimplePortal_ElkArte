@@ -1239,7 +1239,6 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 		WHERE {query_see_board}
 			AND ' . (empty($board) ? 't.id_first_msg >= {int:min_msg_id}' : 't.id_board IN ({array_int:current_board})') . ($modSettings['postmod_active'] ? '
-			AND t.id_first_msg >= {int:min_msg_id}' : 't.id_board IN ({array_int:current_board})') . ($modSettings['postmod_active'] ? '
 			AND t.approved = {int:is_approved}' : '') . '
 			AND (t.locked != {int:locked} OR m.icon != {string:icon})
 		ORDER BY t.id_first_msg DESC
