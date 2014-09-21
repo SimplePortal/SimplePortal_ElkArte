@@ -52,7 +52,7 @@ function sportal_init($standalone = false)
 		}
 	}
 
-	// Portal not enabled then bow out now
+	// Portal not enabled, or mobile, or debug, or maintance, or .... then bow out now
 	if ($context['browser_body_id'] == 'mobile' || !empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')) || isset($_GET['debug']) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
 	{
 		$context['disable_sp'] = true;
@@ -109,9 +109,9 @@ function sportal_init($standalone = false)
 				if (strpos($tree['url'], '#c') !== false && strpos($tree['url'], 'action=forum#c') === false)
 					$context['linktree'][$key]['url'] = str_replace('#c', '?action=forum#c', $tree['url']);
 		}
-		else
-			$_GET['action'] = 'portal';
 	}
+	else
+		$_GET['action'] = 'portal';
 
 	// Load the headers if necessary.
 	sportal_init_headers();
@@ -155,29 +155,32 @@ function sportal_init_headers()
 
 	// Load up some javascript!
 	loadJavascriptFile('portal.js?sp24');
-
-	// We use sortable for the front page
-	$modSettings['jquery_include_ui'] = true;
 	$javascript = '';
 
-	// Javascipt to allow D&D ordering of the front page blocks, not for guests
-	if (empty($_REQUEST['action']) && !($user_info['is_guest'] || $user_info['id'] == 0))
-		$javascript .= '
-			// Set up our sortable call
-			$().elkSortable({
-				sa: "userblockorder",
-				error: "' . $txt['portal_order_error'] . '",
-				title: "' . $txt['portal_order_title'] . '",
-				handle: ".sp_drag_header",
-				tag: ".sp_column",
-				opacity: 0.9,
-				connect: ".sp_column",
-				containment: "#main_content_section",
-				tolerance: "pointer",
-				href: "/",
-				placeholder: "ui-state-highlight",
-				axis: "",
-			});';
+	// We use drag and sort blocks for the front page
+	if ($modSettings['sp_portal_mode'] == 1)
+	{
+		$modSettings['jquery_include_ui'] = true;
+
+		// Javascipt to allow D&D ordering of the front page blocks, not for guests
+		if (empty($_REQUEST['action']) && !($user_info['is_guest'] || $user_info['id'] == 0))
+			$javascript .= '
+				// Set up our sortable call
+				$().elkSortable({
+					sa: "userblockorder",
+					error: "' . $txt['portal_order_error'] . '",
+					title: "' . $txt['portal_order_title'] . '",
+					handle: ".sp_drag_header",
+					tag: ".sp_column",
+					opacity: 0.9,
+					connect: ".sp_column",
+					containment: "#main_content_section",
+					tolerance: "pointer",
+					href: "/",
+					placeholder: "ui-state-highlight",
+					axis: "",
+				});';
+	}
 
 	if ($modSettings['sp_resize_images'])
 	{
