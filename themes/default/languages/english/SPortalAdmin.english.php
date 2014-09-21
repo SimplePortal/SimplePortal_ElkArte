@@ -26,7 +26,9 @@ $txt['sp_standalone_url'] = 'Standalone URL';
 $txt['sp_disableForumRedirect'] = 'Disable Portal Redirection';
 $txt['sp_disableColor'] = 'Disable Colored Member Links';
 $txt['sp_disable_random_bullets'] = 'Disable Colored Bullets on Blocks';
-$txt['sp_disable_php_validation'] = 'Disable PHP Validation<br /><span class="smalltext">Recommended value: Off</span>';
+$txt['sp_disable_php_validation'] = 'Disable PHP Validation';
+$txt['sp_disable_php_validation_desc'] = 'Recommended value: Off';
+
 $txt['sp_disable_side_collapse'] = 'Disable Side Collapsing';
 $txt['portaltheme'] = 'Portal Theme';
 $txt['portalthemedefault'] = 'Forum Default';
@@ -38,7 +40,9 @@ $txt['showright'] = 'Enable Right Side Blocks';
 $txt['leftwidth'] = 'Width of Left Side Blocks';
 $txt['rightwidth'] = 'Width of Right Side Blocks';
 $txt['sp_enableIntegration'] = 'Display Blocks in Forum';
-$txt['sp_IntegrationHide'] = 'Hide Blocks in Forum Areas<br /><span class="smalltext">The <em>Display blocks in Forum</em> setting<br />must be enabled for this to work</span>';
+$txt['sp_IntegrationHide'] = 'Hide Blocks in Forum Areas';
+$txt['sp_IntegrationHide_desc'] = 'The <em>Display blocks in Forum</em> setting must be enabled for this to work';
+
 
 // Article settings
 $txt['sp_articles_index'] = 'Display Articles on Portal Page';

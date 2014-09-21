@@ -153,7 +153,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 			array('check', 'sp_disableColor'),
 			array('check', 'sp_disableForumRedirect'),
 			array('check', 'sp_disable_random_bullets'),
-			array('check', 'sp_disable_php_validation'),
+			array('check', 'sp_disable_php_validation', 'subtext' => $txt['sp_disable_php_validation_desc']),
 			array('check', 'sp_disable_side_collapse'),
 			array('check', 'sp_resize_images'),
 		);
@@ -248,7 +248,11 @@ class ManagePortalConfig_Controller extends Action_Controller
 			array('text', 'rightwidth'),
 			'',
 			array('check', 'sp_enableIntegration'),
-			array('multicheck', 'sp_IntegrationHide', 'subsettings' => array('sp_adminIntegrationHide' => $txt['admin'], 'sp_profileIntegrationHide' => $txt['profile'], 'sp_pmIntegrationHide' => $txt['personal_messages'], 'sp_mlistIntegrationHide' => $txt['members_title'], 'sp_searchIntegrationHide' => $txt['search'], 'sp_calendarIntegrationHide' => $txt['calendar'], 'sp_moderateIntegrationHide' => $txt['moderate'])),
+			array('multicheck',
+				'sp_IntegrationHide',
+				'subsettings' => array('sp_adminIntegrationHide' => $txt['admin'], 'sp_profileIntegrationHide' => $txt['profile'], 'sp_pmIntegrationHide' => $txt['personal_messages'], 'sp_mlistIntegrationHide' => $txt['members_title'], 'sp_searchIntegrationHide' => $txt['search'], 'sp_calendarIntegrationHide' => $txt['calendar'], 'sp_moderateIntegrationHide' => $txt['moderate']),
+				'subtext' => $txt['sp_IntegrationHide_desc']
+			),
 		);
 
 		return $this->_blockSettingsForm->settings($config_vars);
