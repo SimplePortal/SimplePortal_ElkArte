@@ -561,6 +561,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				}
 			}
 
+			loadJavascriptFile('portal.js?sp24');
 			$context['sub_template'] = 'block_edit';
 			$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'];
 		}
@@ -569,7 +570,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		if (!empty($_POST['add_block']))
 		{
 			checkSession();
-			
+
 			// Only the admin can do php here
 			if ($_POST['block_type'] == 'sp_php' && !allowedTo('admin_forum'))
 				fatal_lang_error('cannot_admin_forum', false);
@@ -592,9 +593,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 					$_SESSION['sp_error'] = $error[0];
 					$_SESSION['sp_error_post'] = $_POST;
 					redirectexit('action=admin;area=portalblocks;sa=' . $_REQUEST['sa'] . (!empty($_REQUEST['block_id']) ? ';block_id=' . $_REQUEST['block_id'] : ''));
-
-					//action=admin;area=portalblocks;sa=edit;block_id=23;caeb92efed=c4e166665ebec37b95120eb54a76ee0f
-					//fatal_error($error[0], false);
 				}
 			}
 
