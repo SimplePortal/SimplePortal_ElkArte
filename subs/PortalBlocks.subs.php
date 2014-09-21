@@ -298,7 +298,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 	{
 		require_once(SUBSDIR . '/OnlineToday.class.php');
 		$context['info_center_callbacks'] = array();
-		OnlineToday::get();
+		Online_Today_Integrate::get();
 
 		if (empty($context['num_onlinetoday']))
 			return;
