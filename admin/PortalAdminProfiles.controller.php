@@ -102,7 +102,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'value' => $txt['sp_admin_profiles_col_name'],
 					),
 					'data' => array(
-						'db' => 'name',
+						'db' => 'label',
 					),
 					'sort' => array(
 						'default' => 'name',
@@ -112,51 +112,61 @@ class ManagePortalProfile_Controller extends Action_Controller
 				'articles' => array(
 					'header' => array(
 						'value' => $txt['sp_admin_profiles_col_articles'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$row', '
-							return empty($row[\'articles\']) ? \'\' : $row[\'articles\'];
+							return empty($row[\'articles\']) ? \'0\' : $row[\'articles\'];
 						'),
+						'class' => 'centertext',
 					),
 				),
 				'blocks' => array(
 					'header' => array(
 						'value' => $txt['sp_admin_profiles_col_blocks'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$row', '
-							return empty($row[\'blocks\']) ? \'\' : $row[\'blocks\'];
+							return empty($row[\'blocks\']) ? \'0\' : $row[\'blocks\'];
 						'),
+						'class' => 'centertext',
 					),
 				),
 				'categories' => array(
 					'header' => array(
 						'value' => $txt['sp_admin_profiles_col_categories'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$row', '
-							return empty($row[\'categories\']) ? \'\' : $row[\'categories\'];
+							return empty($row[\'categories\']) ? \'0\' : $row[\'categories\'];
 						'),
+						'class' => 'centertext',
 					),
 				),
 				'pages' => array(
 					'header' => array(
 						'value' => $txt['sp_admin_profiles_col_pages'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$row', '
-							return empty($row[\'pages\']) ? \'\' : $row[\'pages\'];
+							return empty($row[\'pages\']) ? \'0\' : $row[\'pages\'];
 						'),
+						'class' => 'centertext',
 					),
 				),
 				'shoutboxes' => array(
 					'header' => array(
 						'value' => $txt['sp_admin_profiles_col_shoutboxes'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$row', '
-							return empty($row[\'shoutboxes\']) ? \'\' : $row[\'shoutboxes\'];
+							return empty($row[\'shoutboxes\']) ? \'0\' : $row[\'shoutboxes\'];
 						'),
+						'class' => 'centertext',
 					),
 				),
 				'action' => array(

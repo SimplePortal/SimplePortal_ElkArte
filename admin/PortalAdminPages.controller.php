@@ -128,9 +128,11 @@ class ManagePortalPages_Controller extends Action_Controller
 				'views' => array(
 					'header' => array(
 						'value' => $txt['sp_admin_pages_col_views'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'db' => 'views',
+						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'views',
@@ -164,8 +166,7 @@ class ManagePortalPages_Controller extends Action_Controller
 								'id' => true,
 							),
 						),
-						'class' => 'centertext',
-						'style' => "width: 40px",
+						'class' => 'centertext nowrap',
 					),
 				),
 				'check' => array(

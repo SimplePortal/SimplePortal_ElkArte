@@ -116,9 +116,11 @@ class ManagePortalCategories_Controller extends Action_Controller
 				'articles' => array(
 					'header' => array(
 						'value' => $txt['sp_admin_categories_col_articles'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'db' => 'articles',
+						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'articles',
@@ -152,8 +154,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 								'id' => true,
 							),
 						),
-						'class' => 'centertext',
-						'style' => "width: 40px",
+						'class' => 'centertext nowrap',
 					),
 				),
 				'check' => array(

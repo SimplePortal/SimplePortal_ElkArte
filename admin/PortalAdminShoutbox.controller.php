@@ -109,9 +109,11 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 				'shouts' => array(
 					'header' => array(
 						'value' => $txt['sp_admin_shoutbox_col_shouts'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'db' => 'shouts',
+						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'shouts',
@@ -121,9 +123,11 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 				'caching' => array(
 					'header' => array(
 						'value' => $txt['sp_admin_shoutbox_col_caching'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'db' => 'caching',
+						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'caching',
@@ -158,8 +162,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 								'id' => true,
 							),
 						),
-						'class' => 'centertext',
-						'style' => "width: 65px",
+						'class' => 'centertext nowrap',
 					),
 				),
 				'check' => array(

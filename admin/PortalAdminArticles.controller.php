@@ -191,8 +191,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 								'id' => true,
 							),
 						),
-						'class' => 'centertext',
-						'style' => "width: 40px",
+						'class' => 'centertext nowrap',
 					),
 				),
 				'check' => array(
