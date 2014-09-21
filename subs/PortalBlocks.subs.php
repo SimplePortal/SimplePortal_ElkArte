@@ -22,147 +22,19 @@ if (!defined('ELK'))
  */
 function sp_userInfo($parameters, $id, $return_parameters = false)
 {
-	global $context, $txt, $scripturl, $memberContext, $modSettings, $user_info, $color_profile, $settings;
+	static $instance = null;
 
-	$block_parameters = array();
+	if ($instance === null)
+	{
+		require_once(SUBSDIR . '/spblocks/UserInfo.block.php');
+		$instance = new User_Info_Block();
+	}
 
 	if ($return_parameters)
-		return $block_parameters;
+		return $instance->parameters();
 
-	echo '
-								<div class="centertext">';
-
-	// Show the guests a login area
-	if ($context['user']['is_guest'])
-	{
-		echo '
-									<script src="' . $settings['default_theme_url'] . '/scripts/sha256.js"></script>
-									<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', ' >
-									<table>
-											<tr>
-												<td class="righttext">
-													<label for="sp_user">', $txt['username'], ':</label>&nbsp;
-												</td>
-												<td>
-													<input type="text" id="sp_user" name="user" size="8" value="', !empty($user_info['username']) ? $user_info['username'] : '', '" />
-												</td>
-											</tr>
-											<tr>
-												<td class="righttext">
-													<label for="sp_passwrd">', $txt['password'], ':</label>&nbsp;
-												</td>
-												<td>
-													<input type="password" name="passwrd" id="sp_passwrd" size="8" />
-												</td>
-											</tr>
-											<tr>
-												<td>
-													<select name="cookielength">
-														<option value="60">', $txt['one_hour'], '</option>
-														<option value="1440">', $txt['one_day'], '</option>
-														<option value="10080">', $txt['one_week'], '</option>
-														<option value="43200">', $txt['one_month'], '</option>
-														<option value="-1" selected="selected">', $txt['forever'], '</option>
-													</select>
-												</td>
-												<td>
-													<input type="submit" value="', $txt['login'], '" class="button_submit" />
-												</td>
-											</tr>
-										</table>
-										<input type="hidden" name="hash_passwrd" value="" />
-										<input type="hidden" name="old_hash_passwrd" value="" />
-										<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-										<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
-									</form>', replaceBasicActionUrl($txt[$context['can_register'] ? 'welcome_guest_register' : 'welcome_guest']);
-	}
-	// A logged in member then
-	else
-	{
-		// load up the members details
-		loadMemberData($user_info['id']);
-		loadMemberContext($user_info['id'], true);
-
-		$member_info = $memberContext[$user_info['id']];
-
-		if (sp_loadColors($member_info['id']) !== false)
-			$member_info['colored_name'] = $color_profile[$member_info['id']]['colored_name'];
-
-		$member_info['karma']['total'] = $member_info['karma']['good'] - $member_info['karma']['bad'];
-
-		echo '
-									',  $txt['hello_member'], ' <strong>', !empty($member_info['colored_name']) ? $member_info['colored_name'] : $member_info['name'], '</strong>
-									<br /><br />';
-
-		if (!empty($member_info['avatar']['image']))
-			echo '
-									<a href="', $scripturl, '?action=profile;u=', $member_info['id'], '">', $member_info['avatar']['image'], '</a>
-									<br />';
-
-		if (!empty($member_info['group']))
-			echo '
-									', $member_info['group'], '<br />';
-		else
-			echo '
-									', $member_info['post_group'], '<br />';
-
-		echo '
-									', $member_info['group_icons'], '
-									<br />
-									<br />
-									<ul class="sp_list">
-										<li ', sp_embed_class('dot'), '>
-											<strong>', $txt['posts'], ':</strong> ', $member_info['posts'], '
-										</li>';
-
-		if (!empty($modSettings['karmaMode']))
-		{
-			echo '
-										<li ', sp_embed_class('dot'), '>
-											<strong>', $modSettings['karmaLabel'], '
-										</strong> ';
-
-			if ($modSettings['karmaMode'] == 1)
-				echo $member_info['karma']['total'];
-			elseif ($modSettings['karmaMode'] == 2)
-				echo '+', $member_info['karma']['good'], '/-', $member_info['karma']['bad'];
-
-			echo '</li>';
-		}
-
-		// What do they like?
-		if (!empty($modSettings['likes_enabled']))
-			echo '
-										<li ', sp_embed_class('dot'), '>
-											<strong>', $txt['likes'], ': </strong>' . $member_info['likes']['given'] . ' <span ', sp_embed_class('given'), '></span> / ', $member_info['likes']['received'], ' <span ', sp_embed_class('received'), '></span></li>';
-
-
-		if (allowedTo('pm_read'))
-		{
-			echo '
-										<li ', sp_embed_class('dot'), '>
-											<strong>', $txt['sp-usertmessage'], ': </strong><a href="', $scripturl, '?action=pm">', $context['user']['messages'], '</a>
-										</li>
-										<li ', sp_embed_class('dot'), '>
-											<strong>', $txt['sp-usernmessage'], ': </strong> ', $context['user']['unread_messages'], '
-										</li>';
-		}
-
-		echo '
-										<li ', sp_embed_class('dot'), '>
-											<a href="', $scripturl, '?action=unread">', $txt['unread_topics_visit'], '</a>
-										</li>
-										<li ', sp_embed_class('dot'), '>
-											<a href="', $scripturl, '?action=unreadreplies">', $txt['unread_replies'], '</a>
-										</li>
-									</ul>
-									<br />
-									<a class="dot arrow" href="', $scripturl, '?action=profile">', $txt['profile'], '</a>
-									<a class="dot arrow" href="', $scripturl, '?action=logout;sesc=', $context['session_id'], '">', $txt['logout'], '</a>';
-	}
-
-	echo '
-								</div>';
+	$instance->setup();
+	$instance->render();
 }
 
 /**
