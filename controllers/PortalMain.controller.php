@@ -68,8 +68,6 @@ class Sportal_Controller extends Action_Controller
 	{
 		global $context, $modSettings;
 
-		$context['sub_template'] = 'portal_index';
-
 		if (empty($modSettings['sp_articles_index']))
 			return;
 

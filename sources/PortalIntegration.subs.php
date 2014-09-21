@@ -302,7 +302,7 @@ function sp_integrate_frontpage(&$default_action)
 		// Any actions we need to handle with the portal, set up the action here.
 		if (empty($_GET['page']) && empty($_GET['article']) && empty($_GET['category']) && $modSettings['sp_portal_mode'] == 1)
 		{
-			// View the portal
+			// View the portal front page
 			$file = CONTROLLERDIR . '/PortalMain.controller.php';
 			$controller = 'Sportal_Controller';
 			$function = 'action_sportal_index';
@@ -415,7 +415,7 @@ function sp_integrate_menu_buttons(&$buttons)
 	else
 		$sportalurl = '';
 
-	// Define the new menu item(s)
+	// Define the new menu item(s), show it for modes 1 and 3 only
 	$buttons = elk_array_insert($buttons, 'home', array(
 		'forum' => array(
 			'title' => empty($txt['sp-forum']) ? 'Forum' : $txt['sp-forum'],
