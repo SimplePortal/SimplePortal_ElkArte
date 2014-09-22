@@ -921,7 +921,7 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
  *
  * @param string $name
  * @param string $title
- * @param string| $extaclass
+ * @param string $extraclass
  * @param string $spriteclass
  */
 function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'dot')
