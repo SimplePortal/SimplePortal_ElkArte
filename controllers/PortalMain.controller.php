@@ -67,6 +67,8 @@ class Sportal_Controller extends Action_Controller
 	public function action_sportal_index()
 	{
 		global $context, $modSettings;
+		
+		$context['sub_template'] = 'portal_index';
 
 		if (empty($modSettings['sp_articles_index']))
 			return;
@@ -91,8 +93,6 @@ class Sportal_Controller extends Action_Controller
 			if (!empty($modSettings['sp_articles_length']))
 				$context['articles'][$article['id']]['preview'] = Util::shorten_html($context['articles'][$article['id']]['preview'], $modSettings['sp_articles_length']);
 		}
-
-		$context['sub_template'] = 'portal_index';
 	}
 
 	/**
