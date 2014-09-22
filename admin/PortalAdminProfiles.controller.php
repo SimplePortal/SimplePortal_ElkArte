@@ -334,6 +334,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			$context['profile'] = array(
 				'id' => 0,
 				'name' => $txt['sp_profiles_default_name'],
+				'label' => $txt['sp_profiles_default_name'],
 				'groups_allowed' => array(),
 				'groups_denied' => array(),
 			);
