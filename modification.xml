@@ -49,11 +49,13 @@
 	</file>
 
 	<file name="SOURCEDIR/Subs.php">
-		<operation>
+		<!-- only needed for 1.0 -->
+		<operation error="ignore">
 			<search position="replace"><![CDATA[	static $disabled;]]></search>
 			<add><![CDATA[	static $disabled, $default_disabled, $parse_tag_cache;]]></add>
 		</operation>
-		<operation>
+		<!-- only needed for 1.0 -->
+		<operation error="ignore">
 			<search position="replace"><![CDATA[	// If we are not doing every tag then we don't cache this run.
 	if (!empty($parse_tags) && !empty($bbc_codes))
 	{
@@ -69,13 +71,15 @@
 	}
 */]]></add>
 		</operation>
-		<operation>
+		<!-- only needed for 1.0 -->
+		<operation error="ignore">
 			<search position="replace"><![CDATA[	if (empty($bbc_codes) || $message === false || !empty($parse_tags))]]></search>
 			<add><![CDATA[//	if (empty($bbc_codes) || $message === false || !empty($parse_tags))
 	// I wish I didn't had to do this... puff...
 	if (empty($bbc_codes) || $message === false)]]></add>
 		</operation>
-		<operation>
+		<!-- only needed for 1.0 -->
+		<operation error="ignore">
 			<search position="replace"><![CDATA[			if (empty($parse_tags) || in_array($code['tag'], $parse_tags))
 				$bbc_codes[substr($code['tag'], 0, 1)][] = $code;
 		}

@@ -26,7 +26,7 @@ function template_permission_profiles_edit()
 							<label for="profile_name">', $txt['sp_admin_profiles_col_name'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" name="name" id="profile_name" value="', $context['profile']['label'], '" class="input_text" />
+							<input type="text" name="name" id="profile_name" value="', $context['profile']['name'], '" class="input_text" />
 						</dd>
 						<dt>
 							', $txt['sp_admin_profiles_col_permissions'], ':
