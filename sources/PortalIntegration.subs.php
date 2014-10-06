@@ -353,6 +353,7 @@ function sp_integrate_quickhelp()
 
 	// Load the Simple Portal Help file.
 	loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
+	loadLanguage('SPortalAdmin', sp_languageSelect('SPortal'));
 }
 
 /**
