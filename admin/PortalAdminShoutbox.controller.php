@@ -82,7 +82,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 		// Build the listoption array to display the categories
 		$listOptions = array(
 			'id' => 'portal_shout',
-			'title' => $txt['sp_admin_articles_list'],
+			'title' => $txt['sp_admin_shoutbox_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['error_sp_no_pages'],
 			'base_href' => $scripturl . '?action=admin;area=portalshoutbox;sa=list;',
@@ -156,7 +156,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '<a href="?action=admin;area=portalshoutbox;sa=edit;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="m">' . sp_embed_image('modify') . '</a>&nbsp;
-								<a href="?action=admin;area=portalshoutbox;sa=delete;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="p">' . sp_embed_image('bin') . '</a>&nbsp;
+								<a href="?action=admin;area=portalshoutbox;sa=prune;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="p">' . sp_embed_image('bin') . '</a>&nbsp;
 								<a href="?action=admin;area=portalshoutbox;sa=delete;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_shoutbox_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
 								'id' => true,
@@ -471,7 +471,8 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 				{
 					$db->query('', '
 						DELETE FROM {db_prefix}sp_shouts
-						WHERE ' . implode(' AND ', $where), $parameters
+						WHERE ' . implode(' AND ', $where),
+						$parameters
 					);
 
 					if ($_POST['type'] != 'all')
