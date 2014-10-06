@@ -148,39 +148,37 @@ function template_shoutbox_prune()
 	global $context, $scripturl, $settings, $txt;
 
 	echo '
-	<div id="sp_prune_shoutbox">
-		<form  id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalshoutbox;sa=prune" method="post" accept-charset="UTF-8">
-			<h3 class="category_header">
-				', $context['page_title'], '
-			</h3>
-			<div class="windowbg2">
-				<div class="sp_content_padding">
-					<dl class="sp_form">
-						<dt>
-							<input type="radio" name="type" id="type_all" value="all" class="input_radio" /> <label for="type_all">', $txt['sp_admin_shoutbox_opt_all'], '</label>
-						</dt>
-						<dd>
-						</dd>
-						<dt>
-							<input type="radio" name="type" id="type_days" value="days" class="input_radio" /> <label for="type_days">', $txt['sp_admin_shoutbox_opt_days'], '</label>
-						</dt>
-						<dd>
-							<input type="text" name="days" value="" size="5" onfocus="document.getElementById(\'type_days\').checked = true;" class="input_text" />
-						</dd>
-						<dt>
-							<input type="radio" name="type" id="type_member" value="member" class="input_radio" /> <label for="type_member">', $txt['sp_admin_shoutbox_opt_member'], '</label>
-						</dt>
-						<dd>
-							<input type="text" name="member" id="member" value="" onclick="document.getElementById(\'type_member\').checked = true;" size="15" class="input_text" />
-						</dd>
-					</dl>
-					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
-				</div>
+	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalshoutbox;sa=prune" method="post" accept-charset="UTF-8">
+		<h3 class="category_header">
+			', $context['page_title'], '
+		</h3>
+		<div class="windowbg2">
+			<div class="sp_content_padding">
+				<dl class="sp_form">
+					<dt>
+						<input type="radio" name="type" id="type_all" value="all" class="input_radio" /> <label for="type_all">', $txt['sp_admin_shoutbox_opt_all'], '</label>
+					</dt>
+					<dd>
+					</dd>
+					<dt>
+						<input type="radio" name="type" id="type_days" value="days" class="input_radio" /> <label for="type_days">', $txt['sp_admin_shoutbox_opt_days'], '</label>
+					</dt>
+					<dd>
+						<input type="text" name="days" value="" size="5" onfocus="document.getElementById(\'type_days\').checked = true;" class="input_text" />
+					</dd>
+					<dt>
+						<input type="radio" name="type" id="type_member" value="member" class="input_radio" /> <label for="type_member">', $txt['sp_admin_shoutbox_opt_member'], '</label>
+					</dt>
+					<dd>
+						<input type="text" name="member" id="member" value="" onclick="document.getElementById(\'type_member\').checked = true;" size="15" class="input_text" />
+					</dd>
+				</dl>
+				<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
 			</div>
-			<input type="hidden" name="shoutbox_id" value="', $context['shoutbox']['id'], '" />
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-		</form>
-	</div>
+		</div>
+		<input type="hidden" name="shoutbox_id" value="', $context['shoutbox']['id'], '" />
+		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+	</form>
 	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?fin20"></script>
 	<script><!-- // --><![CDATA[
 		var oAddBuddySuggest = new smc_AutoSuggest({
