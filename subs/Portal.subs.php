@@ -340,6 +340,9 @@ function resetMemberLayout()
 			'id_member' => $user_info['id'],
 		)
 	);
+
+	// Clear the user theme cache to reflect the changes now
+	cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 60);
 }
 
 /**
