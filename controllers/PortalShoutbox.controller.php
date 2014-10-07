@@ -90,10 +90,10 @@ class Shoutbox_Controller extends Action_Controller
 			if (!$can_moderate)
 				fatal_lang_error('error_sp_cannot_shoutbox_moderate', false);
 
-			$_REQUEST['delete'] = (int) $_REQUEST['delete'];
+			$delete = (int) $_REQUEST['delete'];
 
-			if (!empty($_REQUEST['delete']))
-				sportal_delete_shout($shoutbox_id, $_REQUEST['delete']);
+			if (!empty($delete))
+				sportal_delete_shout($shoutbox_id, $delete);
 		}
 
 		// Responding to an ajax request
