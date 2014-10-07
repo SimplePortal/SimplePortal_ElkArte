@@ -1798,8 +1798,10 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 		$query[] = 'id_shoutbox = {int:shoutbox_id}';
 		$parameters['shoutbox_id'] = $shoutbox_id;
 	}
+
 	if (!empty($allowed))
 		$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
+	
 	if (!empty($active))
 	{
 		$query[] = 'status = {int:status}';
@@ -2080,6 +2082,15 @@ function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
 	cache_put_data('shoutbox_shouts-' . $shoutbox_id, null, 240);
 }
 
+/**
+ * Limits the number of actions a user can do in a given time
+ *
+ * - Currently only used by the shoutboxes
+ *
+ * @param string $type
+ * @param boolean $fatal
+ * @return boolean
+ */
 function sp_prevent_flood($type, $fatal = true)
 {
 	global $modSettings, $user_info, $txt;
@@ -2095,6 +2106,7 @@ function sp_prevent_flood($type, $fatal = true)
 	else
 		$time_limit = 2;
 
+	// Remove old blocks
 	$db->query('', '
 		DELETE FROM {db_prefix}log_floodcontrol
 		WHERE log_time < {int:log_time}
@@ -2105,6 +2117,7 @@ function sp_prevent_flood($type, $fatal = true)
 		)
 	);
 
+	// Update existing ones that were stil inside the time limit
 	$db->insert('replace', '
 		{db_prefix}log_floodcontrol',
 		array('ip' => 'string-16', 'log_time' => 'int', 'log_type' => 'string'),
@@ -2112,6 +2125,7 @@ function sp_prevent_flood($type, $fatal = true)
 		array('ip', 'log_type')
 	);
 
+	// To many entries, need to slow them down
 	if ($db->affected_rows() != 1)
 	{
 		if ($fatal)
