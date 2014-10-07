@@ -97,6 +97,12 @@ function template_portal_above()
 		echo '
 	</div>';
 	}
+	// No side collapsing but a custom arrangement?
+	elseif (!empty($context['SPortal']['blocks']['custom_arrange']))
+		echo '
+	<div class="righttext sp_fullwidth">
+		<a id="sp_reset_blocks" class="dot dotgrid" title="', $txt['sp_reset blocks'], '" href="' . $scripturl . '?action=portal;sa=resetlayout;' . $context['session_var'] . '=' . $context['session_id'] . '"></a>
+	</div>';
 
 	// Output any header blocks
 	if (!empty($context['SPortal']['blocks'][5]))
