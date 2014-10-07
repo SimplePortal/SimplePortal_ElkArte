@@ -726,7 +726,6 @@ dl.sp_form img, #sp_add_articles_list_header img {
 	padding: 47px 50px;
 }
 
-
 /* "dot" images as a sprite
 ------------------------------------------------- */
 .dot:before {
@@ -771,6 +770,7 @@ dl.sp_form img, #sp_add_articles_list_header img {
 .history:before {background-position: 0 -504px;}
 .smiley:before {background-position: 0 -522px;}
 .style:before {background-position: 0 -540px;}
+.dotgrid:before {background-position: 0 -558px;}
 
 
 /* Experimental media querys */
