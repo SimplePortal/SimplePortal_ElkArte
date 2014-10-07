@@ -99,7 +99,7 @@ function sp_image_resize()
 		}
 	}
 
-	if (typeof (window_oldSPImageOnload) !== "undefined" && window_oldSPImageOnload)
+	if (typeof(window_oldSPImageOnload) !== "undefined" && window_oldSPImageOnload)
 	{
 		window_oldSPImageOnload();
 		window_oldSPImageOnload = null;
@@ -248,22 +248,18 @@ function sp_show_history_ignored_shout(shout_id)
 	document.getElementById('history_ignored_shout_link_' + shout_id).style.display = 'none';
 }
 
-function elk_prepareScriptUrl(sUrl)
-{
-	return sUrl.indexOf('?') === -1 ? sUrl + '?' : sUrl + (sUrl.charAt(sUrl.length - 1) === '?' || sUrl.charAt(sUrl.length - 1) === '&' || sUrl.charAt(sUrl.length - 1) === ';' ? '' : ';');
-}
-
 function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_theme_url, elk_smileys_url)
 {
-	if (this.oSmileyPopupWindow !== undefined && 'closed' in this.oSmileyPopupWindow && !this.oSmileyPopupWindow.closed)
+	if (typeof(this.oSmileyPopupWindow) !== "undefined" && 'closed' in this.oSmileyPopupWindow && !this.oSmileyPopupWindow.closed)
 	{
 		this.oSmileyPopupWindow.focus();
 		return;
 	}
 
-	if (sp_smileyRowsContent === undefined)
+	if (typeof(sp_smileyRowsContent) === "undefined")
 	{
 		var sp_smileyRowsContent = '';
+
 		for (i = 0; i < sp_smileys.length; i++)
 		{
 			sp_smileys[i][2] = sp_smileys[i][2].replace(/"/g, '&quot;');
@@ -285,6 +281,8 @@ function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_them
 /**
  * When using html or php, disable the editor so it does not "fight" with what
  * the user wants to enter.
+ *
+ * @param {string} select
  */
 function sp_update_editor(select)
 {
@@ -292,12 +290,12 @@ function sp_update_editor(select)
 		instance = $("textarea").sceditor("instance");
 
 	// Going back to BBC
-	if (new_state === "bbc" && instance === undefined)
+	if (new_state === "bbc" && typeof(instance) === "undefined")
 	{
 		// Start the editor again
 		elk_editor();
 	}
-	else if (new_state !== "bbc" && instance !== undefined)
+	else if (new_state !== "bbc" && typeof(instance) !== "undefined")
 	{
 		// Update the the original text area with current editor contents and stop the editor
 		if (new_state === 'html')
@@ -338,7 +336,7 @@ function sp_collapseCalendar(id)
  */
 function sp_collapseObject(id)
 {
-	mode = document.getElementById("sp_object_" + id).style.display;
+	var mode = document.getElementById("sp_object_" + id).style.display;
 	mode = (mode === "" | mode === "block") ? false : true;
 
 	// Make it close smoothly

@@ -90,7 +90,7 @@ function template_portal_above()
 			echo '
 		<a id="sp_collapse_side4" class="dot ', $context['SPortal']['sides'][1]['collapsed'] ? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(4)"></a>';
 
-		if (!empty($context['SPortal']['blocks']['custom_arrange']))
+		if (!empty($context['SPortal']['blocks']['custom_arrange']) && $context['site_action'] === 'sportal')
 			echo '
 		<a id="sp_reset_blocks" class="dot dotgrid" title="', $txt['sp_reset blocks'], '" href="' . $scripturl . '?action=portal;sa=resetlayout;' . $context['session_var'] . '=' . $context['session_id'] . '"></a>';
 
@@ -98,7 +98,7 @@ function template_portal_above()
 	</div>';
 	}
 	// No side collapsing but a custom arrangement?
-	elseif (!empty($context['SPortal']['blocks']['custom_arrange']))
+	elseif (!empty($context['SPortal']['blocks']['custom_arrange']) && $context['site_action'] === 'sportal' && ($context['SPortal']['sides'][1]['active'] || $context['SPortal']['sides'][4]['active']))
 		echo '
 	<div class="righttext sp_fullwidth">
 		<a id="sp_reset_blocks" class="dot dotgrid" title="', $txt['sp_reset blocks'], '" href="' . $scripturl . '?action=portal;sa=resetlayout;' . $context['session_var'] . '=' . $context['session_id'] . '"></a>
