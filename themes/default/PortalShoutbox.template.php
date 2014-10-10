@@ -253,11 +253,11 @@ function template_shoutbox_xml()
 			echo '
 	<shout>
 		<id>', $shout['id'], '</id>
-		<author>', Util::htmlspecialchars($shout['author']['link']), '</author>
+		<author>', htmlspecialchars($shout['author']['link']), '</author>
 		<time>', htmlspecialchars($shout['time']), '</time>
 		<timeclean>', htmlspecialchars(strip_tags($shout['time'])), '</timeclean>
 		<delete>', !empty($shout['delete_link_js']) ? htmlspecialchars($shout['delete_link_js']) : ' ', '</delete>
-		<content>',  Util::htmlspecialchars($shout['text']), '</content>
+		<content>',  htmlspecialchars($shout['text']), '</content>
 		<is_me>', $shout['is_me'] ? 1 : 0, '</is_me>
 	</shout>';
 	}
