@@ -169,20 +169,28 @@ function sp_refresh_shout(shoutbox_id, last_refresh)
 	}
 }
 
+/**
+ * Refresh the shoutbox based on the XML response
+ *
+ * @param {object} XMLDoc
+ */
 function onShoutReceived(XMLDoc)
 {
-	var shouts = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("shout");
-	var shoutbox_id, updated, error, warning, reverse, shout, id, author, time, timeclean, delete_link, content, is_me, new_body = '';
+	var shout, shoutbox_id, updated, error, warning, reverse, shout, id, author, time, timeclean, delete_link, content, is_me, new_body = '';
 
+	// All valid response will have these
 	shoutbox_id = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("shoutbox")[0].childNodes[0].nodeValue;
 	updated = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("updated")[0].childNodes[0].nodeValue;
 
+	// Updated response will have the full shoutbox data
 	if (updated === "1")
 	{
+		shouts = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("shout");
 		error = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("error")[0].childNodes[0].nodeValue;
 		warning = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("warning")[0].childNodes[0].nodeValue;
 		reverse = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("reverse")[0].childNodes[0].nodeValue;
 
+		// SHow the "warning" box at the top of the shoutbox
 		if (warning !== "0")
 			new_body += '<li class="shoutbox_warning smalltext">' + warning + '</li>';
 
@@ -190,6 +198,7 @@ function onShoutReceived(XMLDoc)
 			document.getElementById('shouts_' + shoutbox_id).innerHTML = new_body + '<li class="smalltext">' + error + '</li>';
 		else
 		{
+			// Display all the shouts
 			for (var i = 0; i < shouts.length; i++)
 			{
 				shout = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("shout")[i];
@@ -201,11 +210,13 @@ function onShoutReceived(XMLDoc)
 				content = shout.getElementsByTagName("content")[0].childNodes[0].nodeValue;
 				is_me = shout.getElementsByTagName("is_me")[0].childNodes[0].nodeValue;
 
+				// Something you said
 				new_body += '<li>' + (is_me === "0" ? '<strong>' + author + ':</strong> ' : '') + content + '<br />' + (delete_link !== 0 ? ('<span class="shoutbox_delete">' + delete_link + '</span>') : '') + '<span class="smalltext shoutbox_time">' + time + '</span></li>';
 			}
 
 			document.getElementById('shouts_' + shoutbox_id).innerHTML = new_body;
 
+			// Set the display direction
 			if (reverse !== "0")
 				document.getElementById('shouts_' + shoutbox_id).scrollTop = document.getElementById('shouts_' + shoutbox_id).scrollHeight;
 			else
@@ -213,11 +224,18 @@ function onShoutReceived(XMLDoc)
 		}
 	}
 
+	// Turn off the spinner
 	shoutbox_indicator(shoutbox_id, false);
 
 	return false;
 }
 
+/**
+ * Toggle the shoutbox spinner for a given box
+ *
+ * @param {int} shoutbox_id id of the box to work on
+ * @param {boolean} turn_on showing or hiding
+ */
 function shoutbox_indicator(shoutbox_id, turn_on)
 {
 	document.getElementById('shoutbox_load_' + shoutbox_id).style.display = turn_on ? '' : 'none';
