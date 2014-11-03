@@ -19,6 +19,8 @@ if (!defined('ELK'))
  */
 class ManagePortalPages_Controller extends Action_Controller
 {
+	protected $blocks = array();
+
 	/**
 	 * Main dispatcher.
 	 * This function checks permissions and passes control through.
@@ -266,10 +268,10 @@ class ManagePortalPages_Controller extends Action_Controller
 			6 => $txt['sp-positionFooter'],
 		);
 
-		$blocks = getBlockInfo();
+		$this->blocks = getBlockInfo();
 		$context['page_blocks'] = array();
 
-		foreach ($blocks as $block)
+		foreach ($this->blocks as $block)
 		{
 			$shown = false;
 			$tests = array('all', 'allpages', 'sforum');
@@ -533,64 +535,64 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		foreach ($to_show as $id)
 		{
-			if ((empty($blocks[$id]['display']) && empty($blocks[$id]['display_custom'])) || $blocks[$id]['display'] == 'sportal')
+			if ((empty($this->blocks[$id]['display']) && empty($this->blocks[$id]['display_custom'])) || $this->blocks[$id]['display'] == 'sportal')
 			{
 				$changes[$id] = array(
 					'display' => 'portal,p' . $page_info['id'],
 					'display_custom' => '',
 				);
 			}
-			elseif (in_array($blocks[$id]['display'], array('allaction', 'allboard')))
+			elseif (in_array($this->blocks[$id]['display'], array('allaction', 'allboard')))
 			{
 				$changes[$id] = array(
 					'display' => '',
-					'display_custom' => $blocks[$id]['display'] . ',p' . $page_info['id'],
+					'display_custom' => $this->blocks[$id]['display'] . ',p' . $page_info['id'],
 				);
 			}
-			elseif (in_array('-p' . $page_info['id'], explode(',', $blocks[$id]['display_custom'])))
+			elseif (in_array('-p' . $page_info['id'], explode(',', $this->blocks[$id]['display_custom'])))
 			{
 				$changes[$id] = array(
-					'display' => $blocks[$id]['display'],
-					'display_custom' => implode(',', array_diff(explode(',', $blocks[$id]['display_custom']), array('-p' . $page_info['id']))),
+					'display' => $this->blocks[$id]['display'],
+					'display_custom' => implode(',', array_diff(explode(',', $this->blocks[$id]['display_custom']), array('-p' . $page_info['id']))),
 				);
 			}
-			elseif (empty($blocks[$id]['display_custom']))
+			elseif (empty($this->blocks[$id]['display_custom']))
 			{
 				$changes[$id] = array(
-					'display' => implode(',', array_merge(explode(',', $blocks[$id]['display']), array('p' . $page_info['id']))),
+					'display' => implode(',', array_merge(explode(',', $this->blocks[$id]['display']), array('p' . $page_info['id']))),
 					'display_custom' => '',
 				);
 			}
 			else
 			{
 				$changes[$id] = array(
-					'display' => $blocks[$id]['display'],
-					'display_custom' => implode(',', array_merge(explode(',', $blocks[$id]['display_custom']), array('p' . $page_info['id']))),
+					'display' => $this->blocks[$id]['display'],
+					'display_custom' => implode(',', array_merge(explode(',', $this->blocks[$id]['display_custom']), array('p' . $page_info['id']))),
 				);
 			}
 		}
 
 		foreach ($not_to_show as $id)
 		{
-			if (count(array_intersect(array($blocks[$id]['display'], $blocks[$id]['display_custom']), array('sforum', 'allpages', 'all'))) > 0)
+			if (count(array_intersect(array($this->blocks[$id]['display'], $this->blocks[$id]['display_custom']), array('sforum', 'allpages', 'all'))) > 0)
 			{
 				$changes[$id] = array(
 					'display' => '',
-					'display_custom' => $blocks[$id]['display'] . $blocks[$id]['display_custom'] . ',-p' . $page_info['id'],
+					'display_custom' => $this->blocks[$id]['display'] . $this->blocks[$id]['display_custom'] . ',-p' . $page_info['id'],
 				);
 			}
-			elseif (empty($blocks[$id]['display_custom']))
+			elseif (empty($this->blocks[$id]['display_custom']))
 			{
 				$changes[$id] = array(
-					'display' => implode(',', array_diff(explode(',', $blocks[$id]['display']), array('p' . $page_info['id']))),
+					'display' => implode(',', array_diff(explode(',', $this->blocks[$id]['display']), array('p' . $page_info['id']))),
 					'display_custom' => '',
 				);
 			}
 			else
 			{
 				$changes[$id] = array(
-					'display' => implode(',', array_diff(explode(',', $blocks[$id]['display']), array('p' . $page_info['id']))),
-					'display_custom' => implode(',', array_diff(explode(',', $blocks[$id]['display_custom']), array('p' . $page_info['id']))),
+					'display' => implode(',', array_diff(explode(',', $this->blocks[$id]['display']), array('p' . $page_info['id']))),
+					'display_custom' => implode(',', array_diff(explode(',', $this->blocks[$id]['display_custom']), array('p' . $page_info['id']))),
 				);
 			}
 		}
