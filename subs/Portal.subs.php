@@ -1226,7 +1226,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 			'title' => $row['title'],
 			'href' => $scripturl . '?article=' . $row['article_namespace'],
 			'link' => '<a href="' . $scripturl . '?article=' . $row['article_namespace'] . '">' . $row['title'] . '</a>',
-			'body' => $row['body'],
+			'body' => $row['type'] === 'html' ? un_htmlspecialchars($row['body']) : $row['body'],
 			'type' => $row['type'],
 			'date' => $row['date'],
 			'permissions' => $row['article_permissions'],
@@ -1671,7 +1671,7 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 				'title' => $row['title'],
 				'href' => $scripturl . '?page=' . $row['namespace'],
 				'link' => '<a href="' . $scripturl . '?page=' . $row['namespace'] . '">' . $row['title'] . '</a>',
-				'body' => $row['body'],
+				'body' => $row['type'] === 'html' ? un_htmlspecialchars($row['body']) : $row['body'],
 				'type' => $row['type'],
 				'permissions' => $row['permissions'],
 				'views' => $row['views'],
@@ -1801,7 +1801,7 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 
 	if (!empty($allowed))
 		$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
-	
+
 	if (!empty($active))
 	{
 		$query[] = 'status = {int:status}';
