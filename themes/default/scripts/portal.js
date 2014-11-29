@@ -300,26 +300,86 @@ function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_them
  * When using html or php, disable the editor so it does not "fight" with what
  * the user wants to enter.
  *
- * @param {string} select
+ * @param {string} new_state
+ * @param {string} original set to true on first invocation from controller
  */
-function sp_update_editor(select)
+function sp_update_editor(new_state, original)
 {
-	var new_state = document.getElementById(select).value,
-		instance = $("textarea").sceditor("instance");
+	var instance = $("textarea").sceditor("instance"),
+		val = '';
 
 	// Going back to BBC
 	if (new_state === "bbc" && typeof(instance) === "undefined")
 	{
+		// Get the current textbox contents, treat as if html
+		if (original === 'html')
+			val = $("textarea").html().php_unhtmlspecialchars();
+		else
+			val = '[code]' + $("textarea").val().replace(/\n/g, '<br \\>') + '[/code]';
+
 		// Start the editor again
 		elk_editor();
+
+		// load the editor with the html contents, toggle back to bbc so the editor converts it
+		instance = $("textarea").sceditor("instance");
+		instance.sourceMode(false);
+		instance.setWysiwygEditorValue(val);
+		instance.sourceMode(true);
 	}
+	// Toggling from BBC to html or php
+	else if (new_state !== "bbc" && typeof(instance) !== "undefined" && original !== '')
+	{
+		// Update the the original text area with current editor contents and stop the editor
+		if (new_state === 'html')
+		{
+			// Get the editors html value, bypass the bbc pluging, this html will have lost
+			// its formatting but it is html
+			if (instance.getSourceEditorValue() !== '')
+			{
+				val = instance.getWysiwygEditorValue(false);
+				val = val.replace(/<span .*>\s?<\/span>/g, '').replace(/<br( \\)?>/g, "\n");
+			}
+		}
+		// From bbc to php
+		else
+		{
+			val = instance.getSourceEditorValue(false).replace(/<br( \\)?>/g, "\n").php_unhtmlspecialchars().replace('[code]', '').replace('[/code]', '');
+		}
+
+		// Don't need the editor any longer, back to a text box and set the value we determined
+		instance.destroy();
+		$("textarea").val(val);
+	}
+	// Load html to the text area
 	else if (new_state !== "bbc" && typeof(instance) !== "undefined")
 	{
 		// Update the the original text area with current editor contents and stop the editor
 		if (new_state === 'html')
 			instance.updateOriginal();
+
 		instance.destroy();
 	}
+}
+
+/**
+ * Monitors the onchange and focus events for an element
+ *
+ * @param {string} element ID of element to attach change/focus events
+ */
+function sp_editor_change_type(element) {
+    var previous;
+
+    $('#' + element).on('focus', function () {
+        // Store the current value on focus and on change
+        previous = this.value;
+    }).change(function() {
+        // Handle the editor change
+		console.log(this.value);
+		sp_update_editor(this.value, previous);
+
+        // Make sure the previous value is updated
+        previous = this.value;
+    });
 }
 
 /**
