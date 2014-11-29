@@ -934,8 +934,9 @@ function sp_recent($parameters, $id, $return_parameters = false)
 	{
 		foreach ($items as $key => $item)
 			echo '
+								', $item['new'] ? '' : ' <a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
 								<a href="', $item['href'], '">', $item['subject'], '</a>
-								<span class="smalltext">', $txt['by'], ' ', $item['poster']['link'], $item['new'] ? '' : ' <a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>',
+								<span class="smalltext">', $txt['by'], ' ', $item['poster']['link'],
 								'<br />[', $item['time'], ']</span>
 								<br />', empty($item['is_last']) ? '<hr />' : '';
 	}
@@ -948,9 +949,10 @@ function sp_recent($parameters, $id, $return_parameters = false)
 			echo '
 									<tr>
 										<td ', sp_embed_class(empty($parameters['type']) ? 'post' : 'topic', '', 'sp_recent_icon centertext' ), '></td>
-										<td class="sp_recent_subject">
+										<td class="sp_recent_subject">',
+											$item['new'] ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
 											<a href="', $item['href'], '">', $item['subject'], '</a>
-											', $item['new'] ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>', '<br />[', $item['board']['link'], ']
+											<br />[', $item['board']['link'], ']
 										</td>
 										<td class="sp_recent_info righttext">
 											', $item['poster']['link'], '<br />', $item['time'], '
