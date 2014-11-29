@@ -63,7 +63,7 @@ function template_articles_edit()
 						<label for="article_type">', $txt['sp_admin_articles_col_type'], ':</label>
 					</dt>
 					<dd>
-						<select name="type" id="article_type" onchange="sp_update_editor(\'article_type\');">';
+						<select name="type" id="article_type">';
 
 	$content_types = array('bbc', 'html', 'php');
 	foreach ($content_types as $type)
@@ -102,5 +102,8 @@ function template_articles_edit()
 				</div>
 			</form>
 		</div>
-	</div>';
+	</div>
+	<script><!-- // --><![CDATA[
+		sp_editor_change_type("article_type");
+	// ]]></script>';
 }

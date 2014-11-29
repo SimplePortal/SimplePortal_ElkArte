@@ -49,7 +49,7 @@ function template_pages_edit()
 							<label for="page_type">', $txt['sp_admin_pages_col_type'], ':</label>
 						</dt>
 						<dd>
-							<select name="type" id="page_type" onchange="sp_update_editor(\'page_type\');">';
+							<select name="type" id="page_type">';
 
 	$content_types = array('bbc', 'html', 'php');
 	foreach ($content_types as $type)
@@ -185,6 +185,7 @@ function template_pages_edit()
 		</form>
 	</div>
 	<script><!-- // --><![CDATA[
+		sp_editor_change_type("page_type");
 		document.getElementById("title_default_class").disabled = document.getElementById("no_title").checked;
 		document.getElementById("title_custom_class").disabled = document.getElementById("no_title").checked;
 		document.getElementById("title_custom_style").disabled = document.getElementById("no_title").checked;

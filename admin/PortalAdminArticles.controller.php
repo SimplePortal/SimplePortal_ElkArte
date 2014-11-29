@@ -400,7 +400,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// Set the editor box to the right mode
 		addInlineJavascript('
 			$(window).load(function() {
-				diewithfire = window.setTimeout(function() {sp_update_editor(\'article_type\');}, 200);
+				diewithfire = window.setTimeout(function() {sp_update_editor("' . $context['article']['type'] . '", "");}, 200);
 			});
 		');
 	}
