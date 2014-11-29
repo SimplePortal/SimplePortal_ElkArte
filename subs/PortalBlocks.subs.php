@@ -2738,8 +2738,10 @@ function sp_gallery($parameters, $id, $return_parameters = false)
 		if ($mod == 'aeva_media')
 		{
 			echo '
-												<a href="', $scripturl, '?action=media;sa=item;in=', $item['id'], '">', $item['title'], '</a><br />
-												<a href="', $scripturl, '?action=media;sa=item;in=', $item['id'], '"><img src="', $scripturl, '?action=media;sa=media;in=', $item['id'], ';thumb" alt="" /></a><br />
+												<a href="', $scripturl, '?action=media;sa=item;in=', $item['id'], '">', $item['title'], '</a><br />' . (!empty($modSettings['fancybox_enabled']) ? '
+												<a href="' . $scripturl . '?action=media;sa=media;in=' . $item['id'] . '" rel="gallery" class="fancybox">' : '
+												<a href="' . $scripturl . '?action=media;sa=item;in=' . $item['id'] . '">') . '
+												<img src="', $scripturl, '?action=media;sa=media;in=', $item['id'], ';thumb" alt="" /></a><br />
 												', $txt['aeva_views'], ': ', $item['views'], '<br />
 												', $txt['aeva_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
 												', $txt['aeva_in_album'], ': <a href="', $scripturl, '?action=media;sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>';
