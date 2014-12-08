@@ -476,17 +476,6 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 		if (!empty($row['id_member']))
 			$colorids[$row['id_member']] = $row['id_member'];
 
-		if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
-		{
-			$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
-			$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
-		}
-		else
-		{
-			$avatar_width = '';
-			$avatar_height = '';
-		}
-
 		$members[] = array(
 			'id' => $row['id_member'],
 			'name' => $row['real_name'],
@@ -738,18 +727,6 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 			AND (', $where) . ')';
 	else
 		$where = "";
-
-	// Member avatars
-	if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
-	{
-		$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
-		$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
-	}
-	else
-	{
-		$avatar_width = '';
-		$avatar_height = '';
-	}
 
 	// Finaly make the query with the parameters we built
 	$request = $db->query('', '
@@ -1306,17 +1283,6 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		{
 			$ellip = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">&hellip;</a>';
 			$row['body'] = Util::shorten_html($row['body'], $length, $ellip, false);
-		}
-
-		if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
-		{
-			$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
-			$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
-		}
-		else
-		{
-			$avatar_width = '';
-			$avatar_height = '';
 		}
 
 		if (empty($modSettings['messageIconChecks_disable']) && !isset($icon_sources[$row['icon']]))
@@ -2285,17 +2251,6 @@ function sp_staff($parameters, $id, $return_parameters = false)
 	while ($row = $db->fetch_assoc($request))
 	{
 		$colorids[$row['id_member']] = $row['id_member'];
-
-		if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
-		{
-			$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
-			$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
-		}
-		else
-		{
-			$avatar_width = '';
-			$avatar_height = '';
-		}
 
 		if (in_array($row['id_member'], $admins))
 			$row['type'] = 1;

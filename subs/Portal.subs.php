@@ -1187,18 +1187,6 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 		if (!empty($row['id_author']))
 			$member_ids[$row['id_author']] = $row['id_author'];
 
-		// Set up avatar to the right size, per forum settings
-		if ($modSettings['avatar_action_too_large'] === 'option_html_resize' || $modSettings['avatar_action_too_large'] === 'option_js_resize')
-		{
-			$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
-			$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
-		}
-		else
-		{
-			$avatar_width = '';
-			$avatar_height = '';
-		}
-
 		$return[$row['id_article']] = array(
 			'id' => $row['id_article'],
 			'category' => array(
@@ -1995,11 +1983,11 @@ function sportal_create_shout($shoutbox, $shout)
 
 	$db = database();
 
-	// If a guest shouts in the woods, and no one is there to here them
+	// If a guest shouts in the woods, and no one is there to hear them
 	if ($user_info['is_guest'])
 		return false;
 
-	// What, it not like we can shout to nothing
+	// What, its not like we can shout to nothing
 	if (empty($shoutbox))
 		return false;
 
@@ -2074,7 +2062,7 @@ function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
  * Use true to increment by 1
  *
  * @param int $shoutbox_id
- * @param int $num_shouts
+ * @param int|boolean $num_shouts if true increase the count by 1
  */
 function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
 {
