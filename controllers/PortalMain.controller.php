@@ -67,7 +67,7 @@ class Sportal_Controller extends Action_Controller
 	public function action_sportal_index()
 	{
 		global $context, $modSettings;
-		
+
 		$context['sub_template'] = 'portal_index';
 
 		if (empty($modSettings['sp_articles_index']))
@@ -86,7 +86,8 @@ class Sportal_Controller extends Action_Controller
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
 		foreach ($context['articles'] as $article)
 		{
-			$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
+
+			$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
 			$context['articles'][$article['id']]['date'] = standardTime($article['date']);
 
 			// Just the preview

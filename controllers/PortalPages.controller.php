@@ -75,6 +75,9 @@ class Pages_Controller extends Action_Controller
 		// Fetch any style assocated with the page
 		$context['SPortal']['page']['style'] = sportal_parse_style('explode', $context['SPortal']['page']['style'], true);
 
+		// Prepare the body
+		$context['SPortal']['page']['body'] = sportal_parse_content($context['SPortal']['page']['body'], $context['SPortal']['page']['type'], 'return');
+
 		// Increase the view counter
 		if (empty($_SESSION['last_viewed_page']) || $_SESSION['last_viewed_page'] != $context['SPortal']['page']['id'])
 		{

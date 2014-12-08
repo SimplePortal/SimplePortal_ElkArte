@@ -42,11 +42,6 @@ function template_view_pages()
 
 function template_view_page()
 {
-	template_view_page_curve();
-}
-
-function template_view_page_curve()
-{
 	global $context;
 
 	if (empty($context['SPortal']['page']['style']['no_title']))
@@ -61,11 +56,8 @@ function template_view_page_curve()
 
 	echo '
 				<div class="', $context['SPortal']['page']['style']['body']['class'], '">
-					<div class="sp_content_padding"', !empty($context['SPortal']['page']['style']['body']['style']) ? ' style="' . $context['SPortal']['page']['style']['body']['style'] . '"' : '', '>';
-
-	sportal_parse_content($context['SPortal']['page']['body'], $context['SPortal']['page']['type']);
-
-	echo '
+					<div class="sp_content_padding"', !empty($context['SPortal']['page']['style']['body']['style']) ? ' style="' . $context['SPortal']['page']['style']['body']['style'] . '"' : '', '>',
+						$context['SPortal']['page']['body'], '
 					</div>
 				</div>';
 }

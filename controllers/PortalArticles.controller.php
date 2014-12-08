@@ -57,7 +57,8 @@ class Article_Controller extends Action_Controller
 
 		foreach ($context['articles'] as $article)
 		{
-			$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
+
+			$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
 			$context['articles'][$article['id']]['date'] = standardTime($article['date']);
 		}
 
@@ -89,6 +90,7 @@ class Article_Controller extends Action_Controller
 			$article_id = Util::htmlspecialchars($article_id, ENT_QUOTES);
 
 		$context['article'] = sportal_get_articles($article_id, true, true);
+		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
 
 		if (empty($context['article']['id']))
 			fatal_lang_error('error_sp_article_not_found', false);

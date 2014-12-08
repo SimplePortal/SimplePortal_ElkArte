@@ -1226,7 +1226,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 			'title' => $row['title'],
 			'href' => $scripturl . '?article=' . $row['article_namespace'],
 			'link' => '<a href="' . $scripturl . '?article=' . $row['article_namespace'] . '">' . $row['title'] . '</a>',
-			'body' => $row['type'] === 'html' ? un_htmlspecialchars($row['body']) : $row['body'],
+			'body' => $row['body'],
 			'type' => $row['type'],
 			'date' => $row['date'],
 			'permissions' => $row['article_permissions'],
@@ -1671,7 +1671,7 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 				'title' => $row['title'],
 				'href' => $scripturl . '?page=' . $row['namespace'],
 				'link' => '<a href="' . $scripturl . '?page=' . $row['namespace'] . '">' . $row['title'] . '</a>',
-				'body' => $row['type'] === 'html' ? un_htmlspecialchars($row['body']) : $row['body'],
+				'body' => $row['body'],
 				'type' => $row['type'],
 				'permissions' => $row['permissions'],
 				'views' => $row['views'],
@@ -1691,21 +1691,34 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 /**
  * Prepare body text to be of type, html, bbc, php, etc
  *
- * @param string $body
- * @param string $type
+ * @param string $body the string of text to treat as $type
+ * @param string $type one of html, bbc, php
+ * @param string $output_method if echo will echo the results, otherwise returns the string
  */
-function sportal_parse_content($body, $type)
+function sportal_parse_content($body, $type, $output_method = 'echo')
 {
-	if ($type == 'bbc')
-		echo parse_bbc($body);
-	elseif ($type == 'html')
-		echo un_htmlspecialchars($body);
-	elseif ($type == 'php')
+	switch ($type)
 	{
-		$body = trim(un_htmlspecialchars($body));
-		$body = trim($body, '<?php');
-		$body = trim($body, '?>');
-		eval($body);
+		case 'bbc':
+			if ($output_method == 'echo')
+				echo parse_bbc($body);
+			else
+				return parse_bbc($body);
+			break;
+		case 'html':
+			if ($output_method == 'echo')
+				echo un_htmlspecialchars($body);
+			else
+				return un_htmlspecialchars($body);
+			break;
+		case 'php':
+			$body = trim(un_htmlspecialchars($body));
+			$body = trim($body, '<?php');
+			$body = trim($body, '?>');
+			eval($body);
+			break;
+		default:
+			return;
 	}
 }
 

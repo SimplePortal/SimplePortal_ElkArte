@@ -103,11 +103,8 @@ function template_view_article()
 					</span>
 				</div>
 				<hr />
-				<div>';
-
-	sportal_parse_content($context['article']['body'], $context['article']['type']);
-
-	echo '
+				<div>' ,
+					$context['article']['body'], '
 				</div>
 			</div>
 		</div>';

@@ -1540,6 +1540,9 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
 	// For each image that was returned from ssi
 	foreach ($items as $id => $item)
 	{
+		if (empty($item['file']['image']))
+			continue;
+
 		echo !$direction ? '
 									<tr>' : '';
 
@@ -2444,7 +2447,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 		foreach ($articles as $article)
 		{
 			// Shorten it for the preview
-			$article['body'] = parse_bbc($article['body']);
+			$article['body'] = sportal_parse_content($article['body'], $article['type'], 'return');
 			$article['body'] = Util::shorten_html($article['body'], $length);
 
 			echo '
@@ -2676,7 +2679,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
  */
 function sp_gallery($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $txt, $scripturl;
+	global $scripturl, $txt, $scripturl, $modSettings;
 	static $mod;
 
 	$block_parameters = array(
