@@ -261,7 +261,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 */
 	public function action_sportal_admin_article_edit()
 	{
-		global $context, $user_info, $options, $txt, $scripturl;
+		global $context, $options, $txt;
 
 		$context['is_new'] = empty($_REQUEST['article_id']);
 
@@ -292,49 +292,19 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// Just taking a look before you save?
 		if (!empty($_POST['preview']) || $article_errors->hasErrors())
 		{
-			if (!$context['is_new'])
-			{
-				$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
-				$current = sportal_get_articles($_REQUEST['article_id']);
-				$author = $current['author'];
-				$date = standardTime($current['date']);
-				list($views, $comments) = sportal_get_article_views_comments($_REQUEST['article_id']);
-			}
-			else
-			{
-				$author = array('link' => '<a href="' . $scripturl .'?action=profile;u=' . $user_info['id'] . '">' . $user_info['name'] . '</a>');
-				$date = standardTime(time());
-				$views = 0;
-				$comments = 0;
-			}
-
-			$context['article'] = array(
-				'id' => $_POST['article_id'],
-				'article_id' => $_POST['namespace'],
-				'category' => sportal_get_categories((int) $_POST['category_id']),
-				'author' => $author,
-				'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
-				'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
-				'type' => $_POST['type'],
-				'permissions' => $_POST['permissions'],
-				'date' => $date,
-				'status' => !empty($_POST['status']),
-				'views' => $views,
-				'comments' => $comments,
-			);
-
-			if ($context['article']['type'] === 'bbc')
-				preparsecode($context['article']['body']);
+			$context['article'] = $this->_sportal_admin_article_preview();
 
 			loadTemplate('PortalArticles');
 
 			// Showing errors or a preview?
 			if ($article_errors->hasErrors())
+			{
 				$context['article_errors'] = array(
 					'errors' => $article_errors->prepareErrors(),
 					'type' => $article_errors->getErrorType() == 0 ? 'minor' : 'serious',
 					'title' => $txt['sp_form_errors_detected'],
 				);
+			}
 			else
 				$context['preview'] = true;
 		}
@@ -403,6 +373,52 @@ class ManagePortalArticles_Controller extends Action_Controller
 				diewithfire = window.setTimeout(function() {sp_update_editor("' . $context['article']['type'] . '", "");}, 200);
 			});
 		');
+	}
+
+	/**
+	 * Sets up for an article preview
+	 */
+	private function _sportal_admin_article_preview()
+	{
+		global $context, $scripturl, $user_info;
+
+		// Existing article will have some data
+		if (!$context['is_new'])
+		{
+			$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
+			$current = sportal_get_articles($_REQUEST['article_id']);
+			$author = $current['author'];
+			$date = standardTime($current['date']);
+			list($views, $comments) = sportal_get_article_views_comments($_REQUEST['article_id']);
+		}
+		// New ones we set defaults
+		else
+		{
+			$author = array('link' => '<a href="' . $scripturl .'?action=profile;u=' . $user_info['id'] . '">' . $user_info['name'] . '</a>');
+			$date = standardTime(time());
+			$views = 0;
+			$comments = 0;
+		}
+
+		$article = array(
+			'id' => $_POST['article_id'],
+			'article_id' => $_POST['namespace'],
+			'category' => sportal_get_categories((int) $_POST['category_id']),
+			'author' => $author,
+			'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
+			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
+			'type' => $_POST['type'],
+			'permissions' => $_POST['permissions'],
+			'date' => $date,
+			'status' => !empty($_POST['status']),
+			'views' => $views,
+			'comments' => $comments,
+		);
+
+		if ($article['type'] === 'bbc')
+			preparsecode($article['body']);
+
+		return $article;
 	}
 
 	/**
