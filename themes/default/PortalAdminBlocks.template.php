@@ -282,8 +282,8 @@ function template_block_edit()
 						<dd>
 							<select id="order" name="placement"', !$context['SPortal']['is_new'] ? ' onchange="this.form.block_row.disabled = this.options[this.selectedIndex].value == \'\';"' : '', '>
 								', !$context['SPortal']['is_new'] ? '<option value="nochange">' . $txt['sp-placementUnchanged'] . '</option>' : '', '
-								<option value="before">', $txt['sp-placementBefore'], '...</option>
-								<option value="after">', $txt['sp-placementAfter'], '...</option>
+								<option value="before"', (!empty($context['SPortal']['block']['placement']) && $context['SPortal']['block']['placement'] == 'before' ? ' selected="selected"' : ''), '>', $txt['sp-placementBefore'], '...</option>
+								<option value="after"', (!empty($context['SPortal']['block']['placement']) && $context['SPortal']['block']['placement'] == 'after' ? ' selected="selected"' : ''), '>', $txt['sp-placementAfter'], '...</option>
 							</select>
 							<select id="block_row" name="block_row"', !$context['SPortal']['is_new'] ? ' disabled="disabled"' : '', '>';
 
@@ -291,8 +291,7 @@ function template_block_edit()
 		{
 			if ($block['id'] != $context['SPortal']['block']['id'])
 				echo '
-								<option value="', $block['row'], '">', $block['label'], '</option>';
-		}
+								<option value="', $block['row'], '"', (!empty($context['SPortal']['block']['row']) && $context['SPortal']['block']['row'] == $block['row'] ? ' selected="selected"' : ''), '>', $block['label'], '</option>';		}
 
 		echo '
 							</select>

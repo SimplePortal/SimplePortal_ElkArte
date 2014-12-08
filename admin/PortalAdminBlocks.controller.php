@@ -374,6 +374,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'type_text' => !empty($txt['sp_function_' . $_POST['block_type'] . '_label']) ? $txt['sp_function_' . $_POST['block_type'] . '_label'] : $txt['sp_function_unknown_label'],
 				'column' => $_POST['block_column'],
 				'row' => !empty($_POST['block_row']) ? $_POST['block_row'] : 0,
+				'placement' => !empty($_POST['placement']) && in_array($_POST['placement'], array('before', 'after')) ? $_POST['placement'] : '',
 				'permissions' => $_POST['permissions'],
 				'state' => !empty($_POST['block_active']),
 				'force_view' => !empty($_POST['block_force']),
