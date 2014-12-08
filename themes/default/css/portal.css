@@ -771,6 +771,8 @@ dl.sp_form img, #sp_add_articles_list_header img {
 .smiley:before {background-position: 0 -522px;}
 .style:before {background-position: 0 -540px;}
 .dotgrid:before {background-position: 0 -558px;}
+.received:before {background-position: 0 -576px;}
+.given:before {background-position: 0 -594px;}
 
 
 /* Experimental media querys */

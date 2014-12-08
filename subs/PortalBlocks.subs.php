@@ -97,7 +97,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 		if (!empty($member_info['avatar']['image']))
 			echo '
 									<a href="', $scripturl, '?action=profile;u=', $member_info['id'], '">', $member_info['avatar']['image'], '</a>
-									<br /><br />';
+									<br />';
 
 		if (!empty($member_info['group']))
 			echo '
@@ -129,6 +129,13 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 
 			echo '</li>';
 		}
+
+		// What do they like?
+		if (!empty($modSettings['likes_enabled']))
+			echo '
+										<li ', sp_embed_class('dot'), '>
+											<strong>', $txt['likes'], ': </strong>' . $member_info['likes']['given'] . ' <span ', sp_embed_class('given'), '></span> / ', $member_info['likes']['received'], ' <span ', sp_embed_class('received'), '></span></li>';
+
 
 		if (allowedTo('pm_read'))
 		{
@@ -398,7 +405,7 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
  */
 function sp_topPoster($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $modSettings, $txt, $color_profile;
+	global $scripturl, $txt, $color_profile;
 
 	$db = database();
 
@@ -519,11 +526,13 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
 		echo '
 									<tr>
 										<td class="sp_top_poster centertext">', !empty($member['avatar']['href']) ? '
-											<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '"><img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" width="40" /></a>' : '', '
+											<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '">
+												<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" style="max-width:40px" />
+											</a>' : '', '
 										</td>
 										<td>
 											', $member['link'], '<br />
-											', $member['posts'], ' ', $txt['posts'], '
+											<span class="smalltext">', $member['posts'], ' ', $txt['posts'], '</span>
 										</td>
 									</tr>';
 
@@ -561,6 +570,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 			'4' => $txt['sp_topStatsMember_Karma_Total'],
 			'5' => $txt['sp_topStatsMember_Likes_Received'],
 			'6' => $txt['sp_topStatsMember_Likes_Given'],
+			'7' => $txt['sp_topStatsMember_Likes_Total'],
 		),
 		'limit' => 'int',
 		'sort_asc' => 'check',
@@ -656,7 +666,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 				'error_msg' => $txt['sp_karma_is_disabled'],
 			),
 			'5' => array(
-				'name' => 'Likes Received',
+				'name' => 'Likes Received/Given',
 				'field' => 'mem.likes_received',
 				'order' => 'mem.likes_received',
 				'output_text' => '%likes_received% ' . $txt['sp_topStatsMember_Likes_Received'],
@@ -668,6 +678,14 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 				'field' => 'mem.likes_given',
 				'order' => 'mem.likes_given',
 				'output_text' => '%likes_given% ' . $txt['sp_topStatsMember_Likes_Given'],
+				'enabled' => !empty($modSettings['likes_enabled']),
+				'error_msg' => $txt['sp_likes_is_disabled'],
+			),
+			'7' => array(
+				'name' => 'Likes Totals',
+				'field' => 'mem.likes_received, mem.likes_given',
+				'order' => 'mem.likes_received',
+				'output_text' => $txt['sp_topStatsMember_Likes_Received'] . ':&nbsp;%likes_received%' . ' / ' . $txt['sp_topStatsMember_Likes_Given'] . ':&nbsp;%likes_given%',
 				'enabled' => !empty($modSettings['likes_enabled']),
 				'error_msg' => $txt['sp_likes_is_disabled'],
 			),
@@ -838,11 +856,11 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 									<tr>
 										<td class="sp_top_poster centertext">', !empty($member['avatar']['href']) ? '
 											<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '">
-												<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" width="40" />
+												<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" style="max-width:40px" />
 											</a>' : '', '
 										</td>
 										<td>
-											', $member['link'], '<br />', $member['output'], '
+											', $member['link'], '<br /><span class="smalltext">', $member['output'], '</span>
 										</td>
 									</tr>';
 	}
@@ -1367,7 +1385,9 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 
 		if ($avatars && $news['avatar']['name'] !== null && !empty($news['avatar']['href']))
 			echo '
-						<a href="', $scripturl, '?action=profile;u=', $news['poster']['id'], '"><img src="', $news['avatar']['href'], '" alt="', $news['poster']['name'], '" width="30" class="floatright" /></a>
+						<a href="', $scripturl, '?action=profile;u=', $news['poster']['id'], '">
+							<img src="', $news['avatar']['href'], '" alt="', $news['poster']['name'], '" style="max-width:40px" class="floatright" />
+						</a>
 						<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], '<br />', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
 		else
 			echo '
@@ -2297,7 +2317,9 @@ function sp_staff($parameters, $id, $return_parameters = false)
 		echo '
 									<tr>
 										<td class="sp_staff centertext">', !empty($staff['avatar']['href']) ? '
-											<a href="' . $scripturl . '?action=profile;u=' . $staff['id'] . '"><img src="' . $staff['avatar']['href'] . '" alt="' . $staff['name'] . '" width="40" /></a>' : '', '
+											<a href="' . $scripturl . '?action=profile;u=' . $staff['id'] . '">
+												<img src="' . $staff['avatar']['href'] . '" alt="' . $staff['name'] . '" style="max-width:40px" />
+											</a>' : '', '
 										</td>
 										<td ', sp_embed_class($icons[$staff['type']], '', 'sp_staff_info'. $staff_count != ++$count ? ' sp_staff_divider' : ''), '>',
 											$staff['link'], '<br />', $staff['group'], '
@@ -2413,7 +2435,7 @@ function sp_articles($parameters, $id, $return_parameters = false)
 			if ($avatar && !empty($article['author']['avatar']['href']))
 				echo '
 										<a href="', $scripturl, '?action=profile;u=', $article['author']['id'], '">
-											<img src="', $article['author']['avatar']['href'], '" alt="', $article['author']['name'], '" width="40" />
+											<img src="', $article['author']['avatar']['href'], '" alt="', $article['author']['name'], '" style="max-width:40px" />
 										</a>';
 
 			echo '
