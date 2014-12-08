@@ -176,7 +176,7 @@ function sp_refresh_shout(shoutbox_id, last_refresh)
  */
 function onShoutReceived(XMLDoc)
 {
-	var shout, shoutbox_id, updated, error, warning, reverse, shout, id, author, time, timeclean, delete_link, content, is_me, new_body = '';
+	var shout, shoutbox_id, updated, error, warning, reverse, id, author, time, timeclean, delete_link, content, is_me, new_body = '';
 
 	// All valid response will have these
 	shoutbox_id = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("shoutbox")[0].childNodes[0].nodeValue;
