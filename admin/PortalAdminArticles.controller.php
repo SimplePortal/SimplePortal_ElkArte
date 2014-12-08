@@ -294,6 +294,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 		{
 			$context['article'] = $this->_sportal_admin_article_preview();
 
+			// Fix any bbc errors they have created
+			if ($context['article']['type'] == 'bbc')
+				preparsecode($context['article']['body']);
+
 			loadTemplate('PortalArticles');
 
 			// Showing errors or a preview?
@@ -332,14 +336,15 @@ class ManagePortalArticles_Controller extends Action_Controller
 		if ($context['article']['type'] === 'bbc')
 			$context['article']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($context['article']['body']));
 
-		// Override user prefs for wizzy mode if they don't need it
+		// On to the editor
 		if ($context['article']['type'] !== 'bbc')
 		{
+			// Override user prefs for wizzy mode if they don't need it
 			$temp_editor = !empty($options['wysiwyg_default']);
 			$options['wysiwyg_default'] = false;
 		}
 
-		// Fire up the editor
+		// Fire up the editor with the values
 		$editor_options = array(
 			'id' => 'content',
 			'value' => $context['article']['body'],
@@ -354,25 +359,26 @@ class ManagePortalArticles_Controller extends Action_Controller
 		if (isset($temp_editor))
 			$options['wysiwyg_default'] = $temp_editor;
 
-		// Final bits for the template, categorys and permission settings
-		$context['article']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
-		$context['article']['categories'] = sportal_get_categories();
-
-		// Articles need permissions and categorys defined
-		if (empty($context['article']['permission_profiles']))
-			fatal_lang_error('error_sp_no_permission_profiles', false);
-		if (empty($context['article']['categories']))
-			fatal_lang_error('error_sp_no_category', false);
-
-		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'];
-		$context['sub_template'] = 'articles_edit';
-
-		// Set the editor box to the right mode
+		// Set the editor box to the right mode based on type (bbc, html, php)
 		addInlineJavascript('
 			$(window).load(function() {
 				diewithfire = window.setTimeout(function() {sp_update_editor("' . $context['article']['type'] . '", "");}, 200);
 			});
 		');
+
+		// Final bits for the template, categorys and permission settings
+		$context['article']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
+		if (empty($context['article']['permission_profiles']))
+			fatal_lang_error('error_sp_no_permission_profiles', false);
+
+		$context['article']['categories'] = sportal_get_categories();
+		if (empty($context['article']['categories']))
+			fatal_lang_error('error_sp_no_category', false);
+
+		// Page out values
+		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
+		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'];
+		$context['sub_template'] = 'articles_edit';
 	}
 
 	/**

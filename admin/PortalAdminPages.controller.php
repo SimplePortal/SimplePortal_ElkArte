@@ -258,52 +258,9 @@ class ManagePortalPages_Controller extends Action_Controller
 			$_POST['content'] = $_REQUEST['content'];
 		}
 
-		// Its our own cubicle
-		$context['sides'] = array(
-			5 => $txt['sp-positionHeader'],
-			1 => $txt['sp-positionLeft'],
-			2 => $txt['sp-positionTop'],
-			3 => $txt['sp-positionBottom'],
-			4 => $txt['sp-positionRight'],
-			6 => $txt['sp-positionFooter'],
-		);
-
+		// Load in the blocks that can be used on a page
 		$this->blocks = getBlockInfo();
-		$context['page_blocks'] = array();
-
-		foreach ($this->blocks as $block)
-		{
-			$shown = false;
-			$tests = array('all', 'allpages', 'sforum');
-			if (!$context['SPortal']['is_new'])
-				$tests[] = 'p' . ((int) $_REQUEST['page_id']);
-
-			foreach (array('display', 'display_custom') as $field)
-			{
-				if (substr($block[$field], 0, 4) === '$php')
-					continue 2;
-
-				$block[$field] = explode(',', $block[$field]);
-
-				if (!$context['SPortal']['is_new'] && in_array('-p' . ((int) $_REQUEST['page_id']), $block[$field]))
-					continue;
-
-				foreach ($tests as $test)
-				{
-					if (in_array($test, $block[$field]))
-					{
-						$shown = true;
-						break;
-					}
-				}
-			}
-
-			$context['page_blocks'][$block['column']][] = array(
-				'id' => $block['id'],
-				'label' => $block['label'],
-				'shown' => $shown,
-			);
-		}
+		$context['page_blocks'] = $this->_sportal_admin_page_load_blocks();
 
 		// Saving the work?
 		if (!empty($_POST['submit']) && !$pages_errors->hasErrors())
@@ -326,7 +283,8 @@ class ManagePortalPages_Controller extends Action_Controller
 				'status' => !empty($_POST['status']),
 			);
 
-			if ($context['SPortal']['page']['type'] === 'bbc')
+			// Fix up bbc errors before we go to the preview
+			if ($context['SPortal']['page']['type'] == 'bbc')
 				preparsecode($context['SPortal']['page']['body']);
 
 			loadTemplate('PortalPages');
@@ -365,9 +323,10 @@ class ManagePortalPages_Controller extends Action_Controller
 		if ($context['SPortal']['page']['type'] === 'bbc')
 			$context['SPortal']['page']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($context['SPortal']['page']['body']));
 
-		// No wizzy mode if they don't need it
+		// Set up the editor, values, initial state, etc
 		if ($context['SPortal']['page']['type'] !== 'bbc')
 		{
+			// No wizzy mode if they don't need it
 			$temp_editor = !empty($options['wysiwyg_default']);
 			$options['wysiwyg_default'] = false;
 		}
@@ -385,21 +344,82 @@ class ManagePortalPages_Controller extends Action_Controller
 		if (isset($temp_editor))
 			$options['wysiwyg_default'] = $temp_editor;
 
-		$context['SPortal']['page']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
-		$context['SPortal']['page']['style'] = sportal_parse_style('explode', $context['SPortal']['page']['style'], !empty($context['SPortal']['preview']));
-
-		if (empty($context['SPortal']['page']['permission_profiles']))
-			fatal_lang_error('error_sp_no_permission_profiles', false);
-
-		$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp_admin_pages_add'] : $txt['sp_admin_pages_edit'];
-		$context['sub_template'] = 'pages_edit';
-
-		// Set the editor box as needed
+		// Set the editor box as needed (editor or textbox, etc)
 		addInlineJavascript('
 			$(window).load(function() {
 				diewithfire = window.setTimeout(function() {sp_update_editor("' . $context['SPortal']['page']['type'] . '", "");}, 200);
 			});
 		');
+
+		// Permissions
+		$context['SPortal']['page']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
+		if (empty($context['SPortal']['page']['permission_profiles']))
+			fatal_lang_error('error_sp_no_permission_profiles', false);
+
+		// And for the template
+		$context['SPortal']['page']['style'] = sportal_parse_style('explode', $context['SPortal']['page']['style'], !empty($context['SPortal']['preview']));
+		$context['SPortal']['page']['body'] = sportal_parse_content($context['SPortal']['page']['body'], $context['SPortal']['page']['type'], 'return');
+		$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp_admin_pages_add'] : $txt['sp_admin_pages_edit'];
+		$context['sub_template'] = 'pages_edit';
+	}
+
+	/**
+	 * Loads the block selection list for the page layout screen
+	 *
+	 * - Determines what blocks / areas can be displayed on a page
+	 * - Used to populate the selection list
+	 */
+	private function _sportal_admin_page_load_blocks()
+	{
+		global $context, $txt;
+
+		// Its our own cubicle
+		$context['sides'] = array(
+			5 => $txt['sp-positionHeader'],
+			1 => $txt['sp-positionLeft'],
+			2 => $txt['sp-positionTop'],
+			3 => $txt['sp-positionBottom'],
+			4 => $txt['sp-positionRight'],
+			6 => $txt['sp-positionFooter'],
+		);
+
+		// Load the sides with allowed blocks
+		$page_blocks = array();
+		foreach ($this->blocks as $block)
+		{
+			$shown = false;
+			$tests = array('all', 'allpages', 'sforum');
+			if (!$context['SPortal']['is_new'])
+				$tests[] = 'p' . ((int) $_REQUEST['page_id']);
+
+			foreach (array('display', 'display_custom') as $field)
+			{
+				if (substr($block[$field], 0, 4) === '$php')
+					continue 2;
+
+				$block[$field] = explode(',', $block[$field]);
+
+				if (!$context['SPortal']['is_new'] && in_array('-p' . ((int) $_REQUEST['page_id']), $block[$field]))
+					continue;
+
+				foreach ($tests as $test)
+				{
+					if (in_array($test, $block[$field]))
+					{
+						$shown = true;
+						break;
+					}
+				}
+			}
+
+			$page_blocks[$block['column']][] = array(
+				'id' => $block['id'],
+				'label' => $block['label'],
+				'shown' => $shown,
+			);
+		}
+
+		return $page_blocks;
 	}
 
 	/**

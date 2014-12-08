@@ -1703,7 +1703,16 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 			$body = trim(un_htmlspecialchars($body));
 			$body = trim($body, '<?php');
 			$body = trim($body, '?>');
+
+			ob_start();
 			eval($body);
+			$result = ob_get_contents();
+			ob_end_clean();
+
+			if ($output_method == 'echo')
+				echo $result;
+			else
+				return $result;
 			break;
 		default:
 			return;
