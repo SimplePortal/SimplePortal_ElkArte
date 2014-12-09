@@ -1406,7 +1406,7 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
  */
 function sportal_get_comments($article_id = null, $limit = null, $start = null)
 {
-	global $scripturl, $user_info, $modSettings;
+	global $scripturl, $user_info, $modSettings, $color_profile;
 
 	$db = database();
 
