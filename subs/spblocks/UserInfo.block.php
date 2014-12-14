@@ -96,11 +96,8 @@ class User_Info_Block extends SP_Abstract_Block
 
 			$this->data['member_info']['display_group'] = !empty($this->data['member_info']['group']) ? $this->data['member_info']['group'] : $this->data['member_info']['post_group'];
 		}
-	}
 
-	public function render()
-	{
-		template_sp_userInfo($this->data);
+		$this->setTemplate('template_sp_userInfo');
 	}
 }
 

@@ -21,6 +21,7 @@ abstract class SP_Abstract_Block // implements Sp_Block
 	protected $_db = null;
 	protected $block_parameters = array();
 	protected $data = array();
+	protected $template = '';
 
 	public function __construct($db = null)
 	{
@@ -32,7 +33,16 @@ abstract class SP_Abstract_Block // implements Sp_Block
 		return $this->block_parameters;
 	}
 
+	public function setTemplate($template)
+	{
+		$this->template = $template;
+	}
+
 	abstract public function setup();
 
-	abstract public function render();
+	public function render()
+	{
+		if (is_callable($this->template))
+			call_user_func_array($this->template, $this->data);
+	}
 }

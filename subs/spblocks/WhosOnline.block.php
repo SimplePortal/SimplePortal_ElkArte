@@ -50,11 +50,8 @@ class Whos_Online_Block extends SP_Abstract_Block
 		loadLanguage('index', '', false, true);
 
 		$this->data['stats'] = ssi_whosOnline('array');
-	}
 
-	public function render()
-	{
-		template_sp_whosOnline($this->data);
+		$this->setTemplate('template_sp_whosOnline');
 	}
 }
 

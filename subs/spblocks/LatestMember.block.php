@@ -67,11 +67,8 @@ class Latest_Member_Block extends SP_Abstract_Block
 					$this->data['members'][$k]['link'] = $color_profile[$p['id']]['link'];
 			}
 		}
-	}
 
-	public function render()
-	{
-		template_sp_latestMember($this->data);
+		$this->setTemplate('template_sp_latestMember');
 	}
 }
 
