@@ -16,7 +16,7 @@ if (!defined('ELK'))
 /**
  * Abstract Simple Portal block
  */
-class SP_Abstract_Block // implements Sp_Block
+abstract class SP_Abstract_Block // implements Sp_Block
 {
 	protected $_db = null;
 	protected $block_parameters = array();
