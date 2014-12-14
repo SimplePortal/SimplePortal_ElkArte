@@ -69,7 +69,7 @@ class User_Info_Block extends SP_Abstract_Block
 			}
 
 			if (sp_loadColors($this->data['member_info']['id']) !== false)
-				$this->data['member_info']['colored_name'] = $color_profile[$member_info['id']]['colored_name'];
+				$this->data['member_info']['colored_name'] = $color_profile[$this->data['member_info']['id']]['colored_name'];
 			else
 				$this->data['member_info']['colored_name'] = $this->data['member_info']['name'];
 
@@ -88,7 +88,7 @@ class User_Info_Block extends SP_Abstract_Block
 				if ($modSettings['karmaMode'] == 1)
 					$this->data['karma_value'] = $this->data['member_info']['karma']['total'];
 				elseif ($modSettings['karmaMode'] == 2)
-					$this->data['karma_value'] = '+' . $data['member_info']['karma']['good'] . '/-' . $member_info['karma']['bad'];
+					$this->data['karma_value'] = '+' . $this->data['member_info']['karma']['good'] . '/-' . $this->data['member_info']['karma']['bad'];
 			}
 			else
 				$this->data['show_karma'] = false;
@@ -106,7 +106,7 @@ class User_Info_Block extends SP_Abstract_Block
 
 function template_sp_userInfo($data)
 {
-	global $context, $txt, $scripturl, $memberContext, $modSettings, $user_info, $color_profile, $settings;
+	global $txt;
 
 	echo '
 								<div class="centertext">';
@@ -189,6 +189,7 @@ function template_sp_userInfo($data)
 			echo '
 										<li ', sp_embed_class('dot'), '>
 											<strong>', $txt['likes'], ': </strong>' . $data['member_info']['likes']['given'] . ' <span ', sp_embed_class('given'), '></span> / ', $data['member_info']['likes']['received'], ' <span ', sp_embed_class('received'), '></span></li>';
+		}
 
 		if ($data['member_info']['can_pm'])
 		{
