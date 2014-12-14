@@ -34,11 +34,11 @@ class Board_Stats_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup()
+	function setup($parameters)
 	{
 		global $modSettings;
 
-		$this->data['averages'] = !empty($this->block_parameters['averages']);
+		$this->data['averages'] = !empty($parameters['averages']);
 
 		loadLanguage('Stats');
 

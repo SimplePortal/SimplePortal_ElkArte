@@ -33,7 +33,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $instance->parameters();
 
-	$instance->setup();
+	$instance->setup($parameters);
 	$instance->render();
 }
 
@@ -58,7 +58,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $instance->parameters();
 
-	$instance->setup();
+	$instance->setup($parameters);
 	$instance->render();
 }
 
@@ -83,7 +83,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $instance->parameters();
 
-	$instance->setup();
+	$instance->setup($parameters);
 	$instance->render();
 }
 
@@ -108,7 +108,7 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $instance->parameters();
 
-	$instance->setup();
+	$instance->setup($parameters);
 	$instance->render();
 }
 

@@ -32,12 +32,12 @@ class Whos_Online_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup()
+	function setup($parameters)
 	{
 		global $modSettings, $context;
 
 		// Interface with the online today addon?
-		if (!empty($this->block_parameters['online_today']) && !empty($modSettings['onlinetoday']) && file_exists(SUBSDIR . '/OnlineToday.class.php'))
+		if (!empty($parameters['online_today']) && !empty($modSettings['onlinetoday']) && file_exists(SUBSDIR . '/OnlineToday.class.php'))
 		{
 			require_once(SUBSDIR . '/OnlineToday.class.php');
 			$context['info_center_callbacks'] = array();

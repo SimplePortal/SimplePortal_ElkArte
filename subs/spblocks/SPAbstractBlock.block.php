@@ -38,7 +38,7 @@ abstract class SP_Abstract_Block // implements Sp_Block
 		$this->template = $template;
 	}
 
-	abstract public function setup();
+	abstract public function setup($parameters);
 
 	public function render()
 	{

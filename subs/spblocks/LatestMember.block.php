@@ -32,13 +32,13 @@ class Latest_Member_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup()
+	function setup($parameters)
 	{
 		global $scripturl, $color_profile;
 
 		// Load in the latest members
 		require_once(SUBSDIR . '/Members.subs.php');
-		$limit = !empty($this->block_parameters['limit']) ? (int) $this->block_parameters['limit'] : 5;
+		$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
 		$rows = recentMembers($limit);
 
 		// Get them ready for color ids and the template
