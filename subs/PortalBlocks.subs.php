@@ -97,61 +97,19 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
  */
 function sp_boardStats($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $modSettings, $txt;
+	static $instance = null;
 
-	$block_parameters = array(
-		'averages' => 'check',
-	);
+	if ($instance === null)
+	{
+		require_once(SUBSDIR . '/spblocks/BoardStats.block.php');
+		$instance = new Board_Stats_Block();
+	}
 
 	if ($return_parameters)
-		return $block_parameters;
+		return $instance->parameters();
 
-	$averages = !empty($parameters['averages']) ? 1 : 0;
-
-	loadLanguage('Stats');
-
-	// Basic totals are easy
-	$totals = ssi_boardStats('array');
-
-	// Get the averages from the activity log, its the most recent snapshot
-	if ($averages)
-	{
-		require_once(SUBSDIR . '/Stats.subs.php');
-		$averages = getAverages();
-
-		// The number of days the forum has been up...
-		$total_days_up = ceil((time() - strtotime($averages['date'])) / (60 * 60 * 24));
-
-		$totals += array(
-			'average_members' => comma_format(round($averages['registers'] / $total_days_up, 2)),
-			'average_posts' => comma_format(round($averages['posts'] / $total_days_up, 2)),
-			'average_topics' => comma_format(round($averages['topics'] / $total_days_up, 2)),
-			'average_online' => comma_format(round($averages['most_on'] / $total_days_up, 2)),
-		);
-	}
-
-	echo '
-								<ul class="sp_list">
-									<li ', sp_embed_class('portalstats'), '>', $txt['total_members'], ': <a href="', $scripturl . '?action=mlist">', comma_format($totals['members']), '</a></li>
-									<li ', sp_embed_class('portalstats'), '>', $txt['total_posts'], ': ', comma_format($totals['posts']), '</li>
-									<li ', sp_embed_class('portalstats'), '>', $txt['total_topics'], ': ', comma_format($totals['topics']), '</li>
-									<li ', sp_embed_class('portalstats'), '>', $txt['total_cats'], ': ', comma_format($totals['categories']), '</li>
-									<li ', sp_embed_class('portalstats'), '>', $txt['total_boards'], ': ', comma_format($totals['boards']), '</li>
-									<li ', sp_embed_class('portalstats'), '>', $txt['most_online'], ': ', comma_format($modSettings['mostOnline']), '</li>
-								</ul>';
-
-	// And the averages if required
-	if ($averages)
-	{
-		echo '
-								<hr />
-								<ul class="sp_list">
-									<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_posts'], ': ', comma_format($totals['average_posts']), '</li>
-									<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_topics'], ': ', comma_format($totals['average_topics']), '</li>
-									<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_members'], ': ', comma_format($totals['average_members']), '</li>
-									<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_online'], ': ', comma_format($totals['average_online']), '</li>
-								</ul>';
-	}
+	$instance->setup();
+	$instance->render();
 }
 
 /**
