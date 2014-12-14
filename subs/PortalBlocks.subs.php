@@ -47,65 +47,19 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
  */
 function sp_latestMember($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $txt, $color_profile;
+	static $instance = null;
 
-	$block_parameters = array(
-		'limit' => 'int',
-	);
+	if ($instance === null)
+	{
+		require_once(SUBSDIR . '/spblocks/LatestMember.block.php');
+		$instance = new Latest_Member_Block();
+	}
 
 	if ($return_parameters)
-		return $block_parameters;
+		return $instance->parameters();
 
-	// Load in the latest members
-	require_once(SUBSDIR . '/Members.subs.php');
-	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
-	$rows = recentMembers($limit);
-
-	// Get them ready for color ids and the template
-	$members = array();
-	$colorids = array();
-	foreach ($rows as $row)
-	{
-		if (!empty($row['id_member']))
-			$colorids[$row['id_member']] = $row['id_member'];
-
-		$members[] = array(
-			'id' => $row['id_member'],
-			'name' => $row['real_name'],
-			'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
-			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-			'date' => standardTime($row['date_registered'], '%d %b'),
-		);
-	}
-
-	// No recent members, supose it could happen
-	if (empty($members))
-	{
-		echo '
-								', $txt['error_sp_no_members_found'];
-
-		return;
-	}
-
-	// Using member profile colors
-	if (!empty($colorids) && sp_loadColors($colorids) !== false)
-	{
-		foreach ($members as $k => $p)
-		{
-			if (!empty($color_profile[$p['id']]['link']))
-				$members[$k]['link'] = $color_profile[$p['id']]['link'];
-		}
-	}
-
-	echo '
-								<ul class="sp_list">';
-
-	foreach ($members as $member)
-		echo '
-									<li ', sp_embed_class('dot'), '>', $member['link'], ' - <span class="smalltext">', $member['date'], '</span></li>';
-
-	echo '
-								</ul>';
+	$instance->setup();
+	$instance->render();
 }
 
 /**
