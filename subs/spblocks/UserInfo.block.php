@@ -20,16 +20,8 @@ if (!defined('ELK'))
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
-class User_Info_Block // implements Sp_Block
+class User_Info_Block extends SP_Abstract_Block
 {
-	protected $block_parameters = array();
-	protected $data = array();
-
-	public function parameters()
-	{
-		return $this->block_parameters;
-	}
-
 	public function setup()
 	{
 		global $context, $scripturl, $txt, $user_info, $color_profile, $memberContext, $modSettings;

@@ -71,6 +71,7 @@ function sportal_init($standalone = false)
 	// Not standalone means we need to load some portal specific information in to context
 	if (!$standalone)
 	{
+		require_once(SUBSDIR . '/spblocks/SPAbstractBlock.block.php');
 		require_once(SUBSDIR . '/PortalBlocks.subs.php');
 
 		// Not running via ssi then we need to get SSI for its functions

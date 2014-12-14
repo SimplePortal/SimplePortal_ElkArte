@@ -21,21 +21,15 @@ if (!defined('ELK'))
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
-class Latest_Member_Block // implements Sp_Block
+class Latest_Member_Block extends SP_Abstract_Block
 {
-	protected $block_parameters = array();
-	protected $data = array();
-
-	public function __construct()
+	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
 			'limit' => 'int',
 		);
-	}
 
-	public function parameters()
-	{
-		return $this->block_parameters;
+		parent::__construct($db);
 	}
 
 	function setup()

@@ -41,6 +41,7 @@ if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $data, $match))
 require_once($forum_dir . '/SSI.php');
 
 // Its all about the blocks
+require_once(SUBSDIR . '/spblocks/SPAbstractBlock.block.php');
 require_once(SUBSDIR . '/PortalBlocks.subs.php');
 
 // Initialize SP in standalone mode mode
