@@ -34,11 +34,11 @@ class Latest_Member_Block extends SP_Abstract_Block
 
 	function setup()
 	{
-		global $scripturl, $txt, $color_profile;
+		global $scripturl, $color_profile;
 
 		// Load in the latest members
 		require_once(SUBSDIR . '/Members.subs.php');
-		$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
+		$limit = !empty($this->block_parameters['limit']) ? (int) $this->block_parameters['limit'] : 5;
 		$rows = recentMembers($limit);
 
 		// Get them ready for color ids and the template
@@ -64,7 +64,7 @@ class Latest_Member_Block extends SP_Abstract_Block
 			foreach ($this->data['members'] as $k => $p)
 			{
 				if (!empty($color_profile[$p['id']]['link']))
-					$members[$k]['link'] = $color_profile[$p['id']]['link'];
+					$this->data['members'][$k]['link'] = $color_profile[$p['id']]['link'];
 			}
 		}
 	}
@@ -77,7 +77,7 @@ class Latest_Member_Block extends SP_Abstract_Block
 
 function template_sp_latestMember($data)
 {
-	global $txt, $context;
+	global $txt;
 
 	// No recent members, supose it could happen
 	if (empty($data['members']))
