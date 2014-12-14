@@ -24,6 +24,7 @@ if (!defined('ELK'))
 class Board_Stats_Block extends SP_Abstract_Block
 {
 	protected $total_days_up = 0;
+
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -33,16 +34,17 @@ class Board_Stats_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id, $return_parameters = false)
+	function setup()
 	{
-		global $scripturl, $modSettings, $txt;
+		global $modSettings;
 
-		$this->data['averages'] = !empty($parameters['averages']);
+		$this->data['averages'] = !empty($this->block_parameters['averages']);
 
 		loadLanguage('Stats');
 
 		// Basic totals are easy
 		$this->data['totals'] = ssi_boardStats('array');
+		$this->data['totals']['mostOnline'] = $modSettings['mostOnline'];
 
 		// Get the averages from the activity log, its the most recent snapshot
 		if ($this->data['averages'])
@@ -73,7 +75,7 @@ class Board_Stats_Block extends SP_Abstract_Block
 
 function template_sp_boardStats($data)
 {
-	global $txt;
+	global $txt, $scripturl;
 
 	echo '
 								<ul class="sp_list">
@@ -82,7 +84,7 @@ function template_sp_boardStats($data)
 									<li ', sp_embed_class('portalstats'), '>', $txt['total_topics'], ': ', comma_format($data['totals']['topics']), '</li>
 									<li ', sp_embed_class('portalstats'), '>', $txt['total_cats'], ': ', comma_format($data['totals']['categories']), '</li>
 									<li ', sp_embed_class('portalstats'), '>', $txt['total_boards'], ': ', comma_format($data['totals']['boards']), '</li>
-									<li ', sp_embed_class('portalstats'), '>', $txt['most_online'], ': ', comma_format($modSettings['mostOnline']), '</li>
+									<li ', sp_embed_class('portalstats'), '>', $txt['most_online'], ': ', comma_format($data['totals']['mostOnline']), '</li>
 								</ul>';
 
 	// And the averages if required
