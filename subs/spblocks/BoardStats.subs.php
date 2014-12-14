@@ -62,6 +62,8 @@ class Board_Stats_Block extends SP_Abstract_Block
 				'average_online' => $this->formatAvg($averages['most_on']),
 			);
 		}
+
+		$this->setTemplate('template_sp_boardStats');
 	}
 
 	protected function formatAvg($value)
