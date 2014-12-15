@@ -13,6 +13,27 @@
 if (!defined('ELK'))
 	die('No access...');
 
+function sp_call_block($name, $parameters, $id, $return)
+{
+	static $instances = array();
+	static $db = database();
+
+	if (!isset($instances[$name]))
+	{
+		require_once(SUBSDIR . '/spblocks/' . str_replace('_', '', $name) . '.block.php');
+		$class = $name . '_Block';
+		$instances[$name] = new $class($db);
+	}
+
+	$instance = $instances[$name];
+
+	if ($return)
+		return $instance->parameters();
+
+	$instance->setup($parameters, $id);
+	$instance->render();
+}
+
 /**
  * User info block, shows avatar, group, icons, posts, karma, etc
  *
@@ -22,19 +43,7 @@ if (!defined('ELK'))
  */
 function sp_userInfo($parameters, $id, $return_parameters = false)
 {
-	static $instance = null;
-
-	if ($instance === null)
-	{
-		require_once(SUBSDIR . '/spblocks/UserInfo.block.php');
-		$instance = new User_Info_Block();
-	}
-
-	if ($return_parameters)
-		return $instance->parameters();
-
-	$instance->setup($parameters);
-	$instance->render();
+	sp_call_block('User_Info', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -47,19 +56,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
  */
 function sp_latestMember($parameters, $id, $return_parameters = false)
 {
-	static $instance = null;
-
-	if ($instance === null)
-	{
-		require_once(SUBSDIR . '/spblocks/LatestMember.block.php');
-		$instance = new Latest_Member_Block();
-	}
-
-	if ($return_parameters)
-		return $instance->parameters();
-
-	$instance->setup($parameters);
-	$instance->render();
+	sp_call_block('Latest_Member', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -72,19 +69,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
  */
 function sp_whosOnline($parameters, $id, $return_parameters = false)
 {
-	static $instance = null;
-
-	if ($instance === null)
-	{
-		require_once(SUBSDIR . '/spblocks/WhosOnline.block.php');
-		$instance = new Whos_Online_Block();
-	}
-
-	if ($return_parameters)
-		return $instance->parameters();
-
-	$instance->setup($parameters);
-	$instance->render();
+	sp_call_block('Whos_Online', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -97,19 +82,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
  */
 function sp_boardStats($parameters, $id, $return_parameters = false)
 {
-	static $instance = null;
-
-	if ($instance === null)
-	{
-		require_once(SUBSDIR . '/spblocks/BoardStats.block.php');
-		$instance = new Board_Stats_Block();
-	}
-
-	if ($return_parameters)
-		return $instance->parameters();
-
-	$instance->setup($parameters);
-	$instance->render();
+	sp_call_block('Board_Stats', $parameters, $id, $return_parameters);
 }
 
 /**
