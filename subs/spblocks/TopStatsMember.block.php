@@ -33,7 +33,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 
 	public function __construct($db = null)
 	{
-		global $txt;
+		global $txt, $modSettings;
 
 		$this->block_parameters = array(
 			'type' => array(
@@ -165,7 +165,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 
 	public function setup($parameters, $id)
 	{
-		global $context, $txt, $scripturl, $user_info, $user_info, $modSettings, $color_profile;
+		global $context, $scripturl, $user_info, $user_info, $modSettings, $color_profile;
 
 		// Standard Variables
 		$type = !empty($parameters['type']) ? $parameters['type'] : 0;
@@ -174,8 +174,8 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 
 		// Time is in days, but we need seconds
 		$last_active_limit = !empty($parameters['last_active_limit']) ? $parameters['last_active_limit'] * 86400 : 0;
-		$enable_label = !empty($parameters['enable_label']);
-		$list_label = !empty($parameters['list_label']) ? $parameters['list_label'] : '';
+		$this->data['enable_label'] = !empty($parameters['enable_label']);
+		$this->data['list_label'] = !empty($parameters['list_label']) ? $parameters['list_label'] : '';
 
 		// Setup current block type
 		$current_system = $this->sp_topStatsSystem[$type];
@@ -319,6 +319,8 @@ function template_sp_topStatsMember_error($data)
 
 function template_sp_topStatsMember($data)
 {
+	global $scripturl, $txt;
+
 	// No one found, let them know
 	if (empty($data['members']))
 	{
@@ -331,11 +333,11 @@ function template_sp_topStatsMember($data)
 	echo '
 								<table class="sp_fullwidth">';
 
-	if ($enable_label)
+	if ($data['enable_label'])
 		echo '
 									<tr>
 										<td class="sp_top_poster centertext" colspan="2">
-											<strong>', $list_label, '</strong>
+											<strong>', $data['list_label'], '</strong>
 										</td>
 									</tr>';
 
