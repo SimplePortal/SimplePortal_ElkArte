@@ -1490,17 +1490,7 @@ function sp_menu($parameters, $id, $return_parameters = false)
  */
 function sp_bbc($parameters, $id, $return_parameters = false)
 {
-	$block_parameters = array(
-		'content' => 'bbc',
-	);
-
-	if ($return_parameters)
-		return $block_parameters;
-
-	$content = !empty($parameters['content']) ? $parameters['content'] : '';
-
-	echo '
-								', parse_bbc($content);
+	sp_call_block('Bbc', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -1512,17 +1502,7 @@ function sp_bbc($parameters, $id, $return_parameters = false)
  */
 function sp_html($parameters, $id, $return_parameters = false)
 {
-	$block_parameters = array(
-		'content' => 'textarea',
-	);
-
-	if ($return_parameters)
-		return $block_parameters;
-
-	$content = !empty($parameters['content']) ? $parameters['content'] : '';
-
-	echo '
-								', un_htmlspecialchars($content);
+	sp_call_block('Html', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -1535,23 +1515,5 @@ function sp_html($parameters, $id, $return_parameters = false)
  */
 function sp_php($parameters, $id, $return_parameters = false)
 {
-	$block_parameters = array(
-		'content' => 'textarea',
-	);
-
-	if ($return_parameters)
-		return $block_parameters;
-
-	$content = !empty($parameters['content']) ? $parameters['content'] : '';
-
-	$content = trim(un_htmlspecialchars($content));
-
-	// Strip leading / trailing php wrapper
-	if (substr($content, 0, 5) == '<?php')
-		$content = substr($content, 5);
-	if (substr($content, -2) == '?>')
-		$content = substr($content, 0, -2);
-
-	// Can be scary :0
-	eval($content);
+	sp_call_block('Php', $parameters, $id, $return_parameters);
 }
