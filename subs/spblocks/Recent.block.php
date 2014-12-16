@@ -51,11 +51,7 @@ class Recent_Block extends SP_Abstract_Block
 		$this->data['items'] = $type($limit, null, $boards, 'array');
 		$this->data['class_type'] = empty($parameters['type']) ? 'post' : 'topic';
 
-		if (empty($this->data['items']))
-		{
-			return;
-		}
-		else
+		if (!empty($this->data['items']))
 			$this->data['items'][count($this->data['items']) - 1]['is_last'] = true;
 
 		$colorids = array();
@@ -70,6 +66,8 @@ class Recent_Block extends SP_Abstract_Block
 					$this->data['items'][$k]['poster']['link'] = $color_profile[$p['poster']['id']]['link'];
 			}
 		}
+
+		$this->setTemplate('template_sp_recent');
 	}
 }
 
@@ -81,6 +79,7 @@ function template_sp_recent($data)
 	{
 		echo '
 								', $txt['error_sp_no_posts_found'];
+
 		return;
 	}
 

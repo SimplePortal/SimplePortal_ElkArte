@@ -148,44 +148,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
  */
 function sp_topTopics($parameters, $id, $return_parameters = false)
 {
-	global $txt, $user_info, $user_info, $topics;
-
-	$block_parameters = array(
-		'type' => 'select',
-		'limit' => 'int',
-	);
-
-	if ($return_parameters)
-		return $block_parameters;
-
-	$type = !empty($parameters['type']) ? $parameters['type'] : 0;
-	$limit = !empty($parameters['limit']) ? $parameters['limit'] : 5;
-
-	// Use the ssi function to get the data
-	$topics = ssi_topTopics($type ? 'views' : 'replies', $limit, 'array');
-
-	if (empty($topics))
-	{
-		echo '
-								', $txt['error_sp_no_topics_found'];
-		return;
-	}
-	else
-	{
-		end($topics);
-		$topics[key($topics)]['is_last'] = true;
-	}
-
-	echo '
-								<ul class="sp_list">';
-
-	foreach ($topics as $topic)
-		echo '
-									<li ', sp_embed_class('topic', '', 'sp_list_top'), '>', $topic['link'], '</li>
-									<li class="sp_list_indent', empty($topic['is_last']) ? ' sp_list_bottom' : '', ' smalltext">', $txt['replies'], ': ', $topic['num_replies'], ' | ', $txt['views'], ': ', $topic['num_views'], '</li>';
-
-	echo '
-								</ul>';
+	sp_call_block('Top_Topics', $parameters, $id, $return_parameters);
 }
 
 /**
