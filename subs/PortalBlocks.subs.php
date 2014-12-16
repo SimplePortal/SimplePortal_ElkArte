@@ -206,21 +206,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
  */
 function sp_quickSearch($parameters, $id, $return_parameters = false)
 {
-	global $scripturl, $txt;
-
-	$block_parameters = array();
-
-	if ($return_parameters)
-		return $block_parameters;
-
-	echo '
-								<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
-									<div class="centertext">
-										<input type="text" name="search" value="" class="sp_search" /><br />
-										<input type="submit" name="submit" value="', $txt['search'], '" class="button_submit" />
-										<input type="hidden" name="advanced" value="0" />
-									</div>
-								</form>';
+	sp_call_block('Quick_Search', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -232,15 +218,7 @@ function sp_quickSearch($parameters, $id, $return_parameters = false)
  */
 function sp_news($parameters, $id, $return_parameters = false)
 {
-	global $context;
-
-	$block_parameters = array();
-
-	if ($return_parameters)
-		return $block_parameters;
-
-	echo '
-								<div class="centertext">', $context['random_news_line'], '</div>';
+	sp_call_block('News', $parameters, $id, $return_parameters);
 }
 
 /**
