@@ -152,7 +152,7 @@ function template_sp_topPoster($data)
 	echo '
 								<table class="sp_fullwidth">';
 
-	foreach ($this->data['members'] as $member)
+	foreach ($data['members'] as $member)
 		echo '
 									<tr>
 										<td class="sp_top_poster centertext">', !empty($member['avatar']['href']) ? '
