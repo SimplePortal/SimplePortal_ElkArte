@@ -161,46 +161,7 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
  */
 function sp_topBoards($parameters, $id, $return_parameters = false)
 {
-	global $txt, $user_info, $user_info, $boards;
-
-	$block_parameters = array(
-		'limit' => 'int',
-	);
-
-	if ($return_parameters)
-		return $block_parameters;
-
-	// Use ssi to get the top boards
-	$limit = !empty($parameters['limit']) ? $parameters['limit'] : 5;
-	$boards = ssi_topBoards($limit, 'array');
-
-	if (empty($boards))
-	{
-		echo '
-								', $txt['error_sp_no_boards_found'];
-
-		return;
-	}
-	else
-	{
-		end($boards);
-		$boards[key($boards)]['is_last'] = true;
-	}
-
-	echo '
-								<ul class="sp_list">';
-
-	foreach ($boards as $board)
-		echo '
-									<li ', sp_embed_class('board', '', 'sp_list_top'), '>',
-										$board['link'], '
-									</li>
-									<li class="sp_list_indent', empty($board['is_last']) ? ' sp_list_bottom' : '', ' smalltext">',
-										(empty($board['num_topics']) && !empty($board['num_posts'])) ? $txt['redirects'] : ($txt['topics'] . ': ' . $board['num_topics'] . ' | ' . $txt['posts']), ': ', $board['num_posts'], '
-									</li>';
-
-	echo '
-								</ul>';
+	sp_call_block('Top_Boards', $parameters, $id, $return_parameters);
 }
 
 /**
