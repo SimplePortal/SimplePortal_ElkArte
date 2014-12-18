@@ -32,7 +32,7 @@ class Attachment_Recent_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id, $return_parameters = false)
+	function setup($parameters)
 	{
 		$limit = empty($parameters['limit']) ? 5 : (int) $parameters['limit'];
 
