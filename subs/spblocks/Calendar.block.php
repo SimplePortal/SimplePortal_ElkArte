@@ -43,7 +43,7 @@ class Calendar_Block extends SP_Abstract_Block
 		require_once(SUBSDIR . '/Calendar.subs.php');
 		$today = getTodayInfo();
 
-		$curPage = array(
+		$this->data['curPage'] = array(
 			'day' => $today['day'],
 			'month' => $today['month'],
 			'year' => $today['year']
@@ -56,12 +56,12 @@ class Calendar_Block extends SP_Abstract_Block
 			'show_birthdays' => !empty($parameters['birthdays']),
 			'show_holidays' => !empty($parameters['holidays']),
 		);
-		$this->data['calendar'] = getCalendarGrid($curPage['month'], $curPage['year'], $calendarOptions);
+		$this->data['calendar'] = getCalendarGrid($this->data['curPage']['month'], $this->data['curPage']['year'], $calendarOptions);
 
-		$title_text = $txt['months_titles'][$data['calendar']['current_month']] . ' ' . $data['calendar']['current_year'];
+		$title_text = $txt['months_titles'][$this->data['calendar']['current_month']] . ' ' . $this->data['calendar']['current_year'];
 
 		if (!empty($modSettings['cal_enabled']))
-			$this->data['calendar_title'] = '<a href="' . $scripturl . '?action=calendar;year=' . $data['calendar']['current_year'] . ';month=' . $data['calendar']['current_month'] . '">' . $title_text . '</a>';
+			$this->data['calendar_title'] = '<a href="' . $scripturl . '?action=calendar;year=' . $this->data['calendar']['current_year'] . ';month=' . $this->data['calendar']['current_month'] . '">' . $title_text . '</a>';
 		else
 			$this->data['calendar_title'] = $title_text;
 	}
@@ -139,7 +139,7 @@ function template_sp_calendar($data)
 				echo '
 									<li class="centertext"><strong>- ', $txt['sp_calendar_holidays'], ' -</strong></li>';
 
-				foreach ($day['holidays'] as $key => $holiday)
+				foreach ($day['holidays'] as $holiday)
 					echo '
 									<li ', sp_embed_class('holiday', '', 'sp_list_indent'), '>', $holiday, '</li>';
 			}
@@ -174,5 +174,5 @@ function template_sp_calendar($data)
 	echo '
 								<div class="centertext smalltext" id="sp_calendar_0" style="display: none;">', $txt['error_sp_no_items_day'], '</div>';
 
-	addInlineJavascript('var current_day = "sp_calendar_' . $curPage['day'] . '";', true);
+	addInlineJavascript('var current_day = "sp_calendar_' . $data['curPage']['day'] . '";', true);
 }
