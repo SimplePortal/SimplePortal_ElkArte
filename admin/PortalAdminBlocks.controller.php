@@ -37,18 +37,18 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		loadTemplate('PortalAdminBlocks');
 
 		$subActions = array(
-			'list' => array($this, 'action_sportal_admin_block_list'),
-			'header' => array($this, 'action_sportal_admin_block_list'),
-			'left' => array($this, 'action_sportal_admin_block_list'),
-			'top' => array($this, 'action_sportal_admin_block_list'),
-			'bottom' => array($this, 'action_sportal_admin_block_list'),
-			'right' => array($this, 'action_sportal_admin_block_list'),
-			'footer' => array($this, 'action_sportal_admin_block_list'),
-			'add' => array($this, 'action_sportal_admin_block_edit'),
-			'edit' => array($this, 'action_sportal_admin_block_edit'),
-			'delete' => array($this, 'action_sportal_admin_block_delete'),
-			'move' => array($this, 'action_sportal_admin_block_move'),
-			'statechange' => array($this, 'action_sportal_admin_state_change'),
+			'list' => array($this, 'action_list'),
+			'header' => array($this, 'action_list'),
+			'left' => array($this, 'action_list'),
+			'top' => array($this, 'action_list'),
+			'bottom' => array($this, 'action_list'),
+			'right' => array($this, 'action_list'),
+			'footer' => array($this, 'action_list'),
+			'add' => array($this, 'action_edit'),
+			'edit' => array($this, 'action_edit'),
+			'delete' => array($this, 'action_delete'),
+			'move' => array($this, 'action_move'),
+			'statechange' => array($this, 'action_state_change'),
 		);
 
 		// Start up the controller, provide a hook since we can
@@ -98,7 +98,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	/**
 	 * Show the Block List.
 	 */
-	public function action_sportal_admin_block_list()
+	public function action_list()
 	{
 		global $txt, $context, $scripturl;
 
@@ -199,7 +199,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	/**
 	 * Adding or editing a block.
 	 */
-	public function action_sportal_admin_block_edit()
+	public function action_edit()
 	{
 		global $txt, $context, $modSettings, $boards;
 
@@ -881,7 +881,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	 *
 	 * - Moves a block to a new row and/or a new column
 	 */
-	public function action_sportal_admin_block_move()
+	public function action_move()
 	{
 		checkSession('get');
 
@@ -930,7 +930,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	/**
 	 * Function for deleting a block.
 	 */
-	public function action_sportal_admin_block_delete()
+	public function action_delete()
 	{
 		global $context;
 
@@ -968,7 +968,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	/**
 	 * Pass this off to the state change function
 	 */
-	public function action_sportal_admin_state_change()
+	public function action_state_change()
 	{
 		$id = (int) $_REQUEST['block_id'];
 		$type = $_REQUEST['type'];

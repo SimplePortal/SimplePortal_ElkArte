@@ -39,11 +39,11 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		// This are all the actions that we know
 		$subActions = array(
-			'list' => array($this, 'action_sportal_admin_article_list'),
-			'add' => array($this, 'action_sportal_admin_article_edit'),
-			'edit' => array($this, 'action_sportal_admin_article_edit'),
-			'status' => array($this, 'action_sportal_admin_article_status'),
-			'delete' => array($this, 'action_sportal_admin_article_delete'),
+			'list' => array($this, 'action_list'),
+			'add' => array($this, 'action_edit'),
+			'edit' => array($this, 'action_edit'),
+			'status' => array($this, 'action_status'),
+			'delete' => array($this, 'action_delete'),
 		);
 
 		// Start up the controller, provide a hook since we can
@@ -73,7 +73,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	/**
 	 * Show a listing of articles in the system
 	 */
-	public function action_sportal_admin_article_list()
+	public function action_list()
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
@@ -259,7 +259,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 * Edits an existing or adds a new article to the system
 	 * Handles the previewing of an article
 	 */
-	public function action_sportal_admin_article_edit()
+	public function action_edit()
 	{
 		global $context, $options, $txt;
 
@@ -480,7 +480,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			foreach ($validator->validation_errors() as $id => $error)
 				$article_errors->addError($error);
 
-			return $this->action_sportal_admin_article_edit();
+			return $this->action_edit();
 		}
 
 		// Lets make sure this namespace (article id) is unique
@@ -505,7 +505,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		// None shall pass ... with errors
 		if ($article_errors->hasErrors())
-			return $this->action_sportal_admin_article_edit();
+			return $this->action_edit();
 
 		// No errors then, prepare the data for saving
 		$article_info = array(
@@ -532,7 +532,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	/**
 	 * Toggle an articles status
 	 */
-	public function action_sportal_admin_article_status()
+	public function action_status()
 	{
 		checkSession('get');
 
@@ -545,7 +545,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	/**
 	 * Remove an article from the system
 	 */
-	public function action_sportal_admin_article_delete()
+	public function action_delete()
 	{
 		$article_ids = array();
 

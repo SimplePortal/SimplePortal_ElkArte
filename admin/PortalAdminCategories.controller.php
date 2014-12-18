@@ -36,11 +36,11 @@ class ManagePortalCategories_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Portal.subs.php');
 
 		$subActions = array(
-			'list' => array($this, 'action_sportal_admin_category_list'),
-			'add' => array($this, 'action_sportal_admin_category_edit'),
-			'edit' => array($this, 'action_sportal_admin_category_edit'),
-			'status' => array($this, 'action_sportal_admin_category_status'),
-			'delete' => array($this, 'action_sportal_admin_category_delete'),
+			'list' => array($this, 'action_list'),
+			'add' => array($this, 'action_edit'),
+			'edit' => array($this, 'action_edit'),
+			'status' => array($this, 'action_status'),
+			'delete' => array($this, 'action_delete'),
 		);
 
 		// Start up the controller, provide a hook since we can
@@ -70,7 +70,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 	/**
 	 * Show a listing of categories in the system
 	 */
-	public function action_sportal_admin_category_list()
+	public function action_list()
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
@@ -221,7 +221,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 	/**
 	 * Edit or add a category
 	 */
-	public function action_sportal_admin_category_edit()
+	public function action_edit()
 	{
 		global $context, $txt;
 
@@ -298,7 +298,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 	/**
 	 * Switch the active status (on/off) of a category
 	 */
-	public function action_sportal_admin_category_status()
+	public function action_status()
 	{
 		checkSession('get');
 
@@ -311,7 +311,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 	/**
 	 * Delete a category or group of categories by id
 	 */
-	public function action_sportal_admin_category_delete()
+	public function action_delete()
 	{
 		$category_ids = array();
 
