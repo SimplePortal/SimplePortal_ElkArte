@@ -382,55 +382,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
  */
 function sp_menu($parameters, $id, $return_parameters = false)
 {
-	global $context;
-
-	$block_parameters = array();
-
-	if ($return_parameters)
-		return $block_parameters;
-
-	if (empty($context['menu_buttons']))
-		setupMenuContext();
-
-	echo '
-								<ul id="sp_menu" class="sp_list">';
-
-	foreach ($context['menu_buttons'] as $act => $button)
-	{
-		echo '
-									<li ', sp_embed_class('dot'), '>
-										<a title="', strip_tags($button['title']), '" href="', $button['href'], '">', ($button['active_button'] ? '<strong>' : ''), $button['title'], ($button['active_button'] ? '</strong>' : ''), '</a>';
-
-		if (!empty($button['sub_buttons']))
-		{
-			echo '
-										<ul class="sp_list">';
-
-			foreach ($button['sub_buttons'] as $sub_button)
-				echo '
-											<li ', sp_embed_class('dot', '', 'sp_list_indent'), '>
-												<a title="', $sub_button['title'], '" href="', $sub_button['href'], '">', $sub_button['title'], '</a></li>';
-
-			echo '
-										</ul>';
-		}
-
-		echo '</li>';
-	}
-
-	echo '
-								</ul>';
-
-	// Superfish the menu
-	$javascript = "
-	$(document).ready(function() {
-		if (use_click_menu)
-			$('#sp_menu').superclick({speed: 150, animation: {opacity:'show', height:'toggle'}, speedOut: 0, activeClass: 'sfhover'});
-		else
-			$('#sp_menu').superfish({delay : 300, speed: 175, hoverClass: 'sfhover'});
-	});";
-
-	addInlineJavascript($javascript, true);
+	sp_call_block('Menu', $parameters, $id, $return_parameters);
 }
 
 /**
