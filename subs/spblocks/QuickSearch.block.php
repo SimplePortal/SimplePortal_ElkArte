@@ -22,7 +22,7 @@ if (!defined('ELK'))
  */
 class Quick_Search_Block extends SP_Abstract_Block
 {
-	function setup($parameters)
+	function setup($parameters, $id)
 	{
 		// @todo isn't the search subject to verification?
 		$this->setTemplate('template_sp_quickSearch');

@@ -22,7 +22,7 @@ if (!defined('ELK'))
  */
 class User_Info_Block extends SP_Abstract_Block
 {
-	public function setup($parameters)
+	public function setup($parameters, $id)
 	{
 		global $context, $scripturl, $txt, $user_info, $color_profile, $memberContext, $modSettings;
 

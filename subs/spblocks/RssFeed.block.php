@@ -44,7 +44,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters)
+	function setup($parameters, $id)
 	{
 		global $txt;
 

@@ -63,7 +63,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 		return $this->block_parameters;
 	}
 
-	function setup($parameters)
+	function setup($parameters, $id)
 	{
 		global $context, $modSettings, $user_info, $settings, $txt, $editortxt;
 

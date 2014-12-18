@@ -22,7 +22,7 @@ if (!defined('ELK'))
  */
 class Theme_Select_Block extends SP_Abstract_Block
 {
-	function setup($parameters)
+	function setup($parameters, $id)
 	{
 		global $modSettings, $user_info, $settings, $language, $txt;
 

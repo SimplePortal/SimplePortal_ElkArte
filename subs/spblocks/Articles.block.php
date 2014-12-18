@@ -55,7 +55,7 @@ class Articles_Block extends SP_Abstract_Block
 		return $this->block_parameters;
 	}
 
-	function setup($parameters)
+	function setup($parameters, $id)
 	{
 		global $txt, $color_profile;
 

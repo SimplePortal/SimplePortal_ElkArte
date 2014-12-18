@@ -22,7 +22,7 @@ if (!defined('ELK'))
  */
 class News_Block extends SP_Abstract_Block
 {
-	function setup($parameters)
+	function setup($parameters, $id)
 	{
 		$this->setTemplate('template_sp_news');
 	}

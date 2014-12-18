@@ -36,29 +36,7 @@ class Gallery_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	protected function _getGallery()
-	{
-		// right now we only know about one gallery, but more may be added,
-		// maybe even ones we can tell folks about :P
-		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
-			$mod = 'aeva_media';
-		else
-			$mod = '';
-
-		return $mod;
-	}
-
-	protected function _getItems($limit, $type)
-	{
-		if ($this->data['mod'] == 'aeva_media')
-		{
-			require_once(SUBSDIR . '/Aeva-Subs.php');
-
-			return aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC');
-		}
-	}
-
-	function setup($parameters)
+	function setup($parameters, $id)
 	{
 		global $scripturl, $txt, $scripturl, $modSettings;
 
@@ -85,6 +63,28 @@ class Gallery_Block extends SP_Abstract_Block
 			$this->data['error_msg'] = $txt['error_sp_no_pictures_found'];
 			$this->setTemplate('template_sp_gallery_error');
 			return;
+		}
+	}
+
+	protected function _getGallery()
+	{
+		// right now we only know about one gallery, but more may be added,
+		// maybe even ones we can tell folks about :P
+		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
+			$mod = 'aeva_media';
+		else
+			$mod = '';
+
+		return $mod;
+	}
+
+	protected function _getItems($limit, $type)
+	{
+		if ($this->data['mod'] == 'aeva_media')
+		{
+			require_once(SUBSDIR . '/Aeva-Subs.php');
+
+			return aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC');
 		}
 	}
 }

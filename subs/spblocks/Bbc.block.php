@@ -31,7 +31,7 @@ class Bbc_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters)
+	function setup($parameters, $id)
 	{
 		$this->data['content'] = !empty($parameters['content']) ? parse_bbc($parameters['content']) : '';
 

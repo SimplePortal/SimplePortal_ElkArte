@@ -21,7 +21,7 @@ if (!defined('ELK'))
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
-class Whos_Online_Block extends SP_Abstract_Block
+class Top_Boards_Block extends SP_Abstract_Block
 {
 	public function __construct($db = null)
 	{
@@ -32,7 +32,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters)
+	function setup($parameters, $id)
 	{
 		// Use ssi to get the top boards
 		$limit = !empty($parameters['limit']) ? $parameters['limit'] : 5;

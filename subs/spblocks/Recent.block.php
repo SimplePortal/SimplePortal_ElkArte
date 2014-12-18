@@ -38,7 +38,7 @@ class Recent_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters)
+	function setup($parameters, $id)
 	{
 		global $color_profile;
 

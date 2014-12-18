@@ -23,7 +23,7 @@ if (!defined('ELK'))
  */
 class Menu_Block extends SP_Abstract_Block
 {
-	function setup($parameters)
+	function setup($parameters, $id)
 	{
 		global $context;
 
