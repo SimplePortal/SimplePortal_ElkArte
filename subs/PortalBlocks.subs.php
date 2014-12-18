@@ -248,40 +248,7 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
  */
 function sp_attachmentRecent($parameters, $id, $return_parameters = false)
 {
-	global $txt;
-
-	$block_parameters = array(
-		'limit' => 'int',
-	);
-
-	if ($return_parameters)
-		return $block_parameters;
-
-	$limit = empty($parameters['limit']) ? 5 : (int) $parameters['limit'];
-
-	$items = ssi_recentAttachments($limit, array(), 'array');
-
-	// No items they can see
-	if (empty($items))
-	{
-		echo '
-								', $txt['error_sp_no_attachments_found'];
-		return;
-	}
-
-	echo '
-								<ul class="sp_list">';
-
-	foreach ($items as $item)
-		echo '
-									<li ', sp_embed_class('attach'), '>
-										<a href="', $item['file']['href'], '">', $item['file']['filename'], '</a>
-									</li>
-									<li class="smalltext">', $txt['downloads'], ': ', $item['file']['downloads'], '</li>
-									<li class="smalltext">', $txt['filesize'], ': ', $item['file']['filesize'], '</li>';
-
-	echo '
-								</ul>';
+	sp_call_block('Attachment_Recent', $parameters, $id, $return_parameters);
 }
 
 /**
