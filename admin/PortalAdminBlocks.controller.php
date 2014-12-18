@@ -204,7 +204,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		global $txt, $context, $modSettings, $boards;
 
 		// Just in case, the admin could be doing something silly like editing a SP block while SP is disabled. ;)
-		require_once(SUBSDIR . '/spblocks/SPAbstractBlock.block.php');
+		require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');
 		require_once(SUBSDIR . '/PortalBlocks.subs.php');
 
 		$context['SPortal']['is_new'] = empty($_REQUEST['block_id']);

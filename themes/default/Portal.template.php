@@ -227,11 +227,13 @@ function template_block($block, $side = -1)
 		return;
 
 	// Board news gets special formating, really intended to be at the top of a column
+	// @todo move the sp_boardNews-specific style to the board news template
 	if ($block['type'] === 'sp_boardNews')
 	{
 		echo '
 			<div id="sp_block_', $block['id'], '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['sp_articles_index'])) ? '_last' : '', '">';
 
+		// @todo Block->render()
 		$block['type']($block['parameters'], $block['id']);
 
 		echo '
@@ -284,6 +286,7 @@ function template_block_default($block, $side)
 								<div class="', $block['type'] != 'sp_menu' ? 'sp_block' : 'sp_content_padding', '"', !empty($block['style']['body']['style']) ? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
 
 	// Call the block routine
+	// @todo Block->render()
 	$block['type']($block['parameters'], $block['id']);
 
 	// Close this block up
