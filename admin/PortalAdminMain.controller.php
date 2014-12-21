@@ -60,10 +60,10 @@ class ManagePortalConfig_Controller extends Action_Controller
 		loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
 
 		$subActions = array(
-			'information' => array($this, 'action_sportal_information'),
-			'generalsettings' => array($this, 'action_sportal_admin_general_settings'),
-			'blocksettings' => array($this, 'action_sportal_admin_block_settings'),
-			'articlesettings' => array($this, 'action_sportal_admin_article_settings'),
+			'information' => array($this, 'action_information'),
+			'generalsettings' => array($this, 'action_general_settings'),
+			'blocksettings' => array($this, 'action_block_settings'),
+			'articlesettings' => array($this, 'action_article_settings'),
 		);
 
 		// Start up the controller, provide a hook since we can
@@ -85,7 +85,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 	/**
 	 * General settings that control global portal actions
 	 */
-	public function action_sportal_admin_general_settings()
+	public function action_general_settings()
 	{
 		global $context, $scripturl, $txt;
 
@@ -164,7 +164,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 	/**
 	 * Settings that control how blocks behave
 	 */
-	public function action_sportal_admin_block_settings()
+	public function action_block_settings()
 	{
 		global $context, $scripturl, $txt;
 
@@ -261,7 +261,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 	/**
 	 * Settings to control articles
 	 */
-	public function action_sportal_admin_article_settings()
+	public function action_article_settings()
 	{
 		global $context, $scripturl, $txt;
 
@@ -319,7 +319,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 	 *
 	 * @param boolean $in_admin
 	 */
-	public function action_sportal_information($in_admin = true)
+	public function action_information($in_admin = true)
 	{
 		global $context, $scripturl, $txt, $sportal_version, $user_profile;
 

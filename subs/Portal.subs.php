@@ -71,6 +71,7 @@ function sportal_init($standalone = false)
 	// Not standalone means we need to load some portal specific information in to context
 	if (!$standalone)
 	{
+		require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');
 		require_once(SUBSDIR . '/PortalBlocks.subs.php');
 
 		// Not running via ssi then we need to get SSI for its functions
@@ -299,6 +300,7 @@ function sportal_load_blocks()
 	if (!isset($context['SPortal']['blocks']))
 		$context['SPortal']['blocks'] = array();
 
+	// @todo instantiate the blocks and do the Block->setup()
 	foreach ($blocks as $block)
 	{
 		if (!$context['SPortal']['sides'][$block['column']]['active'])

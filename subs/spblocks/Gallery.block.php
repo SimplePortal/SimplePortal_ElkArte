@@ -1,0 +1,139 @@
+<?php
+
+/**
+ * @package SimplePortal
+ *
+ * @author SimplePortal Team
+ * @copyright 2014 SimplePortal Team
+ * @license BSD 3-clause
+ *
+ * @version 2.4
+ */
+
+if (!defined('ELK'))
+	die('No access...');
+
+/**
+ * Gallery Block, show a gallery box with gallery items
+ *
+ * @param mixed[] $parameters
+ *		'limit' => number of gallery items to show
+ *		'type' =>
+ *		'direction' => 0 horizontal or 1 vertical display in the block
+ * @param int $id - not used in this block
+ * @param boolean $return_parameters if true returns the configuration options for the block
+ */
+class Gallery_Block extends SP_Abstract_Block
+{
+	public function __construct($db = null)
+	{
+		$this->block_parameters = array(
+			'limit' => 'int',
+			'type' => 'select',
+			'direction' => 'select',
+		);
+
+		parent::__construct($db);
+	}
+
+	function setup($parameters, $id)
+	{
+		global $scripturl, $txt, $scripturl, $modSettings;
+
+		$limit = empty($parameters['limit']) ? 1 : (int) $parameters['limit'];
+		$type = empty($parameters['type']) ? 0 : 1;
+		$this->data['direction'] = empty($parameters['direction']) ? 0 : 1;
+
+		$this->data['mod'] = $this->_getGallery();
+
+		if (empty($this->data['mod']))
+		{
+			$this->data['error_msg'] = $txt['error_sp_no_gallery_found'];
+			$this->setTemplate('template_sp_gallery_error');
+			return;
+		}
+		$this->data['gallery_template'] = 'template_sp_gallery_' . $this->data['mod'];
+
+		$this->data['items'] = $this->_getItems($limit, $type);
+		$this->data['fancybox_enabled'] = !empty($modSettings['fancybox_enabled']);
+
+		// No items in the gallery?
+		if (empty($this->data['items']))
+		{
+			$this->data['error_msg'] = $txt['error_sp_no_pictures_found'];
+			$this->setTemplate('template_sp_gallery_error');
+			return;
+		}
+	}
+
+	protected function _getGallery()
+	{
+		// right now we only know about one gallery, but more may be added,
+		// maybe even ones we can tell folks about :P
+		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
+			$mod = 'aeva_media';
+		else
+			$mod = '';
+
+		return $mod;
+	}
+
+	protected function _getItems($limit, $type)
+	{
+		if ($this->data['mod'] == 'aeva_media')
+		{
+			require_once(SUBSDIR . '/Aeva-Subs.php');
+
+			return aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC');
+		}
+	}
+}
+
+function template_sp_gallery_error($data)
+{
+		echo '
+								', $data['error_msg'];
+}
+
+function template_sp_gallery_aeva_media($item, $data)
+{
+	global $scripturl, $txt;
+
+	echo '
+												<a href="', $scripturl, '?action=media;sa=item;in=', $item['id'], '">', $item['title'], '</a><br />' . ($data['fancybox_enabled'] ? '
+												<a href="' . $scripturl . '?action=media;sa=media;in=' . $item['id'] . '" rel="gallery" class="fancybox">' : '
+												<a href="' . $scripturl . '?action=media;sa=item;in=' . $item['id'] . '">') . '
+												<img src="', $scripturl, '?action=media;sa=media;in=', $item['id'], ';thumb" alt="" /></a><br />
+												', $txt['aeva_views'], ': ', $item['views'], '<br />
+												', $txt['aeva_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
+												', $txt['aeva_in_album'], ': <a href="', $scripturl, '?action=media;sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>';
+}
+
+function template_sp_gallery($data)
+{
+	// We have gallery items to show!
+	echo '
+								<table class="sp_auto_align">', $data['direction'] ? '
+									<tr>' : '';
+
+	$before = $data['direction'] ? '' : '
+									<tr>';
+	$after = $data['direction'] ? '' : '
+									</tr>';
+	foreach ($data['items'] as $item)
+	{
+		echo $before, '
+										<td>
+											<div class="sp_image smalltext">';
+
+		$data['gallery_template']($item, $data);
+
+		echo '
+											</div>
+										</td>', $after;
+	}
+
+	echo $data['direction'] ? '
+									</tr>' : '', '
+								</table>';
+}

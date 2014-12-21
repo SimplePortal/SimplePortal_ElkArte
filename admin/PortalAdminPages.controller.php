@@ -39,11 +39,11 @@ class ManagePortalPages_Controller extends Action_Controller
 		loadTemplate('PortalAdminPages');
 
 		$subActions = array(
-			'list' => array($this, 'action_sportal_admin_page_list'),
-			'add' => array($this, 'action_sportal_admin_page_edit'),
-			'edit' => array($this, 'action_sportal_admin_page_edit'),
-			'status' => array($this, 'action_sportal_admin_page_status'),
-			'delete' => array($this, 'action_sportal_admin_page_delete'),
+			'list' => array($this, 'action_list'),
+			'add' => array($this, 'action_edit'),
+			'edit' => array($this, 'action_edit'),
+			'status' => array($this, 'action_status'),
+			'delete' => array($this, 'action_delete'),
 		);
 
 		// Start up the controller, provide a hook since we can
@@ -72,7 +72,7 @@ class ManagePortalPages_Controller extends Action_Controller
 	/**
 	 * Show page listing of all portal pages in the system
 	 */
-	public function action_sportal_admin_page_list()
+	public function action_list()
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
@@ -235,7 +235,7 @@ class ManagePortalPages_Controller extends Action_Controller
 	/**
 	 * Interface for adding/editing a page
 	 */
-	public function action_sportal_admin_page_edit()
+	public function action_edit()
 	{
 		global $txt, $context, $options;
 
@@ -467,7 +467,7 @@ class ManagePortalPages_Controller extends Action_Controller
 			foreach ($validator->validation_errors() as $id => $error)
 				$pages_errors->addError($error);
 
-			return $this->action_sportal_admin_page_edit();
+			return $this->action_edit();
 		}
 
 		// Can't have the same name in the same space twice
@@ -509,7 +509,7 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		// None shall pass ... with errors
 		if ($pages_errors->hasErrors())
-			return $this->action_sportal_admin_page_edit();
+			return $this->action_edit();
 
 		// If you made it this far, we are going to save the work
 		if (!empty($_POST['blocks']) && is_array($_POST['blocks']))
@@ -640,7 +640,7 @@ class ManagePortalPages_Controller extends Action_Controller
 	/**
 	 * Update the page status / active on/off
 	 */
-	public function action_sportal_admin_page_status()
+	public function action_status()
 	{
 		$db = database();
 
@@ -664,7 +664,7 @@ class ManagePortalPages_Controller extends Action_Controller
 	/**
 	 * Delete a page from the system
 	 */
-	public function action_sportal_admin_page_delete()
+	public function action_delete()
 	{
 		$page_ids = array();
 

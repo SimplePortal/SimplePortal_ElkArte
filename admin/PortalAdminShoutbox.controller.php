@@ -37,13 +37,13 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 		loadTemplate('PortalAdminShoutbox');
 
 		$subActions = array(
-			'list' => array($this, 'action_sportal_admin_shoutbox_list'),
-			'add' => array($this, 'action_sportal_admin_shoutbox_edit'),
-			'edit' => array($this, 'action_sportal_admin_shoutbox_edit'),
-			'prune' => array($this, 'action_sportal_admin_shoutbox_prune'),
-			'delete' => array($this, 'action_sportal_admin_shoutbox_delete'),
-			'status' => array($this, 'action_sportal_admin_shoutbox_status'),
-			'blockredirect' => array($this, 'action_sportal_admin_shoutbox_block_redirect'),
+			'list' => array($this, 'action_list'),
+			'add' => array($this, 'action_edit'),
+			'edit' => array($this, 'action_edit'),
+			'prune' => array($this, 'action_prune'),
+			'delete' => array($this, 'action_delete'),
+			'status' => array($this, 'action_status'),
+			'blockredirect' => array($this, 'action_block_redirect'),
 		);
 
 		// Start up the controller, provide a hook since we can
@@ -75,7 +75,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	 * Shout, shout, let it all out, these are the things I can do without
 	 * Come on, I'm talking to you, come on
 	 */
-	public function action_sportal_admin_shoutbox_list()
+	public function action_list()
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
@@ -229,7 +229,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	/**
 	 * Edit an existing shoutbox or add a new one
 	 */
-	public function action_sportal_admin_shoutbox_edit()
+	public function action_edit()
 	{
 		global $txt, $context, $modSettings, $editortxt;
 
@@ -418,7 +418,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	/**
 	 * Who does not like prunes .. or maybe cut down the shout list
 	 */
-	public function action_sportal_admin_shoutbox_prune()
+	public function action_prune()
 	{
 		global $context, $txt;
 
@@ -517,7 +517,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	/**
 	 * Remove a shout from the system
 	 */
-	public function action_sportal_admin_shoutbox_delete()
+	public function action_delete()
 	{
 		$shoutbox_ids = array();
 
@@ -545,7 +545,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	/**
 	 * Updates the system status of the shoutout, toggle on/off
 	 */
-	public function action_sportal_admin_shoutbox_status()
+	public function action_status()
 	{
 		$db = database();
 
@@ -569,7 +569,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	/**
 	 * Used to gain access to the add a shoutbox block
 	 */
-	public function action_sportal_admin_shoutbox_block_redirect()
+	public function action_block_redirect()
 	{
 		global $context, $scripturl, $txt;
 

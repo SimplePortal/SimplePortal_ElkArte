@@ -33,10 +33,10 @@ class ManagePortalProfile_Controller extends Action_Controller
 
 		// What can we do
 		$subActions = array(
-			'listpermission' =>  array($this, 'action_sportal_admin_permission_profiles_list', 'permission' => 'sp_manage_profiles'),
-			'addpermission' =>  array($this, 'action_sportal_admin_permission_profiles_edit', 'permission' => 'sp_manage_profiles'),
-			'editpermission' =>  array($this, 'action_sportal_admin_permission_profiles_edit', 'permission' => 'sp_manage_profiles'),
-			'deletepermission' =>  array($this, 'action_sportal_admin_permission_profiles_delete', 'permission' => 'sp_manage_profiles'),
+			'listpermission' =>  array($this, 'action_list', 'permission' => 'sp_manage_profiles'),
+			'addpermission' =>  array($this, 'action_edit', 'permission' => 'sp_manage_profiles'),
+			'editpermission' =>  array($this, 'action_edit', 'permission' => 'sp_manage_profiles'),
+			'deletepermission' =>  array($this, 'action_delete', 'permission' => 'sp_manage_profiles'),
 		);
 
 		// Start up the controller, provide a hook since we can
@@ -66,7 +66,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	/**
 	 * Show page listing of all premission groups in the system
 	 */
-	public function action_sportal_admin_permission_profiles_list()
+	public function action_list()
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
@@ -244,7 +244,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	/**
 	 * Add or edit a portal wide permissions profile
 	 */
-	public function action_sportal_admin_permission_profiles_edit()
+	public function action_edit()
 	{
 		global $context, $txt;
 
@@ -350,7 +350,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 		$context['sub_template'] = 'permission_profiles_edit';
 	}
 
-	public function action_sportal_admin_permission_delete()
+	public function action_delete()
 	{
 		$db = database();
 
