@@ -20,6 +20,13 @@ if (!defined('ELK'))
 class ManagePortalArticles_Controller extends Action_Controller
 {
 	/**
+	 * If we are adding a new article or editing an existing one
+	 * 
+	 * @var bool
+	 */
+	protected $_is_new;
+
+	/**
 	 * Main dispatcher.
 	 * This function checks permissions and passes control through.
 	 */
@@ -263,7 +270,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	{
 		global $context, $options, $txt;
 
-		$context['is_new'] = empty($_REQUEST['article_id']);
+		$this->_is_new = empty($_REQUEST['article_id']);
 
 		$article_errors = Error_Context::context('article', 0);
 
@@ -313,7 +320,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 				$context['preview'] = true;
 		}
 		// Something new?
-		elseif ($context['is_new'])
+		elseif ($this->_is_new)
 		{
 			$context['article'] = array(
 				'id' => 0,
@@ -376,8 +383,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 			fatal_lang_error('error_sp_no_category', false);
 
 		// Page out values
+		$context['is_new'] = $this->_is_new;
 		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
-		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'];
+		$context['page_title'] = $this->_is_new ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'];
 		$context['sub_template'] = 'articles_edit';
 	}
 
@@ -386,10 +394,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 */
 	private function _sportal_admin_article_preview()
 	{
-		global $context, $scripturl, $user_info;
+		global $scripturl, $user_info;
 
 		// Existing article will have some data
-		if (!$context['is_new'])
+		if (!$this->_is_new)
 		{
 			$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
 			$current = sportal_get_articles($_REQUEST['article_id']);
@@ -445,8 +453,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$validator = new Data_Validator();
 
 		// If its not new, lets load the current data
-		$is_new = empty($_REQUEST['article_id']);
-		if (!$is_new)
+		if (!$this->_is_new)
 		{
 			$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
 			$context['article'] = sportal_get_articles($_REQUEST['article_id']);
@@ -524,7 +531,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		// Save away
 		checkSession();
-		sp_save_article($article_info, $is_new);
+		sp_save_article($article_info, $this->_is_new);
 
 		redirectexit('action=admin;area=portalarticles');
 	}
