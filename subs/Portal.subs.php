@@ -891,6 +891,8 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 			'style' => $txt['sp_shoutbox_style'],
 			'bin' => $txt['sp_shoutbox_prune'],
 			'move' => $txt['sp_move'],
+			'given' => $txt['sp_likes_given'],
+			'received' => $txt['sp_likes_received'],
 		);
 	}
 
