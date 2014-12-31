@@ -1405,7 +1405,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	{
 		global $context;
 
-		$context['page_index']  = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, false);
+		$context['page_index']  = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, true);
 
 		echo '
 				<div class="sp_page_index">',
