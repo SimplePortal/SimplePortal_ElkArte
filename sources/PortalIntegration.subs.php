@@ -572,6 +572,10 @@ function sp_integrate_xmlhttp(&$subActions)
  */
 function sp_integrate_pre_log_stats(&$no_stat_actions)
 {
+	// Don't track who actions for the shoutbox
+	if (isset($_REQUEST['action']) && ($_REQUEST['action'] === 'shoutbox' && isset($_GET['xml'])))
+		$no_stat_actions[] = 'shoutbox';
+	
 	// Don't track stats of portal xml actions.
 	if (isset($_REQUEST['action']) && ($_REQUEST['action'] === 'portal' && isset($_GET['xml'])))
 		$no_stat_actions[] = 'portal';
