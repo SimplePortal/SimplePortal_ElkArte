@@ -197,7 +197,6 @@ function sp_integrate_whos_online($actions)
 {
 	global $scripturl, $modSettings, $txt;
 
-	$db = database();
 	$data = null;
 
 	require_once(SUBSDIR . '/Portal.subs.php');
@@ -214,66 +213,134 @@ function sp_integrate_whos_online($actions)
 
 	// If its a portal action, lets check it out.
 	if (isset($actions['page']))
+		$data = sp_whos_online_page($actions['page']);
+	elseif (isset($actions['article']))
+		$data = sp_whos_online_article($actions['article']);
+
+	return $data;
+}
+
+/**
+ * Page online hook, helper function to determine the page a user is viewing
+ *
+ * @param string $page_id
+ */
+function sp_whos_online_page($page_id)
+{
+	global $scripturl, $txt, $context;
+
+	$db = database();
+
+	$data = $txt['who_hidden'];
+	$numeric_ids = '';
+	$string_ids = '';
+	$page_where = '';
+
+	if (is_numeric($page_id))
+		$numeric_ids = (int) $page_id;
+	else
+		$string_ids = $page_id;
+
+	if (!empty($numeric_ids))
+		$page_where = 'id_page IN ({int:numeric_ids})';
+
+	if (!empty($string_ids))
+		$page_where = 'namespace IN ({string:string_ids})';
+
+	$query = sprintf($context['SPortal']['permissions']['query'], 'permissions');
+
+	$result = $db->query('', '
+		SELECT
+			id_page, namespace, title, permissions
+		FROM {db_prefix}sp_pages
+		WHERE ' . $page_where . ' AND ' . $query . '
+		LIMIT {int:limit}',
+		array(
+			'numeric_ids' => $numeric_ids,
+			'string_ids' => $string_ids,
+			'limit' => 1,
+		)
+	);
+	$page_data = '';
+	while ($row = $db->fetch_assoc($result))
 	{
-		$data = $txt['who_hidden'];
-		$page_id = $actions['page'];
-
-		// Due to the way the who action hook works, this is done one by one instead of batch
-		// Arrays are left in place for the future, meaning a new hook is needed
-		$numeric_ids = array();
-		$string_ids = array();
-		$page_where = array();
-
-		if (is_numeric($page_id))
-			$numeric_ids[] = (int) $page_id;
-		else
-			$string_ids[] = $page_id;
-
-		if (!empty($numeric_ids))
-			$page_where[] = 'id_page IN ({array_int:numeric_ids})';
-
-		if (!empty($string_ids))
-			$page_where[] = 'namespace IN ({array_string:string_ids})';
-
-		$result = $db->query('', '
-			SELECT
-				id_page, namespace, title, permissions
-			FROM {db_prefix}sp_pages
-			WHERE ' . implode(' OR ', $page_where) . '
-			LIMIT {int:limit}',
-			array(
-				'numeric_ids' => $numeric_ids,
-				'string_ids' => $string_ids,
-				'limit' => 1,
-			)
+		$page_data = array(
+			'id' => $row['id_page'],
+			'namespace' => $row['namespace'],
+			'title' => $row['title'],
 		);
-		$page_data = array();
-		while ($row = $db->fetch_assoc($result))
-		{
-			if (!sp_allowed_to('page', $row['id_page'], $row['permissions']))
-				continue;
+	}
+	$db->free_result($result);
 
-			$page_data[] = array(
-				'id' => $row['id_page'],
-				'namespace' => $row['namespace'],
-				'title' => $row['title'],
-			);
-		}
-		$db->free_result($result);
+	if (!empty($page_data))
+	{
+		if (isset($page_data['id']))
+			$data = sprintf($txt['sp_who_page'], $page_data['id'], censorText($page_data['title']), $scripturl);
+		if (isset($page_data['namespace']))
+			$data = sprintf($txt['sp_who_page'], $page_data['namespace'], censorText($page_data['title']), $scripturl);
+	}
 
-		if (!empty($page_data))
-		{
-			foreach ($page_data as $page)
-			{
-				if (isset($page_ids[$page['id']]))
-					foreach ($page_ids[$page['id']] as $k => $session_text)
-						$data = sprintf($session_text, $page['id'], censorText($page['title']), $scripturl);
+	return $data;
+}
 
-				if (isset($page_ids[$page['namespace']]))
-					foreach ($page_ids[$page['namespace']] as $k => $session_text)
-						$data = sprintf($session_text, $page['namespace'], censorText($page['title']), $scripturl);
-			}
-		}
+/**
+ * Article online hook, helper function to determine the page a user is viewing
+ *
+ * @param string $article_id
+ */
+function sp_whos_online_article($article_id)
+{
+	global $scripturl, $txt, $context;
+
+	$db = database();
+
+	$data = $txt['who_hidden'];
+	$numeric_ids = '';
+	$string_ids = '';
+	$article_where = '';
+
+	if (is_numeric($article_id))
+		$numeric_ids = (int) $article_id;
+	else
+		$string_ids = $article_id;
+
+	if (!empty($numeric_ids))
+		$article_where = 'id_article IN ({int:numeric_ids})';
+
+	if (!empty($string_ids))
+		$article_where = 'namespace IN ({string:string_ids})';
+
+	$query = sprintf($context['SPortal']['permissions']['query'], 'permissions');
+
+	$result = $db->query('', '
+		SELECT
+			id_article, namespace, title, permissions
+		FROM {db_prefix}sp_articles
+		WHERE ' . $article_where . ' AND ' . $query . '
+		LIMIT {int:limit}',
+		array(
+			'numeric_ids' => $numeric_ids,
+			'string_ids' => $string_ids,
+			'limit' => 1,
+		)
+	);
+	$article_data = '';
+	while ($row = $db->fetch_assoc($result))
+	{
+		$article_data = array(
+			'id' => $row['id_article'],
+			'namespace' => $row['namespace'],
+			'title' => $row['title'],
+		);
+	}
+	$db->free_result($result);
+
+	if (!empty($article_data))
+	{
+		if (isset($article_data['id']))
+			$data = sprintf($txt['sp_who_article'], $article_data['id'], censorText($article_data['title']), $scripturl);
+		if (isset($article_data['namespace']))
+			$data = sprintf($txt['sp_who_article'], $article_data['namespace'], censorText($article_data['title']), $scripturl);
 	}
 
 	return $data;
