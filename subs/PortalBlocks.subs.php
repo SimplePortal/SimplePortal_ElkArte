@@ -372,7 +372,7 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
 
 	echo '
 								<ul class="sp_list">
-									<li ', sp_embed_class('portalstats'), '>', $txt['total_members'], ': <a href="', $scripturl . '?action=mlist">', comma_format($totals['members']), '</a></li>
+									<li ', sp_embed_class('portalstats'), '>', $txt['total_members'], ': <a href="', $scripturl . '?action=memberlist">', comma_format($totals['members']), '</a></li>
 									<li ', sp_embed_class('portalstats'), '>', $txt['total_posts'], ': ', comma_format($totals['posts']), '</li>
 									<li ', sp_embed_class('portalstats'), '>', $txt['total_topics'], ': ', comma_format($totals['topics']), '</li>
 									<li ', sp_embed_class('portalstats'), '>', $txt['total_cats'], ': ', comma_format($totals['categories']), '</li>
@@ -932,7 +932,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
 								', $item['new'] ? '' : ' <a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
 								<a href="', $item['href'], '">', $item['subject'], '</a>
 								<span class="smalltext">', $txt['by'], ' ', $item['poster']['link'],
-								'<br />[', $item['time'], ']</span>
+								'<br />[', $item['time'], '] ', $txt['in'], ' <em>', $item['board']['link'], '</em></span>
 								<br />', empty($item['is_last']) ? '<hr />' : '';
 	}
 	elseif ($display == 'full')
@@ -1291,16 +1291,25 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	$colorids = array();
 	while ($row = $db->fetch_assoc($request))
 	{
+		// Using the cutoff tag?
+		$limited = false;
+		if (($cutoff = Util::strpos($row['body'], '[cutoff]')) !== false)
+		{
+			$row['body'] = Util::substr($row['body'], 0, $cutoff);
+			preparsecode($row['body']);
+			$limited = true;
+		}
+
+		// Good time to do this is ... now
 		censorText($row['subject']);
 		censorText($row['body']);
-
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
-		// Shorten the text if needed, link the ellipsis if the body has been shortened.
-		if (!empty($length))
+		// Shorten the text, link the ellipsis, etc as needed
+		if ($limited || !empty($length))
 		{
 			$ellip = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">&hellip;</a>';
-			$row['body'] = Util::shorten_html($row['body'], $length, $ellip, false);
+			$row['body'] = $limited ? $row['body'] . $ellip : Util::shorten_html($row['body'], $length, $ellip, false);
 		}
 
 		if (empty($modSettings['messageIconChecks_disable']) && !isset($icon_sources[$row['icon']]))
@@ -1405,7 +1414,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 	{
 		global $context;
 
-		$context['page_index']  = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, true);
+		$context['page_index'] = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, true);
 
 		echo '
 				<div class="sp_page_index">',
@@ -1641,7 +1650,13 @@ function sp_calendar($parameters, $id, $return_parameters = false)
 		'show_birthdays' => !empty($parameters['birthdays']),
 		'show_holidays' => !empty($parameters['holidays']),
 	);
-	$calendar_data = getCalendarGrid($curPage['month'], $curPage['year'], $calendarOptions);
+
+	// Check cache or fetch
+	if (($calendar_data = cache_get_data('sp_calendar_data', 360)) === null)
+	{
+		$calendar_data = getCalendarGrid($curPage['month'], $curPage['year'], $calendarOptions);
+		cache_put_data('sp_calendar_data', $calendar_data, 360);
+	}
 
 	// Output the calendar block
 	echo '
@@ -2423,9 +2438,27 @@ function sp_articles($parameters, $id, $return_parameters = false)
 
 		foreach ($articles as $article)
 		{
-			// Shorten it for the preview
+			// Using the cutoff tag?
+			$limited = false;
+			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
+			{
+				$article['body'] = Util::substr($article['body'], 0, $cutoff);
+				preparsecode($article['body']);
+				$limited = true;
+			}
+
+			// Good time to do this is ... now
+			censorText($article['subject']);
+			censorText($article['body']);
+
 			$article['body'] = sportal_parse_content($article['body'], $article['type'], 'return');
-			$article['body'] = Util::shorten_html($article['body'], $length);
+
+			// Shorten the text, link the ellipsis, etc as needed
+			if ($limited || !empty($length))
+			{
+				$ellip = '<a href="' . $scripturl . '?article=' . $article['article_id'] . '">&hellip;</a>';
+				$article['body'] = $limited ? $article['body'] . $ellip : Util::shorten_html($article['body'], $length, $ellip, false);
+			}
 
 			echo '
 								<tr class="sp_articles_row">
