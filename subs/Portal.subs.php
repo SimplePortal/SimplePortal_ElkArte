@@ -952,6 +952,8 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 			'style' => $txt['sp_shoutbox_style'],
 			'bin' => $txt['sp_shoutbox_prune'],
 			'move' => $txt['sp_move'],
+			'given' => $txt['sp_likes_given'],
+			'received' => $txt['sp_likes_received'],
 		);
 	}
 
@@ -1687,6 +1689,9 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
  */
 function sportal_parse_content($body, $type, $output_method = 'echo')
 {
+	if (($type === 'bbc' || $type === 'html') && strpos($body, '[cutoff]') !== false)
+		$body = str_replace('[cutoff]', '', $body);
+
 	switch ($type)
 	{
 		case 'bbc':
