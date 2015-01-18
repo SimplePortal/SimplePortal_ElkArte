@@ -73,8 +73,8 @@ function template_view_category()
 			echo $article['author']['avatar']['image'];
 
 		echo '
-					<span style="text-align: right; float: right;">
-						', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '
+					<span class="sp_article_latest">
+						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '
 						<br />
 						', sprintf($article['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['views']) ,', ', sprintf($article['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '
 					</span>
@@ -95,4 +95,10 @@ function template_view_category()
 	// Pages as well?
 	if (!empty($context['page_index']))
 		template_pagesection();
+
+	if (!empty($context['using_relative_time']))
+		echo '
+	<script><!-- // --><![CDATA[
+		$(\'.sp_article_latest\').addClass(\'relative\');
+	// ]]></script>';
 }

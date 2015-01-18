@@ -198,6 +198,10 @@ table.sp_blog, table.sp_articles, .sp_shop_info {
 	line-height: 35px;
 	font-size: 1.3em;
 }
+.sp_article_latest {
+	text-align: right;
+	float: right;
+}
 .sp_article_detail .avatar {
 	max-height: 40px;
 	float: left;
