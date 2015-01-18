@@ -41,6 +41,8 @@ $txt['sp_commented_on_time'] = 'commented on %d time';
 $txt['sp_commented_on_times'] = 'commented on %d times';
 $txt['sp_posted_on_by'] = 'posted on %1$s by %2$s';
 $txt['sp_posted_in_on_by'] = 'posted in %1$s on %2$s by %3$s';
+$txt['sp_posted_on_in_by'] = 'posted %2$s in %1$s by %3$s';
+
 $txt['sp_read_more'] = 'Read More';
 $txt['sp_write_comment'] = 'Write Comment';
 $txt['sp_function_unknown_label'] = 'Unknown Block Type';
@@ -96,6 +98,7 @@ $txt['sp_topStatsMember_Karma_Bad'] = 'Bad Karma';
 $txt['sp_topStatsMember_Karma_Total'] = 'Total Karma';
 $txt['sp_topStatsMember_Likes_Received'] = 'Likes Received';
 $txt['sp_topStatsMember_Likes_Given'] = 'Likes Given';
+$txt['sp_topStatsMember_Likes_Total'] = 'Likes Total';
 
 // Who area strings
 $txt['sp_who_index'] = 'Viewing the <a href="%s">Portal</a>.';
