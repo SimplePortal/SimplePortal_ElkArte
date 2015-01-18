@@ -57,9 +57,15 @@ class Article_Controller extends Action_Controller
 
 		foreach ($context['articles'] as $article)
 		{
+			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
+			{
+				$article['body'] = Util::substr($article['body'], 0, $cutoff);
+				if ($article['type'] === 'bbc')
+					preparsecode($article['body']);
+			}
 
 			$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
-			$context['articles'][$article['id']]['date'] = standardTime($article['date']);
+			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
 		}
 
 		$context['linktree'][] = array(
@@ -90,6 +96,7 @@ class Article_Controller extends Action_Controller
 			$article_id = Util::htmlspecialchars($article_id, ENT_QUOTES);
 
 		$context['article'] = sportal_get_articles($article_id, true, true);
+
 		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
 
 		if (empty($context['article']['id']))
@@ -103,7 +110,7 @@ class Article_Controller extends Action_Controller
 		if ($total_comments > $per_page)
 			$context['page_index'] = constructPageIndex($scripturl . '?article=' . $context['article']['article_id'] . ';comments=%1$d', $start, $total_comments, $per_page, true);
 
-		$context['article']['date'] = standardTime($context['article']['date']);
+		$context['article']['date'] = htmlTime($context['article']['date']);
 		$context['article']['comments'] = sportal_get_comments($context['article']['id'], $per_page, $start);
 		$context['article']['can_comment'] = $context['user']['is_logged'];
 		$context['article']['can_moderate'] = allowedTo('sp_admin') || allowedTo('sp_manage_articles');
