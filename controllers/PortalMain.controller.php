@@ -86,11 +86,17 @@ class Sportal_Controller extends Action_Controller
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
 		foreach ($context['articles'] as $article)
 		{
+			if (empty($modSettings['sp_articles_length']) && ($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
+			{
+				$article['body'] = Util::substr($article['body'], 0, $cutoff);
+				if ($article['type'] === 'bbc')
+					preparsecode($article['body']);
+			}
 
 			$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
-			$context['articles'][$article['id']]['date'] = standardTime($article['date']);
+			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
 
-			// Just the preview
+			// Just want a shorter look on the index page
 			if (!empty($modSettings['sp_articles_length']))
 				$context['articles'][$article['id']]['preview'] = Util::shorten_html($context['articles'][$article['id']]['preview'], $modSettings['sp_articles_length']);
 		}
