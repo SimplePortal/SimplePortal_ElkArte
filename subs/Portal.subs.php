@@ -940,7 +940,7 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 	if (!isset($default_title))
 	{
 		$default_title = array(
-			'dot' => $txt['sp-dot'],
+			'dot' => '',
 			'stars' => $txt['sp-star'],
 			'arrow' => $txt['sp-arrow'],
 			'modify' => $txt['modify'],
@@ -1737,7 +1737,7 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
  * @param int|null $type
  * @param string $sort
  */
-function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_profile')
+function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 {
 	global $txt;
 
@@ -1762,8 +1762,8 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_prof
 		SELECT
 			id_profile, type, name, value
 		FROM {db_prefix}sp_profiles' . (!empty($query) ? '
-		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY {raw:sort}',
+		WHERE ' . implode(' AND ', $query) : '') . (!empty($sort) ? '
+		ORDER BY {raw:sort}' : ''),
 		$parameters
 	);
 	$return = array();
