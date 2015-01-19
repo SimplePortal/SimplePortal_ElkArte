@@ -51,7 +51,12 @@ class Shoutbox_Controller extends Action_Controller
 		$context['SPortal']['shoutbox'] = sportal_get_shoutbox($shoutbox_id, true, true);
 
 		if (empty($context['SPortal']['shoutbox']))
-			fatal_lang_error('error_sp_shoutbox_not_exist', false);
+		{
+			if (isset($_REQUEST['xml']))
+				obExit(false, false);
+			else
+				fatal_lang_error('error_sp_shoutbox_not_exist', false);
+		}
 
 		// Any warning title for the shoutbox, like Not For Support ;P
 		$context['SPortal']['shoutbox']['warning'] = parse_bbc($context['SPortal']['shoutbox']['warning']);
