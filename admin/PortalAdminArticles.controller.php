@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Article Administation controller class.
+ * SimplePortal Article Administration controller class.
  * This class handles the adding/editing/listing of articles
  */
 class ManagePortalArticles_Controller extends Action_Controller
@@ -362,7 +362,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		create_control_richedit($editor_options);
 		$context['post_box_name'] = $editor_options['id'];
 
-		// Restore thier settings
+		// Restore their settings
 		if (isset($temp_editor))
 			$options['wysiwyg_default'] = $temp_editor;
 
@@ -373,7 +373,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			});
 		');
 
-		// Final bits for the template, categorys and permission settings
+		// Final bits for the template, category's and permission settings
 		$context['article']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		if (empty($context['article']['permission_profiles']))
 			fatal_lang_error('error_sp_no_permission_profiles', false);

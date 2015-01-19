@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Blocks Administation controller class.
+ * SimplePortal Blocks Administration controller class.
  * This class handles the adding/editing/listing of blocks
  */
 class ManagePortalBlocks_Controller extends Action_Controller
@@ -900,7 +900,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		else
 			$target_side = (int) $_REQUEST['col'];
 
-		// Specific row requestetd?
+		// Specific row requested?
 		if (empty($_REQUEST['row']))
 			$target_row = sp_block_nextrow($target_side);
 		else

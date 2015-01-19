@@ -52,7 +52,7 @@ function sportal_init($standalone = false)
 		}
 	}
 
-	// Portal not enabled, or mobile, or debug, or maintance, or .... then bow out now
+	// Portal not enabled, or mobile, or debug, or maintenance, or .... then bow out now
 	if ($context['browser_body_id'] == 'mobile' || !empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')) || isset($_GET['debug']) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
 	{
 		$context['disable_sp'] = true;
@@ -320,7 +320,7 @@ function sportal_load_blocks()
 }
 
 /**
- * If a member has arranged blocks in some bizare fashion, this will reset the layout to
+ * If a member has arranged blocks in some bizarre fashion, this will reset the layout to
  * the default one
  */
 function resetMemberLayout()
@@ -723,11 +723,11 @@ function sp_languageSelect($template_name)
 }
 
 /**
- * Loads a set of calendar data, holdays, birthdays, events
+ * Loads a set of calendar data, holidays, birthdays, events
  *
- * @param string $type type of data to load, events, birthdays, etc
+ * @param string $type type of data to load, events, birthdays, etc.
  * @param string $low_date don't load data before this date
- * @param string|false $high_date dont load data after this date, false for no limit
+ * @param string|false $high_date don't load data after this date, false for no limit
  */
 function sp_loadCalendarData($type, $low_date, $high_date = false)
 {
@@ -1731,7 +1731,7 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
  *
  * What is does:
  * - If no profile id is supplied, all profiles are returned
- * - If type = 1 (generally the case), the profile group permsissions are returned
+ * - If type = 1 (generally the case), the profile group permissions are returned
  *
  * @param int|null $profile_id
  * @param int|null $type
@@ -2134,7 +2134,7 @@ function sp_prevent_flood($type, $fatal = true)
 		)
 	);
 
-	// Update existing ones that were stil inside the time limit
+	// Update existing ones that were still inside the time limit
 	$db->insert('replace', '
 		{db_prefix}log_floodcontrol',
 		array('ip' => 'string-16', 'log_time' => 'int', 'log_type' => 'string'),

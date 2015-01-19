@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Page Administation controller class.
+ * SimplePortal Page Administration controller class.
  * This class handles the adding/editing/listing of pages
  */
 class ManagePortalProfile_Controller extends Action_Controller
@@ -64,7 +64,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	}
 
 	/**
-	 * Show page listing of all premission groups in the system
+	 * Show page listing of all permission groups in the system
 	 */
 	public function action_sportal_admin_permission_profiles_list()
 	{
@@ -82,7 +82,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			sp_delete_profiles($remove);
 		}
 
-		// Build the listoption array to display the permission profles
+		// Build the listoption array to display the permission profiles
 		$listOptions = array(
 			'id' => 'portal_permisssions',
 			'title' => $txt['sp_admin_permission_profiles_list'],

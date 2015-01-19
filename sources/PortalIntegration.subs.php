@@ -164,7 +164,7 @@ function sp_integrate_admin_areas(&$admin_areas)
 
 /**
  * Permissions hook, integrate_load_permissions, called from ManagePermissions.php
- * used to add new permisssions
+ * used to add new permissions
  *
  * @param mixed[] $permissionGroups
  * @param mixed[] $permissionList
@@ -582,7 +582,7 @@ function sp_integrate_pre_log_stats(&$no_stat_actions)
 }
 
 /**
- * Add premissions that guest should never be able to have
+ * Add permissions that guest should never be able to have
  * integrate_load_illegal_guest_permissions called from Permission.subs.php
  */
 function sp_integrate_load_illegal_guest_permissions()

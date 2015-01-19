@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * User info block, shows avatar, group, icons, posts, karma, etc
+ * User info block, shows avatar, group, icons, posts, karma, etc.
  *
  * @param mixed[] $parameters not used in this block
  * @param int $id - not used in this block
@@ -208,7 +208,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
 		);
 	}
 
-	// No recent members, supose it could happen
+	// No recent members, suppose it could happen
 	if (empty($members))
 	{
 		echo '
@@ -748,7 +748,7 @@ function sp_topStatsMember($parameters, $id, $return_parameters = false)
 	else
 		$where = "";
 
-	// Finaly make the query with the parameters we built
+	// Finally make the query with the parameters we built
 	$request = $db->query('', '
 		SELECT
 			mem.id_member, mem.real_name, mem.avatar, mem.email_address,
@@ -1377,7 +1377,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		}
 	}
 
-	// Auto video embeding enabled?
+	// Auto video embedding enabled?
 	if (!empty($modSettings['enableVideoEmbeding']))
 		addInlineJavascript('
 		$(document).ready(function() {
@@ -1818,7 +1818,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 	// Load calendar events
 	if ($show_event)
 	{
-		// Just todays events or looking forward a few days?
+		// Just today's events or looking forward a few days?
 		if (!empty($event_future))
 			$event_future_date = date("Y-m-d", ($now + $event_future * 86400));
 		else
@@ -1853,7 +1853,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
 		}
 	}
 
-	// Load in todays birthdays
+	// Load in today's birthdays
 	if ($show_birthday)
 	{
 		$calendar_array['todayBirthdays'] = current(sp_loadCalendarData('getBirthdays', $today_date));
@@ -2148,7 +2148,7 @@ function sp_theme_select($parameters, $id, $return_parameters = false)
 
 		$settings['images_url'] = &$theme_data['images_url'];
 
-		// Set the description in thier language if available
+		// Set the description in their language if available
 		if (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php'))
 			include($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php');
 		elseif (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php'))
@@ -2511,7 +2511,7 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 		'shoutbox' => array(),
 	);
 
-	// return the paramters for use in setting up the blocks
+	// return the parameters for use in setting up the blocks
 	if ($return_parameters)
 	{
 		$shoutboxes = sportal_get_shoutbox();
@@ -2777,7 +2777,7 @@ function sp_gallery($parameters, $id, $return_parameters = false)
  * Menu Block, creates a sidebar menu block based on the system main menu
  * @todo needs updating so it knows right vs left block for the flyout
  *
- * @param mixed[] $parameters -  not used in this block
+ * @param mixed[] $parameters - not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -2837,7 +2837,7 @@ function sp_menu($parameters, $id, $return_parameters = false)
 /**
  * Generic BBC Block, creates a BBC formatted block with parse_bbc
  *
- * @param mixed[] $parameters -  not used in this block
+ * @param mixed[] $parameters - not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -2859,7 +2859,7 @@ function sp_bbc($parameters, $id, $return_parameters = false)
 /**
  * Generic HTML Block, creates a formatted block with HTML
  *
- * @param mixed[] $parameters -  not used in this block
+ * @param mixed[] $parameters - not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */

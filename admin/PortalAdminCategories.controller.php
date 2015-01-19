@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Category Administation controller class.
+ * SimplePortal Category Administration controller class.
  * This class handles the adding/editing/listing of categories
  */
 class ManagePortalCategories_Controller extends Action_Controller

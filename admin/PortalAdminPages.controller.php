@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Page Administation controller class.
+ * SimplePortal Page Administration controller class.
  * This class handles the adding/editing/listing of pages
  */
 class ManagePortalPages_Controller extends Action_Controller
@@ -489,7 +489,7 @@ class ManagePortalPages_Controller extends Action_Controller
 		if (!empty($has_duplicate))
 			$pages_errors->addError('sp_error_page_namespace_duplicate');
 
-		// Can't have a simple numeric namesapce
+		// Can't have a simple numeric namespace
 		if (preg_replace('~[0-9]+~', '', $_POST['namespace']) === '')
 			$pages_errors->addError('sp_error_page_namespace_numeric');
 
