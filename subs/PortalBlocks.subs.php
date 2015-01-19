@@ -57,13 +57,15 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 											</tr>
 											<tr>
 												<td>
-													<select name="cookielength">
-														<option value="60">', $txt['one_hour'], '</option>
-														<option value="1440">', $txt['one_day'], '</option>
-														<option value="10080">', $txt['one_week'], '</option>
-														<option value="43200">', $txt['one_month'], '</option>
-														<option value="-1" selected="selected">', $txt['forever'], '</option>
-													</select>
+													<label for="cookielength">
+														<select id="cookielength" name="cookielength">
+															<option value="60">', $txt['one_hour'], '</option>
+															<option value="1440">', $txt['one_day'], '</option>
+															<option value="10080">', $txt['one_week'], '</option>
+															<option value="43200">', $txt['one_month'], '</option>
+															<option value="-1" selected="selected">', $txt['forever'], '</option>
+														</select>
+													</label>
 												</td>
 												<td>
 													<input type="submit" value="', $txt['login'], '" class="button_submit" />
@@ -134,7 +136,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
 		if (!empty($modSettings['likes_enabled']))
 			echo '
 										<li ', sp_embed_class('dot'), '>
-											<strong>', $txt['likes'], ': </strong>' . $member_info['likes']['given'] . ' <span ', sp_embed_class('given'), '></span> / ', $member_info['likes']['received'], ' <span ', sp_embed_class('received'), '></span></li>';
+											<strong>', $txt['likes'], ': </strong><a href="', $scripturl, '?action=profile;area=showlikes;sa=given;u=', $user_info['id'], '">', $member_info['likes']['given'], ' <span ', sp_embed_class('given'), '></span></a> / <a href="', $scripturl, '?action=profile;area=showlikes;sa=received;u=', $user_info['id'], '">', $member_info['likes']['received'], ' <span ', sp_embed_class('received'), '></span></a></li>';
 
 
 		if (allowedTo('pm_read'))
