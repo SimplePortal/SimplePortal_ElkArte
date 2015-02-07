@@ -1500,7 +1500,7 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
 
 	$limit = empty($parameters['limit']) ? 5 : (int) $parameters['limit'];
 	$direction = empty($parameters['direction']) ? 0 : 1;
-	$type = array('jpg', 'png', 'gif', 'bmp');
+	$type = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
 	$showPoster = empty($parameters['disablePoster']);
 	$showDownloads = empty($parameters['disableDownloads']);
 	$showLink = empty($parameters['disableLink']);
