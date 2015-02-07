@@ -8,12 +8,12 @@
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
- * @version 2.4
+ * @version 2.4.1
  */
 -->
 <modification xmlns="http://www.elkarte.net/site/modification" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
-	<version>2.4</version>
+	<version>2.4.1</version>
 
 	<file name="SOURCEDIR/Load.php">
 		<operation>
@@ -49,75 +49,6 @@
 	</file>
 
 	<file name="SOURCEDIR/Subs.php">
-		<!-- only needed for 1.0 -->
-		<operation error="ignore">
-			<search position="replace"><![CDATA[	static $disabled;]]></search>
-			<add><![CDATA[	static $disabled, $default_disabled, $parse_tag_cache;]]></add>
-		</operation>
-		<!-- only needed for 1.0 -->
-		<operation error="ignore">
-			<search position="replace"><![CDATA[	// If we are not doing every tag then we don't cache this run.
-	if (!empty($parse_tags) && !empty($bbc_codes))
-	{
-		$temp_bbc = $bbc_codes;
-		$bbc_codes = array();
-	}]]></search>
-			<add><![CDATA[/*
-	// If we are not doing every tag then we don't cache this run.
-	if (!empty($parse_tags) && !empty($bbc_codes))
-	{
-		$temp_bbc = $bbc_codes;
-		$bbc_codes = array();
-	}
-*/]]></add>
-		</operation>
-		<!-- only needed for 1.0 -->
-		<operation error="ignore">
-			<search position="replace"><![CDATA[	if (empty($bbc_codes) || $message === false || !empty($parse_tags))]]></search>
-			<add><![CDATA[//	if (empty($bbc_codes) || $message === false || !empty($parse_tags))
-	// I wish I didn't had to do this... puff...
-	if (empty($bbc_codes) || $message === false)]]></add>
-		</operation>
-		<!-- only needed for 1.0 -->
-		<operation error="ignore">
-			<search position="replace"><![CDATA[			if (empty($parse_tags) || in_array($code['tag'], $parse_tags))
-				$bbc_codes[substr($code['tag'], 0, 1)][] = $code;
-		}
-	}]]></search>
-			<add><![CDATA[			// if (empty($parse_tags) || in_array($code['tag'], $parse_tags))
-				$bbc_codes[substr($code['tag'], 0, 1)][] = $code;
-		}
-	}
-
-	if ($parse_tags !== array() && is_array($parse_tags))
-	{
-		$temp_bbc = $bbc_codes;
-		$tags_cache_id = implode(',', $parse_tags);
-
-		if (!isset($default_disabled))
-			$default_disabled = isset($disabled) ? $disabled : array();
-
-		if (isset($parse_tag_cache[$tags_cache_id]))
-			list ($bbc_codes, $disabled) = $parse_tag_cache[$tags_cache_id];
-		else
-		{
-			foreach ($bbc_codes as $key_bbc => $bbc)
-				foreach ($bbc as $key_code => $code)
-					if (!in_array($code['tag'], $parse_tags))
-					{
-						$disabled[$code['tag']] = true;
-						unset($bbc_codes[$key_bbc][$key_code]);
-					}
-
-			$parse_tag_cache = array($tags_cache_id => array($bbc_codes, $disabled));
-		}
-	}
-	elseif (isset($default_disabled))
-		$disabled = $default_disabled;
-
-	if (strpos($message, '[cutoff]') !== false)
-		$message = str_replace('[cutoff]', '', $message);]]></add>
-		</operation>
 		<operation>
 			<search position="replace"><![CDATA[				$data = parse_bbc($data, !empty($tag['parsed_tags_allowed']) ? false : true, '', !empty($tag['parsed_tags_allowed']) ? $tag['parsed_tags_allowed'] : array());]]></search>
 			<add><![CDATA[			{
