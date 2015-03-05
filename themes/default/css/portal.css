@@ -5,7 +5,7 @@
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
- * @version 2.4.1
+ * @version 2.4.2
  */
 
 hr {
@@ -778,6 +778,13 @@ dl.sp_form img, #sp_add_articles_list_header img {
 .received:before {background-position: 0 -576px;}
 .given:before {background-position: 0 -594px;}
 
+.sp_no_body_style, sp_no_body_style_last {
+	box-shadow: none;
+	border: 0px solid;
+	margin: 2px 0 .7em 0;
+	border-radius: 0;
+	overflow: auto;
+}
 
 /* Experimental media querys */
 /*---------------------------*/
@@ -786,14 +793,19 @@ dl.sp_form img, #sp_add_articles_list_header img {
 	body {
 		min-width: 100%;
 	}
-	#sp_left, #sp_right {
-		position: absolute;
-	}
 	#sp_right {
-		right: 0;
+		left: 0;
+		width: 100% !important;
+		display: block;
+	}
+	#sp_left {
+		left: 0;
+		width: 100% !important;
+		display: block;
 	}
 	#sp_center {
 		width: 100%;
+		display: block;
 	}
 	#sp_collapse_side1, #sp_collapse_side2, #sp_collapse_side3, #sp_collapse_side4 {
 		padding: 6px;
