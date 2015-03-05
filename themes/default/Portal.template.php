@@ -7,7 +7,7 @@
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
- * @version 2.4
+ * @version 2.4.2
  */
 
 /**
@@ -279,7 +279,7 @@ function template_block_default($block, $side)
 	}
 
 	echo '
-						<div id="sp_block_' . $block['id'] . '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['sp_articles_index'])) ? '_last' : '', '" ', $block['collapsed'] && empty($block['force_view']) ? ' style="display: none;"' : '', '>
+						<div id="sp_block_' . $block['id'] . '" class="', empty($block['style']['no_body']) ? 'sp_block_section' : 'sp_no_body_style', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['sp_articles_index'])) ? '_last' : '', '" ', $block['collapsed'] && empty($block['force_view']) ? ' style="display: none;"' : '', '>
 							<div', empty($block['style']['body']['class']) ? '' : ' class="' . $block['style']['body']['class'] . '"', '>
 								<div class="', $block['type'] != 'sp_menu' ? 'sp_block' : 'sp_content_padding', '"', !empty($block['style']['body']['style']) ? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
 
