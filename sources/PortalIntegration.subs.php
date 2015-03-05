@@ -7,7 +7,7 @@
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
- * @version 2.4.1
+ * @version 2.4.2
  */
 
 if (!defined('ELK'))
@@ -575,7 +575,7 @@ function sp_integrate_pre_log_stats(&$no_stat_actions)
 	// Don't track who actions for the shoutbox
 	if (isset($_REQUEST['action']) && ($_REQUEST['action'] === 'shoutbox' && isset($_GET['xml'])))
 		$no_stat_actions[] = 'shoutbox';
-	
+
 	// Don't track stats of portal xml actions.
 	if (isset($_REQUEST['action']) && ($_REQUEST['action'] === 'portal' && isset($_GET['xml'])))
 		$no_stat_actions[] = 'portal';
@@ -601,4 +601,21 @@ function sp_integrate_load_illegal_guest_permissions()
 		'sp_auto_article_approval',
 		'sp_remove_article'
 	));
+}
+
+/**
+ * Subs hook, integrate_pre_parsebbc
+ *
+ * - Allow addons access before entering the main parse_bbc loop
+ * - Prevents parseBBC from working on these tags at all
+ *
+ * @param string $message
+ * @param smixed[] $smileys
+ * @param string $cache_id
+ * @param string[]|null $parse_tags
+ */
+function sp_integrate_pre_parsebbc(&$message, &$smileys, &$cache_id, &$parse_tags)
+{
+	if (strpos($message, '[cutoff]') !== false)
+		$message = str_replace('[cutoff]', '', $message);
 }

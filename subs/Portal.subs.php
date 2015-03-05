@@ -7,7 +7,7 @@
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
- * @version 2.4.1
+ * @version 2.4.2
  */
 
 if (!defined('ELK'))
@@ -40,7 +40,7 @@ function sportal_init($standalone = false)
 		if (!empty($context['right_to_left']))
 			loadCSSFile('portal_rtl.css');
 
-		if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], array('admin', 'helpadmin')))
+		if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], array('admin')))
 			loadLanguage('SPortalAdmin', sp_languageSelect('SPortalAdmin'));
 
 		if (!isset($settings['sp_images_url']))
