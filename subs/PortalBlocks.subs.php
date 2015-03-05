@@ -7,7 +7,7 @@
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
- * @version 2.4.1
+ * @version 2.4.2
  */
 
 if (!defined('ELK'))
@@ -1297,6 +1297,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
 		$limited = false;
 		if (($cutoff = Util::strpos($row['body'], '[cutoff]')) !== false)
 		{
+			require_once(SUBSDIR . '/Post.subs.php');
 			$row['body'] = Util::substr($row['body'], 0, $cutoff);
 			preparsecode($row['body']);
 			$limited = true;
