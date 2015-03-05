@@ -7,7 +7,7 @@
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
- * @version 2.4.1
+ * @version 2.4.2
  */
 
 if (!defined('ELK'))
@@ -90,7 +90,10 @@ class Sportal_Controller extends Action_Controller
 			{
 				$article['body'] = Util::substr($article['body'], 0, $cutoff);
 				if ($article['type'] === 'bbc')
+				{
+					require_once(SUBSDIR . '/Post.subs.php');
 					preparsecode($article['body']);
+				}
 			}
 
 			$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
