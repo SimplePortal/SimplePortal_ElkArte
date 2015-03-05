@@ -8,7 +8,7 @@
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
- * @version 2.4.1
+ * @version 2.4.2
  */
 -->
 <modification xmlns="http://www.elkarte.net/site/modification" xmlns:elk="http://www.elkarte.net/">
@@ -49,13 +49,20 @@
 	</file>
 
 	<file name="SOURCEDIR/Subs.php">
-		<operation>
-			<search position="replace"><![CDATA[				$data = parse_bbc($data, !empty($tag['parsed_tags_allowed']) ? false : true, '', !empty($tag['parsed_tags_allowed']) ? $tag['parsed_tags_allowed'] : array());]]></search>
-			<add><![CDATA[			{
+		<operation error="ignore">
+			<search position="replace"><![CDATA[			if ($tag['type'] !== 'unparsed_equals')
 				$data = parse_bbc($data, !empty($tag['parsed_tags_allowed']) ? false : true, '', !empty($tag['parsed_tags_allowed']) ? $tag['parsed_tags_allowed'] : array());
-				// Unfortunately, this is the only way to deal with such a failure of a function...
-				parse_bbc('sp');
-			}]]></add>
+
+			$tag['after'] = strtr($tag['after'], array('$1' => $data));]]></search>
+			<add><![CDATA[			if ($tag['type'] !== 'unparsed_equals')
+			{
+				$data = parse_bbc($data, !empty($tag['parsed_tags_allowed']) ? false : true, '', !empty($tag['parsed_tags_allowed']) ? $tag['parsed_tags_allowed'] : array());
+
+				// Unfortunately after we recurse, we must manually reset the static disabled tags to what they were
+				parse_bbc('dummy');
+			}
+
+			$tag['after'] = strtr($tag['after'], array('$1' => $data));]]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA['admin_forum', 'manage_boards']]></search>
