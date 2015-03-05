@@ -7,7 +7,7 @@
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
- * @version 2.4
+ * @version 2.4.2
  */
 
 /**
@@ -386,7 +386,7 @@ function template_block_edit()
 		}
 
 		echo '
-						<a class="help" href="', $scripturl, '?action=helpadmin;help=sp-blocksCustomDisplayOptions" onclick="return reqWin(this.href);">
+						<a class="help" href="', $scripturl, '?action=quickhelp;help=sp-blocksCustomDisplayOptions" onclick="return reqOverlayDiv(this.href);">
 							<img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" />
 						</a>
 						<label for="display_custom">', $txt['sp_display_custom'], ': </label>
@@ -456,17 +456,14 @@ function template_block_edit()
 							', $txt['sp-blocksNo' . ucfirst($section)], ':
 						</dt>
 						<dd>
-							<input type="checkbox" name="no_', $section, '" id="no_', $section, '" value="1"', !empty($context['SPortal']['block']['style']['no_' . $section]) ? ' checked="checked"' : '', ' onclick="document.getElementById(\'', $section, '_default_class\').disabled', $section == 'title' ? ' = document.getElementById(\'title_custom_class\').disabled = document.getElementById(\'title_custom_style\').disabled' : '', ' = this.checked;" class="input_check" />
+							<input type="checkbox" name="no_', $section, '" id="no_', $section, '" value="1"', !empty($context['SPortal']['block']['style']['no_' . $section]) ? ' checked="checked"' : '', 'onclick="check_style_options();" class="input_check" />
 						</dd>
 					</dl>';
 		}
 
 		echo '
 					<script><!-- // --><![CDATA[
-						document.getElementById("title_default_class").disabled = document.getElementById("no_title").checked;
-						document.getElementById("title_custom_class").disabled = document.getElementById("no_title").checked;
-						document.getElementById("title_custom_style").disabled = document.getElementById("no_title").checked;
-						document.getElementById("body_default_class").disabled = document.getElementById("no_body").checked;
+						check_style_options();
 					// ]]></script>
 					<div class="sp_button_container">
 						<input type="submit" name="add_block" value="', !$context['SPortal']['is_new'] ? $txt['sp-blocksEdit'] : $txt['sp-blocksAdd'], '" class="right_submit" />

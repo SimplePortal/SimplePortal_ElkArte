@@ -7,7 +7,7 @@
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
- * @version 2.4
+ * @version 2.4.2
  */
 
 function template_pages_edit()
@@ -171,7 +171,7 @@ function template_pages_edit()
 							', $txt['sp-blocksNo' . ucfirst($section)], ':
 						</dt>
 						<dd>
-							<input type="checkbox" name="no_', $section, '" id="no_', $section, '" value="1"', !empty($context['SPortal']['page']['style']['no_' . $section]) ? ' checked="checked"' : '', ' onclick="document.getElementById(\'', $section, '_default_class\').disabled', $section == 'title' ? ' = document.getElementById(\'title_custom_class\').disabled = document.getElementById(\'title_custom_style\').disabled' : '', ' = this.checked;" class="input_check" />
+							<input type="checkbox" name="no_', $section, '" id="no_', $section, '" value="1"', !empty($context['SPortal']['page']['style']['no_' . $section]) ? ' checked="checked"' : '', ' onclick="check_style_options();" class="input_check" />
 						</dd>
 					</dl>';
 	}
@@ -185,10 +185,7 @@ function template_pages_edit()
 		</form>
 	</div>
 	<script><!-- // --><![CDATA[
+		check_style_options();
 		sp_editor_change_type("page_type");
-		document.getElementById("title_default_class").disabled = document.getElementById("no_title").checked;
-		document.getElementById("title_custom_class").disabled = document.getElementById("no_title").checked;
-		document.getElementById("title_custom_style").disabled = document.getElementById("no_title").checked;
-		document.getElementById("body_default_class").disabled = document.getElementById("no_body").checked;
 	// ]]></script>';
 }
