@@ -1211,7 +1211,8 @@ function sp_block_insert($blockInfo)
 		{db_prefix}sp_blocks',
 		array(
 			'label' => 'string', 'type' => 'string', 'col' => 'int', 'row' => 'int', 'permissions' => 'int',
-			'state' => 'int', 'force_view' => 'int', 'display' => 'string', 'display_custom' => 'string', 'style' => 'string',
+			'state' => 'int', 'force_view' => 'int', 'mobile_view' => 'int', 'display' => 'string', 'display_custom' => 'string',
+			'style' => 'string',
 		),
 		$blockInfo,
 		array('id_block')
@@ -1238,6 +1239,7 @@ function sp_block_update($blockInfo)
 		"permissions = {int:permissions}",
 		"state = {int:state}",
 		"force_view = {int:force_view}",
+		"mobile_view = {int:mobile_view}",
 		"display = {string:display}",
 		"display_custom = {string:display_custom}",
 		"style = {string:style}",

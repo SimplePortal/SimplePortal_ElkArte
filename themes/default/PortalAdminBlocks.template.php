@@ -311,6 +311,14 @@ function template_block_edit()
 
 	echo '
 						<dt>
+							<label for="mobile">', $txt['sp-blocksMobile'], ':</label>
+						</dt>
+						<dd>
+							<input type="checkbox" name="block_mobile" id="mobile" value="1"', $context['SPortal']['block']['mobile_view'] ? ' checked="checked"' : '', ' class="input_check" />
+						</dd>';
+
+	echo '
+						<dt>
 							<label for="block_active">', $txt['sp-blocksActive'], ':</label>
 						</dt>
 						<dd>

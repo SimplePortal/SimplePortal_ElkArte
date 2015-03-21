@@ -53,7 +53,7 @@ function sportal_init($standalone = false)
 	}
 
 	// Portal not enabled, or mobile, or debug, or maintenance, or .... then bow out now
-	if ($context['browser_body_id'] == 'mobile' || !empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')) || isset($_GET['debug']) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
+	if (!empty($modSettings['sp_disableMobile']) || !empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')) || isset($_GET['debug']) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
 	{
 		$context['disable_sp'] = true;
 
@@ -304,6 +304,9 @@ function sportal_load_blocks()
 		if (!$context['SPortal']['sides'][$block['column']]['active'])
 			continue;
 
+		if ($context['browser_body_id'] === 'mobile' && empty($block['mobile_view']))
+			continue;
+
 		$block['style'] = sportal_parse_style('explode', $block['style'], true);
 
 		$context['SPortal']['sides'][$block['column']]['last'] = $block['id'];
@@ -386,7 +389,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 	$request = $db->query('', '
 		SELECT
 			spb.id_block, spb.label, spb.type, spb.col, spb.row, spb.permissions, spb.state,
-			spb.force_view, spb.display, spb.display_custom, spb.style, spp.variable, spp.value
+			spb.force_view, spb.mobile_view, spb.display, spb.display_custom, spb.style, spp.variable, spp.value
 		FROM {db_prefix}sp_blocks AS spb
 			LEFT JOIN {db_prefix}sp_parameters AS spp ON (spp.id_block = spb.id_block)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
@@ -410,6 +413,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 				'permissions' => $row['permissions'],
 				'state' => empty($row['state']) ? 0 : 1,
 				'force_view' => $row['force_view'],
+				'mobile_view' => $row['mobile_view'],
 				'display' => $row['display'],
 				'display_custom' => $row['display_custom'],
 				'style' => $row['style'],
