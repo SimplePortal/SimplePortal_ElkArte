@@ -46,7 +46,7 @@ function sp_call_block($name, $parameters, $id, $return)
  */
 function sp_userInfo($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('User_Info', $parameters, $id, $return_parameters);
+	sp_call_block('UserInfo', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -59,7 +59,7 @@ function sp_userInfo($parameters, $id, $return_parameters = false)
  */
 function sp_latestMember($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Latest_Member', $parameters, $id, $return_parameters);
+	sp_call_block('LatestMember', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -72,7 +72,7 @@ function sp_latestMember($parameters, $id, $return_parameters = false)
  */
 function sp_whosOnline($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Whos_Online', $parameters, $id, $return_parameters);
+	sp_call_block('WhosOnline', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -85,7 +85,7 @@ function sp_whosOnline($parameters, $id, $return_parameters = false)
  */
 function sp_boardStats($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Board_Stats', $parameters, $id, $return_parameters);
+	sp_call_block('BoardStats', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -99,7 +99,7 @@ function sp_boardStats($parameters, $id, $return_parameters = false)
  */
 function sp_topPoster($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Top_Poster', $parameters, $id, $return_parameters);
+	sp_call_block('TopPoster', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -118,7 +118,7 @@ function sp_topPoster($parameters, $id, $return_parameters = false)
  */
 function sp_topStatsMember($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Top_Stats_Member', $parameters, $id, $return_parameters);
+	sp_call_block('TopStatsMember', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -148,7 +148,7 @@ function sp_recent($parameters, $id, $return_parameters = false)
  */
 function sp_topTopics($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Top_Topics', $parameters, $id, $return_parameters);
+	sp_call_block('TopTopics', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -161,7 +161,7 @@ function sp_topTopics($parameters, $id, $return_parameters = false)
  */
 function sp_topBoards($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Top_Boards', $parameters, $id, $return_parameters);
+	sp_call_block('TopBoards', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -176,7 +176,7 @@ function sp_topBoards($parameters, $id, $return_parameters = false)
  */
 function sp_showPoll($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Show_Poll', $parameters, $id, $return_parameters);
+	sp_call_block('ShowPoll', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -194,7 +194,7 @@ function sp_showPoll($parameters, $id, $return_parameters = false)
  */
 function sp_boardNews($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Board_News', $parameters, $id, $return_parameters);
+	sp_call_block('BoardNews', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -206,7 +206,7 @@ function sp_boardNews($parameters, $id, $return_parameters = false)
  */
 function sp_quickSearch($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Quick_Search', $parameters, $id, $return_parameters);
+	sp_call_block('QuickSearch', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -235,7 +235,7 @@ function sp_news($parameters, $id, $return_parameters = false)
  */
 function sp_attachmentImage($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Attachment_Image', $parameters, $id, $return_parameters);
+	sp_call_block('AttachmentImage', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -248,7 +248,7 @@ function sp_attachmentImage($parameters, $id, $return_parameters = false)
  */
 function sp_attachmentRecent($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Attachment_Recent', $parameters, $id, $return_parameters);
+	sp_call_block('AttachmentRecent', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -279,7 +279,7 @@ function sp_calendar($parameters, $id, $return_parameters = false)
  */
 function sp_calendarInformation($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Calendar_Information', $parameters, $id, $return_parameters);
+	sp_call_block('CalendarInformation', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -298,7 +298,7 @@ function sp_calendarInformation($parameters, $id, $return_parameters = false)
  */
 function sp_rssFeed($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Rss_Feed', $parameters, $id, $return_parameters);
+	sp_call_block('RssFeed', $parameters, $id, $return_parameters);
 }
 
 /**
@@ -310,7 +310,7 @@ function sp_rssFeed($parameters, $id, $return_parameters = false)
  */
 function sp_theme_select($parameters, $id, $return_parameters = false)
 {
-	sp_call_block('Theme_Select', $parameters, $id, $return_parameters);
+	sp_call_block('ThemeSelect', $parameters, $id, $return_parameters);
 }
 
 /**

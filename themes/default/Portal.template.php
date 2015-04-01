@@ -228,7 +228,7 @@ function template_block($block, $side = -1)
 
 	// Board news gets special formating, really intended to be at the top of a column
 	// @todo move the sp_boardNews-specific style to the board news template
-	if ($block['type'] === 'Board_News')
+	if ($block['type'] === 'BoardNews')
 	{
 		echo '
 			<div id="sp_block_', $block['id'], '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['sp_articles_index'])) ? '_last' : '', '">';
@@ -243,10 +243,10 @@ function template_block($block, $side = -1)
 	// *** Note to themers ***
 	// If you want to change the template of a specific block, this is the place,
 	// add a condition here to check for the type of the block (pretty much like
-	// above for Board_News), then override the set theme, and return.
+	// above for BoardNews), then override the set theme, and return.
 	// The following is an example of how it could be done.
 	/*
-	if ($block['type'] === 'Whos_Online')
+	if ($block['type'] === 'WhosOnline')
 	{
 		$block['instance']->setTemplate('template_my_custom_whois_online');
 		$block['instance']->render();

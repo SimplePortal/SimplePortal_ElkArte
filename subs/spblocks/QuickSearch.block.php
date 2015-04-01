@@ -20,7 +20,7 @@ if (!defined('ELK'))
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
-class Quick_Search_Block extends SP_Abstract_Block
+class QuickSearch_Block extends SP_Abstract_Block
 {
 	function setup($parameters, $id)
 	{
