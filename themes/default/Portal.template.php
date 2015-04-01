@@ -223,24 +223,37 @@ function template_block($block, $side = -1)
 	global $context, $modSettings, $txt;
 
 	// Make sure that we have some valid block data.
-	if (empty($block) || empty($block['type']))
+	if (empty($block))
 		return;
 
 	// Board news gets special formating, really intended to be at the top of a column
 	// @todo move the sp_boardNews-specific style to the board news template
-	if ($block['type'] === 'sp_boardNews')
+	if ($block['type'] === 'Board_News')
 	{
 		echo '
 			<div id="sp_block_', $block['id'], '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['sp_articles_index'])) ? '_last' : '', '">';
 
-		// @todo Block->render()
-		$block['type']($block['parameters'], $block['id']);
+		$block['instance']->render();
 
 		echo '
 			</div>';
 
 		return;
 	}
+	// *** Note to themers ***
+	// If you want to change the template of a specific block, this is the place,
+	// add a condition here to check for the type of the block (pretty much like
+	// above for Board_News), then override the set theme, and return.
+	// The following is an example of how it could be done.
+	/*
+	if ($block['type'] === 'Whos_Online')
+	{
+		$block['instance']->setTemplate('template_my_custom_whois_online');
+		$block['instance']->render();
+
+		return;
+	}
+	*/
 
 	if (isset($txt['sp_custom_block_title_' . $block['id']]))
 		$block['label'] = $txt['sp_custom_block_title_' . $block['id']];
@@ -283,11 +296,10 @@ function template_block_default($block, $side)
 	echo '
 						<div id="sp_block_' . $block['id'] . '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['sp_articles_index'])) ? '_last' : '', '" ', $block['collapsed'] && empty($block['force_view']) ? ' style="display: none;"' : '', '>
 							<div', empty($block['style']['body']['class']) ? '' : ' class="' . $block['style']['body']['class'] . '"', '>
-								<div class="', $block['type'] != 'sp_menu' ? 'sp_block' : 'sp_content_padding', '"', !empty($block['style']['body']['style']) ? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
+								<div class="', $block['type'] != 'Menu' ? 'sp_block' : 'sp_content_padding', '"', !empty($block['style']['body']['style']) ? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
 
 	// Call the block routine
-	// @todo Block->render()
-	$block['type']($block['parameters'], $block['id']);
+	$block['instance']->render();
 
 	// Close this block up
 	echo '
