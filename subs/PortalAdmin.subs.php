@@ -57,31 +57,23 @@ function sportal_admin_state_change($type, $id)
  */
 function getFunctionInfo($function = null)
 {
-	$db = database();
+	$fs = new GlobIterator(SUBSDIR . '/spblocks/*.block.php');
 
-	$request = $db->query('', '
-		SELECT
-			id_function, name
-		FROM {db_prefix}sp_functions' . (!empty($function) ? '
-		WHERE name = {string:function}' : '') . '
-		ORDER BY function_order',
-		array(
-			'function' => $function,
-		)
-	);
 	$return = array();
-	while ($row = $db->fetch_assoc($request))
+	foreach ($fs as $item)
 	{
-		// You must be an admin to use those functions
-		if ($row['name'] == 'sp_php' && !allowedTo('admin_forum'))
+		$class = str_replace('.block.php', '_Block', $item->getFilename());
+		require_once($item->getPathname());
+
+		$perms = $class::permissionsRequired();
+		if (!allowedTo($perms))
 			continue;
 
 		$return[] = array(
-			'id' => $row['id_function'],
-			'function' => $row['name'],
+			'id' => $class,
+			'function' => str_replace('_Block', '', $class),
 		);
 	}
-	$db->free_result($request);
 
 	return $return;
 }

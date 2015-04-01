@@ -46,6 +46,11 @@ class Php_Block extends SP_Abstract_Block
 
 		$this->setTemplate('template_sp_php');
 	}
+
+	public static function permissionsRequired()
+	{
+		return array('admin_forum');
+	}
 }
 function template_sp_php($data)
 {

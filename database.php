@@ -90,16 +90,6 @@ $sp_tables = array(
 			array('type' => 'primary', 'columns' => array('id_comment')),
 		),
 	),
-	'sp_functions' => array(
-		'columns' => array(
-			array('name' => 'id_function', 'type' => 'tinyint', 'size' => 4, 'auto' => true),
-			array('name' => 'function_order', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
-			array('name' => 'name', 'type' => 'tinytext'),
-		),
-		'indexes' => array(
-			array('type' => 'primary', 'columns' => array('id_function')),
-		),
-	),
 	'sp_pages' => array(
 		'columns' => array(
 			array('name' => 'id_page', 'type' => 'int', 'size' => 10, 'auto' => true),
@@ -177,41 +167,6 @@ $sp_tables = array(
 
 foreach ($sp_tables as $sp_table => $data)
 	$db_table->db_create_table('{db_prefix}' . $sp_table, $data['columns'], $data['indexes'], array(), 'ignore');
-
-$db->insert('ignore',
-	'{db_prefix}sp_functions',
-	array('id_function' => 'int', 'function_order' => 'int', 'name' => 'string'),
-	array(
-		array(1, 1, 'sp_userInfo'),
-		array(2, 2, 'sp_latestMember'),
-		array(3, 3, 'sp_whosOnline'),
-		array(5, 4, 'sp_boardStats'),
-		array(7, 5, 'sp_topPoster'),
-		array(35, 6, 'sp_topStatsMember'),
-		array(23, 7, 'sp_recent'),
-		array(9, 8, 'sp_topTopics'),
-		array(8, 9, 'sp_topBoards'),
-		array(4, 10, 'sp_showPoll'),
-		array(12, 11, 'sp_boardNews'),
-		array(6, 12, 'sp_quickSearch'),
-		array(13, 13, 'sp_news'),
-		array(20, 14, 'sp_attachmentImage'),
-		array(21, 15, 'sp_attachmentRecent'),
-		array(27, 16, 'sp_calendar'),
-		array(24, 17, 'sp_calendarInformation'),
-		array(25, 18, 'sp_rssFeed'),
-		array(28, 19, 'sp_theme_select'),
-		array(29, 20, 'sp_staff'),
-		array(31, 21, 'sp_articles'),
-		array(36, 22, 'sp_shoutbox'),
-		array(26, 23, 'sp_gallery'),
-		array(10, 24, 'sp_menu'),
-		array(19, 98, 'sp_bbc'),
-		array(17, 99, 'sp_html'),
-		array(18, 100, 'sp_php'),
-	),
-	array('id_function')
-);
 
 $result = $db->query('', '
 	SELECT id_block
