@@ -230,20 +230,20 @@ if (empty($has_block))
 <p>All this and SimplePortal has remained Simple! SimplePortal is built for simplicity and ease of use; ensuring the average forum administrator can install SimplePortal, configure a few settings, and show off the brand new portal to the users in minutes. Confusing menus, undesired pre-loaded blocks and settings that cannot be found are all avoided as much as possible. Because when it comes down to it, SimplePortal is YOUR portal, and should reflect your taste as much as possible.</p>';
 
 	$default_blocks = array(
-	'user_info' => array('label' => 'User Info', 'type' => 'sp_userInfo', 'col' => 1, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'whos_online' => array('label' => 'Who&#039;s Online', 'type' => 'sp_whosOnline', 'col' => 1, 'row' => 2, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'board_stats' => array('label' => 'Board Stats', 'type' => 'sp_boardStats', 'col' => 1, 'row' => 3, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'theme_select' => array('label' => 'Theme Select', 'type' => 'sp_theme_select', 'col' => 1, 'row' => 4, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'search' => array('label' => 'Search', 'type' => 'sp_quickSearch', 'col' => 1, 'row' => 5, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'news' => array('label' => 'News', 'type' => 'sp_news', 'col' => 2, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => 'title_default_class~|title_custom_class~|title_custom_style~|body_default_class~windowbg|body_custom_class~|body_custom_style~|no_title~1|no_body~'),
-		'welcome' => array('label' => 'Welcome', 'type' => 'sp_html', 'col' => 2, 'row' => 2, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => 'title_default_class~|title_custom_class~|title_custom_style~|body_default_class~windowbg|body_custom_class~|body_custom_style~|no_title~1|no_body~'),
-		'board_news' => array('label' => 'Board News', 'type' => 'sp_boardNews', 'col' => 2, 'row' => 3, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'recent_topics' => array('label' => 'Recent Topics', 'type' => 'sp_recent', 'col' => 3, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'top_poster' => array('label' => 'Top Poster', 'type' => 'sp_topPoster', 'col' => 4, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'recent_posts' => array('label' => 'Recent Posts', 'type' => 'sp_recent', 'col' => 4, 'row' => 2, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'staff' => array('label' => 'Forum Staff', 'type' => 'sp_staff', 'col' => 4, 'row' => 3, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'calendar' => array('label' => 'Calendar', 'type' => 'sp_calendar', 'col' => 4, 'row' => 4, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'top_boards' => array('label' => 'Top Boards', 'type' => 'sp_topBoards', 'col' => 4, 'row' => 5, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'user_info' => array('label' => 'User Info', 'type' => 'User_Info', 'col' => 1, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'whos_online' => array('label' => 'Who&#039;s Online', 'type' => 'Whos_Online', 'col' => 1, 'row' => 2, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'board_stats' => array('label' => 'Board Stats', 'type' => 'Board_Stats', 'col' => 1, 'row' => 3, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'theme_select' => array('label' => 'Theme Select', 'type' => 'Theme_Select', 'col' => 1, 'row' => 4, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'search' => array('label' => 'Search', 'type' => 'Quick_Search', 'col' => 1, 'row' => 5, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'news' => array('label' => 'News', 'type' => 'News', 'col' => 2, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => 'title_default_class~|title_custom_class~|title_custom_style~|body_default_class~windowbg|body_custom_class~|body_custom_style~|no_title~1|no_body~'),
+		'welcome' => array('label' => 'Welcome', 'type' => 'Html', 'col' => 2, 'row' => 2, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => 'title_default_class~|title_custom_class~|title_custom_style~|body_default_class~windowbg|body_custom_class~|body_custom_style~|no_title~1|no_body~'),
+		'board_news' => array('label' => 'Board News', 'type' => 'Board_News', 'col' => 2, 'row' => 3, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'recent_topics' => array('label' => 'Recent Topics', 'type' => 'Recent', 'col' => 3, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'top_poster' => array('label' => 'Top Poster', 'type' => 'Top_Poster', 'col' => 4, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'recent_posts' => array('label' => 'Recent Posts', 'type' => 'Recent', 'col' => 4, 'row' => 2, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'staff' => array('label' => 'Forum Staff', 'type' => 'Staff', 'col' => 4, 'row' => 3, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'calendar' => array('label' => 'Calendar', 'type' => 'Calendar', 'col' => 4, 'row' => 4, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'top_boards' => array('label' => 'Top Boards', 'type' => 'Top_Boards', 'col' => 4, 'row' => 5, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
 	);
 
 	$db->insert('ignore',
@@ -283,6 +283,49 @@ if (empty($has_block))
 		array('id_block' => 'int', 'variable' => 'text', 'value' => 'text'),
 		$default_parameters,
 		array('id_block', 'variable')
+	);
+}
+
+// From the "old" (pre-classes) to the "new" (blocks as classes) format
+$replace_array = array(
+	'sp_userInfo' => 'User_Info',
+	'sp_latestMember' => 'Latest_Member',
+	'sp_whosOnline' => 'Whos_Online',
+	'sp_boardStats' => 'Board_Stats',
+	'sp_topPoster' => 'Top_Poster',
+	'sp_topStatsMember' => 'Top_Stats_Member',
+	'sp_recent' => 'Recent',
+	'sp_topTopics' => 'Top_Topics',
+	'sp_topBoards' => 'Top_Boards',
+	'sp_showPoll' => 'Show_Poll',
+	'sp_boardNews' => 'Board_News',
+	'sp_quickSearch' => 'Quick_Search',
+	'sp_news' => 'News',
+	'sp_attachmentImage' => 'Attachment_Image',
+	'sp_attachmentRecent' => 'Attachment_Recent',
+	'sp_calendar' => 'Calendar',
+	'sp_calendarInformation' => 'Calendar_Information',
+	'sp_rssFeed' => 'Rss_Feed',
+	'sp_theme_select' => 'Theme_Select',
+	'sp_staff' => 'Staff',
+	'sp_articles' => 'Articles',
+	'sp_shoutbox' => 'Shoutbox',
+	'sp_gallery' => 'Gallery',
+	'sp_menu' => 'Menu',
+	'sp_bbc' => 'Bbc',
+	'sp_html' => 'Html',
+	'sp_php' => 'Php',
+);
+foreach ($replace_array as $from => $to)
+{
+	$db->query('', '
+		UPDATE {db_prefix}sp_blocks
+		SET type = REPLACE(type, {string:from}, {string:to})
+		WHERE type LIKE {string:from}',
+		array(
+			'from' => $from,
+			'to' => $to,
+		)
 	);
 }
 
