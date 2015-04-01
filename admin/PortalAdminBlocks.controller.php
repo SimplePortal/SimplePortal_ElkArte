@@ -266,6 +266,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// Selecting a block to place in to service, load some initial values
 		elseif ($context['SPortal']['is_new'] && !empty($_POST['selected_type']))
 		{
+			$block = sp_instantiate_block($_POST['selected_type'][0]);
 			$context['SPortal']['block'] = array(
 				'id' => 0,
 				'label' => $txt['sp-blocksDefaultLabel'],
@@ -280,7 +281,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'display_custom' => '',
 				'style' => '',
 				'parameters' => !empty($start_parameters) ? $start_parameters : array(),
-				'options' => $_POST['selected_type'][0](array(), false, true),
+				'options' => $block->parameters(),
 				'list_blocks' => !empty($_POST['block_column']) ? getBlockInfo($_POST['block_column']) : array(),
 			);
 		}
@@ -290,8 +291,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$_REQUEST['block_id'] = (int) $_REQUEST['block_id'];
 			$context['SPortal']['block'] = current(getBlockInfo(null, $_REQUEST['block_id']));
 
+			$block = sp_instantiate_block($context['SPortal']['block']['type']);
 			$context['SPortal']['block'] += array(
-				'options' => $context['SPortal']['block']['type'](array(), false, true),
+				'options' => $block->parameters(),
 				'list_blocks' => getBlockInfo($context['SPortal']['block']['column']),
 			);
 		}
@@ -367,6 +369,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				$custom = empty($custom) ? '' : implode(',', $custom);
 			}
 
+			$block = sp_instantiate_block($_POST['block_type']);
 			// Create all the information we know about this block
 			$context['SPortal']['block'] = array(
 				'id' => $_POST['block_id'],
@@ -383,7 +386,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'display_custom' => $custom,
 				'style' => sportal_parse_style('implode'),
 				'parameters' => !empty($_POST['parameters']) ? $_POST['parameters'] : array(),
-				'options' => $_POST['block_type'](array(), false, true),
+				'options' => $block->parameters(),
 				'list_blocks' => getBlockInfo($_POST['block_column']),
 				'collapsed' => false,
 			);
