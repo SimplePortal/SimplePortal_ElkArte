@@ -168,6 +168,49 @@ $sp_tables = array(
 foreach ($sp_tables as $sp_table => $data)
 	$db_table->db_create_table('{db_prefix}' . $sp_table, $data['columns'], $data['indexes'], array(), 'ignore');
 
+// From the "old" (pre-classes) to the "new" (blocks as classes) format
+$replace_array = array(
+	'sp_userInfo' => 'UserInfo',
+	'sp_latestMember' => 'LatestMember',
+	'sp_whosOnline' => 'WhosOnline',
+	'sp_boardStats' => 'BoardStats',
+	'sp_topPoster' => 'TopPoster',
+	'sp_topStatsMember' => 'TopStatsMember',
+	'sp_recent' => 'Recent',
+	'sp_topTopics' => 'TopTopics',
+	'sp_topBoards' => 'TopBoards',
+	'sp_showPoll' => 'ShowPoll',
+	'sp_boardNews' => 'BoardNews',
+	'sp_quickSearch' => 'QuickSearch',
+	'sp_news' => 'News',
+	'sp_attachmentImage' => 'AttachmentImage',
+	'sp_attachmentRecent' => 'AttachmentRecent',
+	'sp_calendar' => 'Calendar',
+	'sp_calendarInformation' => 'CalendarInformation',
+	'sp_rssFeed' => 'RssFeed',
+	'sp_theme_select' => 'ThemeSelect',
+	'sp_staff' => 'Staff',
+	'sp_articles' => 'Articles',
+	'sp_shoutbox' => 'Shoutbox',
+	'sp_gallery' => 'Gallery',
+	'sp_menu' => 'Menu',
+	'sp_bbc' => 'Bbc',
+	'sp_html' => 'Html',
+	'sp_php' => 'Php',
+);
+foreach ($replace_array as $from => $to)
+{
+	$db->query('', '
+		UPDATE {db_prefix}sp_blocks
+		SET type = REPLACE(type, {string:from}, {string:to})
+		WHERE type LIKE {string:from}',
+		array(
+			'from' => $from,
+			'to' => $to,
+		)
+	);
+}
+
 $result = $db->query('', '
 	SELECT id_block
 	FROM {db_prefix}sp_blocks
@@ -238,49 +281,6 @@ if (empty($has_block))
 		array('id_block' => 'int', 'variable' => 'text', 'value' => 'text'),
 		$default_parameters,
 		array('id_block', 'variable')
-	);
-}
-
-// From the "old" (pre-classes) to the "new" (blocks as classes) format
-$replace_array = array(
-	'sp_userInfo' => 'UserInfo',
-	'sp_latestMember' => 'LatestMember',
-	'sp_whosOnline' => 'WhosOnline',
-	'sp_boardStats' => 'BoardStats',
-	'sp_topPoster' => 'TopPoster',
-	'sp_topStatsMember' => 'TopStatsMember',
-	'sp_recent' => 'Recent',
-	'sp_topTopics' => 'TopTopics',
-	'sp_topBoards' => 'TopBoards',
-	'sp_showPoll' => 'ShowPoll',
-	'sp_boardNews' => 'BoardNews',
-	'sp_quickSearch' => 'QuickSearch',
-	'sp_news' => 'News',
-	'sp_attachmentImage' => 'AttachmentImage',
-	'sp_attachmentRecent' => 'AttachmentRecent',
-	'sp_calendar' => 'Calendar',
-	'sp_calendarInformation' => 'CalendarInformation',
-	'sp_rssFeed' => 'RssFeed',
-	'sp_theme_select' => 'ThemeSelect',
-	'sp_staff' => 'Staff',
-	'sp_articles' => 'Articles',
-	'sp_shoutbox' => 'Shoutbox',
-	'sp_gallery' => 'Gallery',
-	'sp_menu' => 'Menu',
-	'sp_bbc' => 'Bbc',
-	'sp_html' => 'Html',
-	'sp_php' => 'Php',
-);
-foreach ($replace_array as $from => $to)
-{
-	$db->query('', '
-		UPDATE {db_prefix}sp_blocks
-		SET type = REPLACE(type, {string:from}, {string:to})
-		WHERE type LIKE {string:from}',
-		array(
-			'from' => $from,
-			'to' => $to,
-		)
 	);
 }
 
