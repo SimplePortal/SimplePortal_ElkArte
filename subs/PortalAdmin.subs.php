@@ -62,7 +62,8 @@ function getFunctionInfo($function = null)
 	$return = array();
 	foreach ($fs as $item)
 	{
-		$class = str_replace('.block.php', '_Block', $item->getFilename());
+		$class = str_replace('.block.php', '_Block', trim(preg_replace('/((?<=)\p{Lu}(?=\p{Ll}))/', '_$1', $item->getFilename()), '_'));
+
 		require_once($item->getPathname());
 
 		$perms = $class::permissionsRequired();

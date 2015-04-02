@@ -20,7 +20,7 @@ if (!defined('ELK'))
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
-class ThemeSelect_Block extends SP_Abstract_Block
+class Theme_Select_Block extends SP_Abstract_Block
 {
 	function setup($parameters, $id)
 	{
