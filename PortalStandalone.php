@@ -42,7 +42,6 @@ require_once($forum_dir . '/SSI.php');
 
 // Its all about the blocks
 require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');
-require_once(SUBSDIR . '/PortalBlocks.subs.php');
 
 // Initialize SP in standalone mode mode
 loadTemplate('Portal', 'portal');

@@ -74,7 +74,6 @@
 		<remove-file name="ADMINDIR/PortalAdminPages.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminShoutbox.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminProfiles.controller.php" />
-		<remove-file name="SUBSDIR/PortalBlocks.subs.php" />
 		<remove-file name="SUBSDIR/Portal.subs.php" />
 		<remove-file name="SUBSDIR/PortalAdmin.subs.php" />
 		<remove-file name="SOURCEDIR/PortalIntegration.subs.php" />
