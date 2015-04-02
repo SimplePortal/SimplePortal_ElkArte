@@ -184,7 +184,7 @@ function template_sp_userInfo($data)
 										</strong> ', $data['karma_value'], '</li>';
 		}
 
-		if ($data['likes_enabled'])
+		if ($data['show_likes'])
 		{
 			echo '
 										<li ', sp_embed_class('dot'), '>
