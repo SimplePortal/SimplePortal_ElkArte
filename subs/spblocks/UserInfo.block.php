@@ -28,11 +28,14 @@ class UserInfo_Block extends SP_Abstract_Block
 
 		$this->data['session_id'] = $context['session_id'];
 		$this->data['session_var'] = $context['session_var'];
-		$this->data['tokens'] = array(
-			'login_var' => $context['login_token_var'],
-			'login' => $context['login_token']
-		);
-		$this->data['username'] = !empty($user_info['username']) ? $user_info['user_name'] : '';
+		if (isset($context['login_token_var']))
+		{
+			$this->data['tokens'] = array(
+				'login_var' => $context['login_token_var'],
+				'login' => $context['login_token']
+			);
+		}
+		$this->data['username'] = !empty($user_info['username']) ? $user_info['username'] : '';
 		$this->data['urls'] = array(
 			'pm' => $scripturl. '?action=pm',
 			'login' => $scripturl . '?action=login2;quicklogin',
@@ -42,7 +45,7 @@ class UserInfo_Block extends SP_Abstract_Block
 			'unreadreplies' => $scripturl . '?action=unreadreplies',
 		);
 
-		if ($context['user']['is_guest'])
+		if ($user_info['is_guest'])
 		{
 			loadJavascriptFile('sha256.js');
 			$this->data['is_guest'] = true;
@@ -63,8 +66,8 @@ class UserInfo_Block extends SP_Abstract_Block
 			if ($this->data['member_info']['can_pm'])
 			{
 				$this->data['member_info']['pm'] = array(
-					'messages' => $context['user']['messages'],
-					'unread' => $context['user']['unread_messages'],
+					'messages' => $user_info['messages'],
+					'unread' => $user_info['unread_messages'],
 				);
 			}
 
