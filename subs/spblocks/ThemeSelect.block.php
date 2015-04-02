@@ -60,17 +60,17 @@ class ThemeSelect_Block extends SP_Abstract_Block
 			$settings['images_url'] = &$theme_data['images_url'];
 
 			// Set the description in thier language if available
-			if (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php'))
-				include($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php');
-			elseif (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php'))
-				include($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php');
+			if (file_exists($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php'))
+				include($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php');
+			elseif (file_exists($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php'))
+				include($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php');
 			else
 			{
 				$txt['theme_thumbnail_href'] = $theme_data['images_url'] . '/thumbnail.png';
 				$txt['theme_description'] = '';
 			}
 
-			$available_themes[$id_theme]['thumbnail_href'] = $txt['theme_thumbnail_href'];
+			$available_themes[$id_theme]['thumbnail_href'] = str_replace('{images_url}', $settings['images_url'], $txt['theme_thumbnail_href']);
 			$available_themes[$id_theme]['description'] = $txt['theme_description'];
 
 			// Set the name, keep it short so it does not break our list
