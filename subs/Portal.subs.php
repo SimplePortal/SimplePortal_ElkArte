@@ -303,10 +303,13 @@ function sportal_load_blocks()
 	// @todo instantiate the blocks and do the Block->setup()
 	foreach ($blocks as $block)
 	{
-		if (!$context['SPortal']['sides'][$block['column']]['active'])
+		if (!$context['SPortal']['sides'][$block['column']]['active'] || empty($block['type']))
 			continue;
 
 		$block['style'] = sportal_parse_style('explode', $block['style'], true);
+
+		$block['instance'] = sp_instantiate_block($block['type']);
+		$block['instance']->setup($block['parameters'], $block['id']);
 
 		$context['SPortal']['sides'][$block['column']]['last'] = $block['id'];
 		$context['SPortal']['blocks'][$block['column']][] = $block;
@@ -319,6 +322,31 @@ function sportal_load_blocks()
 
 		$context['SPortal']['sides'][$side['id']]['collapsed'] = $context['user']['is_guest'] ? !empty($_COOKIE['sp_' . $side['name']]) : !empty($options['sp_' . $side['name']]);
 	}
+}
+
+/**
+ * Just a shortcut that takes care of instantiate the block and return the instance
+ *
+ * @param string $name The name of the block (without "_Block" at the end)
+ */
+function sp_instantiate_block($name)
+{
+	static $instances = array();
+	static $db = null;
+
+	if ($db === null)
+		$db = database();
+
+	if (!isset($instances[$name]))
+	{
+		require_once(SUBSDIR . '/spblocks/' . str_replace('_', '', $name) . '.block.php');
+		$class = $name . '_Block';
+		$instances[$name] = new $class($db);
+	}
+
+	$instance = $instances[$name];
+
+	return $instance;
 }
 
 /**

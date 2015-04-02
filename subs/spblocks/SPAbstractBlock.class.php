@@ -45,4 +45,9 @@ abstract class SP_Abstract_Block // implements Sp_Block
 		if (is_callable($this->template))
 			call_user_func_array($this->template, array($this->data));
 	}
+
+	public static function permissionsRequired()
+	{
+		return array();
+	}
 }

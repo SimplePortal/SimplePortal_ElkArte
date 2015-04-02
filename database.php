@@ -90,16 +90,6 @@ $sp_tables = array(
 			array('type' => 'primary', 'columns' => array('id_comment')),
 		),
 	),
-	'sp_functions' => array(
-		'columns' => array(
-			array('name' => 'id_function', 'type' => 'tinyint', 'size' => 4, 'auto' => true),
-			array('name' => 'function_order', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
-			array('name' => 'name', 'type' => 'tinytext'),
-		),
-		'indexes' => array(
-			array('type' => 'primary', 'columns' => array('id_function')),
-		),
-	),
 	'sp_pages' => array(
 		'columns' => array(
 			array('name' => 'id_page', 'type' => 'int', 'size' => 10, 'auto' => true),
@@ -178,40 +168,48 @@ $sp_tables = array(
 foreach ($sp_tables as $sp_table => $data)
 	$db_table->db_create_table('{db_prefix}' . $sp_table, $data['columns'], $data['indexes'], array(), 'ignore');
 
-$db->insert('ignore',
-	'{db_prefix}sp_functions',
-	array('id_function' => 'int', 'function_order' => 'int', 'name' => 'string'),
-	array(
-		array(1, 1, 'sp_userInfo'),
-		array(2, 2, 'sp_latestMember'),
-		array(3, 3, 'sp_whosOnline'),
-		array(5, 4, 'sp_boardStats'),
-		array(7, 5, 'sp_topPoster'),
-		array(35, 6, 'sp_topStatsMember'),
-		array(23, 7, 'sp_recent'),
-		array(9, 8, 'sp_topTopics'),
-		array(8, 9, 'sp_topBoards'),
-		array(4, 10, 'sp_showPoll'),
-		array(12, 11, 'sp_boardNews'),
-		array(6, 12, 'sp_quickSearch'),
-		array(13, 13, 'sp_news'),
-		array(20, 14, 'sp_attachmentImage'),
-		array(21, 15, 'sp_attachmentRecent'),
-		array(27, 16, 'sp_calendar'),
-		array(24, 17, 'sp_calendarInformation'),
-		array(25, 18, 'sp_rssFeed'),
-		array(28, 19, 'sp_theme_select'),
-		array(29, 20, 'sp_staff'),
-		array(31, 21, 'sp_articles'),
-		array(36, 22, 'sp_shoutbox'),
-		array(26, 23, 'sp_gallery'),
-		array(10, 24, 'sp_menu'),
-		array(19, 98, 'sp_bbc'),
-		array(17, 99, 'sp_html'),
-		array(18, 100, 'sp_php'),
-	),
-	array('id_function')
+// From the "old" (pre-classes) to the "new" (blocks as classes) format
+$replace_array = array(
+	'sp_userInfo' => 'UserInfo',
+	'sp_latestMember' => 'LatestMember',
+	'sp_whosOnline' => 'WhosOnline',
+	'sp_boardStats' => 'BoardStats',
+	'sp_topPoster' => 'TopPoster',
+	'sp_topStatsMember' => 'TopStatsMember',
+	'sp_recent' => 'Recent',
+	'sp_topTopics' => 'TopTopics',
+	'sp_topBoards' => 'TopBoards',
+	'sp_showPoll' => 'ShowPoll',
+	'sp_boardNews' => 'BoardNews',
+	'sp_quickSearch' => 'QuickSearch',
+	'sp_news' => 'News',
+	'sp_attachmentImage' => 'AttachmentImage',
+	'sp_attachmentRecent' => 'AttachmentRecent',
+	'sp_calendar' => 'Calendar',
+	'sp_calendarInformation' => 'CalendarInformation',
+	'sp_rssFeed' => 'RssFeed',
+	'sp_theme_select' => 'ThemeSelect',
+	'sp_staff' => 'Staff',
+	'sp_articles' => 'Articles',
+	'sp_shoutbox' => 'Shoutbox',
+	'sp_gallery' => 'Gallery',
+	'sp_menu' => 'Menu',
+	'sp_bbc' => 'Bbc',
+	'sp_html' => 'Html',
+	'sp_php' => 'Php',
 );
+foreach ($replace_array as $from => $to)
+{
+	$db->query('', '
+		UPDATE {db_prefix}sp_blocks
+		SET type = REPLACE(type, {string:from}, {string:to})
+		WHERE type LIKE {string:from}',
+		array(
+			'from' => $from,
+			'to' => $to,
+		)
+	);
+}
 
 $result = $db->query('', '
 	SELECT id_block
@@ -230,20 +228,20 @@ if (empty($has_block))
 <p>All this and SimplePortal has remained Simple! SimplePortal is built for simplicity and ease of use; ensuring the average forum administrator can install SimplePortal, configure a few settings, and show off the brand new portal to the users in minutes. Confusing menus, undesired pre-loaded blocks and settings that cannot be found are all avoided as much as possible. Because when it comes down to it, SimplePortal is YOUR portal, and should reflect your taste as much as possible.</p>';
 
 	$default_blocks = array(
-	'user_info' => array('label' => 'User Info', 'type' => 'sp_userInfo', 'col' => 1, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'whos_online' => array('label' => 'Who&#039;s Online', 'type' => 'sp_whosOnline', 'col' => 1, 'row' => 2, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'board_stats' => array('label' => 'Board Stats', 'type' => 'sp_boardStats', 'col' => 1, 'row' => 3, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'theme_select' => array('label' => 'Theme Select', 'type' => 'sp_theme_select', 'col' => 1, 'row' => 4, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'search' => array('label' => 'Search', 'type' => 'sp_quickSearch', 'col' => 1, 'row' => 5, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'news' => array('label' => 'News', 'type' => 'sp_news', 'col' => 2, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => 'title_default_class~|title_custom_class~|title_custom_style~|body_default_class~windowbg|body_custom_class~|body_custom_style~|no_title~1|no_body~'),
-		'welcome' => array('label' => 'Welcome', 'type' => 'sp_html', 'col' => 2, 'row' => 2, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => 'title_default_class~|title_custom_class~|title_custom_style~|body_default_class~windowbg|body_custom_class~|body_custom_style~|no_title~1|no_body~'),
-		'board_news' => array('label' => 'Board News', 'type' => 'sp_boardNews', 'col' => 2, 'row' => 3, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'recent_topics' => array('label' => 'Recent Topics', 'type' => 'sp_recent', 'col' => 3, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'top_poster' => array('label' => 'Top Poster', 'type' => 'sp_topPoster', 'col' => 4, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'recent_posts' => array('label' => 'Recent Posts', 'type' => 'sp_recent', 'col' => 4, 'row' => 2, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'staff' => array('label' => 'Forum Staff', 'type' => 'sp_staff', 'col' => 4, 'row' => 3, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'calendar' => array('label' => 'Calendar', 'type' => 'sp_calendar', 'col' => 4, 'row' => 4, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
-		'top_boards' => array('label' => 'Top Boards', 'type' => 'sp_topBoards', 'col' => 4, 'row' => 5, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'user_info' => array('label' => 'User Info', 'type' => 'UserInfo', 'col' => 1, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'whos_online' => array('label' => 'Who&#039;s Online', 'type' => 'WhosOnline', 'col' => 1, 'row' => 2, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'board_stats' => array('label' => 'Board Stats', 'type' => 'BoardStats', 'col' => 1, 'row' => 3, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'theme_select' => array('label' => 'Theme Select', 'type' => 'ThemeSelect', 'col' => 1, 'row' => 4, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'search' => array('label' => 'Search', 'type' => 'QuickSearch', 'col' => 1, 'row' => 5, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'news' => array('label' => 'News', 'type' => 'News', 'col' => 2, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => 'title_default_class~|title_custom_class~|title_custom_style~|body_default_class~windowbg|body_custom_class~|body_custom_style~|no_title~1|no_body~'),
+		'welcome' => array('label' => 'Welcome', 'type' => 'Html', 'col' => 2, 'row' => 2, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => 'title_default_class~|title_custom_class~|title_custom_style~|body_default_class~windowbg|body_custom_class~|body_custom_style~|no_title~1|no_body~'),
+		'board_news' => array('label' => 'Board News', 'type' => 'BoardNews', 'col' => 2, 'row' => 3, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'recent_topics' => array('label' => 'Recent Topics', 'type' => 'Recent', 'col' => 3, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'top_poster' => array('label' => 'Top Poster', 'type' => 'TopPoster', 'col' => 4, 'row' => 1, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'recent_posts' => array('label' => 'Recent Posts', 'type' => 'Recent', 'col' => 4, 'row' => 2, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'staff' => array('label' => 'Forum Staff', 'type' => 'Staff', 'col' => 4, 'row' => 3, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'calendar' => array('label' => 'Calendar', 'type' => 'Calendar', 'col' => 4, 'row' => 4, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
+		'top_boards' => array('label' => 'Top Boards', 'type' => 'TopBoards', 'col' => 4, 'row' => 5, 'permissions' => 3, 'display' => '', 'display_custom' => '', 'style' => ''),
 	);
 
 	$db->insert('ignore',
