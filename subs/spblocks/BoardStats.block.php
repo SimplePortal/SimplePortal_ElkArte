@@ -21,7 +21,7 @@ if (!defined('ELK'))
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
-class BoardStats_Block extends SP_Abstract_Block
+class Board_Stats_Block extends SP_Abstract_Block
 {
 	protected $total_days_up = 0;
 

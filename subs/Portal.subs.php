@@ -72,7 +72,6 @@ function sportal_init($standalone = false)
 	if (!$standalone)
 	{
 		require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');
-		require_once(SUBSDIR . '/PortalBlocks.subs.php');
 
 		// Not running via ssi then we need to get SSI for its functions
 		if (ELK !== 'SSI')

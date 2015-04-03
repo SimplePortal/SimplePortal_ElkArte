@@ -47,22 +47,32 @@ function sportal_admin_state_change($type, $id)
 }
 
 /**
- * Fetches all the functions (blocks) in the system
+ * Fetches all the classes (blocks) in the system
  *
  * - if supplied a name gets just that functions id
- * - returns the functions in the order specifed in the table
- * - will not return sp_php to non admins for security
+ * - returns the functions in the order found in the file system
+ * - will not return blocks according to block setting for security reasons
  *
  * @param string|null $function
  */
 function getFunctionInfo($function = null)
 {
-	$fs = new GlobIterator(SUBSDIR . '/spblocks/*.block.php');
+	if ($function !== null)
+	{
+		// Replace dots with nothing to avoid security issues
+		$function = strtr($function, array('.' => ''));
+		$pattern = SUBSDIR . '/spblocks/' . $function . '.block.php';
+	}
+	else
+		$pattern = SUBSDIR . '/spblocks/*.block.php';
+
+	$fs = new GlobIterator($pattern);
 
 	$return = array();
 	foreach ($fs as $item)
 	{
-		$class = str_replace('.block.php', '_Block', $item->getFilename());
+		$class = str_replace('.block.php', '_Block', trim(preg_replace('/((?<=)\p{Lu}(?=\p{Ll}))/', '_$1', $item->getFilename()), '_'));
+
 		require_once($item->getPathname());
 
 		$perms = $class::permissionsRequired();
@@ -75,7 +85,7 @@ function getFunctionInfo($function = null)
 		);
 	}
 
-	return $return;
+	return $function === null ? $return : current($return);
 }
 
 /**

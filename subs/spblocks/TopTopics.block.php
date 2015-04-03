@@ -22,7 +22,7 @@ if (!defined('ELK'))
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
-class TopTopics_Block extends SP_Abstract_Block
+class Top_Topics_Block extends SP_Abstract_Block
 {
 	public function __construct($db = null)
 	{
