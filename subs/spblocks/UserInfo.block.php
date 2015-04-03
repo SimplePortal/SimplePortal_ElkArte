@@ -49,7 +49,7 @@ class User_Info_Block extends SP_Abstract_Block
 		{
 			loadJavascriptFile('sha256.js');
 			$this->data['is_guest'] = true;
-			$this->data['disable_login_hashing'] = $context['disable_login_hashing'];
+			$this->data['disable_login_hashing'] = !empty($context['disable_login_hashing']);
 			$this->data['welcome_msg'] = replaceBasicActionUrl($txt[$context['can_register'] ? 'welcome_guest_register' : 'welcome_guest']);
 		}
 		else
