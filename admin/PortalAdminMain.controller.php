@@ -57,7 +57,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		loadCSSFile('portal.css');
 
 		// Load the Simple Portal Help file.
-		loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
+		loadLanguage('SPortalHelp');
 
 		$subActions = array(
 			'information' => array($this, 'action_information'),

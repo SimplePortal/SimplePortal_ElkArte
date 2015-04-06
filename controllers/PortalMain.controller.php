@@ -103,7 +103,7 @@ class Sportal_Controller extends Action_Controller
 	 */
 	public function action_sportal_credits()
 	{
-		loadLanguage('SPortalAdmin', sp_languageSelect('SPortalAdmin'));
+		loadLanguage('SPortalAdmin');
 
 		require_once(ADMINDIR . '/PortalAdminMain.controller.php');
 		$adminmain = new ManagePortalConfig_Controller();

@@ -420,7 +420,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			if ($context['SPortal']['block']['type'] == 'sp_php' && !allowedTo('admin_forum'))
 				fatal_lang_error('cannot_admin_forum', false);
 
-			loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
+			loadLanguage('SPortalHelp');
 
 			// Load up the permissions
 			$context['SPortal']['block']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');

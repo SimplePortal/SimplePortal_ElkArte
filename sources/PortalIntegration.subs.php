@@ -42,8 +42,8 @@ function sp_integrate_admin_areas(&$admin_areas)
 	global $txt;
 
 	require_once(SUBSDIR . '/Portal.subs.php');
-	loadLanguage('SPortalAdmin', sp_languageSelect('SPortal'));
-	loadLanguage('SPortal', sp_languageSelect('SPortal'));
+	loadLanguage('SPortalAdmin');
+	loadLanguage('SPortal');
 
 	$temp = $admin_areas;
 	$admin_areas = array();
@@ -201,7 +201,7 @@ function sp_integrate_whos_online($actions)
 	$data = null;
 
 	require_once(SUBSDIR . '/Portal.subs.php');
-	loadLanguage('SPortal', sp_languageSelect('SPortal'));
+	loadLanguage('SPortal');
 
 	// This may miss if its needed for the first action ... need to improve the hook or find another location
 	if ($modSettings['sp_portal_mode'] == 1)
@@ -352,8 +352,8 @@ function sp_integrate_quickhelp()
 	require_once (SUBSDIR . '/Portal.subs.php');
 
 	// Load the Simple Portal Help file.
-	loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
-	loadLanguage('SPortalAdmin', sp_languageSelect('SPortal'));
+	loadLanguage('SPortalHelp');
+	loadLanguage('SPortalAdmin');
 }
 
 /**
@@ -406,7 +406,7 @@ function sp_integrate_menu_buttons(&$buttons)
 	global $txt, $scripturl, $modSettings, $context;
 
 	require_once(SUBSDIR . '/Portal.subs.php');
-	loadLanguage('SPortal', sp_languageSelect('SPortal'));
+	loadLanguage('SPortal');
 
 	// Set the right portalurl based on what integration mode the portal is using
 	if ($modSettings['sp_portal_mode'] == 1 && empty($context['disable_sp']))

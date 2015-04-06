@@ -41,7 +41,7 @@ function sportal_init($standalone = false)
 			loadCSSFile('portal_rtl.css');
 
 		if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], array('admin', 'helpadmin')))
-			loadLanguage('SPortalAdmin', sp_languageSelect('SPortalAdmin'));
+			loadLanguage('SPortalAdmin');
 
 		if (!isset($settings['sp_images_url']))
 		{
@@ -79,7 +79,7 @@ function sportal_init($standalone = false)
 
 		// Portal specific templates and language
 		loadTemplate('Portal');
-		loadLanguage('SPortal', sp_languageSelect('SPortal'));
+		loadLanguage('SPortal');
 
 		if (!empty($modSettings['sp_maintenance']) && !allowedTo('sp_admin'))
 			$modSettings['sp_portal_mode'] = 0;
@@ -683,75 +683,6 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 }
 
 /**
- * This is a simple function that returns nothing if the language file exist and english if it does not exist
- * This will help to make it possible to load each time the english language!
- *
- * @param string $template_name
- */
-function sp_languageSelect($template_name)
-{
-	global $user_info, $language, $settings;
-	static $already_loaded = array();
-
-	if (isset($already_loaded[$template_name]))
-		return $already_loaded[$template_name];
-
-	$lang = isset($user_info['language']) ? $user_info['language'] : $language;
-
-	// Make sure we have $settings - if not we're in trouble and need to find it!
-	if (empty($settings['default_theme_dir']))
-		loadEssentialThemeData();
-
-	// For each file open it up and write it out!
-	$allTemplatesExists = array();
-	foreach (explode('+', $template_name) as $template)
-	{
-		// Obviously, the current theme is most important to check.
-		$attempts = array(
-			array($settings['theme_dir'], $template, $lang, $settings['theme_url']),
-			array($settings['theme_dir'], $template, $language, $settings['theme_url']),
-		);
-
-		// Do we have a base theme to worry about?
-		if (isset($settings['base_theme_dir']))
-		{
-			$attempts[] = array($settings['base_theme_dir'], $template, $lang, $settings['base_theme_url']);
-			$attempts[] = array($settings['base_theme_dir'], $template, $language, $settings['base_theme_url']);
-		}
-
-		// Fallback on the default theme if necessary.
-		$attempts[] = array($settings['default_theme_dir'], $template, $lang, $settings['default_theme_url']);
-		$attempts[] = array($settings['default_theme_dir'], $template, $language, $settings['default_theme_url']);
-
-		// Try to find the language file.
-		$allTemplatesExists[$template] = false;
-		$already_loaded[$template] = 'english';
-		foreach ($attempts as $k => $file)
-		{
-			if (file_exists($file[0] . '/languages/' . $file[2] . '/' . $file[1] . '.' . $file[2] . '.php'))
-			{
-				$already_loaded[$template] = '';
-				$allTemplatesExists[$template] = true;
-				break;
-			}
-		}
-	}
-
-	// So all need to be true that it work ;)
-	foreach ($allTemplatesExists as $exist)
-		if (!$exist)
-		{
-			$already_loaded[$template_name] = 'english';
-			return 'english';
-		}
-
-	// Everthing is fine, let's go back :D
-	$already_loaded[$template_name] = '';
-
-	return '';
-}
-
-/**
  * Loads a set of calendar data, holdays, birthdays, events
  *
  * @param string $type type of data to load, events, birthdays, etc
@@ -902,7 +833,7 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 	global $modSettings, $settings, $txt;
 	static $default_alt, $randomizer;
 
-	loadLanguage('SPortal', sp_languageSelect('SPortal'));
+	loadLanguage('SPortal');
 
 	// Some default alt text settings for our standard images
 	if (!isset($default_alt))
@@ -961,7 +892,7 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 	global $modSettings, $txt;
 	static $default_title, $randomizer;
 
-	loadLanguage('SPortal', sp_languageSelect('SPortal'));
+	loadLanguage('SPortal');
 
 	// Some default title text settings for our standard sprites
 	if (!isset($default_title))
