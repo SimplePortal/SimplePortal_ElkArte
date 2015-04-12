@@ -7,7 +7,7 @@
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
- * @version 2.4.1
+ * @version 2.4.3
  */
 
 if (!defined('ELK'))

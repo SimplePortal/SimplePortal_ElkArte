@@ -342,13 +342,13 @@ if (empty($modSettings['sp_version']) || $modSettings['sp_version'] < '2.4.1')
 }
 
 // Update the block table to include the mobile column if needed
-$request = $db->query('', 'SHOW FIELDS FROM {db_prefix}blocks');
+$request = $db->query('', 'SHOW FIELDS FROM {db_prefix}sp_blocks');
 $fields = array();
 while ($row = $db->fetch_assoc($request))
 	$fields[] = $row['Field'];
 $db->free_result($request);
 if (!in_array('mobile_view', $fields))
-	$db->query('', 'ALTER TABLE {db_prefix}media ADD mobile_view INT NOT NULL DEFAULT "0"');
+	$db->query('', 'ALTER TABLE {db_prefix}sp_blocks ADD mobile_view TINYINT NOT NULL DEFAULT "0"');
 
 if (ELK == 'SSI')
 	echo 'Database changes were carried out successfully.';

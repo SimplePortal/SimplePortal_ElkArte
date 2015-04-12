@@ -8,16 +8,16 @@
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
  *
- * @version 2.4.2
+ * @version 2.4.3
  */
 -->
 <package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
 	<name>SimplePortal</name>
-	<version>2.4.2</version>
+	<version>2.4.3</version>
 	<type>modification</type>
 	<install for="1.0.2 - 1.0.99">
-		<readme type="inline">This will install SimplePortal 2.4.1 for Elkarte.</readme>
+		<readme type="inline">This will install SimplePortal 2.4.3 for Elkarte.</readme>
 		<modification>modification.xml</modification>
 		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
 		<require-dir name="sources" destination="BOARDDIR" />
