@@ -26,6 +26,11 @@ if (!defined('ELK'))
  */
 class Recent_Block extends SP_Abstract_Block
 {
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -38,7 +43,15 @@ class Recent_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $color_profile;
 
@@ -71,6 +84,11 @@ class Recent_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_recent($data)
 {
 	global $txt, $scripturl;
@@ -91,7 +109,7 @@ function template_sp_recent($data)
 								', $item['new'] ? '' : ' <a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
 								<a href="', $item['href'], '">', $item['subject'], '</a>
 								<span class="smalltext">', $txt['by'], ' ', $item['poster']['link'],
-								'<br />[', $item['time'], ']</span>
+								'<br />[', $item['time'], '] ', $txt['in'], ' <em>', $item['board']['link'], '</em></span>
 								<br />', empty($item['is_last']) ? '<hr />' : '';
 	}
 	elseif ($data['display'] == 'full')

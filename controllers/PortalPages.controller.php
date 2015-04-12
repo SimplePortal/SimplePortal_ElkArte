@@ -72,7 +72,7 @@ class Pages_Controller extends Action_Controller
 		if (empty($context['SPortal']['page']['id']))
 			fatal_lang_error('error_sp_page_not_found', false);
 
-		// Fetch any style assocated with the page
+		// Fetch any style associated with the page
 		$context['SPortal']['page']['style'] = sportal_parse_style('explode', $context['SPortal']['page']['style'], true);
 
 		// Prepare the body

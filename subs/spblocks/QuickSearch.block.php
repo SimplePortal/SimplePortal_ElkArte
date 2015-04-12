@@ -22,13 +22,26 @@ if (!defined('ELK'))
  */
 class Quick_Search_Block extends SP_Abstract_Block
 {
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		// @todo isn't the search subject to verification?
 		$this->setTemplate('template_sp_quickSearch');
 	}
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_quickSearch($data)
 {
 	global $txt, $scripturl;

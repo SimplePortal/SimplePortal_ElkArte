@@ -31,6 +31,11 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 {
 	protected $sp_topStatsSystem = array();
 
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		global $txt, $modSettings;
@@ -154,7 +159,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'name' => 'Likes Totals',
 				'field' => 'mem.likes_received, mem.likes_given',
 				'order' => 'mem.likes_received',
-				'output_text' => $txt['sp_topStatsMember_Likes_Received'] . ':&nbsp;%likes_received%' . ' / ' . $txt['sp_topStatsMember_Likes_Given'] . ':&nbsp;%likes_given%',
+				'output_text' => $txt['sp_topStatsMember_Likes_Received'] . ':&nbsp;%likes_received% / ' . $txt['sp_topStatsMember_Likes_Given'] . ':&nbsp;%likes_given%',
 				'enabled' => !empty($modSettings['likes_enabled']),
 				'error_msg' => $txt['sp_likes_is_disabled'],
 			),
@@ -163,6 +168,14 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
 	public function setup($parameters, $id)
 	{
 		global $context, $scripturl, $user_info, $user_info, $modSettings, $color_profile;
@@ -188,6 +201,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				$this->setTemplate('template_sp_topStatsMember_error');
 				$this->data['error_msg'] = $current_system['error_msg'];
 			}
+
 			return;
 		}
 
@@ -225,7 +239,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 		else
 			$where = "";
 
-		// Finaly make the query with the parameters we built
+		// Finally make the query with the parameters we built
 		$request = $this->_db->query('', '
 			SELECT
 				mem.id_member, mem.real_name, mem.avatar, mem.email_address,
@@ -238,7 +252,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 			LIMIT {int:limit}',
 			array(
 				// Prevent delete of user if the cache was available
-				'limit' => $context['common_stats']['total_members'] > 100 ? ($limit + 5) : $limit,
+				'limit' => isset($context['common_stats']['total_members']) && $context['common_stats']['total_members'] > 100 ? ($limit + 5) : $limit,
 				'field' => $current_system['field'],
 				'where' => $where,
 				'order' => $current_system['order'],
@@ -291,7 +305,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 		$this->_db->free_result($request);
 
 		// Update the cache, at least around 100 members are needed for a good working version
-		if (empty($modSettings['sp_disableChache']) && $context['common_stats']['total_members'] > 0 && !empty($chache_member_ids) && count($chache_member_ids) > $limit && empty($modSettings[$chache_id]))
+		if (empty($modSettings['sp_disableChache']) && isset($context['common_stats']['total_members']) && $context['common_stats']['total_members'] > 0 && !empty($chache_member_ids) && count($chache_member_ids) > $limit && empty($modSettings[$chache_id]))
 		{
 			$toCache = array($type, $limit, ($sort_asc ? 1 : 0), time(), implode(',', $chache_member_ids));
 			updateSettings(array($chache_id => implode(';', $toCache)));
@@ -312,11 +326,21 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Error template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_topStatsMember_error($data)
 {
 	echo $data['error_msg'];
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_topStatsMember($data)
 {
 	global $scripturl, $txt;

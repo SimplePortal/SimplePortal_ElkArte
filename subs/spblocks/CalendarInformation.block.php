@@ -26,6 +26,11 @@ if (!defined('ELK'))
  */
 class Calendar_Information_Block extends SP_Abstract_Block
 {
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -38,7 +43,15 @@ class Calendar_Information_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $txt;
 
@@ -70,7 +83,7 @@ class Calendar_Information_Block extends SP_Abstract_Block
 		// Load calendar events
 		if ($show_event)
 		{
-			// Just todays events or looking forward a few days?
+			// Just today's events or looking forward a few days?
 			if (!empty($event_future))
 				$event_future_date = date("Y-m-d", ($now + $event_future * 86400));
 			else
@@ -105,7 +118,7 @@ class Calendar_Information_Block extends SP_Abstract_Block
 			}
 		}
 
-		// Load in todays birthdays
+		// Load in today's birthdays
 		if ($show_birthday)
 		{
 			$this->data['calendar']['todayBirthdays'] = current(sp_loadCalendarData('getBirthdays', $today_date));
@@ -131,12 +144,22 @@ class Calendar_Information_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Error template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_calendarInformation_error($data)
 {
 		echo '
 								', $data['error_msg'];
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_calendarInformation($data)
 {
 	global $txt, $scripturl;

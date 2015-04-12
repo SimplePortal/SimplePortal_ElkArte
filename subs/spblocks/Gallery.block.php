@@ -25,6 +25,11 @@ if (!defined('ELK'))
  */
 class Gallery_Block extends SP_Abstract_Block
 {
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -36,7 +41,15 @@ class Gallery_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $scripturl, $txt, $scripturl, $modSettings;
 
@@ -66,6 +79,11 @@ class Gallery_Block extends SP_Abstract_Block
 		}
 	}
 
+	/**
+	 * Returns of list of gallerys that this block can work with
+	 *
+	 * @return string
+	 */
 	protected function _getGallery()
 	{
 		// right now we only know about one gallery, but more may be added,
@@ -78,9 +96,15 @@ class Gallery_Block extends SP_Abstract_Block
 		return $mod;
 	}
 
+	/**
+	 * Load a set of media items from the gallery
+	 *
+	 * @param int $limit
+	 * @param string $type
+	 */
 	protected function _getItems($limit, $type)
 	{
-		if ($this->data['mod'] == 'aeva_media')
+		if ($this->data['mod'] === 'aeva_media')
 		{
 			require_once(SUBSDIR . '/Aeva-Subs.php');
 
@@ -89,12 +113,22 @@ class Gallery_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Error template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_gallery_error($data)
 {
 		echo '
 								', $data['error_msg'];
 }
 
+/**
+ * Main template for aeva block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_gallery_aeva_media($item, $data)
 {
 	global $scripturl, $txt;
@@ -109,6 +143,11 @@ function template_sp_gallery_aeva_media($item, $data)
 												', $txt['aeva_in_album'], ': <a href="', $scripturl, '?action=media;sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>';
 }
 
+/**
+ * Main wrapper template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_gallery($data)
 {
 	// We have gallery items to show!

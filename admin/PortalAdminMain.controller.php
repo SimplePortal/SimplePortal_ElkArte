@@ -156,6 +156,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 			array('check', 'sp_disable_php_validation', 'subtext' => $txt['sp_disable_php_validation_desc']),
 			array('check', 'sp_disable_side_collapse'),
 			array('check', 'sp_resize_images'),
+			array('check', 'sp_disableMobile'),
 		);
 
 		return $this->_generalSettingsForm->settings($config_vars);

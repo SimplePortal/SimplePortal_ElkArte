@@ -25,6 +25,11 @@ if (!defined('ELK'))
  */
 class Calendar_Block extends SP_Abstract_Block
 {
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -36,7 +41,15 @@ class Calendar_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $modSettings, $options, $scripturl, $txt;
 
@@ -56,7 +69,13 @@ class Calendar_Block extends SP_Abstract_Block
 			'show_birthdays' => !empty($parameters['birthdays']),
 			'show_holidays' => !empty($parameters['holidays']),
 		);
-		$this->data['calendar'] = getCalendarGrid($this->data['curPage']['month'], $this->data['curPage']['year'], $calendarOptions);
+
+		// Check cache or fetch
+		if (($this->data['calendar'] = cache_get_data('sp_calendar_data', 360)) === null)
+		{
+			$this->data['calendar'] = getCalendarGrid($this->data['curPage']['month'], $this->data['curPage']['year'], $calendarOptions);
+			cache_put_data('sp_calendar_data', $this->data['calendar'], 360);
+		}
 
 		$title_text = $txt['months_titles'][$this->data['calendar']['current_month']] . ' ' . $this->data['calendar']['current_year'];
 
@@ -67,6 +86,11 @@ class Calendar_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_calendar($data)
 {
 	global $scripturl, $txt;

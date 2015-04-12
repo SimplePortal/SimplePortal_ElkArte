@@ -86,8 +86,19 @@ class Categories_Controller extends Action_Controller
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', $context['category']['id'], $per_page, $start);
 		foreach ($context['articles'] as $article)
 		{
-			$context['articles'][$article['id']]['preview'] = parse_bbc($article['body']);
-			$context['articles'][$article['id']]['date'] = standardTime($article['date']);
+			// Cut me mick
+			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
+			{
+				$article['body'] = Util::substr($article['body'], 0, $cutoff);
+				if ($article['type'] === 'bbc')
+				{
+					require_once(SUBSDIR . '/Post.subs.php');
+					preparsecode($article['body']);
+				}
+			}
+
+			$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
+			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
 		}
 
 		$context['linktree'][] = array(

@@ -23,6 +23,11 @@ if (!defined('ELK'))
  */
 class Shoutbox_Block extends SP_Abstract_Block
 {
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -32,6 +37,11 @@ class Shoutbox_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
+	/**
+	 * Returns optional block parameters
+	 *
+	 * @return mixed[]
+	 */
 	public function parameters()
 	{
 		global $scripturl, $txt;
@@ -48,8 +58,10 @@ class Shoutbox_Block extends SP_Abstract_Block
 			)
 		);
 		while ($row = $this->_db->fetch_assoc($request))
+		{
 			if (empty($_REQUEST['block_id']) || $_REQUEST['block_id'] != $row['id_block'])
 				$in_use[] = $row['value'];
+		}
 		$this->_db->free_result($request);
 
 		// Load up all the shoutboxes that are NOT being used
@@ -63,7 +75,15 @@ class Shoutbox_Block extends SP_Abstract_Block
 		return $this->block_parameters;
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $context, $modSettings, $user_info, $settings, $txt, $editortxt;
 
@@ -206,6 +226,11 @@ class Shoutbox_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Error template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_shoutbox_error($data)
 {
 		echo '

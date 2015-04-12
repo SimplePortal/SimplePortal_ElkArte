@@ -23,6 +23,11 @@ if (!defined('ELK'))
  */
 class Latest_Member_Block extends SP_Abstract_Block
 {
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -32,7 +37,15 @@ class Latest_Member_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $scripturl, $color_profile;
 
@@ -72,11 +85,16 @@ class Latest_Member_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_latestMember($data)
 {
 	global $txt;
 
-	// No recent members, supose it could happen
+	// No recent members, suppose it could happen
 	if (empty($data['members']))
 	{
 		echo '

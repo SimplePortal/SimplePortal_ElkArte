@@ -24,7 +24,11 @@ if (!defined('ELK'))
  */
 class Top_Poster_Block extends SP_Abstract_Block
 {
-
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -35,7 +39,15 @@ class Top_Poster_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $scripturl, $color_profile;
 
@@ -136,6 +148,11 @@ class Top_Poster_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_topPoster($data)
 {
 	global $txt, $scripturl;

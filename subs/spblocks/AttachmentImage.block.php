@@ -27,6 +27,11 @@ if (!defined('ELK'))
  */
 class Attachment_Image_Block extends SP_Abstract_Block
 {
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -40,13 +45,22 @@ class Attachment_Image_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $txt, $color_profile;
 
 		$limit = empty($parameters['limit']) ? 5 : (int) $parameters['limit'];
+		$type = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
+
 		$this->data['direction'] = empty($parameters['direction']) ? 0 : 1;
-		$type = array('jpg', 'png', 'gif', 'bmp');
 		$this->data['showPoster'] = empty($parameters['disablePoster']);
 		$this->data['showDownloads'] = empty($parameters['disableDownloads']);
 		$this->data['showLink'] = empty($parameters['disableLink']);
@@ -80,12 +94,22 @@ class Attachment_Image_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Error template for this block
+ *
+ * @param mixed[[] $data
+ */
 function template_sp_attachmentImage_error($data)
 {
 		echo '
 								', $data['error_msg'];
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_attachmentImage($data)
 {
 	global $scripturl, $txt;
@@ -99,6 +123,7 @@ function template_sp_attachmentImage($data)
 									<tr>';
 	$after = $data['direction'] ? '' : '
 									</tr>';
+
 	// For each image that was returned from ssi
 	foreach ($data['items'] as $id => $item)
 	{

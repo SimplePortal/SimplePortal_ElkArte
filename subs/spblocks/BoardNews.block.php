@@ -28,6 +28,11 @@ if (!defined('ELK'))
  */
 class Board_News_Block extends SP_Abstract_Block
 {
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -42,7 +47,15 @@ class Board_News_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $scripturl, $txt, $settings, $modSettings, $color_profile, $context;
 
@@ -126,13 +139,23 @@ class Board_News_Block extends SP_Abstract_Block
 		$colorids = array();
 		while ($row = $this->_db->fetch_assoc($request))
 		{
+			// Using the cutoff tag?
+			$limited = false;
+			if (($cutoff = Util::strpos($row['body'], '[cutoff]')) !== false)
+			{
+				require_once(SUBSDIR . '/Post.subs.php');
+				$row['body'] = Util::substr($row['body'], 0, $cutoff);
+				preparsecode($row['body']);
+				$limited = true;
+			}
+
+			// Good time to do this is ... now
 			censorText($row['subject']);
 			censorText($row['body']);
-
 			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
 			// Shorten the text if needed, link the ellipsis if the body has been shortened.
-			if (!empty($length))
+			if ($limited || !empty($length))
 			{
 				$ellip = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">&hellip;</a>';
 				$row['body'] = Util::shorten_html($row['body'], $length, $ellip, false);
@@ -198,21 +221,31 @@ class Board_News_Block extends SP_Abstract_Block
 		$this->data['embed_videos'] = !empty($modSettings['enableVideoEmbeding']);
 
 		if (!empty($per_page))
-			$context['sp_boardNews_page_index']  = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, false);
+			$context['sp_boardNews_page_index']  = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, true);
 	}
 }
 
+/**
+ * Error template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_boardNews_error($data)
 {
 		echo '
 				', $data['error_msg'];
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_boardNews($data)
 {
 		global $context, $scripturl, $txt;
 
-	// Auto video embeding enabled?
+	// Auto video embedding enabled?
 	if ($data['embed_videos'])
 	{
 		addInlineJavascript('

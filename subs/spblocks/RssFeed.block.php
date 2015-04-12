@@ -29,6 +29,11 @@ if (!defined('ELK'))
  */
 class Rss_Feed_Block extends SP_Abstract_Block
 {
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -44,7 +49,15 @@ class Rss_Feed_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $txt;
 
@@ -78,7 +91,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 		{
 			// Use iconv if its available
 			if (function_exists('iconv'))
-				$data = @iconv($charset[1], 'UTF-8' . '//TRANSLIT//IGNORE', $data);
+				$data = @iconv($charset[1], 'UTF-8//TRANSLIT//IGNORE', $data);
 
 			// No iconv or a false response from it
 			if (!function_exists('iconv') || ($data == false))
@@ -159,12 +172,22 @@ class Rss_Feed_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Error template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_rssFeed_error($data)
 {
 		echo '
 								', $data['error_msg'];
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_rssFeed($data)
 {
 	if ($this->data['show_content'])

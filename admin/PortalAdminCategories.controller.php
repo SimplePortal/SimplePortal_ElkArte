@@ -14,11 +14,18 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SimplePortal Category Administation controller class.
+ * SimplePortal Category Administration controller class.
  * This class handles the adding/editing/listing of categories
  */
 class ManagePortalCategories_Controller extends Action_Controller
 {
+	/**
+	 * If we are adding a new category
+	 *
+	 * @var bool
+	 */
+	protected $_is_new;
+
 	/**
 	 * Main dispatcher.
 	 * This function checks permissions and passes control through.
@@ -227,7 +234,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 
 		loadTemplate('PortalAdminCategories');
 
-		$context['is_new'] = empty($_REQUEST['category_id']);
+		$this->_is_new = empty($_REQUEST['category_id']);
 
 		// Saving the category form
 		if (!empty($_POST['submit']))
@@ -265,12 +272,12 @@ class ManagePortalCategories_Controller extends Action_Controller
 				'status' => !empty($_POST['status']) ? 1 : 0,
 			);
 
-			$category_info['id'] = sp_update_category($category_info, $context['is_new']);
+			$category_info['id'] = sp_update_category($category_info, $this->_is_new);
 			redirectexit('action=admin;area=portalcategories');
 		}
 
 		// Creating a new category, lets set up some defaults for the form
-		if ($context['is_new'])
+		if ($this->_is_new)
 		{
 			$context['category'] = array(
 				'id' => 0,
@@ -289,9 +296,10 @@ class ManagePortalCategories_Controller extends Action_Controller
 			$context['category'] = sportal_get_categories($_REQUEST['category_id']);
 		}
 
+		$context['is_new'] = $this->_is_new;
 		$context['category']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		$context['category']['groups'] = sp_load_membergroups();
-		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_categories_add'] : $txt['sp_admin_categories_edit'];
+		$context['page_title'] = $this->_is_new ? $txt['sp_admin_categories_add'] : $txt['sp_admin_categories_edit'];
 		$context['sub_template'] = 'categories_edit';
 	}
 

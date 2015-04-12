@@ -25,6 +25,11 @@ class Board_Stats_Block extends SP_Abstract_Block
 {
 	protected $total_days_up = 0;
 
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -34,7 +39,15 @@ class Board_Stats_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $modSettings;
 
@@ -75,13 +88,18 @@ class Board_Stats_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_boardStats($data)
 {
 	global $txt, $scripturl;
 
 	echo '
 								<ul class="sp_list">
-									<li ', sp_embed_class('portalstats'), '>', $txt['total_members'], ': <a href="', $scripturl . '?action=mlist">', comma_format($data['totals']['members']), '</a></li>
+									<li ', sp_embed_class('portalstats'), '>', $txt['total_members'], ': <a href="', $scripturl . '?action=memberlist">', comma_format($data['totals']['members']), '</a></li>
 									<li ', sp_embed_class('portalstats'), '>', $txt['total_posts'], ': ', comma_format($data['totals']['posts']), '</li>
 									<li ', sp_embed_class('portalstats'), '>', $txt['total_topics'], ': ', comma_format($data['totals']['topics']), '</li>
 									<li ', sp_embed_class('portalstats'), '>', $txt['total_cats'], ': ', comma_format($data['totals']['categories']), '</li>

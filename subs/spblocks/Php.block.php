@@ -23,6 +23,11 @@ if (!defined('ELK'))
  */
 class Php_Block extends SP_Abstract_Block
 {
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -32,7 +37,15 @@ class Php_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		$this->data['content'] = !empty($parameters['content']) ? $parameters['content'] : '';
 
@@ -47,11 +60,20 @@ class Php_Block extends SP_Abstract_Block
 		$this->setTemplate('template_sp_php');
 	}
 
+	/**
+	 * Permissions check fo access to this one
+	 */
 	public static function permissionsRequired()
 	{
 		return array('admin_forum');
 	}
 }
+
+/**
+ * Main template for this block, outputs eval !
+ *
+ * @param mixed[] $data
+ */
 function template_sp_php($data)
 {
 	// Can be scary :0

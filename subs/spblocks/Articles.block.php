@@ -28,6 +28,11 @@ if (!defined('ELK'))
  */
 class Articles_Block extends SP_Abstract_Block
 {
+	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database $db
+	 */
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
@@ -41,12 +46,18 @@ class Articles_Block extends SP_Abstract_Block
 		parent::__construct($db);
 	}
 
+	/**
+	 * Sets / loads optional parameters for a block
+	 *
+	 * - Called from PortalAdminBlocks.controller as part of block add/save/edit
+	 */
 	public function parameters()
 	{
 		global $txt;
 
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
 
+		// Load the sp categories for selection in the block
 		$categories = sp_load_categories();
 		$this->block_parameters['category'][0] = $txt['sp_all'];
 		foreach ($categories as $category)
@@ -55,7 +66,15 @@ class Articles_Block extends SP_Abstract_Block
 		return $this->block_parameters;
 	}
 
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $txt, $color_profile;
 
@@ -68,6 +87,7 @@ class Articles_Block extends SP_Abstract_Block
 		$this->data['length'] = isset($parameters['length']) ? (int) $parameters['length'] : 250;
 		$this->data['avatar'] = empty($parameters['avatar']) ? 0 : (int) $parameters['avatar'];
 
+		// Fetch some articles
 		$this->data['articles'] = sportal_get_articles(null, true, true, $type ? 'RAND()' : 'spa.date DESC', $category, $limit);
 
 		$colorids = array();
@@ -95,22 +115,34 @@ class Articles_Block extends SP_Abstract_Block
 					$this->data['articles'][$k]['author']['link'] = $color_profile[$p['author']['id']]['link'];
 			}
 		}
+
+		// Set the template name
 		$this->setTemplate('template_sp_articles');
 	}
 }
 
+/**
+ * Error template
+ *
+ * @param mixed[] $data
+ */
 function template_sp_articles_error($data)
 {
 		echo '
 								', $data['error_msg'];
 }
 
+/**
+ * Main template
+ *
+ * @param mixed[] $data
+ */
 function template_sp_articles($data)
 {
 	global $scripturl;
 
 	// Not showing avatars, just use a compact link view
-	if (empty($this->data['avatar']))
+	if (empty($data['avatar']))
 	{
 		echo '
 			<ul class="sp_list">';
@@ -125,21 +157,41 @@ function template_sp_articles($data)
 	// Or the full monty!
 	else
 	{
+		require_once(SUBSDIR . '/Post.subs.php');
+
 		echo '
 							<table class="sp_fullwidth">';
 
 		foreach ($data['articles'] as $article)
 		{
-			// Shorten it for the preview
+			// Using the cutoff tag?
+			$limited = false;
+			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
+			{
+				$article['body'] = Util::substr($article['body'], 0, $cutoff);
+				preparsecode($article['body']);
+				$limited = true;
+			}
+
+			// Good time to do this is ... now
+			censorText($article['subject']);
+			censorText($article['body']);
+
 			$article['body'] = sportal_parse_content($article['body'], $article['type'], 'return');
-			$article['body'] = Util::shorten_html($article['body'], $this->data['length']);
+
+			// Shorten the text, link the ellipsis, etc as needed
+			if ($limited || !empty($data['length']))
+			{
+				$ellip = '<a href="' . $scripturl . '?article=' . $article['article_id'] . '">&hellip;</a>';
+				$article['body'] = $limited ? $article['body'] . $ellip : Util::shorten_html($article['body'], $data['length'], $ellip, false);
+			}
 
 			echo '
 								<tr class="sp_articles_row">
 									<td class="sp_articles centertext">';
 
 			// If we have an avatar to show, show it
-			if (!empty($article['author']['avatar']['href']))
+			if ($data['avatar'] && !empty($article['author']['avatar']['href']))
 				echo '
 										<a href="', $scripturl, '?action=profile;u=', $article['author']['id'], '">
 											<img src="', $article['author']['avatar']['href'], '" alt="', $article['author']['name'], '" style="max-width:40px" />

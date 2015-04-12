@@ -23,7 +23,15 @@ if (!defined('ELK'))
  */
 class Menu_Block extends SP_Abstract_Block
 {
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $context;
 
@@ -34,6 +42,11 @@ class Menu_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_menu($data)
 {
 	global $context;

@@ -22,12 +22,25 @@ if (!defined('ELK'))
  */
 class News_Block extends SP_Abstract_Block
 {
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		$this->setTemplate('template_sp_news');
 	}
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_news($data)
 {
 	global $context;

@@ -22,12 +22,21 @@ if (!defined('ELK'))
  */
 class User_Info_Block extends SP_Abstract_Block
 {
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
 	public function setup($parameters, $id)
 	{
 		global $context, $scripturl, $txt, $user_info, $color_profile, $memberContext, $modSettings;
 
 		$this->data['session_id'] = $context['session_id'];
 		$this->data['session_var'] = $context['session_var'];
+
 		if (isset($context['login_token_var']))
 		{
 			$this->data['tokens'] = array(
@@ -35,6 +44,7 @@ class User_Info_Block extends SP_Abstract_Block
 				'login' => $context['login_token']
 			);
 		}
+
 		$this->data['username'] = !empty($user_info['username']) ? $user_info['username'] : '';
 		$this->data['urls'] = array(
 			'pm' => $scripturl. '?action=pm',
@@ -104,9 +114,14 @@ class User_Info_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_userInfo($data)
 {
-	global $txt;
+	global $txt, $scripturl;
 
 	echo '
 								<div class="centertext">';
@@ -135,13 +150,15 @@ function template_sp_userInfo($data)
 											</tr>
 											<tr>
 												<td>
-													<select name="cookielength">
-														<option value="60">', $txt['one_hour'], '</option>
-														<option value="1440">', $txt['one_day'], '</option>
-														<option value="10080">', $txt['one_week'], '</option>
-														<option value="43200">', $txt['one_month'], '</option>
-														<option value="-1" selected="selected">', $txt['forever'], '</option>
-													</select>
+													<label for="cookielength">
+														<select id="cookielength" name="cookielength">
+															<option value="60">', $txt['one_hour'], '</option>
+															<option value="1440">', $txt['one_day'], '</option>
+															<option value="10080">', $txt['one_week'], '</option>
+															<option value="43200">', $txt['one_month'], '</option>
+															<option value="-1" selected="selected">', $txt['forever'], '</option>
+														</select>
+													</label>
 												</td>
 												<td>
 													<input type="submit" value="', $txt['login'], '" class="button_submit" />
@@ -188,7 +205,7 @@ function template_sp_userInfo($data)
 		{
 			echo '
 										<li ', sp_embed_class('dot'), '>
-											<strong>', $txt['likes'], ': </strong>' . $data['member_info']['likes']['given'] . ' <span ', sp_embed_class('given'), '></span> / ', $data['member_info']['likes']['received'], ' <span ', sp_embed_class('received'), '></span></li>';
+											<strong>', $txt['likes'], ': </strong><a href="', $scripturl, '?action=profile;area=showlikes;sa=given;u=', $user_info['id'], '">', $data['member_info']['likes']['given'], ' <span ', sp_embed_class('given'), '></span></a> / <a href="', $scripturl, '?action=profile;area=showlikes;sa=received;u=', $user_info['id'], '">', $data['member_info']['likes']['received'], ' <span ', sp_embed_class('received'), '></span></a></li>';
 		}
 
 		if ($data['member_info']['can_pm'])

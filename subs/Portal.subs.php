@@ -40,7 +40,7 @@ function sportal_init($standalone = false)
 		if (!empty($context['right_to_left']))
 			loadCSSFile('portal_rtl.css');
 
-		if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], array('admin', 'helpadmin')))
+		if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], array('admin')))
 			loadLanguage('SPortalAdmin');
 
 		if (!isset($settings['sp_images_url']))
@@ -52,8 +52,8 @@ function sportal_init($standalone = false)
 		}
 	}
 
-	// Portal not enabled, or mobile, or debug, or maintance, or .... then bow out now
-	if ($context['browser_body_id'] == 'mobile' || !empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')) || isset($_GET['debug']) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
+	// Portal not enabled, or mobile, or debug, or maintenance, or .... then bow out now
+	if (!empty($modSettings['sp_disableMobile']) || !empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')) || isset($_GET['debug']) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
 	{
 		$context['disable_sp'] = true;
 
@@ -62,6 +62,7 @@ function sportal_init($standalone = false)
 			$get_string = '';
 			foreach ($_GET as $get_var => $get_value)
 				$get_string .= $get_var . (!empty($get_value) ? '=' . $get_value : '') . ';';
+
 			redirectexit(substr($get_string, 0, -1));
 		}
 
@@ -208,6 +209,7 @@ function sportal_load_permissions()
 	foreach ($profiles as $profile)
 	{
 		$result = false;
+
 		if (!empty($profile['groups_denied']) && count(array_intersect($user_info['groups'], $profile['groups_denied'])) > 0)
 			$result = false;
 		elseif (!empty($profile['groups_allowed']) && count(array_intersect($user_info['groups'], $profile['groups_allowed'])) > 0)
@@ -299,10 +301,13 @@ function sportal_load_blocks()
 	if (!isset($context['SPortal']['blocks']))
 		$context['SPortal']['blocks'] = array();
 
-	// @todo instantiate the blocks and do the Block->setup()
+	// For each active block, instantiate it and do the Block->setup()
 	foreach ($blocks as $block)
 	{
 		if (!$context['SPortal']['sides'][$block['column']]['active'] || empty($block['type']))
+			continue;
+
+		if ($context['browser_body_id'] === 'mobile' && empty($block['mobile_view']))
 			continue;
 
 		$block['style'] = sportal_parse_style('explode', $block['style'], true);
@@ -324,14 +329,13 @@ function sportal_load_blocks()
 }
 
 /**
- * Just a shortcut that takes care of instantiate the block and return the instance
+ * A shortcut that takes care of instantiating the block and returning the instance
  *
  * @param string $name The name of the block (without "_Block" at the end)
  */
 function sp_instantiate_block($name)
 {
-	static $instances = array();
-	static $db = null;
+	static $instances = array(), $db = null;
 
 	if ($db === null)
 		$db = database();
@@ -415,7 +419,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 	$request = $db->query('', '
 		SELECT
 			spb.id_block, spb.label, spb.type, spb.col, spb.row, spb.permissions, spb.state,
-			spb.force_view, spb.display, spb.display_custom, spb.style, spp.variable, spp.value
+			spb.force_view, spb.mobile_view, spb.display, spb.display_custom, spb.style, spp.variable, spp.value
 		FROM {db_prefix}sp_blocks AS spb
 			LEFT JOIN {db_prefix}sp_parameters AS spp ON (spp.id_block = spb.id_block)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
@@ -439,6 +443,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 				'permissions' => $row['permissions'],
 				'state' => empty($row['state']) ? 0 : 1,
 				'force_view' => $row['force_view'],
+				'mobile_view' => $row['mobile_view'],
 				'display' => $row['display'],
 				'display_custom' => $row['display_custom'],
 				'style' => $row['style'],
@@ -851,6 +856,8 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 			'style' => $txt['sp_shoutbox_style'],
 			'bin' => $txt['sp_shoutbox_prune'],
 			'move' => $txt['sp_move'],
+			'given' => $txt['sp_likes_given'],
+			'received' => $txt['sp_likes_received'],
 		);
 	}
 
@@ -898,7 +905,7 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 	if (!isset($default_title))
 	{
 		$default_title = array(
-			'dot' => $txt['sp-dot'],
+			'dot' => '',
 			'stars' => $txt['sp-star'],
 			'arrow' => $txt['sp-arrow'],
 			'modify' => $txt['modify'],
@@ -910,6 +917,8 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 			'style' => $txt['sp_shoutbox_style'],
 			'bin' => $txt['sp_shoutbox_prune'],
 			'move' => $txt['sp_move'],
+			'given' => $txt['sp_likes_given'],
+			'received' => $txt['sp_likes_received'],
 		);
 	}
 
@@ -1645,6 +1654,9 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
  */
 function sportal_parse_content($body, $type, $output_method = 'echo')
 {
+	if (($type === 'bbc' || $type === 'html') && strpos($body, '[cutoff]') !== false)
+		$body = str_replace('[cutoff]', '', $body);
+
 	switch ($type)
 	{
 		case 'bbc':
@@ -1684,13 +1696,13 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
  *
  * What is does:
  * - If no profile id is supplied, all profiles are returned
- * - If type = 1 (generally the case), the profile group permsissions are returned
+ * - If type = 1 (generally the case), the profile group permissions are returned
  *
  * @param int|null $profile_id
  * @param int|null $type
  * @param string $sort
  */
-function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_profile')
+function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 {
 	global $txt;
 
@@ -1715,8 +1727,8 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = 'id_prof
 		SELECT
 			id_profile, type, name, value
 		FROM {db_prefix}sp_profiles' . (!empty($query) ? '
-		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY {raw:sort}',
+		WHERE ' . implode(' AND ', $query) : '') . (!empty($sort) ? '
+		ORDER BY {raw:sort}' : ''),
 		$parameters
 	);
 	$return = array();
@@ -2087,7 +2099,7 @@ function sp_prevent_flood($type, $fatal = true)
 		)
 	);
 
-	// Update existing ones that were stil inside the time limit
+	// Update existing ones that were still inside the time limit
 	$db->insert('replace', '
 		{db_prefix}log_floodcontrol',
 		array('ip' => 'string-16', 'log_time' => 'int', 'log_type' => 'string'),

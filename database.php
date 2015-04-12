@@ -54,6 +54,7 @@ $sp_tables = array(
 			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
 			array('name' => 'state', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
 			array('name' => 'force_view', 'type' => 'tinyint', 'size' => 2, 'default' => 0),
+			array('name' => 'mobile_view', 'type' => 'tinyint', 'size' => 2, 'default' => 0),
 			array('name' => 'display', 'type' => 'text',),
 			array('name' => 'display_custom', 'type' => 'text'),
 			array('name' => 'style', 'type' => 'text'),
@@ -337,6 +338,15 @@ if (empty($modSettings['sp_version']) || $modSettings['sp_version'] < '2.4.1')
 	if (isset($page_cols['body']) && $page_cols['body']['type'] == 'text')
 		$dbtbl->db_change_column('{db_prefix}sp_pages', 'body', array('type' => 'mediumtext'));
 }
+
+// Update the block table to include the mobile column if needed
+$request = $db->query('', 'SHOW FIELDS FROM {db_prefix}sp_blocks');
+$fields = array();
+while ($row = $db->fetch_assoc($request))
+	$fields[] = $row['Field'];
+$db->free_result($request);
+if (!in_array('mobile_view', $fields))
+	$db->query('', 'ALTER TABLE {db_prefix}sp_blocks ADD mobile_view TINYINT NOT NULL DEFAULT "0"');
 
 if (ELK == 'SSI')
 	echo 'Database changes were carried out successfully.';

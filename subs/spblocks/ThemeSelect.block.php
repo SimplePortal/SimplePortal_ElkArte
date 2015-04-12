@@ -22,7 +22,15 @@ if (!defined('ELK'))
  */
 class Theme_Select_Block extends SP_Abstract_Block
 {
-	function setup($parameters, $id)
+	/**
+	 * Initializes a block for use.
+	 *
+	 * - Called from portal.subs as part of the sportal_load_blocks process
+	 *
+	 * @param mixed[] $parameters
+	 * @param int $id
+	 */
+	public function setup($parameters, $id)
 	{
 		global $modSettings, $user_info, $settings, $language, $txt;
 
@@ -59,7 +67,7 @@ class Theme_Select_Block extends SP_Abstract_Block
 
 			$settings['images_url'] = &$theme_data['images_url'];
 
-			// Set the description in thier language if available
+			// Set the description in their language if available
 			if (file_exists($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php'))
 				include($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php');
 			elseif (file_exists($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php'))
@@ -107,6 +115,11 @@ class Theme_Select_Block extends SP_Abstract_Block
 	}
 }
 
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_theme_select($data)
 {
 	global $txt;

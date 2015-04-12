@@ -14,10 +14,10 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * toggles the current state of a block / control
+ * Toggles the current state of a block / control
  *
- * - calls sp_changeState to toggle the on/off status
- * - directs back based on type passed
+ * - Calls sp_changeState to toggle the on/off status
+ * - Directs back based on type passed
  *
  * @param string $type type of control
  * @param int $id id of the control
@@ -49,14 +49,18 @@ function sportal_admin_state_change($type, $id)
 /**
  * Fetches all the classes (blocks) in the system
  *
- * - if supplied a name gets just that functions id
- * - returns the functions in the order found in the file system
- * - will not return blocks according to block setting for security reasons
+ * - If supplied a name gets just that functions id
+ * - Returns the functions in the order found in the file system
+ * - Will not return blocks according to block setting for security reasons
+ * - Uses naming pattern of subs/spblocks/xyz.block.php
  *
  * @param string|null $function
  */
 function getFunctionInfo($function = null)
 {
+	$return = array();
+
+	// Looking for a specific block or all of them
 	if ($function !== null)
 	{
 		// Replace dots with nothing to avoid security issues
@@ -66,19 +70,26 @@ function getFunctionInfo($function = null)
 	else
 		$pattern = SUBSDIR . '/spblocks/*.block.php';
 
+	// Iterates through a file system in a similar fashion to glob().
 	$fs = new GlobIterator($pattern);
 
-	$return = array();
+	// Loop on the glob-ules !
 	foreach ($fs as $item)
 	{
+		// Convert file names to class names, UserInfo.block.pbp => User_Info_Block
 		$class = str_replace('.block.php', '_Block', trim(preg_replace('/((?<=)\p{Lu}(?=\p{Ll}))/', '_$1', $item->getFilename()), '_'));
 
+		// Load the block, make sure we can access it
 		require_once($item->getPathname());
+		if (!class_exists($class))
+			continue;
 
+		// Ensure they have permissions to view this block
 		$perms = $class::permissionsRequired();
 		if (!allowedTo($perms))
 			continue;
 
+		// Add it to our allowed lists
 		$return[] = array(
 			'id' => $class,
 			'function' => str_replace('_Block', '', $class),
@@ -91,7 +102,7 @@ function getFunctionInfo($function = null)
 /**
  * Assigns row id's to each block in a specifed column
  *
- * - ensures each block has a unique row id
+ * - Ensures each block has a unique row id
  * - For each block in a column, it will sequentially number the row id
  * based on the order the blocks are returned via getBlockInfo
  *
@@ -110,7 +121,7 @@ function fixColumnRows($column_id = null)
 
 	$counter = 0;
 
-	// Now seqentially set the row number for each block in this column
+	// Now sequentially set the row number for each block in this column
 	foreach ($blockIds as $block)
 	{
 		$counter = $counter + 1;
@@ -179,12 +190,12 @@ function sp_changeState($type = null, $id = null)
 /**
  * This will file the $context['member_groups'] to the given options
  *
- * @param int[]|string $selectedGroups - all groups who should be shown as selcted, if you like to check all than insert an 'all'
+ * @param int[]|string $selectedGroups - all groups who should be shown as selected, if you like to check all than insert an 'all'
  *								 You can also Give the function a string with '2,3,4'
  * @param string $show - 'normal' => will show all groups, and add a guest and regular member (Standard)
  *						 'post' => will load only post groups
  *						 'master' => will load only not postbased groups
- * @param string $contextName - where the datas should stored in the $context
+ * @param string $contextName - where the data should stored in the $context
  * @param string $subContext
  */
 function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $contextName = 'member_groups', $subContext = 'SPortal')
@@ -339,7 +350,7 @@ function sp_count_categories()
 }
 
 /**
- * Loads all of the categorys in the system
+ * Loads all of the category's in the system
  *
  * - Returns an indexed array of the categories
  *
@@ -622,7 +633,7 @@ function sp_delete_articles($article_ids = array())
 /**
  * Validates that an articles id is not duplicated in a given namespace
  *
- * return true if its a duplate or false if its unique
+ * return true if its a duplicate or false if its unique
  *
  * @param int $article_id
  * @param string $namespace
@@ -653,10 +664,10 @@ function sp_duplicate_articles($article_id, $namespace)
 /**
  * Saves or updates an articles information
  *
- * - expects to have $context popluated from sportal_get_articles()
+ * - expects to have $context populated from sportal_get_articles()
  * - add items as a new article is is_new is true otherwise updates and existing one
  *
- * @param mixed[] $article_info array of feilds details to save/update
+ * @param mixed[] $article_info array of fields details to save/update
  * @param boolean $is_new true for new insertion, false to update
  * @param boolean $update_counts true to update category counts
  */
@@ -844,7 +855,7 @@ function sp_delete_pages($page_ids = array())
  *
  * - add items as a new page is is_new is true otherwise updates and existing one
  *
- * @param mixed[] $page_info array of feilds details to save/update
+ * @param mixed[] $page_info array of fields details to save/update
  * @param boolean $is_new true for new insertion, false to update
  */
 function sp_save_page($page_info, $is_new = false)
@@ -1046,7 +1057,7 @@ function sp_load_profiles($start, $items_per_page, $sort)
 	}
 	$db->free_result($request);
 
-	// Now for each profile, load up the specific permisssions for each area of the portal
+	// Now for each profile, load up the specific permissions for each area of the portal
 	foreach (array('articles', 'blocks', 'categories', 'pages', 'shoutboxes') as $module)
 	{
 		$request = $db->query('', '
@@ -1168,9 +1179,9 @@ function sp_update_block_row($current_row, $row, $col, $decrement = true)
 }
 
 /**
- * Fetches the rows from a specifed column and returns the values
+ * Fetches the rows from a specified column and returns the values
  *
- * - If a current block ID is not specifed the next available row number in
+ * - If a current block ID is not specified the next available row number in
  * the specified column is returned
  * - If a block id is specified, its row number + 1 is returned
  *
@@ -1214,6 +1225,7 @@ function sp_block_insert($blockInfo)
 		array(
 			'label' => 'string', 'type' => 'string', 'col' => 'int', 'row' => 'int', 'permissions' => 'int',
 			'state' => 'int', 'force_view' => 'int', 'display' => 'string', 'display_custom' => 'string', 'style' => 'string',
+			'style' => 'string',
 		),
 		$blockInfo,
 		array('id_block')
@@ -1225,7 +1237,7 @@ function sp_block_insert($blockInfo)
 /**
  * Updates an existing portal block with new values
  *
- * - Removes all parameters stored with the box in anticiaption of new
+ * - Removes all parameters stored with the box in anticipation of new
  * ones being supplied
  *
  * @param mixed[] $blockInfo
@@ -1240,6 +1252,7 @@ function sp_block_update($blockInfo)
 		"permissions = {int:permissions}",
 		"state = {int:state}",
 		"force_view = {int:force_view}",
+		"mobile_view = {int:mobile_view}",
 		"display = {string:display}",
 		"display_custom = {string:display_custom}",
 		"style = {string:style}",
@@ -1343,7 +1356,7 @@ function sp_block_move_col($block_id, $target_side)
 }
 
 /**
- * Adds the portal block to the new row postion
+ * Adds the portal block to the new row position
  *
  * - Opens up space in the column by shift all rows below the insertion point
  * down one

@@ -374,7 +374,6 @@ function sp_editor_change_type(element) {
         previous = this.value;
     }).change(function() {
         // Handle the editor change
-		console.log(this.value);
 		sp_update_editor(this.value, previous);
 
         // Make sure the previous value is updated
@@ -421,6 +420,22 @@ function sp_collapseObject(id)
 	$("#sp_object_" + id).slideToggle(300);
 
 	document.getElementById("sp_collapse_" + id).src = elk_images_url + (!mode ? "/selected_open.png" : "/selected.png");
+}
+
+/**
+ * Used to enable / disable the style options for body and title
+ */
+function check_style_options()
+{
+	var	noTitle = document.getElementById("no_title").checked,
+		noBody = document.getElementById("no_body").checked;
+
+	document.getElementById("title_default_class").disabled = noTitle;
+	document.getElementById("title_custom_class").disabled = noTitle;
+	document.getElementById("title_custom_style").disabled = noTitle;
+	document.getElementById("body_default_class").disabled = noBody;
+	document.getElementById("body_custom_class").disabled = noBody;
+	document.getElementById("body_custom_style").disabled = noBody;
 }
 
 /**
