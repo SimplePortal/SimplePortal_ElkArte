@@ -30,7 +30,7 @@ class Attachment_Image_Block extends SP_Abstract_Block
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database $db
+	 * @param Database|null $db
 	 */
 	public function __construct($db = null)
 	{
@@ -97,7 +97,7 @@ class Attachment_Image_Block extends SP_Abstract_Block
 /**
  * Error template for this block
  *
- * @param mixed[[] $data
+ * @param mixed[] $data
  */
 function template_sp_attachmentImage_error($data)
 {

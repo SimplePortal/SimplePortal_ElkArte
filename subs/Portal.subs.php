@@ -1084,7 +1084,7 @@ function sportal_get_article_views_comments($id)
  */
 function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title', $category_id = null, $limit = null, $start = null)
 {
-	global $scripturl, $context, $modSettings, $color_profile;
+	global $scripturl, $context, $color_profile;
 
 	$db = database();
 
@@ -1700,7 +1700,7 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
  *
  * @param int|null $profile_id
  * @param int|null $type
- * @param string $sort
+ * @param string|null $sort
  */
 function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 {

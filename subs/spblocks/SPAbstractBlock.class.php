@@ -29,7 +29,7 @@ abstract class SP_Abstract_Block
 
 	/**
 	 * Block parameters
-	 * @var mixed[]
+	 * @var array
 	 */
 	protected $block_parameters = array();
 
@@ -48,7 +48,7 @@ abstract class SP_Abstract_Block
 	/**
 	 * Class constuctor, makes db availalbe
 	 *
-	 * @param Database $db
+	 * @param Database|null $db
 	 */
 	public function __construct($db = null)
 	{

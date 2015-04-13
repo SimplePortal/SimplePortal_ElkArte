@@ -19,6 +19,8 @@ function template_block_list()
 {
 	global $context, $scripturl, $txt;
 
+	$sortables = array();
+
 	echo '
 	<div id="sp_manage_blocks">';
 

@@ -27,7 +27,7 @@ class Top_Topics_Block extends SP_Abstract_Block
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database $db
+	 * @param Database|null $db
 	 */
 	public function __construct($db = null)
 	{

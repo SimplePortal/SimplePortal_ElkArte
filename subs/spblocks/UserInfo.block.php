@@ -121,7 +121,7 @@ class User_Info_Block extends SP_Abstract_Block
  */
 function template_sp_userInfo($data)
 {
-	global $txt, $scripturl;
+	global $txt, $scripturl, $user_info;
 
 	echo '
 								<div class="centertext">';
