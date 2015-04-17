@@ -208,40 +208,11 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 		$context['SPortal']['is_new'] = empty($_REQUEST['block_id']);
 
-		// BBC Fix move the parameter to the correct position.
-		if (!empty($_POST['bbc_name']))
-		{
-			$_POST['parameters'][$_POST['bbc_name']] = !empty($_POST[$_POST['bbc_parameter']]) ? $_POST[$_POST['bbc_parameter']] : '';
-
-			// If we came from WYSIWYG then turn it back into BBC regardless.
-			if (!empty($_REQUEST['bbc_' . $_POST['bbc_name'] . '_mode']) && isset($_POST['parameters'][$_POST['bbc_name']]))
-			{
-				require_once(SUBSDIR . 'Html2BBC.class.php');
-				$bbc_converter = new Convert_BBC($_POST['parameters'][$_POST['bbc_name']]);
-				$_POST['parameters'][$_POST['bbc_name']] = $bbc_converter->get_bbc();
-
-				// We need to unhtml it now as it gets done shortly.
-				$_POST['parameters'][$_POST['bbc_name']] = un_htmlspecialchars($_POST['parameters'][$_POST['bbc_name']]);
-
-				// We need this for everything else.
-				$_POST['parameters'][$_POST['bbc_name']] = $_POST['parameters'][$_POST['bbc_name']];
-			}
-		}
+		// Convert HTML to BBC if needed
+		$this->_fixBBC();
 
 		// Passing the selected type via $_GET instead of $_POST?
-		$start_parameters = array();
-		if (!empty($_GET['selected_type']) && empty($_POST['selected_type']))
-		{
-			$_POST['selected_type'] = array($_GET['selected_type']);
-			if (!empty($_GET['parameters']))
-			{
-				foreach ($_GET['parameters'] as $param)
-				{
-					if (isset($_GET[$param]))
-						$start_parameters[$param] = $_GET[$param];
-				}
-			}
-		}
+		$start_parameters = $this->_getStartParameters();
 
 		// Want use a block on the portal?
 		if ($context['SPortal']['is_new'] && empty($_POST['selected_type']) && empty($_POST['add_block']))
@@ -730,6 +701,58 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				sp_block_insert_parameters($_POST['parameters'], $blockInfo['id']);
 
 			redirectexit('action=admin;area=portalblocks');
+		}
+	}
+
+	/**
+	 * Moves get var to post for compatability and get paramters to start params
+	 *
+	 * @return mixed[]
+	 */
+	private function _getStartParameters()
+	{
+		$start_parameters = array();
+
+		if (!empty($_GET['selected_type']) && empty($_POST['selected_type']))
+		{
+			$_POST['selected_type'] = array($_GET['selected_type']);
+
+			if (!empty($_GET['parameters']))
+			{
+				foreach ($_GET['parameters'] as $param)
+				{
+					if (isset($_GET[$param]))
+						$start_parameters[$param] = $_GET[$param];
+				}
+			}
+		}
+
+		return $start_parameters;
+	}
+
+	/**
+	 * Convert html to bbc
+	 */
+	private function _fixBBC()
+	{
+		// BBC Fix move the parameter to the correct position.
+		if (!empty($_POST['bbc_name']))
+		{
+			$_POST['parameters'][$_POST['bbc_name']] = !empty($_POST[$_POST['bbc_parameter']]) ? $_POST[$_POST['bbc_parameter']] : '';
+
+			// If we came from WYSIWYG then turn it back into BBC regardless.
+			if (!empty($_REQUEST['bbc_' . $_POST['bbc_name'] . '_mode']) && isset($_POST['parameters'][$_POST['bbc_name']]))
+			{
+				require_once(SUBSDIR . '/Html2BBC.class.php');
+				$bbc_converter = new Convert_BBC($_POST['parameters'][$_POST['bbc_name']]);
+				$_POST['parameters'][$_POST['bbc_name']] = $bbc_converter->get_bbc();
+
+				// We need to unhtml it now as it gets done shortly.
+				$_POST['parameters'][$_POST['bbc_name']] = un_htmlspecialchars($_POST['parameters'][$_POST['bbc_name']]);
+
+				// We need this for everything else.
+				$_POST['parameters'][$_POST['bbc_name']] = $_POST['parameters'][$_POST['bbc_name']];
+			}
 		}
 	}
 
