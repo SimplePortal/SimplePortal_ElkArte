@@ -467,7 +467,7 @@ class ManagePortalPages_Controller extends Action_Controller
 			foreach ($validator->validation_errors() as $id => $error)
 				$pages_errors->addError($error);
 
-			return $this->action_edit();
+			$this->action_edit();
 		}
 
 		// Can't have the same name in the same space twice
@@ -509,7 +509,7 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		// None shall pass ... with errors
 		if ($pages_errors->hasErrors())
-			return $this->action_edit();
+			$this->action_edit();
 
 		// If you made it this far, we are going to save the work
 		if (!empty($_POST['blocks']) && is_array($_POST['blocks']))

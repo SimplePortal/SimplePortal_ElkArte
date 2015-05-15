@@ -323,7 +323,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 	{
 		$category_ids = array();
 
-		// Retreive the cat ids to remove
+		// Receive the cat ids to remove
 		if (!empty($_POST['remove_categories']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 		{
 			checkSession();

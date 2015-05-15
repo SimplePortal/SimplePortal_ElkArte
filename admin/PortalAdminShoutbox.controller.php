@@ -36,6 +36,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Portal.subs.php');
 		loadTemplate('PortalAdminShoutbox');
 
+		// The actions allowed in the shoutbox
 		$subActions = array(
 			'list' => array($this, 'action_list'),
 			'add' => array($this, 'action_edit'),
@@ -377,6 +378,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 		if (empty($context['SPortal']['shoutbox']['permission_profiles']))
 			fatal_lang_error('error_sp_no_permission_profiles', false);
 
+		// We only allow some BBC in the shoutbox
 		$context['allowed_bbc'] = array(
 			'b' => $editortxt['Bold'],
 			'i' => $editortxt['Italic'],
@@ -397,6 +399,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			'me' => 'me',
 		);
 
+		// Remove the ones the admin does not allow
 		$disabled_tags = array();
 		if (!empty($modSettings['disabledBBC']))
 			$disabled_tags = explode(',', $modSettings['disabledBBC']);

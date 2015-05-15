@@ -272,7 +272,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// Want to take a look at how this block will appear, well we try our best
 		if (!empty($_POST['preview_block']) || isset($_SESSION['sp_error']))
 		{
-			// An error was generated on save, lets set things up like a preview and return to the preivew
+			// An error was generated on save, lets set things up like a preview and return to the preview
 			if (isset($_SESSION['sp_error']))
 			{
 				$context['SPortal']['error'] = $_SESSION['sp_error'];
@@ -341,6 +341,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			}
 
 			$block = sp_instantiate_block($_POST['block_type']);
+
 			// Create all the information we know about this block
 			$context['SPortal']['block'] = array(
 				'id' => $_POST['block_id'],
@@ -751,6 +752,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				$_POST['parameters'][$_POST['bbc_name']] = un_htmlspecialchars($_POST['parameters'][$_POST['bbc_name']]);
 
 				// We need this for everything else.
+				// @todo what, thats what it is already?
 				$_POST['parameters'][$_POST['bbc_name']] = $_POST['parameters'][$_POST['bbc_name']];
 			}
 		}

@@ -21,7 +21,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 {
 	/**
 	 * If we are adding a new article or editing an existing one
-	 * 
+	 *
 	 * @var bool
 	 */
 	protected $_is_new;
@@ -44,7 +44,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		loadTemplate('PortalAdminArticles');
 
-		// This are all the actions that we know
+		// These are all the actions that we know
 		$subActions = array(
 			'list' => array($this, 'action_list'),
 			'add' => array($this, 'action_edit'),
