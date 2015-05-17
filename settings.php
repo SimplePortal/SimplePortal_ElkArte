@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 0.0.4
  */
 
 if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))

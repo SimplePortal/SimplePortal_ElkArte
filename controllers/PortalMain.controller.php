@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4.2
+ * @version 0.0.4
  */
 
 if (!defined('ELK'))
@@ -27,7 +26,7 @@ class Sportal_Controller extends Action_Controller
 	{
 		require_once(SUBSDIR . '/Action.class.php');
 
-		// Where do you want to go today? :P
+		// Where do you want to go today?
 		$subActions = array(
 			'index' => array($this, 'action_sportal_index'),
 			'credits' => array($this, 'action_sportal_credits'),
@@ -73,10 +72,12 @@ class Sportal_Controller extends Action_Controller
 		if (empty($modSettings['sp_articles_index']))
 			return;
 
-		// Set up the pagees
+		// Set up the pages
 		$total_articles = sportal_get_articles_count();
-		$total = min($total_articles, !empty($modSettings['sp_articles_index_total']) ? $modSettings['sp_articles_index_total'] : 20);
-		$per_page = min($total, !empty($modSettings['sp_articles_index_per_page']) ? $modSettings['sp_articles_index_per_page'] : 5);
+		$total = min($total_articles, !empty($modSettings['sp_articles_index_total'])
+			? $modSettings['sp_articles_index_total'] : 20);
+		$per_page = min($total, !empty($modSettings['sp_articles_index_per_page'])
+			? $modSettings['sp_articles_index_per_page'] : 5);
 		$start = !empty($_REQUEST['articles']) ? (int) $_REQUEST['articles'] : 0;
 
 		if ($total > $per_page)
@@ -157,20 +158,28 @@ class Sportal_Controller extends Action_Controller
 		$validation_session = checkSession();
 		if (empty($validation_session))
 		{
+			$block_tree = array();
+
 			// No questions that we are rearranging the blocks
 			if (isset($_POST['order'], $_POST['received'], $_POST['moved']))
 			{
-				$column_numbers = array('sp_left_div' => 1, 'sp_top_div' => 2, 'sp_bottom_div' => 3, 'sp_right_div' => 4, 'sp_header' => 5, 'sp_footer' => 6);
+				$column_numbers = array(
+					'sp_left_div' => 1,
+					'sp_top_div' => 2,
+					'sp_bottom_div' => 3,
+					'sp_right_div' => 4,
+					'sp_header' => 5,
+					'sp_footer' => 6
+				);
 
 				// What block was drag and dropped? e.g. block_2,4
-				list ($block_moved, ) = explode(',', $_POST['moved']);
+				list ($block_moved,) = explode(',', $_POST['moved']);
 				$block_moved = (int) str_replace('block_', '', $block_moved);
 
 				// Where is it going
 				$target_column = $column_numbers[$_POST['received']];
 
 				// The block ids arrive in 1-n view order ... block,column
-				$block_tree = array();
 				foreach ($_POST['block'] as $id)
 				{
 					list ($block, $column) = explode(',', $id);

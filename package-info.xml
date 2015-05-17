@@ -2,22 +2,23 @@
 <!DOCTYPE package-info SYSTEM "http://www.elkarte.net/site/package-info">
 <!--
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
+ * @version 0.0.4
  *
- * @version 2.4.3
+ * This version of SimplePortal ElkArte is based on SimplePortal core 2.4
  */
 -->
 <package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
 	<name>SimplePortal</name>
-	<version>2.4.3</version>
+	<version>0.0.4</version>
 	<type>modification</type>
 	<install for="1.0.2 - 1.0.99">
-		<readme type="inline">This will install SimplePortal 2.4.3 for Elkarte.</readme>
+		<readme type="inline">This will install SimplePortal 0.0.4 for Elkarte.</readme>
 		<modification>modification.xml</modification>
 		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
 		<require-dir name="sources" destination="BOARDDIR" />
@@ -41,13 +42,13 @@
 		<hook hook="integrate_sa_xmlhttp" function="sp_integrate_xmlhttp" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_pre_log_stats" function="sp_integrate_pre_log_stats" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_load_illegal_guest_permissions" function="sp_integrate_load_illegal_guest_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_pre_parsebbc" function="sp_integrate_pre_parsebbc" file="SOURCEDIR/PortalIntegration.subs.php" />	
+		<hook hook="integrate_pre_parsebbc" function="sp_integrate_pre_parsebbc" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<credits url="www.simpleportal.net" license="BSD 3" copyright="Simple Portal Team">SimplePortal</credits>
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
 
 	<uninstall for="1.0 - 1.0.99">
-		<readme type="inline">This will uninstall SimplePortal 2.4.2 for Elkarte.</readme>
+		<readme type="inline">This will uninstall SimplePortal 0.0.4 for Elkarte.</readme>
 		<hook reverse="true" hook="integrate_current_action" function="sp_integrate_current_action" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_action_boardindex_after" function="sp_integrate_boardindex" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_actions" function="sp_integrate_actions" file="SOURCEDIR/PortalIntegration.subs.php" />
@@ -62,7 +63,7 @@
 		<hook reverse="true" hook="integrate_sa_xmlhttp" function="sp_integrate_xmlhttp" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_pre_log_stats" function="sp_integrate_pre_log_stats" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_load_illegal_guest_permissions" function="sp_integrate_load_illegal_guest_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_pre_parsebbc" function="sp_integrate_pre_parsebbc" file="SOURCEDIR/PortalIntegration.subs.php" />	
+		<hook reverse="true" hook="integrate_pre_parsebbc" function="sp_integrate_pre_parsebbc" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<modification reverse="true">modification.xml</modification>
 		<remove-file name="BOARDDIR/PortalStandalone.php" />
 		<remove-file name="CONTROLLERDIR/PortalArticles.controller.php" />

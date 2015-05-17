@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4.1
+ * @version 0.0.4
  */
 
 if (!defined('ELK'))
@@ -323,7 +322,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 	{
 		$category_ids = array();
 
-		// Retreive the cat ids to remove
+		// Retrieve the cat ids to remove
 		if (!empty($_POST['remove_categories']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 		{
 			checkSession();

@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4.3
+ * @version 0.0.4
  */
 
 if (!defined('ELK'))
@@ -222,9 +221,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 				// We need to unhtml it now as it gets done shortly.
 				$_POST['parameters'][$_POST['bbc_name']] = un_htmlspecialchars($_POST['parameters'][$_POST['bbc_name']]);
-
-				// We need this for everything else.
-				$_POST['parameters'][$_POST['bbc_name']] = $_POST['parameters'][$_POST['bbc_name']];
 			}
 		}
 
@@ -517,7 +513,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 					{
 						$firstBBCFound = true;
 
-						// Start Elk BBC Sytem :)
+						// Start Elk BBC System :)
 						require_once(SUBSDIR . '/Editor.subs.php');
 
 						// Prepare the output :D
@@ -802,6 +798,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				$moved_key = array_search($block_id, $blocks);
 				if ($moved_key !== false)
 				{
+					$check_above_row = 0;
+					$check_below_row = 0;
+
 					// Find the details about the blocks above and below our moved one
 					if ($moved_key !== 0)
 						list ($check_above_side, $check_above_row) = sp_block_get_position($blocks[$moved_key - 1]);

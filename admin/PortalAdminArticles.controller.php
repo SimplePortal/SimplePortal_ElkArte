@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4.1
+ * @version 0.0.4
  */
 
 if (!defined('ELK'))
@@ -21,13 +20,13 @@ class ManagePortalArticles_Controller extends Action_Controller
 {
 	/**
 	 * If we are adding a new article or editing an existing one
-	 * 
 	 * @var bool
 	 */
 	protected $_is_new;
 
 	/**
-	 * Main dispatcher.
+	 * Main article dispatcher.
+	 *
 	 * This function checks permissions and passes control through.
 	 */
 	public function action_index()
@@ -487,7 +486,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			foreach ($validator->validation_errors() as $id => $error)
 				$article_errors->addError($error);
 
-			return $this->action_sportal_admin_article_edit();
+			$this->action_sportal_admin_article_edit();
 		}
 
 		// Lets make sure this namespace (article id) is unique
@@ -512,7 +511,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		// None shall pass ... with errors
 		if ($article_errors->hasErrors())
-			return $this->action_sportal_admin_article_edit();
+			$this->action_sportal_admin_article_edit();
 
 		// No errors then, prepare the data for saving
 		$article_info = array(
@@ -534,6 +533,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 		sp_save_article($article_info, $this->_is_new);
 
 		redirectexit('action=admin;area=portalarticles');
+
+		return true;
 	}
 
 	/**
