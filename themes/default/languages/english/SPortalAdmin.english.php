@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 0.0.4
  */
 
 // Configuration area
@@ -496,7 +495,7 @@ $txt['sp-info_groups_beta'] = 'Beta Testers';
 $txt['sp-info_groups_translators'] = 'Language Translators';
 $txt['sp-info_translators_message'] = 'Thank you for your efforts in the internationalization of SimplePortal.';
 $txt['sp-info_groups_founder'] = 'Founding Father of SimplePortal';
-$txt['sp-info_groups_orignal_pm'] = 'Original Project Managers';
+$txt['sp-info_groups_original_pm'] = 'Original Project Managers';
 $txt['sp-info_fam_fam'] = 'Pretty Icons';
 $txt['sp-info_fam_fam_message'] = 'Mark James for his <a href="http://www.famfamfam.com/lab/icons/silk/">Fam Fam Fam Silk Icons</a>.';
 $txt['sp-info_contribute'] = 'Did you find SimplePortal useful? <a href="%s" target="_blank">Contribute to the project!</a>';
