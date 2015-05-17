@@ -1,25 +1,27 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
+ * @version 0.0.4
  *
- * @version 2.4
+ * This version of SimplePortal is based on SimplePortal core 2.4
  *
- * 	This file here, unbelievably, has your portal within.
+ * This file here, unbelievably, has your portal within.
  *
  * In order to use SimplePortal in standalone mode:
- * - Go to "SPortal Admin" >> "Configuration" >> "General Settings"
- * - Select "Standalone" mode as "Portal Mode"
- * - Set "Standalone URL" as the full url of this file.
- * - Edit path to the forum ($forum_dir) in this file.
+ *  - Go to "SPortal Admin" >> "Configuration" >> "General Settings"
+ *  - Select "Standalone" mode as "Portal Mode"
+ *  - Set "Standalone URL" as the full url of this file.
+ *  - Edit path to the forum ($forum_dir) in this file.
  *
  * See? It's just magic!
  *
  */
+
 global $sp_standalone;
 
 // Should be the full path!
