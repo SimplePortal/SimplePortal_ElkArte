@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4.1
+ * @version 0.0.4
  */
 
 if (!defined('ELK'))
@@ -38,6 +37,7 @@ class ManagePortalPages_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Portal.subs.php');
 		loadTemplate('PortalAdminPages');
 
+		// The actions we know
 		$subActions = array(
 			'list' => array($this, 'action_sportal_admin_page_list'),
 			'add' => array($this, 'action_sportal_admin_page_edit'),
@@ -54,10 +54,8 @@ class ManagePortalPages_Controller extends Action_Controller
 			'help' => 'sp_PagesArea',
 			'description' => $txt['sp_admin_pages_desc'],
 			'tabs' => array(
-				'list' => array(
-				),
-				'add' => array(
-				),
+				'list' => array(),
+				'add' => array(),
 			),
 		);
 
@@ -216,7 +214,7 @@ class ManagePortalPages_Controller extends Action_Controller
 	 */
 	public function list_spCountPages()
 	{
-	   return sp_count_pages();
+		return sp_count_pages();
 	}
 
 	/**
@@ -359,7 +357,9 @@ class ManagePortalPages_Controller extends Action_Controller
 		// And for the template
 		$context['SPortal']['page']['style'] = sportal_parse_style('explode', $context['SPortal']['page']['style'], !empty($context['SPortal']['preview']));
 		$context['SPortal']['page']['body'] = sportal_parse_content($context['SPortal']['page']['body'], $context['SPortal']['page']['type'], 'return');
-		$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp_admin_pages_add'] : $txt['sp_admin_pages_edit'];
+		$context['page_title'] = $context['SPortal']['is_new']
+			? $txt['sp_admin_pages_add']
+			: $txt['sp_admin_pages_edit'];
 		$context['sub_template'] = 'pages_edit';
 	}
 
@@ -435,8 +435,6 @@ class ManagePortalPages_Controller extends Action_Controller
 		// No errors, yet.
 		$pages_errors = Error_Context::context('pages', 0);
 
-		$db = database();
-
 		// Use our standard validation functions in a few spots
 		require_once(SUBSDIR . '/DataValidator.class.php');
 		$validator = new Data_Validator();
@@ -467,25 +465,11 @@ class ManagePortalPages_Controller extends Action_Controller
 			foreach ($validator->validation_errors() as $id => $error)
 				$pages_errors->addError($error);
 
-			return $this->action_sportal_admin_page_edit();
+			$this->action_sportal_admin_page_edit();
 		}
 
 		// Can't have the same name in the same space twice
-		$result = $db->query('', '
-			SELECT id_page
-			FROM {db_prefix}sp_pages
-			WHERE namespace = {string:namespace}
-				AND id_page != {int:current}
-			LIMIT {int:limit}',
-			array(
-				'limit' => 1,
-				'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
-				'current' => (int) $_POST['page_id'],
-			)
-		);
-		list ($has_duplicate) = $db->fetch_row($result);
-		$db->free_result($result);
-
+		$has_duplicate = sp_check_duplicate_pages($_POST['namespace'], $_POST['page_id']);
 		if (!empty($has_duplicate))
 			$pages_errors->addError('sp_error_page_namespace_duplicate');
 
@@ -509,7 +493,7 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		// None shall pass ... with errors
 		if ($pages_errors->hasErrors())
-			return $this->action_sportal_admin_page_edit();
+			$this->action_sportal_admin_page_edit();
 
 		// If you made it this far, we are going to save the work
 		if (!empty($_POST['blocks']) && is_array($_POST['blocks']))
@@ -619,22 +603,11 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		// Update the blocks as needed
 		foreach ($changes as $id => $data)
-		{
-			$db->query('', '
-				UPDATE {db_prefix}sp_blocks
-				SET
-					display = {string:display},
-					display_custom = {string:display_custom}
-				WHERE id_block = {int:id}',
-				array(
-					'id' => $id,
-					'display' => $data['display'],
-					'display_custom' => $data['display_custom'],
-				)
-			);
-		}
+			sp_update_block_visibility($id, $data);
 
 		redirectexit('action=admin;area=portalpages');
+
+		return true;
 	}
 
 	/**
@@ -642,21 +615,10 @@ class ManagePortalPages_Controller extends Action_Controller
 	 */
 	public function action_sportal_admin_page_status()
 	{
-		$db = database();
-
 		checkSession('get');
 
 		$page_id = !empty($_REQUEST['page_id']) ? (int) $_REQUEST['page_id'] : 0;
-
-		$db->query('', '
-			UPDATE {db_prefix}sp_pages
-			SET status = CASE WHEN status = {int:is_active} THEN 0 ELSE 1 END
-			WHERE id_page = {int:id}',
-			array(
-				'is_active' => 1,
-				'id' => $page_id,
-			)
-		);
+		sp_changeState('page', $page_id);
 
 		redirectexit('action=admin;area=portalpages');
 	}

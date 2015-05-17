@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4.1
+ * @version 0.0.4
  */
 
 if (!defined('ELK'))
@@ -54,10 +53,8 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			'help' => 'sp_ShoutboxArea',
 			'description' => $txt['sp_admin_shoutbox_desc'],
 			'tabs' => array(
-				'list' => array(
-				),
-				'add' => array(
-				),
+				'list' => array(),
+				'add' => array(),
 			),
 		);
 
@@ -210,7 +207,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	 */
 	public function list_spCountShoutbox()
 	{
-	   return sp_count_shoutbox();
+		return sp_count_shoutbox();
 	}
 
 	/**
@@ -233,8 +230,6 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	{
 		global $txt, $context, $modSettings, $editortxt;
 
-		$db = database();
-
 		$context['SPortal']['is_new'] = empty($_REQUEST['shoutbox_id']);
 
 		if (!empty($_POST['submit']))
@@ -244,21 +239,8 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 				fatal_lang_error('sp_error_shoutbox_name_empty', false);
 
-			$result = $db->query('', '
-				SELECT id_shoutbox
-				FROM {db_prefix}sp_shoutboxes
-				WHERE name = {string:name}
-					AND id_shoutbox != {int:current}
-				LIMIT 1',
-				array(
-					'limit' => 1,
-					'name' => Util::htmlspecialchars($_POST['name'], ENT_QUOTES),
-					'current' => (int) $_POST['shoutbox_id'],
-				)
-			);
-			list ($has_duplicate) = $db->fetch_row($result);
-			$db->free_result($result);
-
+			// No two the same
+			$has_duplicate = sp_check_duplicate_shoutbox($_POST['name'], $_POST['shoutbox_id']);
 			if (!empty($has_duplicate))
 				fatal_lang_error('sp_error_shoutbox_name_duplicate', false);
 
@@ -282,25 +264,11 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			else
 				$_POST['allowed_bbc'] = '';
 
-			$fields = array(
-				'name' => 'string',
-				'permissions' => 'int',
-				'moderator_groups' => 'string',
-				'warning' => 'string',
-				'allowed_bbc' => 'string',
-				'height' => 'int',
-				'num_show' => 'int',
-				'num_max' => 'int',
-				'reverse' => 'int',
-				'caching' => 'int',
-				'refresh' => 'int',
-				'status' => 'int',
-			);
-
 			$shoutbox_info = array(
 				'id' => (int) $_POST['shoutbox_id'],
 				'name' => Util::htmlspecialchars($_POST['name'], ENT_QUOTES),
-				'permissions' => (int) $_POST['permissions'],				'moderator_groups' => $_POST['moderator_groups'],
+				'permissions' => (int) $_POST['permissions'],
+				'moderator_groups' => $_POST['moderator_groups'],
 				'warning' => Util::htmlspecialchars($_POST['warning'], ENT_QUOTES),
 				'allowed_bbc' => $_POST['allowed_bbc'],
 				'height' => (int) $_POST['height'],
@@ -312,30 +280,8 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 				'status' => !empty($_POST['status']) ? 1 : 0,
 			);
 
-			if ($context['SPortal']['is_new'])
-			{
-				unset($shoutbox_info['id']);
-
-				$db->insert('', '
-					{db_prefix}sp_shoutboxes',
-					$fields,
-					$shoutbox_info,
-					array('id_shoutbox')
-				);
-				$shoutbox_info['id'] = $db->insert_id('{db_prefix}sp_shoutboxes', 'id_shoutbox');
-			}
-			else
-			{
-				$update_fields = array();
-				foreach ($fields as $name => $type)
-					$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
-
-				$db->query('', '
-					UPDATE {db_prefix}sp_shoutboxes
-					SET ' . implode(', ', $update_fields) . '
-					WHERE id_shoutbox = {int:id}', $shoutbox_info
-				);
-			}
+			// Update existing or add a new shoutbox
+			$shoutbox_info['id'] = sp_add_update_shoutbox($shoutbox_info, $context['SPortal']['is_new']);
 
 			sportal_update_shoutbox($shoutbox_info['id']);
 
@@ -411,7 +357,9 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			$context['disabled_tags'][trim($tag)] = true;
 		}
 
-		$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp_admin_shoutbox_add'] : $txt['sp_admin_shoutbox_edit'];
+		$context['page_title'] = $context['SPortal']['is_new']
+			? $txt['sp_admin_shoutbox_add']
+			: $txt['sp_admin_shoutbox_edit'];
 		$context['sub_template'] = 'shoutbox_edit';
 	}
 
@@ -422,14 +370,13 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		$db = database();
-
 		$shoutbox_id = empty($_REQUEST['shoutbox_id']) ? 0 : (int) $_REQUEST['shoutbox_id'];
 		$context['shoutbox'] = sportal_get_shoutbox($shoutbox_id);
 
 		if (empty($context['shoutbox']))
 			fatal_lang_error('error_sp_shoutbox_not_exist', false);
 
+		// Time to remove some chitta-chatta
 		if (!empty($_POST['submit']))
 		{
 			checkSession();
@@ -439,27 +386,16 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 				$where = array('id_shoutbox = {int:shoutbox_id}');
 				$parameters = array('shoutbox_id' => $shoutbox_id);
 
-				if ($_POST['type'] == 'days' && !empty($_POST['days']))
+				// Prune by days
+				if ($_POST['type'] === 'days' && !empty($_POST['days']))
 				{
 					$where[] = 'log_time < {int:time_limit}';
 					$parameters['time_limit'] = time() - $_POST['days'] * 86400;
 				}
-				elseif ($_POST['type'] == 'member' && !empty($_POST['member']))
+				// Or maybe by member
+				elseif ($_POST['type'] === 'member' && !empty($_POST['member']))
 				{
-					$request = $db->query('', '
-						SELECT id_member
-						FROM {db_prefix}members
-						WHERE member_name = {string:member}
-							OR real_name = {string:member}
-						LIMIT {int:limit}',
-						array(
-							'member' => strtr(trim(Util::htmlspecialchars($_POST['member'], ENT_QUOTES)), array('\'' => '&#039;')),
-							'limit' => 1,
-						)
-					);
-					list ($member_id) = $db->fetch_row($request);
-					$db->free_result($request);
-
+					$member_id = sp_shoutbox_prune_member($_POST['member']);
 					if (!empty($member_id))
 					{
 						$where[] = 'id_member = {int:member_id}';
@@ -467,42 +403,10 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 					}
 				}
 
-				if ($_POST['type'] == 'all' || count($where) > 1)
+				// Execute the selective prune or clear the entire box
+				if ($_POST['type'] === 'all' || count($where) > 1)
 				{
-					$db->query('', '
-						DELETE FROM {db_prefix}sp_shouts
-						WHERE ' . implode(' AND ', $where),
-						$parameters
-					);
-
-					if ($_POST['type'] != 'all')
-					{
-						$request = $db->query('', '
-							SELECT COUNT(*)
-							FROM {db_prefix}sp_shouts
-							WHERE id_shoutbox = {int:shoutbox_id}
-							LIMIT {int:limit}',
-							array(
-								'shoutbox_id' => $shoutbox_id,
-								'limit' => 1,
-							)
-						);
-						list ($total_shouts) = $db->fetch_row($request);
-						$db->free_result($request);
-					}
-					else
-						$total_shouts = 0;
-
-					$db->query('', '
-						UPDATE {db_prefix}sp_shoutboxes
-						SET num_shouts = {int:total_shouts}
-						WHERE id_shoutbox = {int:shoutbox_id}',
-						array(
-							'shoutbox_id' => $shoutbox_id,
-							'total_shouts' => $total_shouts,
-						)
-					);
-
+					sp_prune_shoutbox($shoutbox_id, $where, $parameters, $_POST['type'] === 'all');
 					sportal_update_shoutbox($shoutbox_id);
 				}
 			}
@@ -510,6 +414,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			redirectexit('action=admin;area=portalshoutbox');
 		}
 
+		loadJavascriptFile('suggest.js');
 		$context['page_title'] = $txt['sp_admin_shoutbox_prune'];
 		$context['sub_template'] = 'shoutbox_prune';
 	}
@@ -547,22 +452,10 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	 */
 	public function action_sportal_admin_shoutbox_status()
 	{
-		$db = database();
-
 		checkSession('get');
 
 		$shoutbox_id = !empty($_REQUEST['shoutbox_id']) ? (int) $_REQUEST['shoutbox_id'] : 0;
-
-		$db->query('', '
-			UPDATE {db_prefix}sp_shoutboxes
-			SET status = CASE WHEN status = {int:is_active} THEN 0 ELSE 1 END
-			WHERE id_shoutbox = {int:id}',
-			array(
-				'is_active' => 1,
-				'id' => $shoutbox_id,
-			)
-		);
-
+		sp_changeState('shout', $shoutbox_id);
 		redirectexit('action=admin;area=portalshoutbox');
 	}
 

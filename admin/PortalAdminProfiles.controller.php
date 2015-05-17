@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4.1
+ * @version 0.0.4
  */
 
 if (!defined('ELK'))
@@ -33,10 +32,10 @@ class ManagePortalProfile_Controller extends Action_Controller
 
 		// What can we do
 		$subActions = array(
-			'listpermission' =>  array($this, 'action_sportal_admin_permission_profiles_list', 'permission' => 'sp_manage_profiles'),
-			'addpermission' =>  array($this, 'action_sportal_admin_permission_profiles_edit', 'permission' => 'sp_manage_profiles'),
-			'editpermission' =>  array($this, 'action_sportal_admin_permission_profiles_edit', 'permission' => 'sp_manage_profiles'),
-			'deletepermission' =>  array($this, 'action_sportal_admin_permission_profiles_delete', 'permission' => 'sp_manage_profiles'),
+			'listpermission' => array($this, 'action_sportal_admin_permission_profiles_list', 'permission' => 'sp_manage_profiles'),
+			'addpermission' => array($this, 'action_sportal_admin_permission_profiles_edit', 'permission' => 'sp_manage_profiles'),
+			'editpermission' => array($this, 'action_sportal_admin_permission_profiles_edit', 'permission' => 'sp_manage_profiles'),
+			'deletepermission' => array($this, 'action_sportal_admin_permission_profiles_delete', 'permission' => 'sp_manage_profiles'),
 		);
 
 		// Start up the controller, provide a hook since we can
@@ -48,10 +47,8 @@ class ManagePortalProfile_Controller extends Action_Controller
 			'help' => 'sp_ProfilesArea',
 			'description' => $txt['sp_admin_profiles_desc'],
 			'tabs' => array(
-				'listpermission' => array(
-				),
-				'addpermission' => array(
-				),
+				'listpermission' => array(),
+				'addpermission' => array(),
 			),
 		);
 
@@ -225,7 +222,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	 */
 	public function list_spCountProfiles()
 	{
-	   return sp_count_profiles();
+		return sp_count_profiles();
 	}
 
 	/**
@@ -247,8 +244,6 @@ class ManagePortalProfile_Controller extends Action_Controller
 	public function action_sportal_admin_permission_profiles_edit()
 	{
 		global $context, $txt;
-
-		$db = database();
 
 		// New or an edit?
 		$context['is_new'] = empty($_REQUEST['profile_id']);
@@ -282,13 +277,6 @@ class ManagePortalProfile_Controller extends Action_Controller
 				$groups_denied = implode(',', $groups_denied);
 			}
 
-			// Our database fields
-			$fields = array(
-				'type' => 'int',
-				'name' => 'string',
-				'value' => 'string',
-			);
-
 			// Add the data to place in the fields
 			$profile_info = array(
 				'id' => (int) $_POST['profile_id'],
@@ -298,32 +286,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			);
 
 			// New we simply insert
-			if ($context['is_new'])
-			{
-				unset($profile_info['id']);
-
-				$db->insert('',
-					'{db_prefix}sp_profiles',
-					$fields,
-					$profile_info,
-					array('id_profile')
-				);
-				$profile_info['id'] = $db->insert_id('{db_prefix}sp_profiles', 'id_profile');
-			}
-			// Or and edit, we do a little update
-			else
-			{
-				$update_fields = array();
-				foreach ($fields as $name => $type)
-					$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
-
-				$db->query('', '
-					UPDATE {db_prefix}sp_profiles
-					SET ' . implode(', ', $update_fields) . '
-					WHERE id_profile = {int:id}',
-					$profile_info
-				);
-			}
+			$profile_info['id'] = sp_add_permission_profile($profile_info, $context['is_new']);
 
 			redirectexit('action=admin;area=portalprofiles');
 		}
@@ -345,26 +308,22 @@ class ManagePortalProfile_Controller extends Action_Controller
 			$context['profile'] = sportal_get_profiles($_REQUEST['profile_id']);
 		}
 
+		// Sub template time
 		$context['profile']['groups'] = sp_load_membergroups();
 		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_profiles_add'] : $txt['sp_admin_profiles_edit'];
 		$context['sub_template'] = 'permission_profiles_edit';
 	}
 
+	/**
+	 * Remove a permission profile from the system
+	 */
 	public function action_sportal_admin_permission_delete()
 	{
-		$db = database();
-
 		checkSession('get');
 
 		$profile_id = !empty($_REQUEST['profile_id']) ? (int) $_REQUEST['profile_id'] : 0;
 
-		$db->query('', '
-			DELETE FROM {db_prefix}sp_profiles
-			WHERE id_profile = {int:id}',
-			array(
-				'id' => $profile_id,
-			)
-		);
+		sp_delete_permission_profile($profile_id);
 
 		redirectexit('action=admin;area=portalprofiles');
 	}

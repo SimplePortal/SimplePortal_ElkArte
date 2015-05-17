@@ -1,20 +1,19 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4.3
+ * @version 0.0.4
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
 /**
- * toggles the current state of a block / control
+ * Toggles the current state of a block / control
  *
  * - calls sp_changeState to toggle the on/off status
  * - directs back based on type passed
@@ -156,6 +155,20 @@ function sp_changeState($type = null, $id = null)
 			'query_id' => 'id_article',
 			'id' => $id
 		);
+	elseif ($type == 'page')
+		$query = array(
+			'column' => 'status',
+			'table' => 'sp_pages',
+			'query_id' => 'id_page',
+			'id' => $id
+		);
+	elseif ($type == 'shout')
+		$query = array(
+			'column' => 'status',
+			'table' => 'sp_shoutboxes',
+			'query_id' => 'id_shoutbox',
+			'id' => $id
+		);
 	else
 		return false;
 
@@ -172,16 +185,48 @@ function sp_changeState($type = null, $id = null)
 			'is_active' => 1,
 		)
 	);
+
+	return true;
+}
+
+/**
+ * Load the default theme names
+ *
+ * @return array
+ */
+function sp_general_load_themes()
+{
+	global $txt;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_theme, value AS name
+		FROM {db_prefix}themes
+		WHERE variable = {string:name}
+			AND id_member = {int:member}
+		ORDER BY id_theme',
+		array(
+			'member' => 0,
+			'name' => 'name',
+		)
+	);
+	$SPortal_themes = array('0' => &$txt['portalthemedefault']);
+	while ($row = $db->fetch_assoc($request))
+		$SPortal_themes[$row['id_theme']] = $row['name'];
+	$db->free_result($request);
+
+	return $SPortal_themes;
 }
 
 /**
  * This will file the $context['member_groups'] to the given options
  *
- * @param int[]|string $selectedGroups - all groups who should be shown as selected, if you like to check all than insert an 'all'
- *								 You can also Give the function a string with '2,3,4'
+ * @param int[]|string $selectedGroups - all groups who should be shown as selected, if you like to check all than
+ *     insert an 'all' You can also Give the function a string with '2,3,4'
  * @param string $show - 'normal' => will show all groups, and add a guest and regular member (Standard)
- *						 'post' => will load only post groups
- *						 'master' => will load only not postbased groups
+ *                       'post' => will load only post groups
+ *                       'master' => will load only not postbased groups
  * @param string $contextName - where the data should stored in the $context
  * @param string $subContext
  */
@@ -200,7 +245,7 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 	else
 		$context[$contextName] = array();
 
-	// Preseting some things :)
+	// Presetting some things :)
 	if (!is_array($selectedGroups))
 		$checked = strtolower($selectedGroups) == 'all';
 	else
@@ -213,7 +258,7 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 		if (!is_array($selectedGroups))
 			$selectedGroups = explode(',', $selectedGroups);
 
-		// Remove all strings, i will only allowe ids :P
+		// Remove all strings, i will only allow ids :P
 		foreach ($selectedGroups as $k => $i)
 			$selectedGroups[$k] = (int) $i;
 
@@ -324,7 +369,6 @@ function sp_load_membergroups()
 function sp_count_categories()
 {
 	$db = database();
-	$total_categories = 0;
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -373,7 +417,9 @@ function sp_load_categories($start = null, $items_per_page = null, $sort = null)
 			'link' => '<a href="' . $scripturl . '?category=' . $row['namespace'] . '">' . $row['name'] . '</a>',
 			'articles' => $row['articles'],
 			'status' => $row['status'],
-			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalcategories;sa=status;category_id=' . $row['id_category'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_categories_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalcategories;sa=status;category_id=' . $row['id_category'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status'])
+				? 'deactive' : 'active', $txt['sp_admin_categories_' . (!empty($row['status']) ? 'de'
+				: '') . 'activate']) . '</a>',
 		);
 	}
 	$db->free_result($request);
@@ -423,7 +469,7 @@ function sp_update_category($data, $is_new = false)
 
 	$id = isset($data['id']) ? $data['id'] : null;
 
-	// Field defnitions
+	// Field definitions
 	$fields = array(
 		'namespace' => 'string',
 		'name' => 'string',
@@ -515,7 +561,6 @@ function sp_category_update_total($category_id)
 function sp_count_articles()
 {
 	$db = database();
-	$total_articles = 0;
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -578,13 +623,17 @@ function sp_load_articles($start, $items_per_page, $sort)
 				'id' => $row['id_author'],
 				'name' => $row['author_name'],
 				'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
-				'link' => $row['id_author'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>') : $row['author_name'],
+				'link' => $row['id_author']
+					? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>')
+					: $row['author_name'],
 			),
 			'type' => $row['type'],
 			'type_text' => $txt['sp_articles_type_' . $row['type']],
 			'date' => standardTime($row['date']),
 			'status' => $row['status'],
-			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status'])
+					? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de'
+					: '') . 'activate']) . '</a>',
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=edit;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=delete;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_articles_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
@@ -757,7 +806,6 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 function sp_count_pages()
 {
 	$db = database();
-	$total_pages = 0;
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -807,7 +855,9 @@ function sp_load_pages($start, $items_per_page, $sort)
 			'type_text' => $txt['sp_pages_type_' . $row['type']],
 			'views' => $row['views'],
 			'status' => $row['status'],
-			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=status;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_pages_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=status;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status'])
+				? 'deactive' : 'active', $txt['sp_admin_pages_' . (!empty($row['status']) ? 'de'
+				: '') . 'activate']) . '</a>',
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=edit;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=delete;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_pages_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
@@ -891,12 +941,40 @@ function sp_save_page($page_info, $is_new = false)
 }
 
 /**
+ * Checks for duplicate page names in the same namespace
+ *
+ * @param string $namespace
+ * @param int $page_id
+ */
+function sp_check_duplicate_pages($namespace, $page_id)
+{
+	$db = database();
+
+	// Can't have the same name in the same space twice
+	$result = $db->query('', '
+		SELECT id_page
+		FROM {db_prefix}sp_pages
+		WHERE namespace = {string:namespace}
+			AND id_page != {int:current}
+		LIMIT {int:limit}',
+		array(
+			'limit' => 1,
+			'namespace' => Util::htmlspecialchars($namespace, ENT_QUOTES),
+			'current' => (int) $page_id,
+		)
+	);
+	list ($has_duplicate) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $has_duplicate;
+}
+
+/**
  * Returns the total count of shoutboxes in the system
  */
 function sp_count_shoutbox()
 {
 	$db = database();
-	$total_shoutbox = 0;
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -942,7 +1020,9 @@ function sp_load_shoutbox($start, $items_per_page, $sort)
 			'shouts' => $row['num_shouts'],
 			'caching' => $row['caching'],
 			'status' => $row['status'],
-			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=status;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_shoutbox_' . (!empty($row['status']) ? 'de' : '') . 'activate']) . '</a>',
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=status;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status'])
+					? 'deactive' : 'active', $txt['sp_admin_shoutbox_' . (!empty($row['status']) ? 'de'
+					: '') . 'activate']) . '</a>',
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=edit;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'prune' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=prune;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('bin') . '</a>',
@@ -982,12 +1062,176 @@ function sp_delete_shoutbox($shoutbox_ids = array())
 }
 
 /**
+ * Checks if a shoutbox with the same name and id already exists
+ *
+ * @param string $name
+ * @param int $shoutbox_id
+ *
+ * @return int
+ */
+function sp_check_duplicate_shoutbox($name, $shoutbox_id)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT id_shoutbox
+		FROM {db_prefix}sp_shoutboxes
+		WHERE name = {string:name}
+			AND id_shoutbox != {int:current}
+		LIMIT {int:limit}',
+		array(
+			'limit' => 1,
+			'name' => Util::htmlspecialchars($name, ENT_QUOTES),
+			'current' => (int) $shoutbox_id,
+		)
+	);
+	list ($has_duplicate) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $has_duplicate;
+}
+
+/**
+ * Add or update a shoutbox on the system
+ *
+ * @param array $shoutbox_info
+ * @param bool $is_new
+ *
+ * @return int
+ */
+function sp_edit_shoutbox($shoutbox_info, $is_new = false)
+{
+	$db = database();
+
+	// Our base shoutbox database looks like this
+	$fields = array(
+		'name' => 'string',
+		'permissions' => 'int',
+		'moderator_groups' => 'string',
+		'warning' => 'string',
+		'allowed_bbc' => 'string',
+		'height' => 'int',
+		'num_show' => 'int',
+		'num_max' => 'int',
+		'reverse' => 'int',
+		'caching' => 'int',
+		'refresh' => 'int',
+		'status' => 'int',
+	);
+
+	// Brand new, insert it
+	if ($is_new)
+	{
+		// Drop any old id, get a new one
+		unset($shoutbox_info['id']);
+
+		$db->insert('', '
+			{db_prefix}sp_shoutboxes',
+			$fields,
+			$shoutbox_info,
+			array('id_shoutbox')
+		);
+		$shoutbox_info['id'] = $db->insert_id('{db_prefix}sp_shoutboxes', 'id_shoutbox');
+	}
+	// Then editing so we update what was there
+	else
+	{
+		$update_fields = array();
+		foreach ($fields as $name => $type)
+			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+
+		$db->query('', '
+			UPDATE {db_prefix}sp_shoutboxes
+			SET ' . implode(', ', $update_fields) . '
+			WHERE id_shoutbox = {int:id}', $shoutbox_info
+		);
+	}
+
+	return $shoutbox_info['id'];
+}
+
+/**
+ * Gets a members ID from their userid or display name, used to
+ * prune a members shouts from a box
+ *
+ * @param string $member
+ */
+function sp_shoutbox_prune_member($member)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_member
+		FROM {db_prefix}members
+		WHERE member_name = {string:member}
+			OR real_name = {string:member}
+		LIMIT {int:limit}',
+		array(
+			'member' => strtr(trim(Util::htmlspecialchars($member, ENT_QUOTES)), array('\'' => '&#039;')),
+			'limit' => 1,
+		)
+	);
+	list ($member_id) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return (int) $member_id;
+}
+
+/**
+ * Removes selectively some shouts or all shouts from a shoutbox
+ *
+ * @param int $shoutbox_id
+ * @param array $where
+ * @param array $parameters
+ * @param bool $all
+ */
+function sp_prune_shoutbox($shoutbox_id, $where, $parameters, $all = false)
+{
+	$db = database();
+
+	// Do the pruning
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_shouts
+		WHERE ' . implode(' AND ', $where),
+		$parameters
+	);
+
+	// If we did not get them all, how many shouts are left?
+	$total_shouts = 0;
+	if (!$all)
+	{
+		$request = $db->query('', '
+			SELECT COUNT(*)
+			FROM {db_prefix}sp_shouts
+			WHERE id_shoutbox = {int:shoutbox_id}
+			LIMIT {int:limit}',
+			array(
+				'shoutbox_id' => $shoutbox_id,
+				'limit' => 1,
+			)
+		);
+		list ($total_shouts) = $db->fetch_row($request);
+		$db->free_result($request);
+	}
+
+	// Update the shout count
+	$db->query('', '
+		UPDATE {db_prefix}sp_shoutboxes
+		SET num_shouts = {int:total_shouts}
+		WHERE id_shoutbox = {int:shoutbox_id}',
+		array(
+			'shoutbox_id' => $shoutbox_id,
+			'total_shouts' => $total_shouts,
+		)
+	);
+}
+
+/**
  * Returns the total count of profiles in the system
  */
 function sp_count_profiles()
 {
 	$db = database();
-	$total_profiles = 0;
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -997,7 +1241,7 @@ function sp_count_profiles()
 			'type' => 1,
 		)
 	);
-	list ($total_profiles) =  $db->fetch_row($request);
+	list ($total_profiles) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $total_profiles;
@@ -1035,7 +1279,9 @@ function sp_load_profiles($start, $items_per_page, $sort)
 		$profiles[$row['id_profile']] = array(
 			'id' => $row['id_profile'],
 			'name' => $row['name'],
-			'label' => isset($txt['sp_admin_profiles' . substr($row['name'], 1)]) ? $txt['sp_admin_profiles' . substr($row['name'], 1)] : $row['name'],
+			'label' => isset($txt['sp_admin_profiles' . substr($row['name'], 1)])
+				? $txt['sp_admin_profiles' . substr($row['name'], 1)]
+				: $row['name'],
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalprofiles;sa=editpermission;profile_id=' . $row['id_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalprofiles;sa=deletepermission;profile_id=' . $row['id_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_profiles_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
@@ -1166,6 +1412,30 @@ function sp_update_block_row($current_row, $row, $col, $decrement = true)
 }
 
 /**
+ * Update a portals block display
+ *
+ * @param int $id
+ * @param array $data
+ */
+function sp_update_block_visibility($id, $data)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}sp_blocks
+		SET
+			display = {string:display},
+			display_custom = {string:display_custom}
+		WHERE id_block = {int:id}',
+		array(
+			'id' => $id,
+			'display' => $data['display'],
+			'display_custom' => $data['display_custom'],
+		)
+	);
+}
+
+/**
  * Fetches the rows from a specified column and returns the values
  *
  * - If a current block ID is not specified the next available row number in
@@ -1184,7 +1454,7 @@ function sp_block_nextrow($block_column, $block_id = 0)
 			row
 		FROM {db_prefix}sp_blocks
 		WHERE col = {int:col}' . (!empty($block_id) ? '
-			AND id_block != {int:current_id}' : '' ) . '
+			AND id_block != {int:current_id}' : '') . '
 		ORDER BY row DESC
 		LIMIT 1',
 		array(
@@ -1314,7 +1584,7 @@ function sp_block_get_position($block_id)
 	list ($current_side, $current_row) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	return array($current_side,$current_row);
+	return array($current_side, $current_row);
 }
 
 /**
@@ -1410,6 +1680,65 @@ function sp_block_delete($block_id)
 		WHERE id_block = {int:id}',
 		array(
 			'id' => $block_id,
+		)
+	);
+}
+
+function sp_add_permission_profile($profile_info, $is_new = false)
+{
+	$db = database();
+
+	// Our database fields
+	$fields = array(
+		'type' => 'int',
+		'name' => 'string',
+		'value' => 'string',
+	);
+
+	// A new permissions profile?
+	if ($is_new)
+	{
+		unset($profile_info['id']);
+
+		$db->insert('',
+			'{db_prefix}sp_profiles',
+			$fields,
+			$profile_info,
+			array('id_profile')
+		);
+		$profile_info['id'] = $db->insert_id('{db_prefix}sp_profiles', 'id_profile');
+	}
+	// Or and edit, we do a little update
+	else
+	{
+		$update_fields = array();
+		foreach ($fields as $name => $type)
+			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+
+		$db->query('', '
+			UPDATE {db_prefix}sp_profiles
+			SET ' . implode(', ', $update_fields) . '
+			WHERE id_profile = {int:id}',
+			$profile_info
+		);
+	}
+
+	return (int) $profile_info['id'];
+}
+
+/**
+ * Removes a permission profile from the system
+ * @param int $profile_id
+ */
+function sp_delete_permission_profile($profile_id)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_profiles
+		WHERE id_profile = {int:id}',
+		array(
+			'id' => $profile_id,
 		)
 	);
 }

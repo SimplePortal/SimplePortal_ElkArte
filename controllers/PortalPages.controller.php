@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4.1
+ * @version 0.0.4
  */
 
 if (!defined('ELK'))
@@ -62,8 +61,6 @@ class Pages_Controller extends Action_Controller
 	{
 		global $context, $scripturl;
 
-		$db = database();
-
 		// Use the requested page id
 		$page_id = !empty($_REQUEST['page']) ? $_REQUEST['page'] : 0;
 
@@ -81,15 +78,7 @@ class Pages_Controller extends Action_Controller
 		// Increase the view counter
 		if (empty($_SESSION['last_viewed_page']) || $_SESSION['last_viewed_page'] != $context['SPortal']['page']['id'])
 		{
-			$db->query('', '
-				UPDATE {db_prefix}sp_pages
-				SET views = views + 1
-				WHERE id_page = {int:current_page}',
-				array(
-					'current_page' => $context['SPortal']['page']['id'],
-				)
-			);
-
+			sportal_increase_viewcount('page', $context['SPortal']['page']['id']);
 			$_SESSION['last_viewed_page'] = $context['SPortal']['page']['id'];
 		}
 
