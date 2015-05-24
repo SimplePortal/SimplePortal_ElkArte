@@ -25,6 +25,7 @@ class Shoutbox_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		loadTemplate('PortalShoutbox');
+		require_once(SUBSDIR . '/PortalShoutbox.subs.php');
 	}
 
 	/**

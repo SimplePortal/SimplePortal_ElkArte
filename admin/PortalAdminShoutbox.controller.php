@@ -19,6 +19,18 @@ if (!defined('ELK'))
 class ManagePortalShoutbox_Controller extends Action_Controller
 {
 	/**
+	 * This method is executed before any action handler.
+	 * Loads common things for all methods
+	 */
+	public function pre_dispatch()
+	{
+		// We'll need the utility functions from here.
+		require_once(SUBSDIR . '/PortalAdmin.subs.php');
+		require_once(SUBSDIR . '/Portal.subs.php');
+		require_once(SUBSDIR . '/PortalShoutbox.subs.php');
+	}
+
+	/**
 	 * Main dispatcher.
 	 * This function checks permissions and passes control through.
 	 */
@@ -30,9 +42,6 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 		if (!allowedTo('sp_admin'))
 			isAllowedTo('sp_manage_shoutbox');
 
-		// Some help will be needed
-		require_once(SUBSDIR . '/PortalAdmin.subs.php');
-		require_once(SUBSDIR . '/Portal.subs.php');
 		loadTemplate('PortalAdminShoutbox');
 
 		$subActions = array(
@@ -281,7 +290,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			);
 
 			// Update existing or add a new shoutbox
-			$shoutbox_info['id'] = sp_add_update_shoutbox($shoutbox_info, $context['SPortal']['is_new']);
+			$shoutbox_info['id'] = sp_edit_shoutbox($shoutbox_info, $context['SPortal']['is_new']);
 
 			sportal_update_shoutbox($shoutbox_info['id']);
 
