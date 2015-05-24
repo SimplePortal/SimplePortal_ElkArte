@@ -295,7 +295,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// Want to take a look at how this block will appear, well we try our best
 		if (!empty($_POST['preview_block']) || isset($_SESSION['sp_error']))
 		{
-			// An error was generated on save, lets set things up like a preview and return to the preivew
+			// An error was generated on save, lets set things up like a preview and return to the preview
 			if (isset($_SESSION['sp_error']))
 			{
 				$context['SPortal']['error'] = $_SESSION['sp_error'];
