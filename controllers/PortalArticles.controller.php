@@ -19,21 +19,22 @@ if (!defined('ELK'))
 class Article_Controller extends Action_Controller
 {
 	/**
-	 * Default method
-	 */
-	public function action_index()
-	{
-		// Where do you want to go today? :P
-		$this->action_sportal_articles();
-	}
-
-	/**
 	 * This method is executed before any action handler.
 	 * Loads common things for all methods
 	 */
 	public function pre_dispatch()
 	{
 		loadTemplate('PortalArticles');
+		require_once(SUBSDIR . '/PortalArticle.subs.php');
+	}
+
+	/**
+	 * Default method
+	 */
+	public function action_index()
+	{
+		// Where do you want to go today? :P
+		$this->action_sportal_articles();
 	}
 
 	/**
@@ -58,6 +59,7 @@ class Article_Controller extends Action_Controller
 
 		foreach ($context['articles'] as $article)
 		{
+			// Want to cut this one a bit short?
 			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
 			{
 				$article['body'] = Util::substr($article['body'], 0, $cutoff);
@@ -97,12 +99,12 @@ class Article_Controller extends Action_Controller
 		else
 			$article_id = Util::htmlspecialchars($article_id, ENT_QUOTES);
 
+		// Fetch and render the article
 		$context['article'] = sportal_get_articles($article_id, true, true);
-
-		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
-
 		if (empty($context['article']['id']))
 			fatal_lang_error('error_sp_article_not_found', false);
+
+		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
 
 		// Set up for the comment pagination
 		$total_comments = sportal_get_article_comment_count($context['article']['id']);
@@ -114,9 +116,11 @@ class Article_Controller extends Action_Controller
 		if ($total_comments > $per_page)
 			$context['page_index'] = constructPageIndex($scripturl . '?article=' . $context['article']['article_id'] . ';comments=%1$d', $start, $total_comments, $per_page, true);
 
-		// Prepare the template
-		$context['article']['date'] = htmlTime($context['article']['date']);
+		// Load in all the comments for the article
 		$context['article']['comments'] = sportal_get_comments($context['article']['id'], $per_page, $start);
+
+		// Prepare the final template details
+		$context['article']['date'] = htmlTime($context['article']['date']);
 		$context['article']['can_comment'] = $context['user']['is_logged'];
 		$context['article']['can_moderate'] = allowedTo('sp_admin') || allowedTo('sp_manage_articles');
 
@@ -147,7 +151,9 @@ class Article_Controller extends Action_Controller
 					sportal_create_article_comment($context['article']['id'], $body);
 			}
 
-			redirectexit('article=' . $context['article']['article_id']);
+			// Set a anchor
+			$anchor = '#comment' . (!empty($comment_id) ? $comment_id : ($total_comments > 0 ? $total_comments - 1 : 1));
+			redirectexit('article=' . $context['article']['article_id']. $anchor);
 		}
 
 		// Prepare to edit an existing comment
@@ -178,13 +184,14 @@ class Article_Controller extends Action_Controller
 			redirectexit('article=' . $context['article']['article_id']);
 		}
 
-		// Increase the view counter
+		// Increase the article view counter
 		if (empty($_SESSION['last_viewed_article']) || $_SESSION['last_viewed_article'] != $context['article']['id'])
 		{
 			sportal_increase_viewcount('article', $context['article']['id']);
 			$_SESSION['last_viewed_article'] = $context['article']['id'];
 		}
 
+		// Build the breadcrumbs
 		$context['linktree'] = array_merge($context['linktree'], array(
 			array(
 				'url' => $scripturl . '?category=' . $context['article']['category']['category_id'],
@@ -196,6 +203,7 @@ class Article_Controller extends Action_Controller
 			)
 		));
 
+		// Off to the template we go
 		$context['page_title'] = $context['article']['title'];
 		$context['sub_template'] = 'view_article';
 	}

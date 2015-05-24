@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 0.0.4
  */
 
 /**
@@ -32,7 +31,7 @@ function template_articles_edit()
 			<h3 class="category_header">
 				', $context['is_new'] ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'], '
 			</h3>
-			<div class="windowbg">
+			<div class="content">
 				<dl class="sp_form">
 					<dt>
 						<label for="article_title">', $txt['sp_admin_articles_col_title'], ':</label>
@@ -102,8 +101,7 @@ function template_articles_edit()
 				</div>
 			</form>
 		</div>
-	</div>
-	<script><!-- // --><![CDATA[
-		sp_editor_change_type("article_type");
-	// ]]></script>';
+	</div>';
+
+	addInlineJavascript('sp_editor_change_type("article_type");', true);
 }

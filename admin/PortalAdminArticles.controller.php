@@ -25,6 +25,18 @@ class ManagePortalArticles_Controller extends Action_Controller
 	protected $_is_new;
 
 	/**
+	 * This method is executed before any action handler.
+	 * Loads common things for all methods
+	 */
+	public function pre_dispatch()
+	{
+		// We'll need the utility functions from here.
+		require_once(SUBSDIR . '/PortalAdmin.subs.php');
+		require_once(SUBSDIR . '/Portal.subs.php');
+		require_once(SUBSDIR . '/PortalArticle.subs.php');
+	}
+
+	/**
 	 * Main article dispatcher.
 	 *
 	 * This function checks permissions and passes control through.
@@ -36,10 +48,6 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// You need to be an admin or have manage article permissions
 		if (!allowedTo('sp_admin'))
 			isAllowedTo('sp_manage_articles');
-
-		// We'll need the utility functions from here.
-		require_once(SUBSDIR . '/PortalAdmin.subs.php');
-		require_once(SUBSDIR . '/Portal.subs.php');
 
 		loadTemplate('PortalAdminArticles');
 
@@ -424,8 +432,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 			'permissions' => $_POST['permissions'],
 			'date' => $date,
 			'status' => !empty($_POST['status']),
-			'views' => $views,
-			'comments' => $comments,
+			'view_count' => $views,
+			'comment_count' => $comments,
 		);
 
 		if ($article['type'] === 'bbc')
