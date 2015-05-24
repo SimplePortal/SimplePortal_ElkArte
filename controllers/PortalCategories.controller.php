@@ -61,6 +61,9 @@ class Categories_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $modSettings;
 
+		// Basic article support
+		require_once(SUBSDIR . '/PortalArticle.subs.php');
+
 		$category_id = !empty($_REQUEST['category']) ? $_REQUEST['category'] : 0;
 
 		if (is_int($category_id))

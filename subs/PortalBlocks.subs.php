@@ -2383,7 +2383,9 @@ function sp_articles($parameters, $id, $return_parameters = false)
 		return $block_parameters;
 	}
 
+	// Needed utilities
 	require_once(SUBSDIR . '/Post.subs.php');
+	require_once(SUBSDIR . '/PortalArticle.subs.php');
 
 	// Set up for the query
 	$category = empty($parameters['category']) ? 0 : (int) $parameters['category'];
@@ -2510,6 +2512,8 @@ function sp_shoutbox($parameters, $id, $return_parameters = false)
 	$block_parameters = array(
 		'shoutbox' => array(),
 	);
+
+	require_once(SUBSDIR . '/PortalShoutbox.subs.php');
 
 	// return the parameters for use in setting up the blocks
 	if ($return_parameters)
