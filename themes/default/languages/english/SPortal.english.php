@@ -40,6 +40,7 @@ $txt['sp_has_articles'] = '%d articles';
 $txt['sp_commented_on_time'] = 'commented on %d time';
 $txt['sp_commented_on_times'] = 'commented on %d times';
 $txt['sp_posted_on_by'] = 'posted on %1$s by %2$s';
+$txt['sp_posted_by'] = 'posted %1$s by %2$s';
 $txt['sp_posted_in_on_by'] = 'posted in %1$s on %2$s by %3$s';
 $txt['sp_posted_on_in_by'] = 'posted %2$s in %1$s by %3$s';
 
@@ -143,7 +144,7 @@ $txt['error_sp_no_permission_profiles'] = 'There are no permission profiles avai
 $txt['error_sp_no_pages'] = 'There are no pages available.';
 $txt['error_sp_no_categories'] = 'There are no categories available.';
 $txt['error_sp_no_articles'] = 'There are no articles available.';
-$txt['error_sp_no_comments'] = 'There are no comment made on this article yet. Be the first one to comment!';
+$txt['error_sp_no_comments'] = 'There are no comments on this article yet. Be the first one to comment!';
 $txt['error_sp_cannot_comment_modify'] = 'You don\'t have permission to modify this comment.';
 $txt['error_sp_cannot_comment_delete'] = 'You don\'t have permission to delete this comment.';
 $txt['error_sp_page_not_found'] = 'The page you requested cannot be found.';
