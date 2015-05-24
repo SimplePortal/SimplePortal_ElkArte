@@ -67,42 +67,45 @@ class Sportal_Controller extends Action_Controller
 	{
 		global $context, $modSettings;
 
-		$context['sub_template'] = 'portal_index';
-
-		if (empty($modSettings['sp_articles_index']))
-			return;
-
-		// Set up the pages
-		$total_articles = sportal_get_articles_count();
-		$total = min($total_articles, !empty($modSettings['sp_articles_index_total'])
-			? $modSettings['sp_articles_index_total'] : 20);
-		$per_page = min($total, !empty($modSettings['sp_articles_index_per_page'])
-			? $modSettings['sp_articles_index_per_page'] : 5);
-		$start = !empty($_REQUEST['articles']) ? (int) $_REQUEST['articles'] : 0;
-
-		if ($total > $per_page)
-			$context['page_index'] = constructPageIndex($context['portal_url'] . '?articles=%1$d', $start, $total, $per_page, true);
-
-		// If we have some articles
-		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
-		foreach ($context['articles'] as $article)
+		// Showing articles on the index page?
+		if (!empty($modSettings['sp_articles_index']))
 		{
-			if (empty($modSettings['sp_articles_length']) && ($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
+			require_once(SUBSDIR . '/PortalArticle.subs.php');
+			$context['sub_template'] = 'portal_index';
+
+			// Set up the pages
+			$total_articles = sportal_get_articles_count();
+			$total = min($total_articles, !empty($modSettings['sp_articles_index_total'])
+				? $modSettings['sp_articles_index_total'] : 20);
+			$per_page = min($total, !empty($modSettings['sp_articles_index_per_page'])
+				? $modSettings['sp_articles_index_per_page'] : 5);
+			$start = !empty($_REQUEST['articles']) ? (int) $_REQUEST['articles'] : 0;
+
+			if ($total > $per_page)
+				$context['article_page_index'] = constructPageIndex($context['portal_url'] . '?articles=%1$d', $start, $total, $per_page, true);
+
+			// If we have some articles
+			require_once(SUBSDIR . '/PortalArticle.subs.php');
+			$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
+			foreach ($context['articles'] as $article)
 			{
-				$article['body'] = Util::substr($article['body'], 0, $cutoff);
-				if ($article['type'] === 'bbc')
+				if (empty($modSettings['sp_articles_length']) && ($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
 				{
-					require_once(SUBSDIR . '/Post.subs.php');
-					preparsecode($article['body']);
+					$article['body'] = Util::substr($article['body'], 0, $cutoff);
+					if ($article['type'] === 'bbc')
+					{
+						require_once(SUBSDIR . '/Post.subs.php');
+						preparsecode($article['body']);
+					}
 				}
+
+				$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
+				$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
+
+				// Just want a shorter look on the index page
+				if (!empty($modSettings['sp_articles_length']))
+					$context['articles'][$article['id']]['preview'] = Util::shorten_html($context['articles'][$article['id']]['preview'], $modSettings['sp_articles_length']);
 			}
-
-			$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
-			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
-
-			// Just want a shorter look on the index page
-			if (!empty($modSettings['sp_articles_length']))
-				$context['articles'][$article['id']]['preview'] = Util::shorten_html($context['articles'][$article['id']]['preview'], $modSettings['sp_articles_length']);
 		}
 	}
 
