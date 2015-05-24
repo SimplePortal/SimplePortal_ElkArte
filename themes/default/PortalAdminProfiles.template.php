@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 0.0.4
  */
 
 function template_permission_profiles_edit()
@@ -19,26 +18,25 @@ function template_permission_profiles_edit()
 			<h3 class="category_header">
 				', $context['page_title'], '
 			</h3>
-			<div class="windowbg">
-				<div class="sp_content_padding">
-					<dl class="sp_form">
-						<dt>
-							<label for="profile_name">', $txt['sp_admin_profiles_col_name'], ':</label>
-						</dt>
-						<dd>
-							<input type="text" name="name" id="profile_name" value="', $context['profile']['name'], '" class="input_text" />
-						</dd>
-						<dt>
-							', $txt['sp_admin_profiles_col_permissions'], ':
-						</dt>
-						<dd>
-							<table>
-								<tr>
-									<th>', $txt['sp_admin_profiles_permissions_membergroup'], '</td>
-									<th title="', $txt['sp_admin_profiles_permissions_allowed'], '">', $txt['sp_admin_profiles_permissions_allowed_short'], '</th>
-									<th title="', $txt['sp_admin_profiles_permissions_disallowed'], '">', $txt['sp_admin_profiles_permissions_disallowed_short'], '</th>
-									<th title="', $txt['sp_admin_profiles_permissions_denied'], '">', $txt['sp_admin_profiles_permissions_denied_short'], '</th>
-								</tr>';
+			<div class="sp_content_padding">
+				<dl class="sp_form">
+					<dt>
+						<label for="profile_name">', $txt['sp_admin_profiles_col_name'], ':</label>
+					</dt>
+					<dd>
+						<input type="text" name="name" id="profile_name" value="', $context['profile']['name'], '" class="input_text" />
+					</dd>
+					<dt>
+						', $txt['sp_admin_profiles_col_permissions'], ':
+					</dt>
+					<dd>
+						<table>
+							<tr>
+								<th>', $txt['sp_admin_profiles_permissions_membergroup'], '</td>
+								<th title="', $txt['sp_admin_profiles_permissions_allowed'], '">', $txt['sp_admin_profiles_permissions_allowed_short'], '</th>
+								<th title="', $txt['sp_admin_profiles_permissions_disallowed'], '">', $txt['sp_admin_profiles_permissions_disallowed_short'], '</th>
+								<th title="', $txt['sp_admin_profiles_permissions_denied'], '">', $txt['sp_admin_profiles_permissions_denied_short'], '</th>
+							</tr>';
 
 	foreach ($context['profile']['groups'] as $id => $label)
 	{
@@ -49,24 +47,23 @@ function template_permission_profiles_edit()
 			$current = -1;
 
 		echo '
-								<tr>
-									<td>', $label, '</td>
-									<td><input type="radio" name="membergroups[', $id, ']" value="1"', $current == 1 ? ' checked="checked"' : '', ' class="input_radio"></td>
-									<td><input type="radio" name="membergroups[', $id, ']" value="0"', $current == 0 ? ' checked="checked"' : '', ' class="input_radio"></td>
-									<td><input type="radio" name="membergroups[', $id, ']" value="-1"', $current == -1 ? ' checked="checked"' : '', ' class="input_radio"></td>
-								</tr>';
+							<tr>
+								<td>', $label, '</td>
+								<td><input type="radio" name="membergroups[', $id, ']" value="1"', $current == 1 ? ' checked="checked"' : '', ' class="input_radio"></td>
+								<td><input type="radio" name="membergroups[', $id, ']" value="0"', $current == 0 ? ' checked="checked"' : '', ' class="input_radio"></td>
+								<td><input type="radio" name="membergroups[', $id, ']" value="-1"', $current == -1 ? ' checked="checked"' : '', ' class="input_radio"></td>
+							</tr>';
 	}
 
 	echo '
-							</table>
-						</dd>
-					</dl>
-				</div>
+						</table>
+					</dd>
+				</dl>
 			</div>
-								<div class="submitbutton">
-						<input type="submit" name="submit" value="', $context['page_title'], '" class="button_submit" />
-						<input type="hidden" name="profile_id" value="', $context['profile']['id'], '" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					</div>
+			<div class="submitbutton">
+				<input type="submit" name="submit" value="', $context['page_title'], '" class="button_submit" />
+				<input type="hidden" name="profile_id" value="', $context['profile']['id'], '" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			</div>
 		</form>';
 }

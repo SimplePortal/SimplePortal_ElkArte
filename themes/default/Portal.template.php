@@ -20,7 +20,7 @@ function template_portal_index()
 		return;
 
 	echo '
-	<div id="sp_index">';
+	<div id="sp_index" class="sp_article_block_container">';
 
 	foreach ($context['articles'] as $article)
 	{
@@ -48,9 +48,9 @@ function template_portal_index()
 					<span class="floatright">';
 
 		echo '
-						', sprintf($article['views'] == 1 ? $txt['sp_viewed_time']
-			: $txt['sp_viewed_times'], $article['views']), ', ', sprintf($article['comments'] == 1
-			? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '
+						', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time']
+						: $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1
+						? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
 					</span>
 				</div>
 				<hr />
@@ -62,12 +62,15 @@ function template_portal_index()
 		</div>';
 	}
 
+	// Pages as well?
+	if (!empty($context['article_page_index']))
+		echo'
+		<div class="sp_page_index">',
+			template_pagesection(), '
+		</div>';
+
 	echo '
 	</div>';
-
-	// Pages as well?
-	if (!empty($context['page_index']))
-		template_pagesection();
 }
 
 /**
@@ -77,7 +80,7 @@ function template_portal_above()
 {
 	global $context, $modSettings, $scripturl, $txt;
 
-	// Allowing side collasping? if so show the buttons
+	// Allowing side collapsing? if so show the buttons
 	if (empty($modSettings['sp_disable_side_collapse']) && ($context['SPortal']['sides'][1]['active'] || $context['SPortal']['sides'][4]['active']))
 	{
 		echo '
