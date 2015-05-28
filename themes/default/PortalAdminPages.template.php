@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 function template_pages_edit()
@@ -30,7 +29,6 @@ function template_pages_edit()
 			<h3 class="category_header">
 				', $context['SPortal']['is_new'] ? $txt['sp_admin_pages_add'] : $txt['sp_admin_pages_edit'], '
 			</h3>
-			<div class="windowbg">
 				<div class="editor_wrapper">
 					<dl class="sp_form">
 						<dt>
@@ -115,14 +113,13 @@ function template_pages_edit()
 					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
 					<input type="submit" name="preview" value="', $txt['sp_admin_pages_preview'], '" class="right_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				</div>
 			</div>';
 
 	$style_sections = array('title' => 'left', 'body' => 'right');
 	$style_types = array('default' => 'DefaultClass', 'class' => 'CustomClass', 'style' => 'CustomStyle');
 	$style_parameters = array(
 		'title' => array('category_header', 'secondary_header'),
-		'body' => array('windowbg',  'windowbg2', 'information', 'roundframe'),
+		'body' => array('content', 'information', 'roundframe'),
 	);
 
 	echo '
@@ -130,7 +127,6 @@ function template_pages_edit()
 			<h3 class="category_header">
 				', $txt['sp_admin_pages_style'], '
 			</h3>
-			<div class="windowbg2">
 				<div class="sp_content_padding">';
 
 	foreach ($style_sections as $section => $float)
@@ -180,12 +176,9 @@ function template_pages_edit()
 					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
 					<input type="submit" name="preview" value="', $txt['sp_admin_pages_preview'], '" class="right_submit" />
 				</div>
-			</div>
 			<input type="hidden" name="page_id" value="', $context['SPortal']['page']['id'], '" />
 		</form>
-	</div>
-	<script><!-- // --><![CDATA[
-		check_style_options();
-		sp_editor_change_type("page_type");
-	// ]]></script>';
+	</div>';
+
+	addInlineJavascript('sp_editor_change_type("page_type");', true);
 }

@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 if (!defined('ELK'))
@@ -21,13 +20,25 @@ class ManagePortalArticles_Controller extends Action_Controller
 {
 	/**
 	 * If we are adding a new article or editing an existing one
-	 *
 	 * @var bool
 	 */
 	protected $_is_new;
 
 	/**
-	 * Main dispatcher.
+	 * This method is executed before any action handler.
+	 * Loads common things for all methods
+	 */
+	public function pre_dispatch()
+	{
+		// We'll need the utility functions from here.
+		require_once(SUBSDIR . '/PortalAdmin.subs.php');
+		require_once(SUBSDIR . '/Portal.subs.php');
+		require_once(SUBSDIR . '/PortalArticle.subs.php');
+	}
+
+	/**
+	 * Main article dispatcher.
+	 *
 	 * This function checks permissions and passes control through.
 	 */
 	public function action_index()
@@ -38,9 +49,6 @@ class ManagePortalArticles_Controller extends Action_Controller
 		if (!allowedTo('sp_admin'))
 			isAllowedTo('sp_manage_articles');
 
-		// We'll need the utility functions from here.
-		require_once(SUBSDIR . '/PortalAdmin.subs.php');
-		require_once(SUBSDIR . '/Portal.subs.php');
 
 		loadTemplate('PortalAdminArticles');
 
@@ -425,8 +433,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 			'permissions' => $_POST['permissions'],
 			'date' => $date,
 			'status' => !empty($_POST['status']),
-			'views' => $views,
-			'comments' => $comments,
+			'view_count' => $views,
+			'comment_count' => $comments,
 		);
 
 		if ($article['type'] === 'bbc')
@@ -487,7 +495,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			foreach ($validator->validation_errors() as $id => $error)
 				$article_errors->addError($error);
 
-			return $this->action_edit();
+			$this->action_edit();
 		}
 
 		// Lets make sure this namespace (article id) is unique
@@ -512,7 +520,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		// None shall pass ... with errors
 		if ($article_errors->hasErrors())
-			return $this->action_edit();
+			$this->action_edit();
 
 		// No errors then, prepare the data for saving
 		$article_info = array(
@@ -534,6 +542,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		sp_save_article($article_info, $this->_is_new);
 
 		redirectexit('action=admin;area=portalarticles');
+		return true;
 	}
 
 	/**

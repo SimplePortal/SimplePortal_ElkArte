@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 if (!defined('ELK'))
@@ -442,7 +441,7 @@ function sp_integrate_buffer($tourniquet)
 
 	// Don't display copyright for things like SSI.
 	if (!isset($forum_version))
-		return;
+		return '';
 
 	// Append our cp notice at the end of the line
 	$finds = array(
@@ -501,6 +500,7 @@ function sp_integrate_menu_buttons(&$buttons)
  * Redirection hook, integrate_redirect, called from subs.php redirectexit()
  *
  * @param string $setLocation
+ *
  * @uses redirectexit_callback in subs.php
  */
 function sp_integrate_redirect(&$setLocation)
@@ -550,7 +550,8 @@ function sp_integrate_current_action(&$current_action)
 
 	// If it is home, it may be something else
 	if ($current_action == 'home')
-		$current_action = $modSettings['sp_portal_mode'] == 3 && empty($context['standalone']) && empty($context['disable_sp']) ? 'forum' : 'home';
+		$current_action = $modSettings['sp_portal_mode'] == 3 && empty($context['standalone']) && empty($context['disable_sp'])
+			? 'forum' : 'home';
 
 	if (empty($context['disable_sp']) && ((isset($_GET['board']) || isset($_GET['topic']) || in_array($context['current_action'], array('unread', 'unreadreplies', 'collapse', 'recent', 'stats', 'who'))) && in_array($modSettings['sp_portal_mode'], array(1, 3))))
 		$current_action = 'forum';
@@ -570,6 +571,7 @@ function sp_integrate_xmlhttp(&$subActions)
 
 /**
  * Add items to the not stat action array to prevent logging in some cases
+ *
  * @param string $no_stat_actions
  */
 function sp_integrate_pre_log_stats(&$no_stat_actions)

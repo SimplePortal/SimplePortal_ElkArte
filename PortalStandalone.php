@@ -1,13 +1,14 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
+ * @version 1.1.0 Beta 1
  *
- * @version 2.4
+ * This version of SimplePortal is based on SimplePortal core 2.4
  *
  * 	This file here, unbelievably, has your portal within.
  *

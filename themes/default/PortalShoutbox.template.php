@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 /**
@@ -29,7 +28,6 @@ function template_shoutbox_all_default()
 	<h3 class="category_header">
 		', $context['SPortal']['shoutbox']['name'], '
 	</h3>
-	<div class="windowbg">
 		<div class="sp_content_padding">';
 
 	template_pagesection();
@@ -41,7 +39,8 @@ function template_shoutbox_all_default()
 	if (!empty($context['SPortal']['shouts_history']))
 		foreach ($context['SPortal']['shouts_history'] as $shout)
 			echo '
-					', !$shout['is_me'] ? '<li class="smalltext"><strong>' . $shout['author']['link'] . ':</strong></li>' : '', '
+					', !$shout['is_me']
+			? '<li class="smalltext"><strong>' . $shout['author']['link'] . ':</strong></li>' : '', '
 					<li class="smalltext">', str_replace('ignored_shout', 'history_ignored_shout', $shout['text']), '</li>
 					<li class="smalltext shoutbox_time">', $shout['delete_link'], $shout['time'], '</li>';
 	else
@@ -55,7 +54,6 @@ function template_shoutbox_all_default()
 	template_pagesection();
 
 	echo '
-		</div>
 	</div>';
 }
 
@@ -129,7 +127,8 @@ function template_shoutbox_embed($shoutbox)
 	// The shouts!
 	echo '
 			<div class="shoutbox_body">
-				<ul class="shoutbox_list_compact" id="shouts_', $shoutbox['id'], '"', !empty($shoutbox['height']) ? ' style="height: ' . $shoutbox['height'] . 'px;"' : '', '>';
+				<ul class="shoutbox_list_compact" id="shouts_', $shoutbox['id'], '"', !empty($shoutbox['height'])
+		? ' style="height: ' . $shoutbox['height'] . 'px;"' : '', '>';
 
 	if (!empty($shoutbox['warning']))
 		echo '
@@ -138,7 +137,10 @@ function template_shoutbox_embed($shoutbox)
 	if (!empty($shoutbox['shouts']))
 		foreach ($shoutbox['shouts'] as $shout)
 			echo '
-					<li>', !$shout['is_me'] ? '<strong>' . $shout['author']['link'] . ':</strong> ' : '', $shout['text'], '<br />', !empty($shout['delete_link_js']) ? '<span class="shoutbox_delete">' . $shout['delete_link_js'] . '</span>' : '', '<span class="smalltext shoutbox_time">', $shout['time'], '</span></li>';
+					<li>', !$shout['is_me'] ? '<strong>' . $shout['author']['link'] . ':</strong> '
+				: '', $shout['text'], '<br />', !empty($shout['delete_link_js'])
+				? '<span class="shoutbox_delete">' . $shout['delete_link_js'] . '</span>'
+				: '', '<span class="smalltext shoutbox_time">', $shout['time'], '</span></li>';
 	else
 		echo '
 					<li>', $txt['sp_shoutbox_no_shout'], '</li>';
@@ -151,7 +153,9 @@ function template_shoutbox_embed($shoutbox)
 	if ($context['can_shout'])
 		echo '
 			<div class="submitbutton">
-				<input type="text" name="new_shout" id="new_shout_', $shoutbox['id'], '" class="shoutbox_input floatleft input_text"', isBrowser('is_ie8') ? ' onkeypress="if (sp_catch_enter(event)) { sp_submit_shout(' . $shoutbox['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false; }"' : '', ' />
+				<input type="text" name="new_shout" id="new_shout_', $shoutbox['id'], '" class="shoutbox_input floatleft input_text"', isBrowser('is_ie8')
+			? ' onkeypress="if (sp_catch_enter(event)) { sp_submit_shout(' . $shoutbox['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false; }"'
+			: '', ' />
 				<input type="submit" name="submit_shout" value="', $txt['sp_shoutbox_button'], '" class="right_submit" onclick="sp_submit_shout(', $shoutbox['id'], ', \'', $context['session_var'], '\', \'', $context['session_id'], '\'); return false;" />
 			</div>';
 
@@ -203,14 +207,14 @@ function template_shoutbox_embed($shoutbox)
 		echo '
 		if (sp_moreSmileysTemplate == undefined)
 		{
-			var sp_moreSmileysTemplate = ', JavaScriptEscape('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+			var sp_moreSmileysTemplate = ', JavaScriptEscape('<!DOCTYPE html>
 					<html>
 						<head>
 							<title>' . $txt['more_smileys_title'] . '</title>
-							<link rel="stylesheet" type="text/css" href="' . $settings['theme_url'] . '/css/index' . $context['theme_variant'] . '.css?rc2" />
+		<link rel="stylesheet" type="text/css" href="' . $settings['theme_url'] . '/css/index' . $context['theme_variant'] . '.css" />
 						</head>
 						<body id="help_popup">
-							<div class="padding windowbg">
+		<div class="padding">
 								<h3 class="category_header">
 									' . $txt['more_smileys_pick'] . '
 								</h3>
@@ -246,7 +250,8 @@ function template_shoutbox_xml()
 		echo '
 	<updated>1</updated>
 	<error>', empty($context['SPortal']['shouts']) ? $txt['sp_shoutbox_no_shout'] : 0, '</error>
-	<warning>', !empty($context['SPortal']['shoutbox']['warning']) ? htmlspecialchars($context['SPortal']['shoutbox']['warning']) : 0, '</warning>
+	<warning>', !empty($context['SPortal']['shoutbox']['warning'])
+			? htmlspecialchars($context['SPortal']['shoutbox']['warning']) : 0, '</warning>
 	<reverse>', !empty($context['SPortal']['shoutbox']['reverse']) ? 1 : 0, '</reverse>';
 
 		foreach ($context['SPortal']['shouts'] as $shout)

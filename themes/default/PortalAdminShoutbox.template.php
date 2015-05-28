@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 function template_shoutbox_edit()
@@ -20,7 +19,6 @@ function template_shoutbox_edit()
 			<h3 class="category_header">
 				', $context['page_title'], '
 			</h3>
-			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">
 						<dt>
@@ -136,7 +134,6 @@ function template_shoutbox_edit()
 					</dl>
 					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
 				</div>
-			</div>
 			<input type="hidden" name="shoutbox_id" value="', $context['SPortal']['shoutbox']['id'], '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
@@ -145,29 +142,31 @@ function template_shoutbox_edit()
 
 function template_shoutbox_prune()
 {
-	global $context, $scripturl, $settings, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalshoutbox;sa=prune" method="post" accept-charset="UTF-8">
 		<h3 class="category_header">
 			', $context['page_title'], '
 		</h3>
-		<div class="windowbg2">
 			<div class="sp_content_padding">
 				<dl class="sp_form">
 					<dt>
-						<input type="radio" name="type" id="type_all" value="all" class="input_radio" /> <label for="type_all">', $txt['sp_admin_shoutbox_opt_all'], '</label>
+					<input type="radio" name="type" id="type_all" value="all" class="input_radio" />
+					<label for="type_all">', $txt['sp_admin_shoutbox_opt_all'], '</label>
 					</dt>
 					<dd>
 					</dd>
 					<dt>
-						<input type="radio" name="type" id="type_days" value="days" class="input_radio" /> <label for="type_days">', $txt['sp_admin_shoutbox_opt_days'], '</label>
+					<input type="radio" name="type" id="type_days" value="days" class="input_radio" />
+					<label for="type_days">', $txt['sp_admin_shoutbox_opt_days'], '</label>
 					</dt>
 					<dd>
 						<input type="text" name="days" value="" size="5" onfocus="document.getElementById(\'type_days\').checked = true;" class="input_text" />
 					</dd>
 					<dt>
-						<input type="radio" name="type" id="type_member" value="member" class="input_radio" /> <label for="type_member">', $txt['sp_admin_shoutbox_opt_member'], '</label>
+					<input type="radio" name="type" id="type_member" value="member" class="input_radio" />
+					<label for="type_member">', $txt['sp_admin_shoutbox_opt_member'], '</label>
 					</dt>
 					<dd>
 						<input type="text" name="member" id="member" value="" onclick="document.getElementById(\'type_member\').checked = true;" size="15" class="input_text" />
@@ -175,28 +174,25 @@ function template_shoutbox_prune()
 				</dl>
 				<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
 			</div>
-		</div>
 		<input type="hidden" name="shoutbox_id" value="', $context['shoutbox']['id'], '" />
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-	</form>
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?fin20"></script>
-	<script><!-- // --><![CDATA[
-		var oAddBuddySuggest = new smc_AutoSuggest({
-			sSelf: \'oAddBuddySuggest\',
-			sSessionId: \'', $context['session_id'], '\',
-			sSessionVar: \'', $context['session_var'], '\',
+	</form>';
+
+	addInlineJavascript('
+		var oPruneSuggest = new smc_AutoSuggest({
+			sSelf: \'oPruneSuggest\',
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'member\',
 			sControlId: \'member\',
 			sSearchType: \'member\',
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+			sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
 			bItemList: false
-		});
-	// ]]></script>';
+		});', true);
 }
 
 /**
  * Once a shoutbox has been created, displays a success message with instructions
- * @global type $context
  */
 function template_shoutbox_block_redirect()
 {

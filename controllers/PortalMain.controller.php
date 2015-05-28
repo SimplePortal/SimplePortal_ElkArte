@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 if (!defined('ELK'))
@@ -27,7 +26,7 @@ class Sportal_Controller extends Action_Controller
 	{
 		require_once(SUBSDIR . '/Action.class.php');
 
-		// Where do you want to go today? :P
+		// Where do you want to go today?
 		$subActions = array(
 			'index' => array($this, 'action_sportal_index'),
 			'credits' => array($this, 'action_sportal_credits'),
@@ -68,21 +67,26 @@ class Sportal_Controller extends Action_Controller
 	{
 		global $context, $modSettings;
 
+		// Showing articles on the index page?
+		if (!empty($modSettings['sp_articles_index']))
+		{
+			require_once(SUBSDIR . '/PortalArticle.subs.php');
 		$context['sub_template'] = 'portal_index';
 
-		if (empty($modSettings['sp_articles_index']))
-			return;
+			// Set up the pages
 
-		// Set up the pagees
 		$total_articles = sportal_get_articles_count();
-		$total = min($total_articles, !empty($modSettings['sp_articles_index_total']) ? $modSettings['sp_articles_index_total'] : 20);
-		$per_page = min($total, !empty($modSettings['sp_articles_index_per_page']) ? $modSettings['sp_articles_index_per_page'] : 5);
+			$total = min($total_articles, !empty($modSettings['sp_articles_index_total'])
+				? $modSettings['sp_articles_index_total'] : 20);
+			$per_page = min($total, !empty($modSettings['sp_articles_index_per_page'])
+				? $modSettings['sp_articles_index_per_page'] : 5);
 		$start = !empty($_REQUEST['articles']) ? (int) $_REQUEST['articles'] : 0;
 
 		if ($total > $per_page)
-			$context['page_index'] = constructPageIndex($context['portal_url'] . '?articles=%1$d', $start, $total, $per_page, true);
+				$context['article_page_index'] = constructPageIndex($context['portal_url'] . '?articles=%1$d', $start, $total, $per_page, true);
 
 		// If we have some articles
+			require_once(SUBSDIR . '/PortalArticle.subs.php');
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
 		foreach ($context['articles'] as $article)
 		{
@@ -104,6 +108,7 @@ class Sportal_Controller extends Action_Controller
 				$context['articles'][$article['id']]['preview'] = Util::shorten_html($context['articles'][$article['id']]['preview'], $modSettings['sp_articles_length']);
 		}
 	}
+	}
 
 	/**
 	 * Displays the credit page outside of the admin area,
@@ -112,7 +117,7 @@ class Sportal_Controller extends Action_Controller
 	 */
 	public function action_sportal_credits()
 	{
-		loadLanguage('SPortalAdmin');
+		loadLanguage('SPortalAdmin', sp_languageSelect('SPortalAdmin'));
 
 		require_once(ADMINDIR . '/PortalAdminMain.controller.php');
 		$adminmain = new ManagePortalConfig_Controller();
@@ -157,10 +162,18 @@ class Sportal_Controller extends Action_Controller
 		$validation_session = checkSession();
 		if (empty($validation_session))
 		{
+			$block_tree = array();
 			// No questions that we are rearranging the blocks
 			if (isset($_POST['order'], $_POST['received'], $_POST['moved']))
 			{
-				$column_numbers = array('sp_left_div' => 1, 'sp_top_div' => 2, 'sp_bottom_div' => 3, 'sp_right_div' => 4, 'sp_header' => 5, 'sp_footer' => 6);
+				$column_numbers = array(
+					'sp_left_div' => 1,
+					'sp_top_div' => 2,
+					'sp_bottom_div' => 3,
+					'sp_right_div' => 4,
+					'sp_header' => 5,
+					'sp_footer' => 6
+				);
 
 				// What block was drag and dropped? e.g. block_2,4
 				list ($block_moved, ) = explode(',', $_POST['moved']);
@@ -170,7 +183,6 @@ class Sportal_Controller extends Action_Controller
 				$target_column = $column_numbers[$_POST['received']];
 
 				// The block ids arrive in 1-n view order ... block,column
-				$block_tree = array();
 				foreach ($_POST['block'] as $id)
 				{
 					list ($block, $column) = explode(',', $id);

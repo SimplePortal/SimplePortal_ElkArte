@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 if (!defined('ELK'))
@@ -89,23 +88,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt;
 
-		$db = database();
-
-		$request = $db->query('', '
-			SELECT id_theme, value AS name
-			FROM {db_prefix}themes
-			WHERE variable = {string:name}
-				AND id_member = {int:member}
-			ORDER BY id_theme',
-			array(
-				'member' => 0,
-				'name' => 'name',
-			)
-		);
-		$context['SPortal']['themes'] = array('0' => &$txt['portalthemedefault']);
-		while ($row = $db->fetch_assoc($request))
-			$context['SPortal']['themes'][$row['id_theme']] = $row['name'];
-		$db->free_result($request);
+		$context['SPortal']['themes'] = sp_general_load_themes();
 
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
 		require_once(ADMINDIR . '/ManagePermissions.controller.php');
@@ -403,7 +386,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 						),
 					),
 					array(
-						'title' => $txt['sp-info_groups_orignal_pm'],
+						'title' => $txt['sp-info_groups_original_pm'],
 						'members' => array(
 						),
 					),

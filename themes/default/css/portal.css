@@ -2,10 +2,9 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 hr {
@@ -80,14 +79,12 @@ hr {
 
 .sp_online_flow {
 	max-height: 150px;
-	height: auto !important;
-	height: 150px;
+	height: 150px !important;;
 	overflow: auto;
 }
 .sp_rss_flow {
 	max-height: 300px;
-	height: auto !important;
-	height: 300px;
+	height: 300px !important;;
 	overflow: auto;
 }
 .sp_top_poster, .sp_staff, .sp_blog, .sp_articles {
@@ -201,9 +198,10 @@ table.sp_blog, table.sp_articles, .sp_shop_info {
 .sp_article_latest {
 	text-align: right;
 	float: right;
+	padding-right: 0.5em;
 }
 .sp_article_detail .avatar {
-	max-height: 40px;
+	max-height: 50px;
 	float: left;
 	margin-right: 0.5em;
 }
@@ -217,12 +215,15 @@ table.sp_blog, table.sp_articles, .sp_shop_info {
 	text-align: right;
 }
 .sp_comment_detail .avatar {
-	max-height: 25px;
+	max-height: 30px;
 	float: left;
 	margin-right: 0.5em;
 }
-.sp_comment_detail span {
-	line-height: 25px;
+.sp_comment_body {
+	padding: 0 .3em;
+}
+.sp_comment_detail {
+	line-height: 2em;
 }
 #sp_main {
 	width: 100%;
@@ -274,6 +275,16 @@ table.sp_block {
 	box-shadow: 4px 6px 3px -5px rgba(0,0,0,0.5);
 	overflow: auto;
 }
+.sp_article_block_container {
+	background: transparent;
+	margin: 0 0 1.6em 0;
+	padding: 0 0 .5em 0;
+	border: 1px solid #ccc;
+	border-top: none;
+	border-radius: 5px;
+	box-shadow: 4px 6px 3px -5px rgba(0,0,0,0.5);
+	overflow: auto;
+}
 .portalbg {
 	padding: 10px 0;
 }
@@ -297,14 +308,12 @@ body {
 	padding: 0;
 }
 .shoutbox_list_compact {
-	margin: 0;
-	margin-top: 2px;
+	margin: 2px 0 0;
 	padding: 0;
 	list-style: none;
 	overflow: auto;
 	height: 200px;
 	box-shadow: 0 -1px 0 #ccc;
-    height: 200px;
 }
 .shoutbox_list_compact li {
 	padding: 4px 0 4px 4px;
@@ -455,6 +464,11 @@ body {
 	overflow: auto;
 	padding: 0 4px;
 }
+#admin_main_section .content {
+    padding: 6px 0px;
+    height: 12em;
+    overflow: auto;
+}
 #sp_live_info div.sp_content_padding, #sp_general_info div.sp_content_padding {
 	height: 18ex;
 }
@@ -463,7 +477,7 @@ body {
 	padding: 0.5em 0;
 }
 .sp_content_padding {
-	padding: 0 .8em;
+	padding: .5em .8em;
 }
 #sp_manage_blocks .table_grid {
 	margin-bottom: 0.8em;
@@ -473,7 +487,7 @@ body {
 	margin: 2px 0;
 	overflow: auto;
 }
-#sp_select_block_type .windowbg {
+#sp_select_block_type .content {
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 	margin: 2px 0.166%;
 	padding: 10px 10px 4px 10px;
@@ -482,14 +496,14 @@ body {
 	float: left;
 	overflow: auto;
 }
-#sp_select_block_type .windowbg label:hover {
+#sp_select_block_type .content label:hover {
 	text-decoration: underline;
 	cursor: pointer;
 }
 #sp_select_block_type .smalltext {
 	margin: 6px;
 }
-#sp_select_block_type .windowbg2 {
+#sp_select_block_type .content {
 	width: 99.66%;
 	margin: 2px 0.166%;
 	padding: 8px 0;
@@ -554,8 +568,7 @@ select#shoutbox_bbc, select#page_blocks, select#boards, select#board {
 	width: 34%;
 }
 #sp_shoutbox_redirect {
-	margin: 0 auto;
-	margin-top: 1em;
+	margin: 1em auto 0;
 }
 #sp_shoutbox_redirect div {
 	font-size: 1.071em;
@@ -687,8 +700,8 @@ dl.sp_form img, #sp_add_articles_list_header img {
 	background-color: #fafafa;
 	border-radius: 4px 4px 0 0;
 }
-.ui-dialog .ui-dialog-content {
-	padding: 4px;
+.warninbox .ui-dialog .ui-dialog-content {
+	padding-left: 35px;
 }
 .ui-dialog .ui-dialog-titlebar-close {
 	cursor: pointer;
@@ -780,13 +793,13 @@ dl.sp_form img, #sp_add_articles_list_header img {
 
 .sp_no_body_style, sp_no_body_style_last {
 	box-shadow: none;
-	border: 0px solid;
+	border: 0 solid;
 	margin: 2px 0 .7em 0;
 	border-radius: 0;
 	overflow: auto;
 }
 
-/* Experimental media querys */
+/* Experimental media query's */
 /*---------------------------*/
 @media screen and (max-width: 32em)
 {

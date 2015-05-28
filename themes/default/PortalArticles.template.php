@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 /**
@@ -26,15 +25,14 @@ function template_view_articles()
 	if (empty($context['articles']))
 	{
 		echo '
-		<div class="windowbg">
-			<div class="sp_content_padding">', $txt['error_sp_no_articles'], '</div>
+		<div class="sp_content_padding">',
+			$txt['error_sp_no_articles'], '
 		</div>';
 	}
 
 	foreach ($context['articles'] as $article)
 	{
 		echo '
-		<div class="windowbg">
 			<div class="sp_content_padding">
 				<div class="sp_article_detail">';
 
@@ -54,7 +52,6 @@ function template_view_articles()
 				<div class="sp_article_extra">
 					<a href="', $article['href'], '">', $txt['sp_read_more'], '</a> | <a href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
 				</div>
-			</div>
 		</div>';
 	}
 
@@ -66,15 +63,12 @@ function template_view_articles()
 		template_pagesection();
 
 	if (!empty($context['using_relative_time']))
-		echo '
-	<script><!-- // --><![CDATA[
-		$(\'.sp_article_latest\').addClass(\'relative\');
-	// ]]></script>';
+		addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
 }
 
 /**
  * Template for viewing a specific article in the system
- * Also used to preivew an article from the new article form
+ * Also used to preview an article from the new article form
  */
 function template_view_article()
 {
@@ -85,7 +79,6 @@ function template_view_article()
 		<h3 class="category_header">
 			', $context['article']['title'], '
 		</h3>
-		<div class="windowbg">
 			<div class="sp_content_padding">
 				<div class="sp_article_detail">';
 
@@ -105,17 +98,17 @@ function template_view_article()
 					<span class="floatright">';
 
 	echo '
-						', sprintf($context['article']['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $context['article']['views']), ', ', sprintf($context['article']['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $context['article']['comments']), '
+					', sprintf($context['article']['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $context['article']['view_count']), ', ',
+					sprintf($context['article']['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $context['article']['comment_count']), '
 					</span>
 				</div>
 				<hr />
 				<div>' ,
 					$context['article']['body'], '
 				</div>
-			</div>
 		</div>';
 
-	// Just previewing the new article?
+	// Not just previewing the new article?
 	if (empty($context['preview']))
 	{
 		echo '
@@ -127,35 +120,34 @@ function template_view_article()
 		if (empty($context['article']['comments']))
 		{
 			echo '
-			<div class="windowbg">
-				<div class="sp_content_padding">
+			<div class="infobox">
 					', $txt['error_sp_no_comments'], '
-				</div>
 			</div>';
 		}
 
 		foreach ($context['article']['comments'] as $comment)
 		{
 			echo '
-			<div id="comment', $comment['id'], '" class="windowbg">
+			<div id="comment', $comment['id'], '" class="content">
 				<div class="sp_content_padding flow_auto">
 					<div class="sp_comment_detail">';
 
 			if (!empty($comment['author']['avatar']['image']))
 				echo $comment['author']['avatar']['image'];
 
+			// Show the edit icons if they are allowed
 			if ($comment['can_moderate'])
 				echo '
 						<div class="floatright">
-							<a href="', $context['article']['href'], ';modify=', $comment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', sp_embed_image('modify'), '</a>
+							<a href="', $context['article']['href'], ';modify=', $comment['id'], ';', $context['session_var'], '=', $context['session_id'], '#sp_comment">', sp_embed_image('modify'), '</a>
 							<a href="', $context['article']['href'], ';delete=', $comment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', sp_embed_image('delete'), '</a>
 						</div>';
 
 			echo '
-						<span class="sp_article_latest">', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $comment['time'], $comment['author']['link']), '</span>
+						<span class="sp_article_latest">', sprintf($txt['sp_posted_by'], $comment['time'], $comment['author']['link']), '</span>
 					</div>
 					<hr />
-					<p>
+					<p class="sp_comment_body">
 						', $comment['body'], '
 					</p>
 				</div>
@@ -166,20 +158,19 @@ function template_view_article()
 		if (!empty($context['page_index']))
 			template_pagesection();
 
+		// Show the comment box
 		if ($context['article']['can_comment'])
 		{
 			echo '
-			<div class="windowbg">
-				<div class="sp_content_padding">
+			<div id="sp_comment" class="sp_content_padding">
 					<form action="', $context['article']['href'], '" method="post" accept-charset="UTF-8">
-						<textarea name="body" rows="5" cols="50" style="', isBrowser('is_ie8') ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 100%', ';">', !empty($context['article']['comment']['body']) ? $context['article']['comment']['body'] : '', '</textarea>
-						<div class="centertext">
+					<textarea name="body" rows="5" cols="50" style="width: 100%;padding: 0.1em 0.2em" tabindex="', $context['tabindex']++, '">', !empty($context['article']['comment']['body']) ? $context['article']['comment']['body'] : '', '</textarea>
+					<div class="submitbutton">
 							<input type="submit" name="submit" value="', !empty($context['article']['comment']) ? $txt['sp_modify'] : $txt['sp_submit'], '" class="right_submit" />
-						</div>
 						<input type="hidden" name="comment" value="', !empty($context['article']['comment']['id']) ? $context['article']['comment']['id'] : 0, '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					</form>
 				</div>
+				</form>
 			</div>';
 		}
 
@@ -191,8 +182,5 @@ function template_view_article()
 	</div>';
 
 	if (!empty($context['using_relative_time']))
-		echo '
-	<script><!-- // --><![CDATA[
-		$(\'.sp_article_latest\').addClass(\'relative\');
-	// ]]></script>';
+		addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
 }

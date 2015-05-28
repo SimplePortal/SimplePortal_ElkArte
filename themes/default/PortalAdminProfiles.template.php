@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 function template_permission_profiles_edit()
@@ -19,7 +18,6 @@ function template_permission_profiles_edit()
 			<h3 class="category_header">
 				', $context['page_title'], '
 			</h3>
-			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">
 						<dt>
@@ -62,7 +60,6 @@ function template_permission_profiles_edit()
 						</dd>
 					</dl>
 				</div>
-			</div>
 								<div class="submitbutton">
 						<input type="submit" name="submit" value="', $context['page_title'], '" class="button_submit" />
 						<input type="hidden" name="profile_id" value="', $context['profile']['id'], '" />

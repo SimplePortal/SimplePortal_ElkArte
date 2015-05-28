@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 if (!defined('ELK'))
@@ -62,6 +61,9 @@ class Categories_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $modSettings;
 
+		// Basic article support
+		require_once(SUBSDIR . '/PortalArticle.subs.php');
+
 		$category_id = !empty($_REQUEST['category']) ? $_REQUEST['category'] : 0;
 
 		if (is_int($category_id))
@@ -76,7 +78,9 @@ class Categories_Controller extends Action_Controller
 
 		// Set up the pages
 		$total_articles = sportal_get_articles_in_cat_count($context['category']['id']);
-		$per_page = min($total_articles, !empty($modSettings['sp_articles_per_page']) ? $modSettings['sp_articles_per_page'] : 10);
+		$per_page = min($total_articles, !empty($modSettings['sp_articles_per_page'])
+			? $modSettings['sp_articles_per_page']
+			: 10);
 		$start = !empty($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 
 		if ($total_articles > $per_page)

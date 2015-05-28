@@ -1,11 +1,10 @@
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 /**
@@ -305,7 +304,8 @@ function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_them
  */
 function sp_update_editor(new_state, original)
 {
-	var instance = $("textarea").sceditor("instance"),
+	var $_textarea = $("textarea"),
+		instance = $_textarea.sceditor("instance"),
 		val = '';
 
 	// Going back to BBC
@@ -313,15 +313,15 @@ function sp_update_editor(new_state, original)
 	{
 		// Get the current textbox contents, treat as if html
 		if (original === 'html')
-			val = $("textarea").html().php_unhtmlspecialchars();
+			val =  $_textarea.html().php_unhtmlspecialchars();
 		else
-			val = '[code]' + $("textarea").val().replace(/\n/g, '<br \\>') + '[/code]';
+			val = '[code]' +  $_textarea.val().replace(/\n/g, '<br \>') + '[/code]';
 
 		// Start the editor again
 		elk_editor();
 
 		// load the editor with the html contents, toggle back to bbc so the editor converts it
-		instance = $("textarea").sceditor("instance");
+		instance =  $_textarea.sceditor("instance");
 		instance.sourceMode(false);
 		instance.setWysiwygEditorValue(val);
 		instance.sourceMode(true);
@@ -332,7 +332,7 @@ function sp_update_editor(new_state, original)
 		// Update the the original text area with current editor contents and stop the editor
 		if (new_state === 'html')
 		{
-			// Get the editors html value, bypass the bbc pluging, this html will have lost
+			// Get the editors html value, bypass the bbc plugin, this html will have lost
 			// its formatting but it is html
 			if (instance.getSourceEditorValue() !== '')
 			{

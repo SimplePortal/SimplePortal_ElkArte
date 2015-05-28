@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 if (!defined('ELK'))
@@ -22,7 +21,7 @@ function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings, $maintenance, $sportal_version;
 
-	$sportal_version = '2.4';
+	$sportal_version = '1.0.0 Beta 1';
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach'))
 		return;
@@ -34,7 +33,7 @@ function sportal_init($standalone = false)
 	if (!$standalone)
 	{
 		// Load the portal css and the default css if its not yet loaded.
-		loadTemplate(false, 'portal');
+		loadCSSFile('portal.css');
 
 		// rtl css as well?
 		if (!empty($context['right_to_left']))
@@ -140,7 +139,7 @@ function sportal_init_headers()
 
 	// If already loaded just return
 	if (!empty($initialized))
-		return;
+		return $initialized;
 
 	// Generate a safe scripturl
 	$safe_scripturl = $scripturl;
@@ -155,7 +154,7 @@ function sportal_init_headers()
 	addJavascriptVar(array('sp_script_url' => '\'' . $safe_scripturl . '\''));
 
 	// Load up some javascript!
-	loadJavascriptFile('portal.js?sp24');
+	loadJavascriptFile('portal.js?sp100');
 	$javascript = '';
 
 	// We use drag and sort blocks for the front page
@@ -194,6 +193,8 @@ function sportal_init_headers()
 	addInlineJavascript($javascript, true);
 
 	$initialized = true;
+
+	return $initialized;
 }
 
 /**
@@ -324,7 +325,9 @@ function sportal_load_blocks()
 		if (empty($context['SPortal']['blocks'][$side['id']]))
 			$context['SPortal']['sides'][$side['id']]['active'] = false;
 
-		$context['SPortal']['sides'][$side['id']]['collapsed'] = $context['user']['is_guest'] ? !empty($_COOKIE['sp_' . $side['name']]) : !empty($options['sp_' . $side['name']]);
+		$context['SPortal']['sides'][$side['id']]['collapsed'] = $context['user']['is_guest']
+ ? !empty($_COOKIE['sp_' . $side['name']])
+ : !empty($options['sp_' . $side['name']]);
 	}
 }
 
@@ -511,7 +514,8 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 	$board = !empty($context['current_board']) ? 'b' . $context['current_board'] : '';
 	$topic = !empty($context['current_topic']) ? 't' . $context['current_topic'] : '';
 	$page = !empty($page_info['id']) ? 'p' . $page_info['id'] : '';
-	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] == 1) || $action == 'portal' || !empty($context['standalone']) ? true : false;
+	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] == 1) || $action == 'portal' || !empty($context['standalone'])
+		? true : false;
 
 	// Will hopefully get larger in the future.
 	$portal_actions = array(
@@ -692,7 +696,7 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
  *
  * @param string $type type of data to load, events, birthdays, etc
  * @param string $low_date don't load data before this date
- * @param string|false $high_date dont load data after this date, false for no limit
+ * @param string|boolean $high_date don't load data after this date, false for no limit
  */
 function sp_loadCalendarData($type, $low_date, $high_date = false)
 {
@@ -814,8 +818,11 @@ function sp_loadColors($users = array())
 		$color_profile[$row['id_member']] = $row;
 		$onlineColor = !empty($row['member_group_color']) ? $row['member_group_color'] : $row['post_group_color'];
 		$color_profile[$row['id_member']]['color'] = $onlineColor;
-		$color_profile[$row['id_member']]['link'] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '"' . (!empty($onlineColor) ? ' style="color: ' . $onlineColor . ';"' : '') . '>' . $row['real_name'] . '</a>';
-		$color_profile[$row['id_member']]['colored_name'] = (!empty($onlineColor) ? '<span style="color: ' . $onlineColor . ';">' : '' ) . $row['real_name'] . (!empty($onlineColor) ? '</span>' : '');
+		$color_profile[$row['id_member']]['link'] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '"' . (!empty($onlineColor)
+				? ' style="color: ' . $onlineColor . ';"' : '') . '>' . $row['real_name'] . '</a>';
+		$color_profile[$row['id_member']]['colored_name'] = (!empty($onlineColor)
+				? '<span style="color: ' . $onlineColor . ';">' : '') . $row['real_name'] . (!empty($onlineColor)
+				? '</span>' : '');
 	}
 	$db->free_result($request);
 
@@ -881,7 +888,9 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 		$name .= $randomizer;
 
 	// Build the image tag
-	$image = '<img src="' . $settings['sp_images_url'] . '/' . $name . '.png" alt="' . $alt . '"' . (!empty($title) ? ' title="' . $title . '"' : '') . (!empty($width) ? ' width="' . $width . '"' : '') . (!empty($height) ? ' height="' . $height . '"' : '') . (!empty($id) ? ' id="' . $id . '"' : '') . ' />';
+	$image = '<img src="' . $settings['sp_images_url'] . '/' . $name . '.png" alt="' . $alt . '"' . (!empty($title)
+			? ' title="' . $title . '"' : '') . (!empty($width) ? ' width="' . $width . '"' : '') . (!empty($height)
+			? ' height="' . $height . '"' : '') . (!empty($id) ? ' id="' . $id . '"' : '') . ' />';
 
 	return $image;
 }
@@ -939,7 +948,8 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 	}
 
 	// Build the attributes
-	return 'class="' . $spriteclass . ' ' . $name . (!empty($extraclass) ? ' ' . $extraclass : '') . '" title="' . $title . '"';
+	return 'class="' . $spriteclass . ' ' . $name . (!empty($extraclass)
+		? ' ' . $extraclass : '') . '" title="' . $title . '"';
 }
 
 /**
@@ -952,6 +962,8 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 function sportal_parse_style($action, $setting = '', $process = false)
 {
 	static $process_cache;
+
+	$style = array();
 
 	if ($action === 'implode')
 	{
@@ -978,8 +990,6 @@ function sportal_parse_style($action, $setting = '', $process = false)
 	}
 	elseif ($action === 'explode')
 	{
-		$style = array();
-
 		// Supplying a style set or using our defaults
 		if (!empty($setting))
 		{
@@ -1037,267 +1047,7 @@ function sportal_parse_style($action, $setting = '', $process = false)
 }
 
 /**
- * Returns the number of views and comments for a given article
- *
- * @param int $id the id of the article
- */
-function sportal_get_article_views_comments($id)
-{
-	$db = database();
-
-	if (empty($id))
-		return array(0, 0);
-
-	// Make the request
-	$request = $db->query('', '
-		SELECT
-			views, comments
-		FROM {db_prefix}sp_articles
-		WHERE id_article = {int:article_id}
-		LIMIT {int:limit}',
-		array(
-			'article_id' => $id,
-			'limit' => 1,
-		)
-	);
-	$result = array(0, 0);
-	while($row = $db->fetch_assoc($request))
-	{
-		$result[0] = $row['views'];
-		$result[1] = $row['comments'];
-	}
-	$db->free_result($request);
-
-	return $result;
-}
-
-/**
- * Loads an article by id, or articles by namespace
- *
- * @param int|string|null $article_id id of an article or string for the articles in a namespace
- * @param boolean $active true to only return items that are active
- * @param boolean $allowed true to check permission access to the item
- * @param string $sort string passed to the order by parameter
- * @param int|null $category_id id of the category
- * @param int|null $limit limit the number of results
- * @param int|null $start start number for pages
- */
-function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title', $category_id = null, $limit = null, $start = null)
-{
-	global $scripturl, $context, $color_profile;
-
-	$db = database();
-
-	$query = array();
-	$parameters = array('sort' => $sort);
-
-	// Load up an article or namspace
-	if (!empty($article_id) && is_int($article_id))
-	{
-		$query[] = 'spa.id_article = {int:article_id}';
-		$parameters['article_id'] = (int) $article_id;
-	}
-	elseif (!empty($article_id))
-	{
-		$query[] = 'spa.namespace = {string:namespace}';
-		$parameters['namespace'] = $article_id;
-	}
-
-	// Want articles only from a specific category
-	if (!empty($category_id))
-	{
-		$query[] = 'spa.id_category = {int:category_id}';
-		$parameters['category_id'] = (int) $category_id;
-	}
-
-	// Checking access?
-	if (!empty($allowed))
-	{
-		$query[] = sprintf($context['SPortal']['permissions']['query'], 'spa.permissions');
-		$query[] = sprintf($context['SPortal']['permissions']['query'], 'spc.permissions');
-	}
-
-	// Its an active article and category?
-	if (!empty($active))
-	{
-		$query[] = 'spa.status = {int:article_status}';
-		$parameters['article_status'] = 1;
-		$query[] = 'spc.status = {int:category_status}';
-		$parameters['category_status'] = 1;
-	}
-
-	// Limits?
-	if (!empty($limit))
-	{
-		$parameters['limit'] = $limit;
-		$parameters['start'] = !empty($start) ? $start : 0;
-	}
-
-	// Make the request
-	$request = $db->query('', '
-		SELECT
-			spa.id_article, spa.id_category, spa.namespace AS article_namespace, spa.title, spa.body,
-			spa.type, spa.date, spa.status, spa.permissions AS article_permissions, spa.views, spa.comments,
-			spc.permissions AS category_permissions, spc.name, spc.namespace AS category_namespace,
-			m.avatar, IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name, m.email_address,
-			a.id_attach, a.attachment_type, a.filename
-		FROM {db_prefix}sp_articles AS spa
-			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
-			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spa.id_member)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)' . (!empty($query) ? '
-		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY {raw:sort}' . (!empty($limit) ? '
-		LIMIT {int:start}, {int:limit}' : ''), $parameters
-	);
-	$return = array();
-	$member_ids = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		if (!empty($row['id_author']))
-			$member_ids[$row['id_author']] = $row['id_author'];
-
-		$return[$row['id_article']] = array(
-			'id' => $row['id_article'],
-			'category' => array(
-				'id' => $row['id_category'],
-				'category_id' => $row['category_namespace'],
-				'name' => $row['name'],
-				'href' => $scripturl . '?category=' . $row['category_namespace'],
-				'link' => '<a href="' . $scripturl . '?category=' . $row['category_namespace'] . '">' . $row['name'] . '</a>',
-				'permissions' => $row['category_permissions'],
-			),
-			'author' => array(
-				'id' => $row['id_author'],
-				'name' => $row['author_name'],
-				'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
-				'link' => $row['id_author'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>') : $row['author_name'],
-				'avatar' => determineAvatar(array(
-					'avatar' => $row['avatar'],
-					'filename' => $row['filename'],
-					'id_attach' => $row['id_attach'],
-					'email_address' => $row['email_address'],
-					'attachment_type' => $row['attachment_type'],
-				)),
-			),
-			'article_id' => $row['article_namespace'],
-			'title' => $row['title'],
-			'href' => $scripturl . '?article=' . $row['article_namespace'],
-			'link' => '<a href="' . $scripturl . '?article=' . $row['article_namespace'] . '">' . $row['title'] . '</a>',
-			'body' => $row['body'],
-			'type' => $row['type'],
-			'date' => $row['date'],
-			'permissions' => $row['article_permissions'],
-			'views' => $row['views'],
-			'comments' => $row['comments'],
-			'status' => $row['status'],
-		);
-	}
-	$db->free_result($request);
-
-	// Use color profiles?
-	if (!empty($member_ids) && sp_loadColors($member_ids) !== false)
-	{
-		foreach ($return as $key => $value)
-		{
-			if (!empty($color_profile[$value['author']['id']]['link']))
-				$return[$key]['author']['link'] = $color_profile[$value['author']['id']]['link'];
-		}
-	}
-
-	// Return one or all
-	return !empty($article_id) ? current($return) : $return;
-}
-
-/**
- * Returns the count of articles in a given category
- *
- * @param ing $catid category identifier
- */
-function sportal_get_articles_in_cat_count($catid)
-{
-	global $context;
-
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}sp_articles
-		WHERE status = {int:article_status}
-			AND {raw:article_permissions}
-			AND id_category = {int:current_category}
-		LIMIT {int:limit}',
-		array(
-			'article_status' => 1,
-			'article_permissions' => sprintf($context['SPortal']['permissions']['query'], 'permissions'),
-			'current_category' => $catid,
-			'limit' => 1,
-		)
-	);
-	list ($total_articles) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return $total_articles;
-}
-
-/**
- * Returns the number of articles in the system that a user can see
- */
-function sportal_get_articles_count()
-{
-	global $context;
-
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}sp_articles AS spa
-			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
-		WHERE spa.status = {int:article_status}
-			AND spc.status = {int:category_status}
-			AND {raw:article_permissions}
-			AND {raw:category_permissions}
-		LIMIT {int:limit}',
-		array(
-			'article_status' => 1,
-			'category_status' => 1,
-			'article_permissions' => sprintf($context['SPortal']['permissions']['query'], 'spa.permissions'),
-			'category_permissions' => sprintf($context['SPortal']['permissions']['query'], 'spc.permissions'),
-			'limit' => 1,
-		)
-	);
-	list ($total_articles) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return $total_articles;
-}
-
-/**
- * Fetches the number of comments a given article has received
- *
- * @param int $id article id
- */
-function sportal_get_article_comment_count($id)
-{
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}sp_comments
-		WHERE id_article = {int:current_article}
-		LIMIT {int:limit}',
-		array(
-			'current_article' => $id,
-			'limit' => 1,
-		)
-	);
-	list ($total_comments) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return $total_comments;
-}
-
-/**
- * Loads a category by id, or categorys by namespace
+ * Loads a category by id, or category's by namespace
  *
  * @param int|string|null $category_id
  * @param boolean $active
@@ -1367,199 +1117,36 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 }
 
 /**
- * Loads all the comments that an article has generated
+ * Increase the view counter for articles or pages
  *
- * @param int|null $article_id
- * @param int|null $limit limit the number of results
- * @param int|null $start start number for pages
+ * @param string $name
+ * @param int $id
  */
-function sportal_get_comments($article_id = null, $limit = null, $start = null)
+function sportal_increase_viewcount($name, $id)
 {
-	global $scripturl, $user_info, $modSettings, $color_profile;
-
 	$db = database();
 
-	$request = $db->query('', '
-		SELECT
-			spc.id_comment, IFNULL(spc.id_member, 0) AS id_author,
-			IFNULL(m.real_name, spc.member_name) AS author_name,
-			spc.body, spc.log_time,
-			m.avatar,
-			a.id_attach, a.attachment_type, a.filename
-		FROM {db_prefix}sp_comments AS spc
-			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spc.id_member)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
-		WHERE spc.id_article = {int:article_id}
-		ORDER BY spc.id_comment' . (!empty($limit) ? '
-		LIMIT {int:start}, {int:limit}' : ''),
-		array(
-			'article_id' => (int) $article_id,
-			'limit' => (int) $limit,
-			'start' => (int) $start,
-		)
+	if ($name == 'page')
+		$query = array(
+			'table' => 'sp_pages',
+			'query_id' => 'id_page',
+			'id' => $id
 	);
-	$return = array();
-	$member_ids = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		if (!empty($row['id_author']))
-			$member_ids[$row['id_author']] = $row['id_author'];
-
-		if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
-		{
-			$avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' width="' . $modSettings['avatar_max_width_external'] . '"' : '';
-			$avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' height="' . $modSettings['avatar_max_height_external'] . '"' : '';
-		}
-		else
-		{
-			$avatar_width = '';
-			$avatar_height = '';
-		}
-
-		$return[$row['id_comment']] = array(
-			'id' => $row['id_comment'],
-			'body' => parse_bbc($row['body']),
-			'time' => standardTime($row['log_time']),
-			'author' => array(
-				'id' => $row['id_author'],
-				'name' => $row['author_name'],
-				'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
-				'link' => $row['id_author'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>') : $row['author_name'],
-				'avatar' => array(
-					'name' => $row['avatar'],
-					'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" class="avatar" border="0" />' : '') : (stristr($row['avatar'], 'http://') ? '<img src="' . $row['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" class="avatar" border="0" />' : '<img src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar']) . '" alt="" class="avatar" border="0" />'),
-					'href' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : '') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
-					'url' => $row['avatar'] == '' ? '' : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar'])
-				),
-			),
-			'can_moderate' => allowedTo('sp_admin') || allowedTo('sp_manage_articles') || (!$user_info['is_guest'] && $user_info['id'] == $row['id_author']),
-		);
-	}
-	$db->free_result($request);
-
-	// Colorization
-	if (!empty($member_ids) && sp_loadColors($member_ids) !== false)
-	{
-		foreach ($return as $key => $value)
-		{
-			if (!empty($color_profile[$value['author']['id']]['link']))
-				$return[$key]['author']['link'] = $color_profile[$value['author']['id']]['link'];
-		}
-	}
-
-	return $return;
-}
-
-/**
- * Creates a new comment response to a published article
- *
- * @param int $article_id id of the article commented on
- * @param string $body text of the comment
- */
-function sportal_create_comment($article_id, $body)
-{
-	global $user_info;
-
-	$db = database();
-
-	$db->insert('',
-		'{db_prefix}sp_comments',
-		array(
-			'id_article' => 'int',
-			'id_member' => 'int',
-			'member_name' => 'string',
-			'log_time' => 'int',
-			'body' => 'string',
-		),
-		array(
-			$article_id,
-			$user_info['id'],
-			$user_info['name'],
-			time(),
-			$body,
-		),
-		array('id_comment')
+	elseif ($name == 'article')
+		$query = array(
+			'table' => 'sp_articles',
+			'query_id' => 'id_article',
+			'id' => $id
 	);
-
-	// Increase the comment count
-	sportal_recount_comments($article_id);
-}
-
-/**
- * Edits an article comment that has already been made
- *
- * @param int $comment_id comment id to edit
- * @param string $body replacement text
- */
-function sportal_modify_comment($comment_id, $body)
-{
-	$db = database();
 
 	$db->query('', '
-		UPDATE {db_prefix}sp_comments
-		SET body = {text:body}
-		WHERE id_comment = {int:comment_id}',
+		UPDATE {db_prefix}{raw:table}
+		SET views = views + 1
+		WHERE {raw:query_id} = {int:id}',
 		array(
-			'comment_id' => $comment_id,
-			'body' => $body,
-		)
-	);
-}
-
-/**
- * Removes an comment from an article
- *
- * @param int $article_id article id, needed for the counter
- * @param int $comment_id comment it
- */
-function sportal_delete_comment($article_id, $comment_id)
-{
-	$db = database();
-
-	// Poof ... gone
-	$db->query('', '
-		DELETE FROM {db_prefix}sp_comments
-		WHERE id_comment = {int:comment_id}',
-		array(
-			'comment_id' => $comment_id,
-		)
-	);
-
-	// One less comment
-	sportal_recount_comments($article_id);
-}
-
-/**
- * Recounts all comments made on an article and updates the DB with the new value
- *
- * @param int $article_id
- */
-function sportal_recount_comments($article_id)
-{
-	$db = database();
-
-	// How many comments were made for this article
-	$request = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}sp_comments
-		WHERE id_article = {int:article_id}
-		LIMIT {int:limit}',
-		array(
-			'article_id' => $article_id,
-			'limit' => 1,
-		)
-	);
-	list ($comments) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	// Update the article comment count
-	$db->query('', '
-		UPDATE {db_prefix}sp_articles
-		SET comments = {int:comments}
-		WHERE id_article = {int:article_id}',
-		array(
-			'article_id' => $article_id,
-			'comments' => $comments,
+			'table' => $query['table'],
+			'query_id' => $query['query_id'],
+			'id' => $id,
 		)
 	);
 }
@@ -1686,9 +1273,8 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 			else
 				return $result;
 			break;
-		default:
-			return;
 	}
+	return false;
 }
 
 /**
@@ -1700,7 +1286,7 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
  *
  * @param int|null $profile_id
  * @param int|null $type
- * @param string|null $sort
+ * @param string $sort
  */
 function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 {
@@ -1737,12 +1323,13 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 		$return[$row['id_profile']] = array(
 			'id' => $row['id_profile'],
 			'name' => $row['name'],
-			'label' => isset($txt['sp_admin_profiles' . substr($row['name'], 1)]) ? $txt['sp_admin_profiles' . substr($row['name'], 1)] : $row['name'],
+			'label' => isset($txt['sp_admin_profiles' . substr($row['name'], 1)])
+				? $txt['sp_admin_profiles' . substr($row['name'], 1)] : $row['name'],
 			'type' => $row['type'],
 			'value' => $row['value'],
 		);
 
-		// Get the permisssions
+		// Get the permissions
 		if ($row['type'] == 1)
 		{
 			list ($groups_allowed, $groups_denied) = explode('|', $row['value']);
@@ -1760,317 +1347,13 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 }
 
 /**
- * Load a shoutboxs parameters by ID
- *
- * @param int|null $shoutbox_id
- * @param boolean $active
- * @param boolean $allowed
- */
-function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = false)
-{
-	global $context;
-
-	$db = database();
-
-	$query = array();
-	$parameters = array();
-
-	if ($shoutbox_id !== null)
-	{
-		$query[] = 'id_shoutbox = {int:shoutbox_id}';
-		$parameters['shoutbox_id'] = $shoutbox_id;
-	}
-
-	if (!empty($allowed))
-		$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
-
-	if (!empty($active))
-	{
-		$query[] = 'status = {int:status}';
-		$parameters['status'] = 1;
-	}
-
-	$request = $db->query('', '
-		SELECT
-			id_shoutbox, name, permissions, moderator_groups, warning,
-			allowed_bbc, height, num_show, num_max, refresh, reverse,
-			caching, status, num_shouts, last_update
-		FROM {db_prefix}sp_shoutboxes' . (!empty($query) ? '
-		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY name',
-		$parameters
-	);
-	$return = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$return[$row['id_shoutbox']] = array(
-			'id' => $row['id_shoutbox'],
-			'name' => $row['name'],
-			'permissions' => $row['permissions'],
-			'moderator_groups' => $row['moderator_groups'] !== '' ? explode(',', $row['moderator_groups']) : array(),
-			'warning' => $row['warning'],
-			'allowed_bbc' => explode(',', $row['allowed_bbc']),
-			'height' => $row['height'],
-			'num_show' => $row['num_show'],
-			'num_max' => $row['num_max'],
-			'refresh' => $row['refresh'],
-			'reverse' => $row['reverse'],
-			'caching' => $row['caching'],
-			'status' => $row['status'],
-			'num_shouts' => $row['num_shouts'],
-			'last_update' => $row['last_update'],
-		);
-	}
-	$db->free_result($request);
-
-	return !empty($shoutbox_id) ? current($return) : $return;
-}
-
-/**
- * Loads all the shouts for a given shoutbox
- *
- * @param int $shoutbox id of the shoutbox to get data from
- * @param mixed[] $parameters
- * @return type
- */
-function sportal_get_shouts($shoutbox, $parameters)
-{
-	global $scripturl, $context, $user_info, $modSettings, $txt;
-
-	$db = database();
-
-	// Set defaults or used what was passed
-	$shoutbox = !empty($shoutbox) ? (int) $shoutbox : 0;
-	$start = !empty($parameters['start']) ? (int) $parameters['start'] : 0;
-	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 20;
-	$bbc = !empty($parameters['bbc']) ? $parameters['bbc'] : array();
-	$reverse = !empty($parameters['reverse']);
-	$cache = !empty($parameters['cache']);
-	$can_delete = !empty($parameters['can_moderate']);
-
-	// Cached, use it first
-	if (!empty($start) || !$cache || ($shouts = cache_get_data('shoutbox_shouts-' . $shoutbox, 240)) === null)
-	{
-		$request = $db->query('', '
-			SELECT
-				sh.id_shout, sh.body, IFNULL(mem.id_member, 0) AS id_member,
-				IFNULL(mem.real_name, sh.member_name) AS member_name, sh.log_time,
-				mg.online_color AS member_group_color, pg.online_color AS post_group_color
-			FROM {db_prefix}sp_shouts AS sh
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = sh.id_member)
-				LEFT JOIN {db_prefix}membergroups AS pg ON (pg.id_group = mem.id_post_group)
-				LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)
-			WHERE sh.id_shoutbox = {int:id_shoutbox}
-			ORDER BY sh.id_shout DESC
-			LIMIT {int:start}, {int:limit}',
-			array(
-				'id_shoutbox' => $shoutbox,
-				'start' => $start,
-				'limit' => $limit,
-			)
-		);
-		$shouts = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			// Disable the aeva mod for the shoutbox.
-			$context['aeva_disable'] = true;
-			$online_color = !empty($row['member_group_color']) ? $row['member_group_color'] : $row['post_group_color'];
-			$shouts[$row['id_shout']] = array(
-				'id' => $row['id_shout'],
-				'author' => array(
-					'id' => $row['id_member'],
-					'name' => $row['member_name'],
-					'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '" title="' . $txt['on'] . ' ' . strip_tags(standardTime($row['log_time'])) . '"' . (!empty($online_color) ? ' style="color: ' . $online_color . ';"' : '') . '>' . $row['member_name'] . '</a>') : $row['member_name'],
-					'color' => $online_color,
-				),
-				'time' => $row['log_time'],
-				'text' => parse_bbc($row['body'], true, '', $bbc),
-			);
-		}
-		$db->free_result($request);
-
-		if (empty($start) && $cache)
-			cache_put_data('shoutbox_shouts-' . $shoutbox, $shouts, 240);
-	}
-
-	foreach ($shouts as $shout)
-	{
-		// Private shouts @username: only get shown to the shouter and shoutee, and the admin
-		if (preg_match('~^@(.+?): ~u', $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
-		{
-			unset($shouts[$shout['id']]);
-			continue;
-		}
-
-		$shouts[$shout['id']] += array(
-			'is_me' => preg_match('~^<div\sclass="meaction">\* ' . preg_quote($shout['author']['name'], '~') . '.+</div>$~', $shout['text']) != 0,
-			'delete_link' => $can_delete ? '<a class="dot dotdelete" href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"></a> ' : '',
-			'delete_link_js' => $can_delete ? '<a class="dot dotdelete" href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="sp_delete_shout(' . $shoutbox . ', ' . $shout['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false;"></a> ' : '',
-		);
-
-		// Prepare for display in the box
-		$shouts[$shout['id']]['time'] = standardTime($shouts[$shout['id']]['time']);
-		$shouts[$shout['id']]['text'] = preg_replace('~(</?)div([^<]*>)~', '$1span$2', $shouts[$shout['id']]['text']);
-		$shouts[$shout['id']]['text'] = preg_replace('~<a([^>]+>)([^<]+)</a>~', '<a$1' . $txt['sp_link'] . '</a>', $shouts[$shout['id']]['text']);
-		$shouts[$shout['id']]['text'] = censorText($shouts[$shout['id']]['text']);
-
-		// Ignored user, hide the shout with option to show it
-		if (!empty($modSettings['enable_buddylist']) && in_array($shout['author']['id'], $context['user']['ignoreusers']))
-			$shouts[$shout['id']]['text'] = '<a href="#toggle" id="ignored_shout_link_' . $shout['id'] . '" onclick="sp_show_ignored_shout(' . $shout['id'] . '); return false;">[' . $txt['sp_shoutbox_show_ignored'] . ']</a><span id="ignored_shout_' . $shout['id'] . '" style="display: none;">' . $shouts[$shout['id']]['text'] . '</span>';
-	}
-
-	if ($reverse)
-		$shouts = array_reverse($shouts);
-
-	return $shouts;
-}
-
-/**
- * Return the number of shouts in a given shoutbox
- *
- * @param int $shoutbox_id ID of the shoutbox
- */
-function sportal_get_shoutbox_count($shoutbox_id)
-{
-	$db = database();
-	$total_shouts = 0;
-
-	$request = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}sp_shouts
-		WHERE id_shoutbox = {int:current}',
-		array(
-			'current' => $shoutbox_id,
-		)
-	);
-	list ($total_shouts) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return $total_shouts;
-}
-
-/**
- * Adds a new shout to a given box
- *
- * - Prevents guest from adding a shout
- * - Checks the shout total and archives if over the display limit for the box
- *
- * @param int $shoutbox
- * @param string $shout
- */
-function sportal_create_shout($shoutbox, $shout)
-{
-	global $user_info;
-
-	$db = database();
-
-	// If a guest shouts in the woods, and no one is there to hear them
-	if ($user_info['is_guest'])
-		return false;
-
-	// What, its not like we can shout to nothing
-	if (empty($shoutbox))
-		return false;
-
-	if (trim(strip_tags(parse_bbc($shout, false), '<img>')) === '')
-		return false;
-
-	// Add the shout
-	$db->insert('', '
-		{db_prefix}sp_shouts',
-		array('id_shoutbox' => 'int', 'id_member' => 'int', 'member_name' => 'string', 'log_time' => 'int', 'body' => 'string',),
-		array($shoutbox['id'], $user_info['id'], $user_info['name'], time(), $shout, ),
-		array('id_shout')
-	);
-
-	// To many shouts in the box, then its archive maintance time
-	$shoutbox['num_shouts']++;
-	if ($shoutbox['num_shouts'] > $shoutbox['num_max'])
-	{
-		$request = $db->query('', '
-			SELECT id_shout
-			FROM {db_prefix}sp_shouts
-			WHERE id_shoutbox = {int:shoutbox}
-			ORDER BY log_time
-			LIMIT {int:limit}',
-			array(
-				'shoutbox' => $shoutbox['id'],
-				'limit' => $shoutbox['num_shouts'] - $shoutbox['num_max'],
-			)
-		);
-		$old_shouts = array();
-		while ($row = $db->fetch_assoc($request))
-			$old_shouts[] = $row['id_shout'];
-		$db->free_result($request);
-
-		sportal_delete_shout($shoutbox['id'], $old_shouts, true);
-	}
-	else
-		sportal_update_shoutbox($shoutbox['id'], true);
-}
-
-/**
- * Removes a shout from the shoutbox by id
- *
- * @param int $shoutbox_id
- * @param int[]|int $shouts
- * @param boolean $prune
- */
-function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
-{
-	$db = database();
-
-	if (!is_array($shouts))
-		$shouts = array($shouts);
-
-	// Remove it
-	$db->query('', '
-		DELETE FROM {db_prefix}sp_shouts
-		WHERE id_shout IN ({array_int:shouts})',
-		array(
-			'shouts' => $shouts,
-		)
-	);
-
-	// Update the view
-	sportal_update_shoutbox($shoutbox_id, $prune ? count($shouts) - 1 : count($shouts));
-}
-
-/**
- * Updates the number of shouts for a given shoutbox
- *
- * Can supply a specific number to update the count to
- * Use true to increment by 1
- *
- * @param int $shoutbox_id
- * @param int|boolean $num_shouts if true increase the count by 1
- */
-function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
-{
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}sp_shoutboxes
-		SET last_update = {int:time}' . ($num_shouts === 0 ? '' : ',
-			num_shouts = {raw:shouts}') . '
-		WHERE id_shoutbox = {int:shoutbox}',
-		array(
-			'shoutbox' => $shoutbox_id,
-			'time' => time(),
-			'shouts' => $num_shouts === true ? 'num_shouts + 1' : 'num_shouts - ' . $num_shouts,
-		)
-	);
-
-	cache_put_data('shoutbox_shouts-' . $shoutbox_id, null, 240);
-}
-
-/**
  * Limits the number of actions a user can do in a given time
  *
- * - Currently only used by the shoutboxes
+ * - Currently only used by the shoutboxes and article comments
  *
  * @param string $type
  * @param boolean $fatal
+ *
  * @return boolean
  */
 function sp_prevent_flood($type, $fatal = true)
@@ -2113,7 +1396,8 @@ function sp_prevent_flood($type, $fatal = true)
 		if ($fatal)
 			fatal_lang_error('error_sp_flood_' . $type, false, array($time_limit));
 		else
-			return isset($txt['error_sp_flood_' . $type]) ? sprintf($txt['error_sp_flood_' . $type], $time_limit) : true;
+			return isset($txt['error_sp_flood_' . $type]) ? sprintf($txt['error_sp_flood_' . $type], $time_limit)
+				: true;
 	}
 
 	return false;

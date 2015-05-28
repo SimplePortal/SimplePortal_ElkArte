@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 function template_categories_edit()
@@ -20,7 +19,6 @@ function template_categories_edit()
 			<h3 class="category_header">
 				', $context['page_title'], '
 			</h3>
-			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">
 						<dt>
@@ -64,7 +62,6 @@ function template_categories_edit()
 					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
 					<input type="hidden" name="category_id" value="', $context['category']['id'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				</div>
 			</div>
 		</form>
 	</div>';

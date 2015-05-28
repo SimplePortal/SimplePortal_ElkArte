@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 if (!defined('ELK'))
@@ -25,6 +24,7 @@ class Shoutbox_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		loadTemplate('PortalShoutbox');
+		require_once(SUBSDIR . '/PortalShoutbox.subs.php');
 	}
 
 	/**

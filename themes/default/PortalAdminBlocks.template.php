@@ -1,17 +1,16 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 /**
- * Show the list of availalbe blocks in the system
+ * Show the list of available blocks in the system
  * If no specific area is provided will show all areas with available blocks in each
  * otherwise will just show the chosen area
  */
@@ -51,7 +50,7 @@ function template_block_list()
 		if (empty($context['blocks'][$side['name']]))
 		{
 			echo '
-				<tr class="windowbg">
+				<tr class="content">
 					<td class="centertext noticebox" colspan="4"></td>
 				</tr>';
 		}
@@ -59,7 +58,7 @@ function template_block_list()
 		foreach($context['blocks'][$side['name']] as $block)
 		{
 			echo '
-				<tr id="block_',$block['id'],'" class="windowbg">
+				<tr id="block_',$block['id'],'" class="content">
 					<td>', $block['label'], '</td>
 					<td>', $block['type_text'], '</td>
 					<td class="centertext">', implode(' ', $block['actions']), '</td>
@@ -86,7 +85,7 @@ function template_block_list()
 			containment: "#sp_manage_blocks",
 			href: "?action=admin;area=portalblocks",
 			placeholder: "ui-state-highlight",
-			axis: "y",
+			axis: "y"
 		});
 	</script>';
 }
@@ -121,7 +120,6 @@ function template_block_edit()
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=sp-blocks', $context['SPortal']['is_new'] ? 'Add' : 'Edit', '" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 				', $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'], '
 			</h3>
-			<div class="windowbg">
 				<div class="sp_content_padding">
 					<dl class="sp_form">
 						<dt>
@@ -331,7 +329,6 @@ function template_block_edit()
 						<input type="submit" name="preview_block" value="', $txt['sp-blocksPreview'], '" class="right_submit" />
 						<input type="submit" name="add_block" value="', !$context['SPortal']['is_new'] ? $txt['sp-blocksEdit'] : $txt['sp-blocksAdd'], '" class="right_submit" />
 					</div>
-				</div>
 			</div>';
 
 	if (!empty($context['SPortal']['block']['column']))
@@ -352,7 +349,6 @@ function template_block_edit()
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=sp-blocksDisplayOptions" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 				', $txt['sp-blocksDisplayOptions'], '
 			</h3>
-			<div class="windowbg2">
 				<div class="sp_content_padding">
 					<span class="floatright">', $txt['sp-blocksAdvancedOptions'], '<input type="checkbox" name="display_advanced" id="display_advanced" onclick="$(\'#sp_display_advanced\').slideToggle(300); document.getElementById(\'display_simple\').disabled = this.checked;" ', empty($context['SPortal']['block']['display_type']) ? '' : ' checked="checked"', ' class="input_check" /></span>
 					', $txt['sp-blocksShowBlock'], '
@@ -405,7 +401,6 @@ function template_block_edit()
 					<div class="sp_button_container">
 						<input type="submit" name="add_block" value="', !$context['SPortal']['is_new'] ? $txt['sp-blocksEdit'] : $txt['sp-blocksAdd'], '" class="right_submit" />
 					</div>
-				</div>
 			</div>';
 	}
 
@@ -425,7 +420,6 @@ function template_block_edit()
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=sp-blocksStyleOptions" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 				', $txt['sp-blocksStyleOptions'], '
 			</h3>
-			<div class="windowbg2">
 				<div class="sp_content_padding">';
 
 		foreach ($style_sections as $section => $float)
@@ -478,7 +472,6 @@ function template_block_edit()
 					<div class="sp_button_container">
 						<input type="submit" name="add_block" value="', !$context['SPortal']['is_new'] ? $txt['sp-blocksEdit'] : $txt['sp-blocksAdd'], '" class="right_submit" />
 					</div>
-				</div>
 			</div>';
 	}
 
@@ -510,7 +503,7 @@ function template_block_select_type()
 		$this_title = !empty($this_block) ? sprintf($txt['sp-adminBlockInuse'], $context['location'][$this_block['column']]) . ': ' . (!empty($this_block['state']) ? '(' . $txt['sp-blocksActive'] . ')' : '') : '';
 
 		echo '
-						<li class="windowbg">
+						<li class="content">
 								<input type="radio" name="selected_type[]" id="block_', $type['function'], '" value="', $type['function'], '" class="input_radio" />
 								<strong><label ', (!empty($this_block) ? 'class="sp_block_active" ' : ''), 'for="block_', $type['function'], '" title="', $this_title, '">', $txt['sp_function_' . $type['function'] . '_label'], '</label></strong>
 								<p class="smalltext">', $txt['sp_function_' . $type['function'] . '_desc'], '</p>';
@@ -523,7 +516,8 @@ function template_block_select_type()
 	echo '
 <li>
 					<input type="submit" name="select_type" value="', $txt['sp-blocksSelectType'], '" class="right_submit" />
-			</li></ul>';
+						</li>
+					</ul>';
 
 	if (!empty($context['SPortal']['block']['column']))
 		echo '

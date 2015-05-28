@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2014 SimplePortal Team
+ * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.1.0 Beta 1
  */
 
 // Configuration area
@@ -409,8 +408,7 @@ $txt['sp_admin_shoutbox_opt_member'] = 'Delete shouts posted by a member';
 
 $txt['sp_admin_shoutbox_block_redirect_message'] = '<p>Congratulations, you have created a new shoutbox!</p>
 <p>Although it won\'t be displayed anywhere within your forum yet. You will need to create a shoutbox block before your users can use the shoutbox.</p>
-<p>Click <a href="%s">here</a> to create a new shoutbox block for this shoutbox.</p>
-<p>Click <a href="%s">here</a> to continue to your list of shoutboxes.</p>';
+<p><a href="%s" class="linkbutton">Create a new shoutbox block</a>&nbsp;<a href="%s" class="linkbutton">List shoutboxes</a></p>';
 
 // Profiles Area
 $txt['sp_admin_profiles_title'] = 'Profiles';
@@ -496,7 +494,7 @@ $txt['sp-info_groups_beta'] = 'Beta Testers';
 $txt['sp-info_groups_translators'] = 'Language Translators';
 $txt['sp-info_translators_message'] = 'Thank you for your efforts in the internationalization of SimplePortal.';
 $txt['sp-info_groups_founder'] = 'Founding Father of SimplePortal';
-$txt['sp-info_groups_orignal_pm'] = 'Original Project Managers';
+$txt['sp-info_groups_original_pm'] = 'Original Project Managers';
 $txt['sp-info_fam_fam'] = 'Pretty Icons';
 $txt['sp-info_fam_fam_message'] = 'Mark James for his <a href="http://www.famfamfam.com/lab/icons/silk/">Fam Fam Fam Silk Icons</a>.';
 $txt['sp-info_contribute'] = 'Did you find SimplePortal useful? <a href="%s" target="_blank">Contribute to the project!</a>';
