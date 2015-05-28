@@ -15,10 +15,10 @@
 <package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
 	<name>SimplePortal</name>
-	<version>0.0.4</version>
+	<version>1.0.0 Beta 1</version>
 	<type>modification</type>
 	<install for="1.0.2 - 1.0.99">
-		<readme type="inline">This will install SimplePortal 0.0.4 for Elkarte.</readme>
+		<readme type="inline">This will install SimplePortal 1.0.0 Beta 1 for Elkarte.</readme>
 		<modification>modification.xml</modification>
 		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
 		<require-dir name="sources" destination="BOARDDIR" />
@@ -48,7 +48,7 @@
 	</install>
 
 	<uninstall for="1.0 - 1.0.99">
-		<readme type="inline">This will uninstall SimplePortal 0.0.4 for Elkarte.</readme>
+		<readme type="inline">This will uninstall SimplePortal 1.0.0 Beta 1 for Elkarte.</readme>
 		<hook reverse="true" hook="integrate_current_action" function="sp_integrate_current_action" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_action_boardindex_after" function="sp_integrate_boardindex" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_actions" function="sp_integrate_actions" file="SOURCEDIR/PortalIntegration.subs.php" />
@@ -81,6 +81,9 @@
 		<remove-file name="SUBSDIR/PortalBlocks.subs.php" />
 		<remove-file name="SUBSDIR/Portal.subs.php" />
 		<remove-file name="SUBSDIR/PortalAdmin.subs.php" />
+		<remove-file name="SUBSDIR/PortalArticle.subs.php" />
+		<remove-file name="SUBSDIR/PortalBlocks.subs.php" />
+		<remove-file name="SUBSDIR/PortalShoutbox.subs.php" />
 		<remove-file name="SOURCEDIR/PortalIntegration.subs.php" />
 		<remove-file name="THEMEDIR/Portal.template.php" />
 		<remove-file name="THEMEDIR/PortalArticles.template.php" />

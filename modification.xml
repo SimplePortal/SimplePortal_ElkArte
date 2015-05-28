@@ -14,7 +14,7 @@
 -->
 <modification xmlns="http://www.elkarte.net/site/modification" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
-	<version>2.4.3</version>
+	<version>1.0.0 Beta 1</version>
 
 	<file name="SOURCEDIR/Load.php">
 		<operation>
