@@ -34,6 +34,8 @@ class Articles_Block extends SP_Abstract_Block
 	 */
 	public function __construct($db = null)
 	{
+		require_once(SUBSDIR . '/PortalArticle.subs.php');
+
 		$this->block_parameters = array(
 			'category' => array(),
 			'limit' => 'int',
