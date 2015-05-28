@@ -21,7 +21,7 @@ function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings, $maintenance, $sportal_version;
 
-	$sportal_version = '1.0.0 Beta 1';
+	$sportal_version = '1.1.0 Beta 1';
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach'))
 		return;
@@ -154,8 +154,7 @@ function sportal_init_headers()
 	addJavascriptVar(array('sp_script_url' => '\'' . $safe_scripturl . '\''));
 
 	// Load up some javascript!
-	loadJavascriptFile('portal.js?sp100');
-	$javascript = '';
+	loadJavascriptFile('portal.js?sp110
 
 	// We use drag and sort blocks for the front page
 	if ($modSettings['sp_portal_mode'] == 1)
