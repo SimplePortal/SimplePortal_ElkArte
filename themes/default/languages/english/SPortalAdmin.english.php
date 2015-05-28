@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 0.0.4
+ * @version 1.0.0 Beta 1
  */
 
 // Configuration area
