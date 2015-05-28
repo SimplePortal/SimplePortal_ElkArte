@@ -154,9 +154,10 @@ function sportal_init_headers()
 	addJavascriptVar(array('sp_script_url' => '\'' . $safe_scripturl . '\''));
 
 	// Load up some javascript!
-	loadJavascriptFile('portal.js?sp110
+	loadJavascriptFile('portal.js?sp110');
 
 	// We use drag and sort blocks for the front page
+	$javascript = '';
 	if ($modSettings['sp_portal_mode'] == 1)
 	{
 		$modSettings['jquery_include_ui'] = true;
@@ -189,8 +190,10 @@ function sportal_init_headers()
 	}
 
 	// Let the template know we have some inline JS to display
-	addInlineJavascript($javascript, true);
+	if (!empty($javascript))
+		addInlineJavascript($javascript, true);
 
+	// Mark it as done so we don't do it again
 	$initialized = true;
 
 	return $initialized;
