@@ -31,9 +31,9 @@ hr {
 	padding: 0 0.4em;
 }
 #sp_credits {
-    border-radius: 7px;
-    box-shadow: none;
-    padding: 0 8px 16px;
+	border-radius: 7px;
+	box-shadow: none;
+	padding: 0 8px 16px;
 }
 .sp_fullwidth {
 	width: 100%;
@@ -465,9 +465,9 @@ body {
 	padding: 0 4px;
 }
 #admin_main_section .content {
-    padding: 6px 0px;
-    height: 12em;
-    overflow: auto;
+	padding: 6px 0px;
+	height: 12em;
+	overflow: auto;
 }
 #sp_live_info div.sp_content_padding, #sp_general_info div.sp_content_padding {
 	height: 18ex;
@@ -502,13 +502,6 @@ body {
 }
 #sp_select_block_type .smalltext {
 	margin: 6px;
-}
-#sp_select_block_type .content {
-	width: 99.66%;
-	margin: 2px 0.166%;
-	padding: 8px 0;
-	float: left;
-	text-align: center;
 }
 #sp_edit_block {
 	margin: 0 auto;
@@ -627,9 +620,9 @@ dl.sp_form img, #sp_add_articles_list_header img {
 }
 #sp_rich_editor {
 	padding-top: 1em;
-    margin: 0 auto;
-    max-width: 97%;
-    width: 60em;
+	margin: 0 auto;
+	max-width: 97%;
+	width: 60em;
 }
 #sp_text_editor {
 	padding: 1em;
@@ -644,7 +637,7 @@ dl.sp_form img, #sp_add_articles_list_header img {
 }
 
 #sp_view_comments {
-  margin-top: 1em;
+	margin-top: 1em;
 }
 #category_description {
 	width: 75%;
