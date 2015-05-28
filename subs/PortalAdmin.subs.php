@@ -201,6 +201,35 @@ function sp_changeState($type = null, $id = null)
 
 	return true;
 }
+
+/**
+ * Load the default theme names
+ *
+ * @return array
+ */
+function sp_general_load_themes()
+{
+	global $txt;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_theme, value AS name
+		FROM {db_prefix}themes
+		WHERE variable = {string:name}
+			AND id_member = {int:member}
+		ORDER BY id_theme',
+		array(
+			'member' => 0,
+			'name' => 'name',
+		)
+	);
+	$SPortal_themes = array('0' => &$txt['portalthemedefault']);
+	while ($row = $db->fetch_assoc($request))
+		$SPortal_themes[$row['id_theme']] = $row['name'];
+	$db->free_result($request);
+
+	return $SPortal_themes;
 }
 
 /**
