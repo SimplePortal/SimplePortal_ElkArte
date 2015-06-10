@@ -502,13 +502,6 @@ body {
 #sp_select_block_type .smalltext {
 	margin: 6px;
 }
-#sp_select_block_type .content {
-	width: 99.66%;
-	margin: 2px 0.166%;
-	padding: 8px 0;
-	float: left;
-	text-align: center;
-}
 #sp_edit_block {
 	margin: 0 auto;
 }
