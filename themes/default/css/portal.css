@@ -79,7 +79,7 @@ hr {
 
 .sp_online_flow {
 	max-height: 150px;
-	height: 150px !important;;
+	height: auto !important;;
 	overflow: auto;
 }
 .sp_rss_flow {
