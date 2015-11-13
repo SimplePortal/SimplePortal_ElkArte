@@ -538,7 +538,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'];
 		}
 
-		// Want to add / edit a block oo the portal
+		// Want to add / edit a block on the portal
 		if (!empty($_POST['add_block']))
 		{
 			checkSession();
@@ -568,7 +568,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				}
 			}
 
-			// If we have a block ID passed, we must be editing, so the the blocks current data
+			// If we have a block ID passed, we must be editing, so load the blocks current data
 			if (!empty($_REQUEST['block_id']))
 				$current_data = current(getBlockInfo(null, $_REQUEST['block_id']));
 
@@ -705,7 +705,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	}
 
 	/**
-	 * Moves get var to post for compatability and get paramters to start params
+	 * Moves get var to post for compatibility and get parameters to start params
 	 *
 	 * @return mixed[]
 	 */

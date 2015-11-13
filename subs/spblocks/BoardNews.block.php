@@ -242,7 +242,7 @@ function template_sp_boardNews_error($data)
  */
 function template_sp_boardNews($data)
 {
-		global $context, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	// Auto video embedding enabled?
 	if ($data['embed_videos'])
