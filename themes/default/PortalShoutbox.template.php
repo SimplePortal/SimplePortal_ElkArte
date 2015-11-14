@@ -251,18 +251,18 @@ function template_shoutbox_xml()
 	<updated>1</updated>
 	<error>', empty($context['SPortal']['shouts']) ? $txt['sp_shoutbox_no_shout'] : 0, '</error>
 	<warning>', !empty($context['SPortal']['shoutbox']['warning'])
-			? htmlspecialchars($context['SPortal']['shoutbox']['warning']) : 0, '</warning>
+			? Util::htmlspecialchars($context['SPortal']['shoutbox']['warning']) : 0, '</warning>
 	<reverse>', !empty($context['SPortal']['shoutbox']['reverse']) ? 1 : 0, '</reverse>';
 
 		foreach ($context['SPortal']['shouts'] as $shout)
 			echo '
 	<shout>
 		<id>', $shout['id'], '</id>
-		<author>', htmlspecialchars($shout['author']['link']), '</author>
-		<time>', htmlspecialchars($shout['time']), '</time>
-		<timeclean>', htmlspecialchars(strip_tags($shout['time'])), '</timeclean>
-		<delete>', !empty($shout['delete_link_js']) ? htmlspecialchars($shout['delete_link_js']) : ' ', '</delete>
-		<content>',  htmlspecialchars($shout['text']), '</content>
+		<author>', Util::htmlspecialchars($shout['author']['link']), '</author>
+		<time>', Util::htmlspecialchars($shout['time']), '</time>
+		<timeclean>', Util::htmlspecialchars(strip_tags($shout['time'])), '</timeclean>
+		<delete>', !empty($shout['delete_link_js']) ? Util::htmlspecialchars($shout['delete_link_js']) : ' ', '</delete>
+		<content>', Util::htmlspecialchars($shout['text']), '</content>
 		<is_me>', $shout['is_me'] ? 1 : 0, '</is_me>
 	</shout>';
 	}
