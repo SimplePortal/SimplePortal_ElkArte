@@ -118,9 +118,7 @@ function sp_submit_shout(shoutbox_id, sSessionVar, sSessionId)
 	{
 		shoutbox_indicator(shoutbox_id, true);
 
-		var shout_body = "";
-
-		shout_body = escape(document.getElementById('new_shout_' + shoutbox_id).value.replace(/&#/g, "&#").php_to8bit()).replace(/\+/g, "%2B");
+		var shout_body = escape(document.getElementById('new_shout_' + shoutbox_id).value.replace(/&#/g, "&#").php_to8bit()).replace(/\+/g, "%2B");
 
 		sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;xml', 'shoutbox_id=' + shoutbox_id + '&shout=' + shout_body + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
 
