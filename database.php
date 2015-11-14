@@ -25,19 +25,19 @@ $db_table = db_table();
 $sp_tables = array(
 	'sp_articles' => array(
 		'columns' => array(
-			array('name' => 'id_article', 'type' => 'mediumint', 'size' => 8, 'auto' => true),
-			array('name' => 'id_category', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
-			array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
-			array('name' => 'member_name', 'type' => 'varchar', 'size' => 80, 'default' => 0),
-			array('name' => 'namespace', 'type' => 'tinytext'),
-			array('name' => 'title', 'type' => 'tinytext'),
+			array('name' => 'id_article', 'type' => 'mediumint', 'size' => 8, 'auto' => true, 'unsigned' => true),
+			array('name' => 'id_category', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'member_name', 'type' => 'varchar', 'size' => 80, 'default' => ''),
+			array('name' => 'namespace', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+			array('name' => 'title', 'type' => 'varchar', 'size' => 255, 'default' => ''),
 			array('name' => 'body', 'type' => 'text'),
-			array('name' => 'type', 'type' => 'tinytext'),
-			array('name' => 'date', 'type' => 'int', 'size' => 10, 'default' => 0),
-			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
-			array('name' => 'styles', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
-			array('name' => 'views', 'type' => 'int', 'size' => 10, 'default' => 0),
-			array('name' => 'comments', 'type' => 'int', 'size' => 10, 'default' => 0),
+			array('name' => 'type', 'type' => 'varchar', 'size' => 40, 'default' => ''),
+			array('name' => 'date', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true),
+			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'styles', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'views', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true),
+			array('name' => 'comments', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true),
 			array('name' => 'status', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
 		),
 		'indexes' => array(
@@ -46,13 +46,13 @@ $sp_tables = array(
 	),
 	'sp_blocks' => array(
 		'columns' => array(
-			array('name' => 'id_block', 'type' => 'int', 'size' => 10, 'auto' => true),
-			array('name' => 'label', 'type' => 'tinytext'),
-			array('name' => 'type', 'type' => 'text'),
+			array('name' => 'id_block', 'type' => 'mediumint', 'size' => 8, 'auto' => true, 'unsigned' => true),
+			array('name' => 'label', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+			array('name' => 'type', 'type' => 'varchar', 'size' => 40, 'default' => ''),
 			array('name' => 'col', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
 			array('name' => 'row', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
-			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
-			array('name' => 'styles', 'type' => 'mediumint', 'size' => 8, 'default' => 0), 
+			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'styles', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true), 
 			array('name' => 'state', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
 			array('name' => 'force_view', 'type' => 'tinyint', 'size' => 2, 'default' => 0),
 			array('name' => 'mobile_view', 'type' => 'tinyint', 'size' => 2, 'default' => 0),
@@ -66,12 +66,12 @@ $sp_tables = array(
 	),
 	'sp_categories' => array(
 		'columns' => array(
-			array('name' => 'id_category', 'type' => 'mediumint', 'size' => 8, 'auto' => true),
-			array('name' => 'namespace', 'type' => 'tinytext'),
-			array('name' => 'name', 'type' => 'tinytext'),
+			array('name' => 'id_category', 'type' => 'mediumint', 'size' => 8, 'auto' => true, 'unsigned' => true),
+			array('name' => 'namespace', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+			array('name' => 'name', 'type' => 'varchar', 'size' => 255, 'default' => ''),
 			array('name' => 'description', 'type' => 'text'),
-			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
-			array('name' => 'articles', 'type' => 'int', 'size' => 10, 'default' => 0),
+			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'articles', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true),
 			array('name' => 'status', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
 		),
 		'indexes' => array(
@@ -80,10 +80,10 @@ $sp_tables = array(
 	),
 	'sp_comments' => array(
 		'columns' => array(
-			array('name' => 'id_comment', 'type' => 'mediumint', 'size' => 8, 'auto' => true),
-			array('name' => 'id_article', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
-			array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
-			array('name' => 'member_name', 'type' => 'varchar', 'size' => 80, 'default' => 0),
+			array('name' => 'id_comment', 'type' => 'mediumint', 'size' => 8, 'auto' => true, 'unsigned' => true),
+			array('name' => 'id_article', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'member_name', 'type' => 'varchar', 'size' => 80, 'default' => ''),
 			array('name' => 'body', 'type' => 'text'),
 			array('name' => 'log_time', 'type' => 'int', 'size' => 10, 'default' => 0),
 		),
@@ -91,16 +91,26 @@ $sp_tables = array(
 			array('type' => 'primary', 'columns' => array('id_comment')),
 		),
 	),
+	'sp_functions' => array(
+		'columns' => array(
+			array('name' => 'id_function', 'type' => 'tinyint', 'size' => 4, 'auto' => true, 'unsigned' => true),
+			array('name' => 'function_order', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
+			array('name' => 'name', 'type' => 'varchar', 'size' => 40, 'default' => ''),
+		),
+		'indexes' => array(
+			array('type' => 'primary', 'columns' => array('id_function')),
+		),
+	),
 	'sp_pages' => array(
 		'columns' => array(
-			array('name' => 'id_page', 'type' => 'int', 'size' => 10, 'auto' => true),
-			array('name' => 'namespace', 'type' => 'tinytext'),
-			array('name' => 'title', 'type' => 'tinytext'),
+			array('name' => 'id_page', 'type' => 'mediumint', 'size' => 8, 'auto' => true, 'unsigned' => true),
+			array('name' => 'namespace', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+			array('name' => 'title', 'type' => 'varchar', 'size' => 255, 'default' => ''),
 			array('name' => 'body', 'type' => 'mediumtext'),
-			array('name' => 'type', 'type' => 'tinytext'),
-			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
-			array('name' => 'styles', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
-			array('name' => 'views', 'type' => 'int', 'size' => 10, 'default' => 0),
+			array('name' => 'type', 'type' => 'varchar', 'size' => 40, 'default' => ''),
+			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'styles', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'views', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true),
 			array('name' => 'status', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
 		),
 		'indexes' => array(
@@ -109,7 +119,7 @@ $sp_tables = array(
 	),
 	'sp_parameters' => array(
 		'columns' => array(
-			array('name' => 'id_block', 'type' => 'int', 'size' => 10, 'default' => 0),
+			array('name' => 'id_block', 'type' => 'mediumint', 'size' => 9, 'default' => 0, 'unsigned' => true),
 			array('name' => 'variable', 'type' => 'varchar', 'size' => 255, 'default' => ''),
 			array('name' => 'value', 'type' => 'text'),
 		),
@@ -120,9 +130,9 @@ $sp_tables = array(
 	),
 	'sp_profiles' => array(
 		'columns' => array(
-			array('name' => 'id_profile', 'type' => 'mediumint', 'size' => 8, 'auto' => true),
+			array('name' => 'id_profile', 'type' => 'mediumint', 'size' => 8, 'auto' => true, 'unsigned' => true),
 			array('name' => 'type', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
-			array('name' => 'name', 'type' => 'tinytext'),
+			array('name' => 'name', 'type' => 'varchar', 'size' => 255, 'default' => ''),
 			array('name' => 'value', 'type' => 'text'),
 		),
 		'indexes' => array(
@@ -131,21 +141,21 @@ $sp_tables = array(
 	),
 	'sp_shoutboxes' => array(
 		'columns' => array(
-			array('name' => 'id_shoutbox', 'type' => 'int', 'size' => 10, 'auto' => true),
-			array('name' => 'name', 'type' => 'tinytext'),
-			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
+			array('name' => 'id_shoutbox', 'type' => 'mediumint', 'size' => 8, 'auto' => true, 'unsigned' => true),
+			array('name' => 'name', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
 			array('name' => 'moderator_groups', 'type' => 'text'),
 			array('name' => 'warning', 'type' => 'text'),
 			array('name' => 'allowed_bbc', 'type' => 'text'),
-			array('name' => 'height', 'type' => 'smallint', 'size' => 5, 'default' => 200),
-			array('name' => 'num_show', 'type' => 'smallint', 'size' => 5, 'default' => 20),
-			array('name' => 'num_max', 'type' => 'mediumint', 'size' => 8, 'default' => 1000),
+			array('name' => 'height', 'type' => 'smallint', 'size' => 5, 'default' => 200, 'unsigned' => true),
+			array('name' => 'num_show', 'type' => 'smallint', 'size' => 5, 'default' => 20, 'unsigned' => true),
+			array('name' => 'num_max', 'type' => 'mediumint', 'size' => 8, 'default' => 1000, 'unsigned' => true),
 			array('name' => 'refresh', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
 			array('name' => 'reverse', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
 			array('name' => 'caching', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
 			array('name' => 'status', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
-			array('name' => 'num_shouts', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
-			array('name' => 'last_update', 'type' => 'int', 'size' => 10, 'default' => 0),
+			array('name' => 'num_shouts', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'last_update', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true),
 		),
 		'indexes' => array(
 			array('type' => 'primary', 'columns' => array('id_shoutbox')),
@@ -153,11 +163,11 @@ $sp_tables = array(
 	),
 	'sp_shouts' => array(
 		'columns' => array(
-			array('name' => 'id_shout', 'type' => 'mediumint', 'size' => 8, 'auto' => true),
-			array('name' => 'id_shoutbox', 'type' => 'int', 'size' => 10, 'default' => 0),
-			array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
-			array('name' => 'member_name', 'type' => 'varchar', 'size' => 80, 'default' => 0),
-			array('name' => 'log_time', 'type' => 'int', 'size' => 10, 'default' => 0),
+			array('name' => 'id_shout', 'type' => 'mediumint', 'size' => 8, 'auto' => true, 'unsigned' => true),
+			array('name' => 'id_shoutbox', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'member_name', 'type' => 'varchar', 'size' => 80, 'default' => ''),
+			array('name' => 'log_time', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true),
 			array('name' => 'body', 'type' => 'text'),
 		),
 		'indexes' => array(
