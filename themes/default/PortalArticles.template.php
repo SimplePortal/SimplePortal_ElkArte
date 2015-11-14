@@ -75,12 +75,19 @@ function template_view_article()
 	global $context, $txt;
 
 	echo '
-	<div id="sp_view_article">
-		<h3 class="category_header">
+	<div id="sp_view_article">';
+
+	if (empty($context['article']['style']['no_title']))
+	{
+		echo '
+		<h3', strpos($context['article']['style']['title']['class'], 'custom') === false ? ' class="' . $context['article']['style']['title']['class'] . '"' : '', !empty($context['article']['style']['title']['style']) ? ' style="' . $context['article']['style']['title']['style'] . '"' : '', '>
 			', $context['article']['title'], '
-		</h3>
-			<div class="sp_content_padding">
-				<div class="sp_article_detail">';
+		</h3>';
+	}
+
+	echo '
+		<div class="sp_content_padding ', $context['article']['style']['body']['class'], '"', !empty($context['article']['style']['body']['style']) ? ' style="' . $context['article']['style']['body']['style'] . '"' : '', '>
+			<div class="sp_article_detail">';
 
 	if (!empty($context['article']['author']['avatar']['image']))
 		echo $context['article']['author']['avatar']['image'];

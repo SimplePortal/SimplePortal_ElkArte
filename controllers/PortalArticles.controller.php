@@ -104,6 +104,7 @@ class Article_Controller extends Action_Controller
 		if (empty($context['article']['id']))
 			fatal_lang_error('error_sp_article_not_found', false);
 
+		$context['article']['style'] = sportal_select_style($context['article']['styles']);
 		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
 
 		// Set up for the comment pagination

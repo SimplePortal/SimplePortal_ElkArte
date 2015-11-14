@@ -338,6 +338,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 				'body' => '',
 				'type' => 'bbc',
 				'permissions' => 3,
+				'styles' => 4,
 				'status' => 1,
 			);
 		}
@@ -381,16 +382,21 @@ class ManagePortalArticles_Controller extends Action_Controller
 			});
 		');
 
-		// Final bits for the template, category's and permission settings
+		// Final bits for the template, category's, styles and permission settings
 		$context['article']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		if (empty($context['article']['permission_profiles']))
 			fatal_lang_error('error_sp_no_permission_profiles', false);
+
+		$context['article']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
+		if (empty($context['article']['permission_profiles']))
+			fatal_lang_error('error_sp_no_style_profiles', false);
 
 		$context['article']['categories'] = sportal_get_categories();
 		if (empty($context['article']['categories']))
 			fatal_lang_error('error_sp_no_category', false);
 
 		// Page out values
+		$context['article']['style'] = sportal_select_style($context['article']['styles']);
 		$context['is_new'] = $this->_is_new;
 		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
 		$context['page_title'] = $this->_is_new ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'];
@@ -431,6 +437,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
 			'type' => $_POST['type'],
 			'permissions' => $_POST['permissions'],
+			'styles' => $_POST['styles'],
 			'date' => $date,
 			'status' => !empty($_POST['status']),
 			'view_count' => $views,
@@ -474,6 +481,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			'article_id' => 'intval',
 			'category_id' => 'intval',
 			'permissions' => 'intval',
+			'styles' => 'intval',
 			'type' => 'trim',
 			'content' => 'trim'
 		));
@@ -531,6 +539,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
 			'type' => in_array($validator->type, array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
 			'permissions' => $validator->permissions,
+			'styles' => $validator->styles,
 			'status' => !empty($_POST['status']) ? 1 : 0,
 		);
 

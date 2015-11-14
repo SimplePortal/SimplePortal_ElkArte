@@ -313,7 +313,7 @@ function sportal_load_blocks()
 		if ($context['browser_body_id'] === 'mobile' && empty($block['mobile_view']))
 			continue;
 
-		$block['style'] = sportal_parse_style('explode', $block['style'], true);
+		$block['style'] = sportal_select_style($block['styles']);
 
 		$block['instance'] = sp_instantiate_block($block['type']);
 		$block['instance']->setup($block['parameters'], $block['id']);
@@ -424,7 +424,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 	$request = $db->query('', '
 		SELECT
 			spb.id_block, spb.label, spb.type, spb.col, spb.row, spb.permissions, spb.state,
-			spb.force_view, spb.mobile_view, spb.display, spb.display_custom, spb.style, spp.variable, spp.value
+			spb.force_view, spb.mobile_view, spb.display, spb.display_custom, spb.styles, spp.variable, spp.value
 		FROM {db_prefix}sp_blocks AS spb
 			LEFT JOIN {db_prefix}sp_parameters AS spp ON (spp.id_block = spb.id_block)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
@@ -451,7 +451,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 				'mobile_view' => $row['mobile_view'],
 				'display' => $row['display'],
 				'display_custom' => $row['display_custom'],
-				'style' => $row['style'],
+				'styles' => $row['styles'],
 				'collapsed' => $context['user']['is_guest'] ? !empty($_COOKIE['sp_block_' . $row['id_block']]) : !empty($options['sp_block_' . $row['id_block']]),
 				'parameters' => array(),
 			);
@@ -1203,7 +1203,7 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 		// Make the page request
 		$request = $db->query('', '
 			SELECT
-				id_page, namespace, title, body, type, permissions, views, style, status
+				id_page, namespace, title, body, type, permissions, views, styles, status
 			FROM {db_prefix}sp_pages' . (!empty($query) ? '
 			WHERE ' . implode(' AND ', $query) : '') . '
 			ORDER BY {raw:sort}', $parameters
@@ -1221,7 +1221,7 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 				'type' => $row['type'],
 				'permissions' => $row['permissions'],
 				'views' => $row['views'],
-				'style' => $row['style'],
+				'styles' => $row['styles'],
 				'status' => $row['status'],
 			);
 		}
@@ -1341,11 +1341,39 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 				'groups_denied' => $groups_denied !== '' ? explode(',', $groups_denied) : array(),
 			));
 		}
+		elseif ($row['type'] == 2)
+		{
+			$return[$row['id_profile']] = array_merge($return[$row['id_profile']], sportal_parse_style('explode', $row['value'], true));
+		}
 	}
 
 	$db->free_result($request);
 
 	return !empty($profile_id) ? current($return) : $return;
+}
+
+/**
+ * Fetch a style based on its id
+ *
+ * @param int $style_id
+ */
+function sportal_select_style($style_id)
+{
+	static $styles;
+
+	if (!isset($styles))
+	{
+		$styles = sportal_get_profiles(null, 2);
+	}
+
+	if (isset($styles[$style_id]))
+	{
+		return $styles[$style_id];
+	}
+	else
+	{
+		return sportal_parse_style('explode', null, true);
+	}
 }
 
 /**

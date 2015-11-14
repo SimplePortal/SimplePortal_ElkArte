@@ -43,7 +43,7 @@ function template_view_page()
 	{
 		echo '
 			<div', !empty($context['SPortal']['page']['style']['title']['style']) ? ' style="' . $context['SPortal']['page']['style']['title']['style'] . '"' : '', '>
-				<h3 class="', $context['SPortal']['page']['style']['title']['class'], '">
+				<h3', strpos($context['SPortal']['page']['style']['title']['class'], 'custom') === false ? ' class="' . $context['SPortal']['page']['style']['title']['class'] . '"' : '', '>
 					', $context['SPortal']['page']['title'], '
 				</h3>
 			</div>';

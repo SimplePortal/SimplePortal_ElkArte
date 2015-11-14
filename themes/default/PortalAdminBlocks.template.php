@@ -145,8 +145,21 @@ function template_block_edit()
 									<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['block']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
 
 	echo '
-							</select>
-						</dd>';
+						</select>
+					</dd>
+					<dt>
+						<label for="block_styles">', $txt['sp_admin_blocks_col_styles'], ':</label>
+					</dt>
+					<dd>
+						<select name="styles" id="block_styles">';
+
+	foreach ($context['SPortal']['block']['style_profiles'] as $profile)
+		echo '
+							<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['block']['styles'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+
+	echo '
+						</select>
+					</dd>';
 
 	// Display any options that are available for this block
 	foreach ($context['SPortal']['block']['options'] as $name => $type)
@@ -331,15 +344,6 @@ function template_block_edit()
 					</div>
 			</div>';
 
-	if (!empty($context['SPortal']['block']['column']))
-		echo '
-			<input type="hidden" name="block_column" value="', $context['SPortal']['block']['column'], '" />';
-
-	echo '
-			<input type="hidden" name="block_type" value="', $context['SPortal']['block']['type'], '" />
-			<input type="hidden" name="block_id" value="', $context['SPortal']['block']['id'], '" />
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
-
 	// Display Options is integrated
 	if (!empty($modSettings['sp_enableIntegration']))
 	{
@@ -404,78 +408,14 @@ function template_block_edit()
 			</div>';
 	}
 
-	$style_sections = array('title' => 'left', 'body' => 'right');
-	$style_types = array('default' => 'DefaultClass', 'class' => 'CustomClass', 'style' => 'CustomStyle');
-	$style_parameters = array(
-		'title' => array('category_header', 'secondary_header'),
-		'body' => array('portalbg', 'portalbg2', 'information', 'roundframe'),
-	);
-
-	// Style options for the block, but not boardNews
-	if ($context['SPortal']['block']['type'] != 'sp_boardNews')
-	{
+	if (!empty($context['SPortal']['block']['column']))
 		echo '
-			<br />
-			<h3 class="category_header">
-				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=sp-blocksStyleOptions" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
-				', $txt['sp-blocksStyleOptions'], '
-			</h3>
-				<div class="sp_content_padding">';
-
-		foreach ($style_sections as $section => $float)
-		{
-			echo '
-					<dl id="sp_edit_style_', $section, '" class="sp_form sp_float_', $float, '">';
-
-			foreach ($style_types as $type => $label)
-			{
-				echo '
-						<dt>
-							', $txt['sp-blocks' . ucfirst($section) . $label], ':
-						</dt>
-						<dd>';
-
-				if ($type == 'default')
-				{
-					echo '
-							<select name="', $section, '_default_class" id="', $section, '_default_class">';
-
-					foreach ($style_parameters[$section] as $class)
-						echo '
-								<option value="', $class, '"', $context['SPortal']['block']['style'][$section . '_default_class'] == $class ? ' selected="selected"' : '', '>', $class, '</option>';
-
-					echo '
-							</select>';
-				}
-				else
-					echo '
-							<input type="text" name="', $section, '_custom_', $type, '" id="', $section, '_custom_', $type, '" value="', $context['SPortal']['block']['style'][$section . '_custom_' . $type], '" class="input_text" />';
-
-				echo '
-						</dd>';
-			}
-
-			echo '
-						<dt>
-							', $txt['sp-blocksNo' . ucfirst($section)], ':
-						</dt>
-						<dd>
-							<input type="checkbox" name="no_', $section, '" id="no_', $section, '" value="1"', !empty($context['SPortal']['block']['style']['no_' . $section]) ? ' checked="checked"' : '', 'onclick="check_style_options();" class="input_check" />
-						</dd>
-					</dl>';
-		}
-
-		echo '
-					<script><!-- // --><![CDATA[
-						check_style_options();
-					// ]]></script>
-					<div class="sp_button_container">
-						<input type="submit" name="add_block" value="', !$context['SPortal']['is_new'] ? $txt['sp-blocksEdit'] : $txt['sp-blocksAdd'], '" class="right_submit" />
-					</div>
-			</div>';
-	}
+			<input type="hidden" name="block_column" value="', $context['SPortal']['block']['column'], '" />';
 
 	echo '
+			<input type="hidden" name="block_type" value="', $context['SPortal']['block']['type'], '" />
+			<input type="hidden" name="block_id" value="', $context['SPortal']['block']['id'], '" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
 	</div>';
 }

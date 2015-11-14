@@ -277,7 +277,7 @@ class ManagePortalPages_Controller extends Action_Controller
 				'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
 				'type' => $_POST['type'],
 				'permissions' => $_POST['permissions'],
-				'style' => sportal_parse_style('implode'),
+				'styles' => (int) $_POST['styles'],
 				'status' => !empty($_POST['status']),
 			);
 
@@ -307,7 +307,7 @@ class ManagePortalPages_Controller extends Action_Controller
 				'body' => '',
 				'type' => 'bbc',
 				'permissions' => 3,
-				'style' => '',
+				'styles' => 4,
 				'status' => 1,
 			);
 		}
@@ -354,8 +354,13 @@ class ManagePortalPages_Controller extends Action_Controller
 		if (empty($context['SPortal']['page']['permission_profiles']))
 			fatal_lang_error('error_sp_no_permission_profiles', false);
 
+		// Styles
+		$context['SPortal']['page']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
+		if (empty($context['SPortal']['page']['style_profiles']))
+			fatal_lang_error('error_sp_no_style_profiles', false);
+
 		// And for the template
-		$context['SPortal']['page']['style'] = sportal_parse_style('explode', $context['SPortal']['page']['style'], !empty($context['SPortal']['preview']));
+		$context['SPortal']['page']['style'] = sportal_select_style($context['SPortal']['page']['styles']);
 		$context['SPortal']['page']['body'] = sportal_parse_content($context['SPortal']['page']['body'], $context['SPortal']['page']['type'], 'return');
 		$context['page_title'] = $context['SPortal']['is_new']
 			? $txt['sp_admin_pages_add']
@@ -512,7 +517,7 @@ class ManagePortalPages_Controller extends Action_Controller
 			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
 			'type' => in_array($_POST['type'], array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
 			'permissions' => (int) $_POST['permissions'],
-			'style' => sportal_parse_style('implode'),
+			'styles' => (int) $_POST['styles'],
 			'status' => !empty($_POST['status']) ? 1 : 0,
 		);
 

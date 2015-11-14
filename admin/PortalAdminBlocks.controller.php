@@ -244,12 +244,12 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'column' => !empty($_POST['block_column']) ? $_POST['block_column'] : 0,
 				'row' => 0,
 				'permissions' => 3,
+				'styles' => 4,
 				'state' => 1,
 				'force_view' => 0,
 				'mobile_view' => 0,
 				'display' => '',
 				'display_custom' => '',
-				'style' => '',
 				'parameters' => !empty($start_parameters) ? $start_parameters : array(),
 				'options' => $block->parameters(),
 				'list_blocks' => !empty($_POST['block_column']) ? getBlockInfo($_POST['block_column']) : array(),
@@ -351,12 +351,12 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'row' => !empty($_POST['block_row']) ? $_POST['block_row'] : 0,
 				'placement' => !empty($_POST['placement']) && in_array($_POST['placement'], array('before', 'after')) ? $_POST['placement'] : '',
 				'permissions' => $_POST['permissions'],
+				'styles' => $_POST['styles'],
 				'state' => !empty($_POST['block_active']),
 				'force_view' => !empty($_POST['block_force']),
 				'mobile_view' => !empty($_POST['block_mobile']),
 				'display' => $display,
 				'display_custom' => $custom,
-				'style' => sportal_parse_style('implode'),
 				'parameters' => !empty($_POST['parameters']) ? $_POST['parameters'] : array(),
 				'options' => $block->parameters(),
 				'list_blocks' => getBlockInfo($_POST['block_column']),
@@ -399,6 +399,11 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$context['SPortal']['block']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 			if (empty($context['SPortal']['block']['permission_profiles']))
 				fatal_lang_error('error_sp_no_permission_profiles', false);
+
+			// Load in the style profiles
+			$context['SPortal']['block']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
+			if (empty($context['SPortal']['block']['style_profiles']))
+				fatal_lang_error('error_sp_no_style_profiles', false);
 
 			$context['simple_actions'] = array(
 				'sportal' => $txt['sp-portal'],
@@ -443,7 +448,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			else
 				$context['SPortal']['block']['display_type'] = 1;
 
-			$context['SPortal']['block']['style'] = sportal_parse_style('explode', $context['SPortal']['block']['style'], !empty($context['SPortal']['preview']));
+			$context['SPortal']['block']['style'] = sportal_select_style($context['SPortal']['block']['styles']);
 
 			// Prepare the Textcontent for BBC, only the first bbc will be detected correctly!
 			$firstBBCFound = false;
@@ -678,12 +683,12 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'col' => $_POST['block_column'],
 				'row' => $row,
 				'permissions' => (int) $_POST['permissions'],
+				'styles' => (int) $_POST['styles'],
 				'state' => !empty($_POST['block_active']) ? 1 : 0,
 				'force_view' => !empty($_POST['block_force']) ? 1 : 0,
 				'mobile_view' => !empty($_POST['block_mobile']) ? 1 : 0,
 				'display' => $display,
 				'display_custom' => $custom,
-				'style' => sportal_parse_style('implode'),
 			);
 
 			// Insert a new block in to the portal
