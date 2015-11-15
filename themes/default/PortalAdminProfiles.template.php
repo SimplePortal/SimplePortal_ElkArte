@@ -73,7 +73,7 @@ function template_style_profiles_edit()
 	global $context, $scripturl, $txt;
 
 	echo '
-		<form action="', $scripturl, '?action=admin;area=portalprofiles;sa=editstyle" method="post" accept-charset="', $context['character_set'], '" onsubmit="submitonce(this);">
+		<form action="', $scripturl, '?action=admin;area=portalprofiles;sa=editstyle" method="post" accept-charset="UTF-8"" onsubmit="submitonce(this);">
 			<h3 class="category_header">
 				', $context['page_title'], '
 			</h3>
