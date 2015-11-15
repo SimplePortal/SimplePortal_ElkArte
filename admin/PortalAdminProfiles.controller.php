@@ -90,7 +90,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			'id' => 'portal_permisssions',
 			'title' => $txt['sp_admin_permission_profiles_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
-			'no_items_label' => $txt['error_sp_no_articles'],
+			'no_items_label' => $txt['error_sp_no_profiles'],
 			'base_href' => $scripturl . '?action=admin;area=portalprofiles;sa=listpermission;',
 			'default_sort_col' => 'name',
 			'get_items' => array(
@@ -361,8 +361,8 @@ class ManagePortalProfile_Controller extends Action_Controller
 			'id' => 'portal_styles',
 			'title' => $txt['sp_admin_style_profiles_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
-			'no_items_label' => $txt['error_sp_no_articles'],
-			'base_href' => $scripturl . '?action=admin;area=portalprofiles;sa=listpermission;',
+			'no_items_label' => $txt['error_sp_no_style_profiles'],
+			'base_href' => $scripturl . '?action=admin;area=portalprofiles;sa=liststyle;',
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'function' => array($this, 'list_spLoadProfiles'),
