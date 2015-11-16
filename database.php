@@ -335,12 +335,8 @@ if (empty($has_permission_profiles))
 	);
 }
 
-$db_package_log = array();
-foreach ($sp_tables as $sp_table_name => $null)
-	$db_package_log[] = array('remove_table', $db_prefix . $sp_table_name);
-
-$dbtbl = db_table();
 // Update the page table to accept more data
+$dbtbl = db_table();
 if (empty($modSettings['sp_version']) || $modSettings['sp_version'] < '2.4.1')
 {
 	$page_cols = $dbtbl->db_list_columns('{db_prefix}sp_pages', true);
@@ -356,14 +352,14 @@ $dbtbl->db_add_column('{db_prefix}sp_blocks', array('name' => 'mobile_view', 'ty
 foreach (array('sp_articles', 'sp_blocks', 'sp_pages') as $sp_style)
 {
 	$block_cols = $dbtbl->db_list_columns('{db_prefix}' . $sp_style, true);
-	if (isset($block_cols['style']))
+	if (!isset($block_cols['styles']))
 	{
 		$dbtbl->db_add_column('{db_prefix}' . $sp_style, array('name' => 'styles', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true));
 		$dbtbl->db_remove_column('{db_prefix}' . $sp_style, 'style');
 	}
 }
 
-// Convert styles to style profiles
+// If there are no style profiles, then add some defaults to use
 $result = $db->query('','
 	SELECT 
 		id_profile
@@ -377,7 +373,6 @@ $result = $db->query('','
 );
 list ($has_style_profiles) = $db->fetch_row($result);
 $db->free_result($result);
-
 if (empty($has_style_profiles))
 {
 	$db->insert('replace',
@@ -386,18 +381,22 @@ if (empty($has_style_profiles))
 		array(
 			array(4, 2, '$_default_title_default_body', 'title_default_class~category_header|title_custom_class~|title_custom_style~|body_default_class~portalbg|body_custom_class~|body_custom_style~|no_title~|no_body~'),
 			array(5, 2, '$_default_title_alternate_body', 'title_default_class~category_header|title_custom_class~|title_custom_style~|body_default_class~portalbg2|body_custom_class~|body_custom_style~|no_title~|no_body~'),
-			array(6, 2, '$_alternate_title_default_body', 'title_default_class~category_header|title_custom_class~|title_custom_style~|body_default_class~portalbg|body_custom_class~|body_custom_style~|no_title~|no_body~'),
-			array(7, 2, '$_alternate_title_alternate_body', 'title_default_class~category_header|title_custom_class~|title_custom_style~|body_default_class~portalbg2|body_custom_class~|body_custom_style~|no_title~|no_body~'),
+			array(6, 2, '$_alternate_title_default_body', 'title_default_class~secondary_header|title_custom_class~|title_custom_style~|body_default_class~portalbg|body_custom_class~|body_custom_style~|no_title~|no_body~'),
+			array(7, 2, '$_alternate_title_alternate_body', 'title_default_class~secondary_header|title_custom_class~|title_custom_style~|body_default_class~portalbg2|body_custom_class~|body_custom_style~|no_title~|no_body~'),
 			array(8, 2, '$_no_title_default_body', 'title_default_class~|title_custom_class~|title_custom_style~|body_default_class~portalbg|body_custom_class~|body_custom_style~|no_title~1|no_body~'),
 			array(9, 2, '$_no_title_alternate_body', 'title_default_class~|title_custom_class~|title_custom_style~|body_default_class~portalbg2|body_custom_class~|body_custom_style~|no_title~1|no_body~'),
 			array(10, 2, '$_default_title_roundframe', 'title_default_class~category_header|title_custom_class~|title_custom_style~|body_default_class~roundframe|body_custom_class~|body_custom_style~|no_title~|no_body~'),
-			array(11, 2, '$_alternate_title_roundframe', 'title_default_class~category_header|title_custom_class~|title_custom_style~|body_default_class~roundframe|body_custom_class~|body_custom_style~|no_title~|no_body~'),
+			array(11, 2, '$_alternate_title_roundframe', 'title_default_class~secondary_header|title_custom_class~|title_custom_style~|body_default_class~roundframe|body_custom_class~|body_custom_style~|no_title~|no_body~'),
 			array(12, 2, '$_no_title_roundframe', 'title_default_class~|title_custom_class~|title_custom_style~|body_default_class~roundframe|body_custom_class~|body_custom_style~|no_title~1|no_body~'),
 			array(13, 2, '$_no_title_information', 'title_default_class~|title_custom_class~|title_custom_style~|body_default_class~information|body_custom_class~|body_custom_style~|no_title~1|no_body~'),
 		),
 		array('id_profile')
 	);
 }
+
+$db_package_log = array();
+foreach ($sp_tables as $sp_table_name => $null)
+	$db_package_log[] = array('remove_table', $db_prefix . $sp_table_name);
 
 if (ELK === 'SSI')
 	echo 'Database changes were carried out successfully.';
