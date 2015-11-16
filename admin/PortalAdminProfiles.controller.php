@@ -73,7 +73,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
-		// Removing some permission profiles?
+		// Removing some permission profiles via checkbox?
 		if (!empty($_POST['remove_profiles']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 		{
 			checkSession();
@@ -210,6 +210,12 @@ class ManagePortalProfile_Controller extends Action_Controller
 					$context['session_var'] => $context['session_id'],
 				),
 			),
+			'additional_rows' => array(
+				array(
+					'position' => 'below_table_data',
+					'value' => '<input type="submit" name="remove_profiles" value="' . $txt['sp_admin_profiles_remove'] . '" class="right_submit" />',
+				),
+			),
 		);
 
 		// Set the context values
@@ -324,7 +330,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	}
 
 	/**
-	 * Remove a permission profile from the system
+	 * Remove a single permission profile from the system
 	 */
 	public function action_delete()
 	{
@@ -344,7 +350,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
-		// Removing some profiles?
+		// Removing some styles via the checkbox?
 		if (!empty($_POST['remove_profiles']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 		{
 			checkSession();
@@ -356,7 +362,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			sp_delete_profiles($remove);
 		}
 
-		// Build the listoption array to display the permission profiles
+		// Build the listoption array to display the style profiles
 		$listOptions = array(
 			'id' => 'portal_styles',
 			'title' => $txt['sp_admin_style_profiles_list'],
@@ -463,6 +469,12 @@ class ManagePortalProfile_Controller extends Action_Controller
 					$context['session_var'] => $context['session_id'],
 				),
 			),
+			'additional_rows' => array(
+				array(
+					'position' => 'below_table_data',
+					'value' => '<input type="submit" name="remove_profiles" value="' . $txt['sp_admin_profiles_remove'] . '" class="right_submit" />',
+				),
+			),
 		);
 
 		// Set the context values
@@ -483,7 +495,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 		global $context, $txt;
 
 		// New or an edit to an existing style
-		$context['is_new'] = empty($_REQUEST['profile_id']);
+		$context['is_new'] = empty($_GET['profile_id']);
 
 		// Saving the style form
 		if (!empty($_POST['submit']))
@@ -491,21 +503,22 @@ class ManagePortalProfile_Controller extends Action_Controller
 			// Security first
 			checkSession();
 
-			// Always clean the name
+			// Always clean the profile name
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 				fatal_lang_error('sp_error_profile_name_empty', false);
 
 			// Add the data to place in the fields
 			$profile_info = array(
 				'id' => (int) $_POST['profile_id'],
-				'type' => 1,
+				'type' => 2,
 				'name' => Util::htmlspecialchars($_POST['name'], ENT_QUOTES),
 				'value' => sportal_parse_style('implode'),
 			);
 
 			// New we simply insert, or if editing update
-			$profile_info['id'] = sp_add_permission_profile($profile_info, $context['is_new']);
+			$profile_info['id'] = sp_add_permission_profile($profile_info, empty($_POST['profile_id']));
 
+			// Tada
 			redirectexit('action=admin;area=portalprofiles;sa=liststyle');
 		}
 
@@ -515,24 +528,24 @@ class ManagePortalProfile_Controller extends Action_Controller
 			$context['profile'] = array(
 				'id' => 0,
 				'name' => $txt['sp_profiles_default_name'],
-				'title_default_class' => 'catbg',
+				'title_default_class' => 'category_header',
 				'title_custom_class' => '',
 				'title_custom_style' => '',
-				'body_default_class' => 'windowbg',
+				'body_default_class' => 'portalbg',
 				'body_custom_class' => '',
 				'body_custom_style' => '',
 				'no_title' => false,
 				'no_body' => false,
 			);
 		}
-		// Else fetch an existing one to display
+		// Now a new style so fetch an existing one to display
 		else
 		{
-			$_REQUEST['profile_id'] = (int) $_REQUEST['profile_id'];
-			$context['profile'] = sportal_get_profiles($_REQUEST['profile_id']);
+			$profile_id = (int) $_GET['profile_id'];
+			$context['profile'] = sportal_get_profiles($profile_id);
 		}
 
-		// All we know for style
+		// We may not have much style, but we have class
 		$context['profile']['classes'] = array(
 			'title' => array('category_header', 'secondary_header', 'custom'),
 			'body' => array('portalbg', 'portalbg2', 'information', 'roundframe', 'custom'),

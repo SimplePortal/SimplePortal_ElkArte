@@ -1086,7 +1086,8 @@ function sp_load_profiles($start, $items_per_page, $sort, $type = 1)
 
 	// First load up all of the permission profiles names in the system
 	$request = $db->query('', '
-		SELECT id_profile, name
+		SELECT
+			id_profile, name
 		FROM {db_prefix}sp_profiles
 		WHERE type = {int:type}
 		ORDER BY {raw:sort}
@@ -1115,30 +1116,51 @@ function sp_load_profiles($start, $items_per_page, $sort, $type = 1)
 	}
 	$db->free_result($request);
 
-	// Now for each profile, load up the specific permissions for each area of the portal
-	foreach (array('articles', 'blocks', 'categories', 'pages', 'shoutboxes') as $module)
+	// Now for each profile, load up the specific in-use for each area of the portal
+	switch ($type)
+	{
+		case 2:
+			$select = 'styles, COUNT(*) AS used';
+			$area = array('articles', 'blocks', 'pages');
+			$group = 'styles';
+			break;
+		case 3:
+			$select = 'display, COUNT(*) AS used';
+			$area = array('articles', 'blocks', 'pages', 'shoutboxes');
+			$group = 'display';
+			break;
+		default:
+			$select = 'permissions, COUNT(*) AS used';
+			$area = array('articles', 'blocks', 'categories', 'pages', 'shoutboxes');
+			$group = 'permissions';
+			break;
+	}
+
+	foreach ($area as $module)
 	{
 		$request = $db->query('', '
-			SELECT permissions, COUNT(*) AS used
-			FROM {db_prefix}sp_{raw:module}
-			GROUP BY permissions',
+			SELECT ' . $select . '
+			FROM {db_prefix}sp_' . $module . '
+			GROUP BY ' . $group,
 			array(
-				'module' => $module,
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
 		{
-			if (isset($profiles[$row['permissions']]))
-				$profiles[$row['permissions']][$module] = $row['used'];
+			if (isset($profiles[$row[$group]]))
+			{
+				$profiles[$row[$group]][$module] = $row['used'];
+			}
 		}
 		$db->free_result($request);
 	}
 
 	return $profiles;
+
 }
 
 /**
- * Removes a permission group by id
+ * Removes a group of profiles by id
  *
  * @param int[] $remove_ids
  */
@@ -1484,6 +1506,14 @@ function sp_block_delete($block_id)
 	);
 }
 
+/**
+ * Function to add or update a profile, style, permissions or display
+ *
+ * @param mixed[] $profile_info The data to insert/update
+ * @param bool $is_new if to update or insert
+ *
+ * @return int
+ */
 function sp_add_permission_profile($profile_info, $is_new = false)
 {
 	$db = database();
@@ -1495,9 +1525,10 @@ function sp_add_permission_profile($profile_info, $is_new = false)
 		'value' => 'string',
 	);
 
-	// A new permissions profile?
+	// A new profile?
 	if ($is_new)
 	{
+		// Don't need this, we will create it instead
 		unset($profile_info['id']);
 
 		$db->insert('',
@@ -1508,14 +1539,14 @@ function sp_add_permission_profile($profile_info, $is_new = false)
 		);
 		$profile_info['id'] = $db->insert_id('{db_prefix}sp_profiles', 'id_profile');
 	}
-	// Or and edit, we do a little update
+	// Or an edit, we do a little update
 	else
 	{
 		$update_fields = array();
 		foreach ($fields as $name => $type)
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
 
-		$db->query('', '
+		$res = $db->query('', '
 			UPDATE {db_prefix}sp_profiles
 			SET ' . implode(', ', $update_fields) . '
 			WHERE id_profile = {int:id}',
@@ -1527,7 +1558,8 @@ function sp_add_permission_profile($profile_info, $is_new = false)
 }
 
 /**
- * Removes a permission profile from the system
+ * Removes a single permission profile from the system
+ *
  * @param int $profile_id
  */
 function sp_delete_permission_profile($profile_id)

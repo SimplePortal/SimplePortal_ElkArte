@@ -68,6 +68,9 @@ function template_permission_profiles_edit()
 		</form>';
 }
 
+/**
+ * Template for use when editing or adding a new, style profile
+ */
 function template_style_profiles_edit()
 {
 	global $context, $scripturl, $txt;
@@ -150,8 +153,8 @@ function template_style_profiles_edit()
 				</dl>
 				<div class="submitbutton">
 					<input type="submit" name="submit" value="', $context['page_title'], '" class="button_submit" />
-					<input type="hidden" name="profile_id" value="\', $context[\'profile\'][\'id\'], \'" />
-					<input type="hidden" name="\', $context[\'session_var\'], \'" value="\', $context[\'session_id\'], \'" />
+					<input type="hidden" name="profile_id" value="', $context['profile']['id'], '" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>
 		</form>';
