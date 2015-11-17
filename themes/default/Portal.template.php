@@ -237,7 +237,7 @@ function template_block($block, $side = -1)
 	if (empty($block) || empty($block['type']))
 		return;
 
-	// Board news gets special formating, really intended to be at the top of a column
+	// Board news gets special formatting, really intended to be at the top of a column
 	// @todo move the sp_boardNews-specific style to the board news template
 	if ($block['type'] === 'BoardNews')
 	{
@@ -293,22 +293,20 @@ function template_block_default($block, $side)
 	}
 
 	echo '
-						<div id="sp_block_' . $block['id'] . '" class="', empty($block['style']['no_body'])
-		? 'sp_block_section'
-		: 'sp_no_body_style', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['sp_articles_index']))
-		? '_last' : '', '" ', $block['collapsed'] && empty($block['force_view']) ? ' style="display: none;"' : '', '>
-							<div', empty($block['style']['body']['class']) ? ''
-		: ' class="' . $block['style']['body']['class'] . '"', '>
-								<div class="', $block['type'] != 'sp_menu' ? 'sp_block'
-		: 'sp_content_padding', '"', !empty($block['style']['body']['style'])
-		? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
+						<div id="sp_block_' . $block['id'] . '" class="sp_block_section', empty($block['style']['no_body'])
+								? (empty($block['style']['body']['class']) ? '"' : ' ' . $block['style']['body']['class'] . '"') : ' sp_no_body_style"',
+						$block['collapsed'] && empty($block['force_view'])
+								? ' style="display: none;"' : '', '>
+							<div class="', 	$block['type'] != 'sp_menu'
+								? 'sp_block' : 'sp_content_padding', '"',
+						!empty($block['style']['body']['style'])
+								? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
 
 	// Call the block routine
 	$block['instance']->render();
 
 	// Close this block up
 	echo '
-								</div>
 							</div>
 						</div>
 					</div>';

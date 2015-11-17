@@ -338,14 +338,23 @@ table.sp_block {
 	color: green;
 }
 
-.sp_block_section,
-.sp_block_section_last {
+.sp_block_section {
 	overflow: auto;
 	margin: 2px 0 .7em 0;
 	border: 1px solid #CCCCCC;
 	border-radius: 0 0 5px 5px;
 	background: transparent;
 	box-shadow: 4px 6px 3px -5px rgba(0, 0, 0, 0.5);
+}
+
+.sp_block_section.roundframe {
+	border-radius: 5px;
+	margin-top: 0;
+}
+
+h3.secondary_header {
+	border-radius: 0;
+	font-size: 1.143em;
 }
 
 .sp_article_block_container {
@@ -356,7 +365,7 @@ table.sp_block {
 	border-top: none;
 	border-radius: 5px;
 	background: transparent;
-	box-shadow: 4px 6px 3px -5px rgba(0, 0, 0, 0.5);
+	box-shadow: 4px 6px 3px -5px rgba(0, 0, 0, 0.4);
 }
 
 .portalbg {
@@ -364,7 +373,9 @@ table.sp_block {
 }
 
 .portalbg2 {
-	padding: 10px 0;
+	padding: 10px 5px;
+	border-radius: 0 0 2px 2px;
+	font-size: .929em;
 }
 
 body {
