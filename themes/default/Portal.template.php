@@ -266,8 +266,6 @@ function template_block($block, $side = -1)
  */
 function template_block_default($block, $side)
 {
-	global $context, $modSettings;
-
 		echo '
 					<div class="sp_block_container" id="block_' . $block['id'] . ',' . $side . '">';
 
