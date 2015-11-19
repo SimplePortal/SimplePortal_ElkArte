@@ -14,7 +14,7 @@ if (!defined('ELK'))
 
 /**
  * SimplePortal Profiles Administration controller class.
- * This class handles the adding/editing/listing of profiles for permissions and styles
+ * This class handles the adding/editing/listing of profiles for permissions, styles and display
  */
 class ManagePortalProfile_Controller extends Action_Controller
 {
@@ -30,17 +30,21 @@ class ManagePortalProfile_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
 		loadTemplate('PortalAdminProfiles');
 
-		// What can we do
+		// Lots of profile areas and things to do
 		$subActions = array(
-			'listpermission' =>  array($this, 'action_list', 'permission' => 'sp_manage_profiles'),
-			'addpermission' =>  array($this, 'action_edit', 'permission' => 'sp_manage_profiles'),
-			'editpermission' =>  array($this, 'action_edit', 'permission' => 'sp_manage_profiles'),
-			'deletepermission' =>  array($this, 'action_delete', 'permission' => 'sp_manage_profiles'),
-			'liststyle' => array($this, 'sportal_admin_style_profiles_list', 'permission' => 'sp_manage_profiles'),
-			'addstyle' => array($this, 'sportal_admin_style_profiles_edit', 'permission' => 'sp_manage_profiles'),
-			'editstyle' => array($this, 'sportal_admin_style_profiles_edit', 'permission' => 'sp_manage_profiles'),
-			'deletestyle' => array($this, 'sportal_admin_style_profiles_delete', 'permission' => 'sp_manage_profiles'),
-			);
+			'listpermission' => array($this, 'action_sportal_admin_permission_profiles_list', 'permission' => 'sp_manage_profiles'),
+			'addpermission' => array($this, 'action_sportal_admin_permission_profiles_edit', 'permission' => 'sp_manage_profiles'),
+			'editpermission' => array($this, 'action_sportal_admin_permission_profiles_edit', 'permission' => 'sp_manage_profiles'),
+			'deletepermission' => array($this, 'action_sportal_admin_profiles_delete', 'permission' => 'sp_manage_profiles'),
+			'liststyle' => array($this, 'action_sportal_admin_style_profiles_list', 'permission' => 'sp_manage_profiles'),
+			'addstyle' => array($this, 'action_sportal_admin_style_profiles_edit', 'permission' => 'sp_manage_profiles'),
+			'editstyle' => array($this, 'action_sportal_admin_style_profiles_edit', 'permission' => 'sp_manage_profiles'),
+			'deletestyle' => array($this, 'action_sportal_admin_profiles_delete', 'permission' => 'sp_manage_profiles'),
+			'listvisibility' => array($this, 'action_sportal_admin_visibility_profiles_list', 'permission' => 'sp_manage_profiles'),
+			'addvisibility' => array($this, 'action_sportal_admin_visibility_profiles_edit', 'permission' => 'sp_manage_profiles'),
+			'editvisibility' => array($this, 'action_sportal_admin_visibility_profiles_edit','permission' => 'sp_manage_profiles'),
+			'deletevisibility' => array($this, 'action_sportal_admin_profiles_delete','permission' => 'sp_manage_profiles'),
+		);
 
 		// Start up the controller, provide a hook since we can
 		$action = new Action('portal_profile');
@@ -55,6 +59,8 @@ class ManagePortalProfile_Controller extends Action_Controller
 				'addpermission' => array(),
 				'liststyle' => array(),
 				'addstyle' => array(),
+				'listvisibility' => array(),
+				'addvisibility' => array(),
 			),
 		);
 
@@ -74,16 +80,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 		global $context, $scripturl, $txt, $modSettings;
 
 		// Removing some permission profiles via checkbox?
-		if (!empty($_POST['remove_profiles']) && !empty($_POST['remove']) && is_array($_POST['remove']))
-		{
-			checkSession();
-
-			$remove = array();
-			foreach ($_POST['remove'] as $index => $profile_id)
-				$remove[(int) $index] = (int) $profile_id;
-
-			sp_delete_profiles($remove);
-		}
+		$this->_remove_profiles();
 
 		// Build the listoption array to display the permission profiles
 		$listOptions = array(
@@ -273,24 +270,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 				fatal_lang_error('sp_error_profile_name_empty', false);
 
-			$groups_allowed = $groups_denied = '';
-
-			// If specific member groups were picked, build the allow/deny arrays
-			if (!empty($_POST['membergroups']) && is_array($_POST['membergroups']))
-			{
-				$groups_allowed = $groups_denied = array();
-
-				foreach ($_POST['membergroups'] as $id => $value)
-				{
-					if ($value == 1)
-						$groups_allowed[] = (int) $id;
-					elseif ($value == -1)
-						$groups_denied[] = (int) $id;
-				}
-
-				$groups_allowed = implode(',', $groups_allowed);
-				$groups_denied = implode(',', $groups_denied);
-			}
+			list($groups_allowed, $groups_denied) = $this->_group_permissions();
 
 			// Add the data to place in the fields
 			$profile_info = array(
@@ -321,6 +301,9 @@ class ManagePortalProfile_Controller extends Action_Controller
 		{
 			$_REQUEST['profile_id'] = (int) $_REQUEST['profile_id'];
 			$context['profile'] = sportal_get_profiles($_REQUEST['profile_id']);
+
+			// Set the add tab
+			$context[$context['admin_menu_name']]['current_subsection'] = 'addpermission';
 		}
 
 		// Sub template time
@@ -330,37 +313,47 @@ class ManagePortalProfile_Controller extends Action_Controller
 	}
 
 	/**
-	 * Remove a single permission profile from the system
+	 * Prepares submitted form values for permission profiles
+	 *
+	 * @return array
 	 */
-	public function action_delete()
+	private function _group_permissions()
 	{
-		checkSession('get');
+		$groups_allowed = $groups_denied = '';
 
-		$profile_id = !empty($_REQUEST['profile_id']) ? (int) $_REQUEST['profile_id'] : 0;
+		// If specific member groups were picked, build the allow/deny arrays
+		if (!empty($_POST['membergroups']) && is_array($_POST['membergroups']))
+		{
+			$groups_allowed = $groups_denied = array();
 
-		sp_delete_permission_profile($profile_id);
+			foreach ($_POST['membergroups'] as $id => $value)
+			{
+				if ($value == 1)
+				{
+					$groups_allowed[] = (int) $id;
+				}
+				elseif ($value == -1)
+				{
+					$groups_denied[] = (int) $id;
+				}
+			}
 
-		redirectexit('action=admin;area=portalprofiles;sa=listpermission');
+			$groups_allowed = implode(',', $groups_allowed);
+			$groups_denied = implode(',', $groups_denied);
+		}
+
+		return array($groups_allowed, $groups_denied);
 	}
 
 	/**
 	 * Show page listing of all style groups in the system
 	 */
-	function sportal_admin_style_profiles_list()
+	function action_sportal_admin_style_profiles_list()
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
 		// Removing some styles via the checkbox?
-		if (!empty($_POST['remove_profiles']) && !empty($_POST['remove']) && is_array($_POST['remove']))
-		{
-			checkSession();
-
-			$remove = array();
-			foreach ($_POST['remove'] as $index => $profile_id)
-				$remove[(int) $index] = (int) $profile_id;
-
-			sp_delete_profiles($remove);
-		}
+		$this->_remove_profiles();
 
 		// Build the listoption array to display the style profiles
 		$listOptions = array(
@@ -490,7 +483,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	/**
 	 * Add or edit a portal wide style profile
 	 */
-	function sportal_admin_style_profiles_edit()
+	function action_sportal_admin_style_profiles_edit()
 	{
 		global $context, $txt;
 
@@ -543,6 +536,9 @@ class ManagePortalProfile_Controller extends Action_Controller
 		{
 			$profile_id = (int) $_GET['profile_id'];
 			$context['profile'] = sportal_get_profiles($profile_id);
+
+			// Set the add tab
+			$context[$context['admin_menu_name']]['current_subsection'] = 'addstyle';
 		}
 
 		// We may not have much style, but we have class
@@ -556,16 +552,273 @@ class ManagePortalProfile_Controller extends Action_Controller
 	}
 
 	/**
+	 * Show page listing of all visibility groups in the system
+	 */
+	function action_sportal_admin_visibility_profiles_list()
+	{
+		global $context, $scripturl, $txt, $modSettings;
+
+		// Removing some styles via the checkbox?
+		$this->_remove_profiles();
+
+		// Build the listoption array to display the style profiles
+		$listOptions = array(
+			'id' => 'portal_visibility',
+			'title' => $txt['sp_admin_visibility_profiles_list'],
+			'items_per_page' => $modSettings['defaultMaxMessages'],
+			'no_items_label' => $txt['error_sp_no_visibility_profiles'],
+			'base_href' => $scripturl . '?action=admin;area=portalprofiles;sa=listvisibility;',
+			'default_sort_col' => 'name',
+			'get_items' => array(
+				'function' => array($this, 'list_spLoadProfiles'),
+				'params' => array(
+					3,
+				),
+			),
+			'get_count' => array(
+				'function' => array($this, 'list_spCountProfiles'),
+				'params' => array(
+					3,
+				),
+			),
+			'columns' => array(
+				'name' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_profiles_col_name'],
+					),
+					'data' => array(
+						'db' => 'label',
+					),
+					'sort' => array(
+						'default' => 'name',
+						'reverse' => 'name DESC',
+					),
+				),
+				'blocks' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_profiles_col_blocks'],
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'function' => create_function('$row', '
+							return empty($row[\'blocks\']) ? \'0\' : $row[\'blocks\'];'),
+						'class' => 'centertext',
+					),
+				),
+				'action' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_articles_col_actions'],
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'sprintf' => array(
+							'format' => '<a href="?action=admin;area=portalprofiles;sa=editvisibility;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
+								<a href="?action=admin;area=portalprofiles;sa=deletevisibility;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_articles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+							'params' => array(
+								'id' => true,
+							),
+						),
+						'class' => 'centertext',
+						'style' => "width: 40px",
+					),
+				),
+				'check' => array(
+					'header' => array(
+						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'function' => create_function('$row', '
+							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
+						'),
+						'class' => 'centertext',
+					),
+				),
+			),
+			'form' => array(
+				'href' => $scripturl . '?action=admin;area=portalprofiles;sa=listvisibility',
+				'include_sort' => true,
+				'include_start' => true,
+				'hidden_fields' => array(
+					$context['session_var'] => $context['session_id'],
+				),
+			),
+			'additional_rows' => array(
+				array(
+					'position' => 'below_table_data',
+					'value' => '<input type="submit" name="remove_profiles" value="' . $txt['sp_admin_profiles_remove'] . '" class="right_submit" />',
+				),
+			),
+		);
+
+		// Set the context values
+		$context['page_title'] = $txt['sp_admin_visibility_profiles_list'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'portal_visibility';
+
+		// Create the list.
+		require_once(SUBSDIR . '/GenericList.class.php');
+		createList($listOptions);
+	}
+
+	/**
+	 * Add or edit a portal wide visibility profile
+	 */
+	function action_sportal_admin_visibility_profiles_edit()
+	{
+		global $context, $txt;
+
+		// New or an edit to an existing visibility
+		$context['is_new'] = empty($_GET['profile_id']);
+
+		// Saving the visibility form
+		if (!empty($_POST['submit']))
+		{
+			// Security first
+			checkSession();
+
+			// Always clean the profile name
+			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
+				fatal_lang_error('sp_error_profile_name_empty', false);
+
+			// Get the form values
+			list($selections, $query) = $this->_profile_visibility();
+
+			// Add the data to place in the fields
+			$profile_info = array(
+				'id' => (int) $_POST['profile_id'],
+				'type' => 3,
+				'name' => Util::htmlspecialchars($_POST['name'], ENT_QUOTES),
+				'value' => implode('|', array(implode(',', $selections), implode(',', $query))),
+			);
+
+			// New we simply insert, or if editing update
+			$profile_info['id'] = sp_add_permission_profile($profile_info, empty($_POST['profile_id']));
+
+			// Tada
+			redirectexit('action=admin;area=portalprofiles;sa=listvisibility');
+		}
+
+		// Not saving, then its time to show the visibility form
+		if ($context['is_new'])
+		{
+			$context['profile'] = array(
+				'id' => 0,
+				'name' => $txt['sp_profiles_default_name'],
+				'query' => '',
+				'selections' => array(),
+				'mobile_view' => false,
+			);
+		}
+		// Not a new visibility profile so fetch the existing one to display
+		else
+		{
+			$profile_id = (int) $_GET['profile_id'];
+			$context['profile'] = sportal_get_profiles($profile_id);
+
+			// Set the add tab
+			$context[$context['admin_menu_name']]['current_subsection'] = 'addvisibility';
+		}
+
+		// All the places we can add portal visibility
+		$context['profile']['actions'] = array(
+			'portal' => $txt['sp-portal'],
+			'forum' => $txt['sp-forum'],
+			'recent' => $txt['recent_posts'],
+			'unread' => $txt['unread_topics_visit'],
+			'unreadreplies' => $txt['unread_replies'],
+			'profile' => $txt['profile'],
+			'pm' => $txt['pm_short'],
+			'calendar' => $txt['calendar'],
+			'admin' => $txt['admin'],
+			'login' => $txt['login'],
+			'register' => $txt['register'],
+			'post' => $txt['post'],
+			'stats' => $txt['forum_stats'],
+			'search' => $txt['search'],
+			'mlist' => $txt['members_list'],
+			'moderate' => $txt['moderate'],
+			'help' => $txt['help'],
+			'who' => $txt['who_title'],
+		);
+
+		// Load board, cat, page and article values for the template
+		sp_block_template_helpers();
+
+		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_profiles_add'] : $txt['sp_admin_profiles_edit'];
+		$context['sub_template'] = 'visibility_profiles_edit';
+	}
+
+	/**
+	 * Load in visibility values from the profile form
+	 */
+	private function _profile_visibility()
+	{
+		$selections = array();
+		$query = array();
+
+		$types = array('actions', 'boards', 'pages', 'categories', 'articles');
+		foreach ($types as $type)
+		{
+			if (!empty($_POST[$type]) && is_array($_POST[$type]))
+			{
+				foreach ($_POST[$type] as $item)
+				{
+					$selections[] = Util::htmlspecialchars($item, ENT_QUOTES);
+				}
+			}
+		}
+
+		if (!empty($_POST['query']))
+		{
+			$items = explode(',', $_POST['query']);
+			foreach ($items as $item)
+			{
+				$item = Util::htmltrim(Util::htmlspecialchars($item, ENT_QUOTES));
+
+				if ($item !== '')
+				{
+					$query[] = $item;
+				}
+			}
+		}
+
+		return array($selections, $query);
+	}
+
+	/**
 	 * Remove a style profile from the system
 	 */
-	function sportal_admin_style_profiles_delete()
+	function action_sportal_admin_profiles_delete()
 	{
+		global $context;
+
 		checkSession('get');
 
 		$profile_id = !empty($_REQUEST['profile_id']) ? (int) $_REQUEST['profile_id'] : 0;
 
 		sp_delete_permission_profile($profile_id);
 
-		redirectexit('action=admin;area=portalprofiles;sa=liststyle');
+		redirectexit('action=admin;area=portalprofiles;sa=list' . str_replace('delete', '', $context['sub_action']));
+	}
+
+	/**
+	 * Remove a batch of profiles from the system
+	 *
+	 * - Acts on checkbox selection from the various profile list areas
+	 */
+	function _remove_profiles()
+	{
+		// Removing some permission profiles via checkbox?
+		if (!empty($_POST['remove_profiles']) && !empty($_POST['remove']) && is_array($_POST['remove']))
+		{
+			checkSession();
+
+			$remove = array();
+			foreach ($_POST['remove'] as $index => $profile_id)
+				$remove[(int) $index] = (int) $profile_id;
+
+			sp_delete_profiles($remove);
+		}
 	}
 }

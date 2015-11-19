@@ -15,6 +15,7 @@ $txt['sp-adminConfigurationDesc'] = 'This area allows you to view SimplePortal i
 $txt['sp-adminGeneralSettingsName'] = 'General Settings';
 $txt['sp-adminBlockSettingsName'] = 'Block Settings';
 $txt['sp-adminArticleSettingsName'] = 'Article Settings';
+$txt['sp-adminother'] = 'Other';
 
 // General settings
 $txt['portalactive'] = 'Enable SimplePortal';
@@ -39,7 +40,6 @@ $txt['showleft'] = 'Enable Left Side Blocks';
 $txt['showright'] = 'Enable Right Side Blocks';
 $txt['leftwidth'] = 'Width of Left Side Blocks';
 $txt['rightwidth'] = 'Width of Right Side Blocks';
-$txt['sp_enableIntegration'] = 'Display Blocks in Forum';
 $txt['sp_IntegrationHide'] = 'Hide Blocks in Forum Areas';
 $txt['sp_IntegrationHide_desc'] = 'The <em>Display blocks in Forum</em> setting must be enabled for this to work';
 
@@ -91,20 +91,10 @@ $txt['sp-blocksContent'] = 'Content';
 $txt['sp-blocksColumn'] = 'Column';
 $txt['sp_admin_blocks_col_permissions'] = 'Permissions';
 $txt['sp_admin_blocks_col_styles'] = 'Style';
+$txt['sp_admin_blocks_col_visibility'] = 'Visibility';
 $txt['sp-blocksRow'] = 'Order';
 $txt['sp-blocksForce'] = 'Not Collapsible';
 $txt['sp-blocksMobile'] = 'Show on mobile';
-$txt['sp-blocksDisplayOptions'] = 'Display Options';
-$txt['sp-blocksAdvancedOptions'] = 'Advanced Options';
-$txt['sp-blocksShowBlock'] = 'Show Block On';
-$txt['sp-blocksOptionAllPages'] = 'All Pages';
-$txt['sp-blocksOptionAllActions'] = 'All Actions';
-$txt['sp-blocksOptionAllBoards'] = 'All Boards';
-$txt['sp-blocksOptionEverywhere'] = 'Everywhere';
-$txt['sp-blocksSelectActions'] = 'Select Actions';
-$txt['sp-blocksSelectBoards'] = 'Select Boards';
-$txt['sp-blocksSelectPages'] = 'Select Pages';
-$txt['sp_display_custom'] = 'Custom Display Options';
 
 // Block labels
 $txt['sp_function_User_Info_label'] = 'Member Information';
@@ -332,7 +322,6 @@ $txt['sp_admin_pages_edit'] = 'Edit Page';
 $txt['sp_admin_pages_remove'] = 'Remove Pages';
 $txt['sp_admin_pages_preview'] = 'Preview';
 $txt['sp_admin_pages_general'] = 'General Settings';
-$txt['sp_admin_pages_style'] = 'Style Options';
 
 $txt['sp_admin_pages_desc'] = 'You can create and manage SimplePortal pages in this area.';
 $txt['sp_pages_remove_confirm'] = 'Are you sure that you want to remove the selected pages?';
@@ -352,7 +341,6 @@ $txt['sp_admin_pages_col_status'] = 'Active';
 $txt['sp_admin_pages_col_actions'] = 'Actions';
 $txt['sp_admin_pages_col_permissions'] = 'Permissions';
 $txt['sp_admin_pages_col_styles'] = 'Style';
-$txt['sp_admin_pages_col_blocks'] = 'Blocks';
 $txt['sp_admin_pages_activate'] = 'Activate';
 $txt['sp_admin_pages_deactivate'] = 'Deactivate';
 
@@ -414,6 +402,8 @@ $txt['sp_admin_permission_profiles_list'] = 'Permission Profiles List';
 $txt['sp_admin_permission_profiles_add'] = 'Add Permission Profile';
 $txt['sp_admin_style_profiles_list'] = 'Style Profiles List';
 $txt['sp_admin_style_profiles_add'] = 'Add Style Profile';
+$txt['sp_admin_visibility_profiles_list'] = 'Visibility Profiles List';
+$txt['sp_admin_visibility_profiles_add'] = 'Add Visibility Profile';
 
 $txt['sp_admin_profiles_desc'] = 'You can create and manage SimplePortal profiles in this area.';
 $txt['sp_admin_profiles_delete_confirm'] = 'Are you sure you want to delete this profile?';
@@ -428,6 +418,7 @@ $txt['sp_admin_profiles_col_categories'] = 'Categories';
 $txt['sp_admin_profiles_col_pages'] = 'Pages';
 $txt['sp_admin_profiles_col_shoutboxes'] = 'Shoutboxes';
 $txt['sp_admin_profiles_col_permissions'] = 'Permissions';
+$txt['sp_admin_profiles_col_query'] = 'Query';
 $txt['sp_admin_profiles_col_actions'] = 'Actions';
 
 $txt['sp_profiles_default_name'] = 'Unnamed Profile';
@@ -449,6 +440,12 @@ $txt['sp_admin_profiles_styles_body_custom_class'] = 'Custom Body Class';
 $txt['sp_admin_profiles_styles_body_custom_style'] = 'Custom Body Style';
 $txt['sp_admin_profiles_styles_no_body'] = 'No Body';
 
+$txt['sp_admin_profiles_visibility_select_actions'] = 'Select Actions';
+$txt['sp_admin_profiles_visibility_select_boards'] = 'Select Boards';
+$txt['sp_admin_profiles_visibility_select_pages'] = 'Select Pages';
+$txt['sp_admin_profiles_visibility_select_categories'] = 'Select Categories';
+$txt['sp_admin_profiles_visibility_select_articles'] = 'Select Articles';
+
 $txt['sp_admin_profiles_guests'] = 'Guests';
 $txt['sp_admin_profiles_members'] = 'Members';
 $txt['sp_admin_profiles_everyone'] = 'Everyone';
@@ -463,6 +460,15 @@ $txt['sp_admin_profiles_default_title_roundframe'] = 'Default title and roundfra
 $txt['sp_admin_profiles_alternate_title_roundframe'] = 'Alternate title and roundframe';
 $txt['sp_admin_profiles_no_title_roundframe'] = 'No title and roundframe';
 $txt['sp_admin_profiles_no_title_information'] = 'No title and information';
+
+$txt['sp_admin_profiles_show_on_portal'] = 'Show on portal';
+$txt['sp_admin_profiles_show_on_board_index'] = 'Show on board index';
+$txt['sp_admin_profiles_show_on_all_actions'] = 'Show on all actions';
+$txt['sp_admin_profiles_show_on_all_boards'] = 'Show on all boards';
+$txt['sp_admin_profiles_show_on_all_pages'] = 'Show on all pages';
+$txt['sp_admin_profiles_show_on_all_categories'] = 'Show on all categories';
+$txt['sp_admin_profiles_show_on_all_articles'] = 'Show on all articles';
+$txt['sp_admin_profiles_show_everywhere'] = 'Show everywhere';
 
 // General titles
 $txt['sp-adminColumnAction'] = 'Action';

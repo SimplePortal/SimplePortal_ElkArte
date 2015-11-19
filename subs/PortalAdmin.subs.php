@@ -1125,9 +1125,9 @@ function sp_load_profiles($start, $items_per_page, $sort, $type = 1)
 			$group = 'styles';
 			break;
 		case 3:
-			$select = 'display, COUNT(*) AS used';
-			$area = array('articles', 'blocks', 'pages', 'shoutboxes');
-			$group = 'display';
+			$select = 'visibility, COUNT(*) AS used';
+			$area = array('blocks');
+			$group = 'visibility';
 			break;
 		default:
 			$select = 'permissions, COUNT(*) AS used';
@@ -1141,9 +1141,7 @@ function sp_load_profiles($start, $items_per_page, $sort, $type = 1)
 		$request = $db->query('', '
 			SELECT ' . $select . '
 			FROM {db_prefix}sp_' . $module . '
-			GROUP BY ' . $group,
-			array(
-			)
+			GROUP BY ' . $group
 		);
 		while ($row = $db->fetch_assoc($request))
 		{
@@ -1156,7 +1154,6 @@ function sp_load_profiles($start, $items_per_page, $sort, $type = 1)
 	}
 
 	return $profiles;
-
 }
 
 /**
@@ -1175,40 +1172,6 @@ function sp_delete_profiles($remove_ids = array())
 			'profiles' => $remove_ids,
 		)
 	);
-}
-
-/**
- * Loads boards and pages for template selection
- *
- * - Returns the results in $context for the template
- */
-function sp_block_template_helpers()
-{
-	global $context;
-
-	$db = database();
-
-	// Get a list of board names for use in the template
-	$request = $db->query('', '
-		SELECT id_board, name
-		FROM {db_prefix}boards
-		ORDER BY name DESC'
-	);
-	$context['display_boards'] = array();
-	while ($row = $db->fetch_assoc($request))
-		$context['display_boards']['b' . $row['id_board']] = $row['name'];
-	$db->free_result($request);
-
-	// Get all the pages loaded in the system for template use
-	$request = $db->query('', '
-		SELECT id_page, title
-		FROM {db_prefix}sp_pages
-		ORDER BY title DESC'
-	);
-	$context['display_pages'] = array();
-	while ($row = $db->fetch_assoc($request))
-		$context['display_pages']['p' . $row['id_page']] = $row['title'];
-	$db->free_result($request);
 }
 
 /**
@@ -1330,11 +1293,9 @@ function sp_block_update($blockInfo)
 		"label = {string:label}",
 		"permissions = {int:permissions}",
 		"styles={int:styles}",
+		"visibility = {int:visibility}",
 		"state = {int:state}",
 		"force_view = {int:force_view}",
-		"mobile_view = {int:mobile_view}",
-		"display = {string:display}",
-		"display_custom = {string:display_custom}",
 	);
 
 	if (!empty($blockInfo['row']))
@@ -1546,7 +1507,7 @@ function sp_add_permission_profile($profile_info, $is_new = false)
 		foreach ($fields as $name => $type)
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
 
-		$res = $db->query('', '
+		$db->query('', '
 			UPDATE {db_prefix}sp_profiles
 			SET ' . implode(', ', $update_fields) . '
 			WHERE id_profile = {int:id}',
@@ -1573,4 +1534,83 @@ function sp_delete_permission_profile($profile_id)
 			'id' => $profile_id,
 		)
 	);
+}
+
+function stuff()
+{
+	$request = $smcFunc['db_query']('','
+		SELECT id_page, title
+		FROM {db_prefix}sp_pages
+		ORDER BY title DESC'
+	);
+	$context['profile']['pages'] = array();
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$context['profile']['pages']['p' . $row['id_page']] = $row['title'];
+	$smcFunc['db_free_result']($request);
+
+
+}
+
+/**
+ * Loads boards and pages for template selection
+ *
+ * - Returns the results in $context for the template
+ */
+function sp_block_template_helpers()
+{
+	global $context;
+
+	$db = database();
+
+	// Get a list of board names for use in the template
+	$request = $db->query('', '
+		SELECT
+			id_board, name
+		FROM {db_prefix}boards
+		WHERE redirect = {string:empty}
+		ORDER BY name DESC',
+		array(
+			'empty' => '',
+		)
+	);
+	$context['profile']['boards'] = array();
+	while ($row = $db->fetch_assoc($request))
+		$context['profile']['boards']['b' . $row['id_board']] = $row['name'];
+	$db->free_result($request);
+
+	// Get all the pages loaded in the system for template use
+	$request = $db->query('', '
+		SELECT
+			id_page, title
+		FROM {db_prefix}sp_pages
+		ORDER BY title DESC'
+	);
+	$context['profile']['pages'] = array();
+	while ($row = $db->fetch_assoc($request))
+		$context['profile']['pages']['p' . $row['id_page']] = $row['title'];
+	$db->free_result($request);
+
+	// Same for categories
+	$request =  $db->query('', '
+		SELECT
+			id_category, name
+		FROM {db_prefix}sp_categories
+		ORDER BY name DESC'
+	);
+	$context['profile']['categories'] = array();
+	while ($row = $db->fetch_assoc($request))
+		$context['profile']['categories']['c' . $row['id_category']] = $row['name'];
+	$db->free_result($request);
+
+	// And finish up with articles
+	$request =  $db->query('', '
+		SELECT
+			id_article, title
+		FROM {db_prefix}sp_articles
+		ORDER BY title DESC'
+	);
+	$context['profile']['articles'] = array();
+	while ($row = $db->fetch_assoc($request))
+		$context['profile']['articles']['a' . $row['id_article']] = $row['title'];
+	$db->free_result($request);
 }

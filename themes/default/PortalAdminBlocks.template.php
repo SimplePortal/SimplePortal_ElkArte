@@ -159,7 +159,20 @@ function template_block_edit()
 
 	echo '
 						</select>
-					</dd>';
+					</dd>
+					<dt>
+						<label for="block_visibility">', $txt['sp_admin_blocks_col_visibility'], ':</label>
+					</dt>
+					<dd>
+						<select name="visibility" id="block_visibility">';
+
+	foreach ($context['SPortal']['block']['visibility_profiles'] as $profile)
+		echo '
+					<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['block']['visibility'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+
+	echo '
+					</select>
+				</dd>';
 
 	// Display any options that are available for this block
 	foreach ($context['SPortal']['block']['options'] as $name => $type)
@@ -323,90 +336,18 @@ function template_block_edit()
 	}
 
 	echo '
-						<dt>
-							<label for="mobile">', $txt['sp-blocksMobile'], ':</label>
-						</dt>
-						<dd>
-							<input type="checkbox" name="block_mobile" id="mobile" value="1"', $context['SPortal']['block']['mobile_view'] ? ' checked="checked"' : '', ' class="input_check" />
-						</dd>';
-
-	echo '
-						<dt>
-							<label for="block_active">', $txt['sp-blocksActive'], ':</label>
-						</dt>
-						<dd>
-							<input type="checkbox" name="block_active" id="block_active" value="1"', $context['SPortal']['block']['state'] ? ' checked="checked"' : '', ' class="input_check" />
-						</dd>
-					</dl>
-					<div class="sp_button_container">
-						<input type="submit" name="preview_block" value="', $txt['sp-blocksPreview'], '" class="right_submit" />
-						<input type="submit" name="add_block" value="', !$context['SPortal']['is_new'] ? $txt['sp-blocksEdit'] : $txt['sp-blocksAdd'], '" class="right_submit" />
-					</div>
-			</div>';
-
-	// Display Options is integrated
-	if (!empty($modSettings['sp_enableIntegration']))
-	{
-		echo '
-			<br />
-			<h3 class="category_header">
-				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=sp-blocksDisplayOptions" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
-				', $txt['sp-blocksDisplayOptions'], '
-			</h3>
-				<div class="sp_content_padding">
-					<span class="floatright">', $txt['sp-blocksAdvancedOptions'], '<input type="checkbox" name="display_advanced" id="display_advanced" onclick="$(\'#sp_display_advanced\').slideToggle(300); document.getElementById(\'display_simple\').disabled = this.checked;" ', empty($context['SPortal']['block']['display_type']) ? '' : ' checked="checked"', ' class="input_check" /></span>
-					', $txt['sp-blocksShowBlock'], '
-					<select name="display_simple" id="display_simple"', empty($context['SPortal']['block']['display_type']) ? '' : ' disabled="disabled"', '>';
-
-		foreach ($context['simple_actions'] as $action => $label)
-			echo '
-						<option value="', $action, '"', in_array($action, $context['SPortal']['block']['display']) ? ' selected="selected"' : '', '>', $label, '</option>';
-
-		echo '
-					</select>
-					<div id="sp_display_advanced"', empty($context['SPortal']['block']['display_type']) ? ' style="display: none;"' : '', '>';
-
-		$display_types = array('actions', 'boards', 'pages');
-		foreach ($display_types as $type)
-		{
-			if (empty($context['display_' . $type]))
-				continue;
-
-			echo '
-						<a href="javascript:void(0);" onclick="sp_collapseObject(\'', $type, '\')">
-							<img id="sp_collapse_', $type, '" src="', $settings['images_url'], '/selected_open.png" alt="*" />
-						</a> ', $txt['sp-blocksSelect' . ucfirst($type)], '
-						<ul id="sp_object_', $type, '" class="reset sp_display_list" style="display: none;">';
-
-			foreach ($context['display_' . $type] as $index => $action)
-			{
-				echo '
-							<li>
-								<input type="checkbox" name="display_', $type, '[]" id="', $type, $index, '" value="', $index, '"', in_array($index, $context['SPortal']['block']['display']) ? ' checked="checked"' : '', ' class="input_check" />
-								<label for="', $type, $index, '">', $action, '</label>
-							</li>';
-		}
-
-			echo '
-							<li>
-								<input type="checkbox" onclick="invertAll(this, this.form, \'display_', $type, '[]\');" class="input_check" /> <em>', $txt['check_all'], '</em>
-							</li>
-						</ul>
-						<br />';
-		}
-
-		echo '
-						<a class="help" href="', $scripturl, '?action=quickhelp;help=sp-blocksCustomDisplayOptions" onclick="return reqOverlayDiv(this.href);">
-							<img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" />
-						</a>
-						<label for="display_custom">', $txt['sp_display_custom'], ': </label>
-						<input class="input_text" type="text" name="display_custom" id="display_custom" value="', $context['SPortal']['block']['display_custom'], '" />
-					</div>
-					<div class="sp_button_container">
-						<input type="submit" name="add_block" value="', !$context['SPortal']['is_new'] ? $txt['sp-blocksEdit'] : $txt['sp-blocksAdd'], '" class="right_submit" />
-					</div>
-			</div>';
-	}
+				<dt>
+					<label for="block_active">', $txt['sp-blocksActive'], ':</label>
+				</dt>
+				<dd>
+					<input type="checkbox" name="block_active" id="block_active" value="1"', $context['SPortal']['block']['state'] ? ' checked="checked"' : '', ' class="input_check" />
+				</dd>
+			</dl>
+			<div class="sp_button_container">
+				<input type="submit" name="preview_block" value="', $txt['sp-blocksPreview'], '" class="right_submit" />
+				<input type="submit" name="add_block" value="', !$context['SPortal']['is_new'] ? $txt['sp-blocksEdit'] : $txt['sp-blocksAdd'], '" class="right_submit" />
+			</div>
+		</div>';
 
 	if (!empty($context['SPortal']['block']['column']))
 		echo '

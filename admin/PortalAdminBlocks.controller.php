@@ -245,11 +245,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'row' => 0,
 				'permissions' => 3,
 				'styles' => 4,
+				'visibility' => 14,
 				'state' => 1,
 				'force_view' => 0,
-				'mobile_view' => 0,
-				'display' => '',
-				'display_custom' => '',
 				'parameters' => !empty($start_parameters) ? $start_parameters : array(),
 				'options' => $block->parameters(),
 				'list_blocks' => !empty($_POST['block_column']) ? getBlockInfo($_POST['block_column']) : array(),
@@ -300,45 +298,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			else
 				$_POST['parameters'] = array();
 
-			// Simple is clean
-			if (empty($_POST['display_advanced']))
-			{
-				if (!empty($_POST['display_simple']) && in_array($_POST['display_simple'], array('all', 'sportal', 'sforum', 'allaction', 'allboard', 'allpages')))
-					$display = $_POST['display_simple'];
-				else
-					$display = '';
-
-				$custom = '';
-			}
-			// Want to see the advanced options
-			else
-			{
-				$display = array();
-				$custom = array();
-
-				if (!empty($_POST['display_actions']))
-					foreach ($_POST['display_actions'] as $action)
-						$display[] = Util::htmlspecialchars($action, ENT_QUOTES);
-
-				if (!empty($_POST['display_boards']))
-					foreach ($_POST['display_boards'] as $board)
-						$display[] = 'b' . ((int) substr($board, 1));
-
-				if (!empty($_POST['display_pages']))
-					foreach ($_POST['display_pages'] as $page)
-						$display[] = 'p' . ((int) substr($page, 1));
-
-				if (!empty($_POST['display_custom']))
-				{
-					$temp = explode(',', $_POST['display_custom']);
-					foreach ($temp as $action)
-						$custom[] = Util::htmlspecialchars(Util::htmltrim($action), ENT_QUOTES);
-				}
-
-				$display = empty($display) ? '' : implode(',', $display);
-				$custom = empty($custom) ? '' : implode(',', $custom);
-			}
-
 			$block = sp_instantiate_block($_POST['block_type']);
 
 			// Create all the information we know about this block
@@ -352,11 +311,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'placement' => !empty($_POST['placement']) && in_array($_POST['placement'], array('before', 'after')) ? $_POST['placement'] : '',
 				'permissions' => $_POST['permissions'],
 				'styles' => $_POST['styles'],
+				'visibility' => $_POST['visibility'],
 				'state' => !empty($_POST['block_active']),
 				'force_view' => !empty($_POST['block_force']),
-				'mobile_view' => !empty($_POST['block_mobile']),
-				'display' => $display,
-				'display_custom' => $custom,
 				'parameters' => !empty($_POST['parameters']) ? $_POST['parameters'] : array(),
 				'options' => $block->parameters(),
 				'list_blocks' => getBlockInfo($_POST['block_column']),
@@ -405,48 +362,10 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			if (empty($context['SPortal']['block']['style_profiles']))
 				fatal_lang_error('error_sp_no_style_profiles', false);
 
-			$context['simple_actions'] = array(
-				'sportal' => $txt['sp-portal'],
-				'sforum' => $txt['sp-forum'],
-				'allaction' => $txt['sp-blocksOptionAllActions'],
-				'allboard' => $txt['sp-blocksOptionAllBoards'],
-				'allpages' => $txt['sp-blocksOptionAllPages'],
-				'all' => $txt['sp-blocksOptionEverywhere'],
-			);
-
-			$context['display_actions'] = array(
-				'portal' => $txt['sp-portal'],
-				'forum' => $txt['sp-forum'],
-				'recent' => $txt['recent_posts'],
-				'unread' => $txt['unread_topics_visit'],
-				'unreadreplies' => $txt['unread_replies'],
-				'profile' => $txt['profile'],
-				'pm' => $txt['pm_short'],
-				'calendar' => $txt['calendar'],
-				'admin' => $txt['admin'],
-				'login' => $txt['login'],
-				'register' => $txt['register'],
-				'post' => $txt['post'],
-				'stats' => $txt['forum_stats'],
-				'search' => $txt['search'],
-				'mlist' => $txt['members_list'],
-				'moderate' => $txt['moderate'],
-				'help' => $txt['help'],
-				'who' => $txt['who_title'],
-			);
-
-			// Load up boards and pages for selection in the template
-			sp_block_template_helpers();
-
-			if (empty($context['SPortal']['block']['display']))
-				$context['SPortal']['block']['display'] = array('0');
-			else
-				$context['SPortal']['block']['display'] = explode(',', $context['SPortal']['block']['display']);
-
-			if (in_array($context['SPortal']['block']['display'][0], array('all', 'sportal', 'sforum', 'allaction', 'allboard', 'allpages')) || $context['SPortal']['is_new'] || empty($context['SPortal']['block']['display'][0]) && empty($context['SPortal']['block']['display_custom']))
-				$context['SPortal']['block']['display_type'] = 0;
-			else
-				$context['SPortal']['block']['display_type'] = 1;
+			// Load in the display profiles
+			$context['SPortal']['block']['visibility_profiles'] = sportal_get_profiles(null, 3, 'name');
+			if (empty($context['SPortal']['block']['visibility_profiles']))
+				fatal_lang_error('error_sp_no_visibility_profiles', false);
 
 			$context['SPortal']['block']['style'] = sportal_select_style($context['SPortal']['block']['styles']);
 
@@ -488,10 +407,10 @@ class ManagePortalBlocks_Controller extends Action_Controller
 						);
 					}
 				}
-				// Prepare the Textcontent for BBC, only the first bbc will be correct detected!
+				// Prepare the Text content for BBC, only the first bbc will be correct detected!
 				elseif ($type === 'bbc')
 				{
-					// ELK support only one bbc correct, multiple bbc do not work at the moment
+					// ELK onlys supports one bbc correctly, multiple bbc do not work at the moment
 					if (!$firstBBCFound)
 					{
 						$firstBBCFound = true;
@@ -538,7 +457,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				}
 			}
 
-			loadJavascriptFile('portal.js?sp24');
+			loadJavascriptFile('portal.js?sp100');
 			$context['sub_template'] = 'block_edit';
 			$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'];
 		}
@@ -618,64 +537,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			else
 				$_POST['parameters'] = array();
 
-			// Standard options
-			if (empty($_POST['display_advanced']))
-			{
-				if (!empty($_POST['display_simple']) && in_array($_POST['display_simple'], array('all', 'sportal', 'sforum', 'allaction', 'allboard', 'allpages')))
-					$display = $_POST['display_simple'];
-				else
-					$display = '';
-
-				$custom = '';
-			}
-			// Advanced options
-			else
-			{
-				$display = array();
-
-				if (!empty($_POST['display_actions']))
-					foreach ($_POST['display_actions'] as $action)
-						$display[] = Util::htmlspecialchars($action, ENT_QUOTES);
-
-				if (!empty($_POST['display_boards']))
-					foreach ($_POST['display_boards'] as $board)
-						$display[] = 'b' . ((int) substr($board, 1));
-
-				if (!empty($_POST['display_pages']))
-					foreach ($_POST['display_pages'] as $page)
-						$display[] = 'p' . ((int) substr($page, 1));
-
-				if (!empty($_POST['display_custom']))
-				{
-					$custom = array();
-					$temp = explode(',', $_POST['display_custom']);
-					foreach ($temp as $action)
-						$custom[] = Util::htmlspecialchars(Util::htmltrim($action), ENT_QUOTES);
-				}
-
-				$display = empty($display) ? '' : implode(',', $display);
-
-				if (!allowedTo('admin_forum') && isset($current_data['display_custom']) && substr($current_data['display_custom'], 0, 4) === '$php')
-					$custom = $current_data['display_custom'];
-				elseif (!empty($_POST['display_custom']))
-				{
-					if (allowedTo('admin_forum') && substr($_POST['display_custom'], 0, 4) === '$php')
-						$custom = Util::htmlspecialchars($_POST['display_custom'], ENT_QUOTES);
-					else
-					{
-						$custom = array();
-						$temp = explode(',', $_POST['display_custom']);
-
-						foreach ($temp as $action)
-							$custom[] = Util::htmlspecialchars($action, ENT_QUOTES);
-
-						$custom = empty($custom) ? '' : implode(',', $custom);
-					}
-				}
-				else
-					$custom = '';
-			}
-
 			$blockInfo = array(
 				'id' => (int) $_POST['block_id'],
 				'label' => Util::htmlspecialchars($_POST['block_name'], ENT_QUOTES),
@@ -684,11 +545,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'row' => $row,
 				'permissions' => (int) $_POST['permissions'],
 				'styles' => (int) $_POST['styles'],
+				'visibility' => (int) $_POST['visibility'],
 				'state' => !empty($_POST['block_active']) ? 1 : 0,
 				'force_view' => !empty($_POST['block_force']) ? 1 : 0,
-				'mobile_view' => !empty($_POST['block_mobile']) ? 1 : 0,
-				'display' => $display,
-				'display_custom' => $custom,
 			);
 
 			// Insert a new block in to the portal

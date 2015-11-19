@@ -608,19 +608,19 @@ body {
 	margin: 0 auto;
 }
 
-#sp_edit_block #sp_display_advanced {
+#sp_select_visibility {
 	padding-top: 0.6em;
 	line-height: 2em;
 }
 
-#sp_edit_block .sp_display_list {
+ul.sp_visibility_list {
 	overflow: hidden;
 	margin: 0;
 }
 
-#sp_edit_block .sp_display_list li {
-	float: left;
-	width: 50%;
+ul.sp_visibility_list li {
+	display: inline-block;
+	width: 33%;
 }
 
 select#shoutbox_bbc,

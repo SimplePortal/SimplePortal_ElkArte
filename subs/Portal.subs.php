@@ -123,8 +123,10 @@ function sportal_init($standalone = false)
 	$context['standalone'] = $standalone;
 	sportal_load_blocks();
 
-	$context['SPortal']['on_portal'] = getShowInfo(0, 'portal', '');
+	// Determine if we will show blocks on the portal page
+	$context['SPortal']['on_portal'] = sportal_process_visibility('portal');
 
+	// Add the portal template
 	if (!Template_Layers::getInstance()->hasLayers(true) && !in_array('portal', Template_Layers::getInstance()->getLayers()))
 		Template_Layers::getInstance()->add('portal');
 }
@@ -162,7 +164,7 @@ function sportal_init_headers()
 	{
 		$modSettings['jquery_include_ui'] = true;
 
-		// Javascipt to allow D&D ordering of the front page blocks, not for guests
+		// Javascript to allow D&D ordering of the front page blocks, not for guests
 		if (empty($_REQUEST['action']) && !($user_info['is_guest'] || $user_info['id'] == 0))
 			$javascript .= '
 				// Set up our sortable call
@@ -310,9 +312,6 @@ function sportal_load_blocks()
 		if (!$context['SPortal']['sides'][$block['column']]['active'] || empty($block['type']))
 			continue;
 
-		if ($context['browser_body_id'] === 'mobile' && empty($block['mobile_view']))
-			continue;
-
 		$block['style'] = sportal_select_style($block['styles']);
 
 		$block['instance'] = sp_instantiate_block($block['type']);
@@ -424,7 +423,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 	$request = $db->query('', '
 		SELECT
 			spb.id_block, spb.label, spb.type, spb.col, spb.row, spb.permissions, spb.state,
-			spb.force_view, spb.mobile_view, spb.display, spb.display_custom, spb.styles, spp.variable, spp.value
+			spb.force_view, spb.visibility, spb.styles, spp.variable, spp.value
 		FROM {db_prefix}sp_blocks AS spb
 			LEFT JOIN {db_prefix}sp_parameters AS spp ON (spp.id_block = spb.id_block)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
@@ -433,7 +432,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		if (!empty($show) && !getShowInfo($row['id_block'], $row['display'], $row['display_custom']))
+		if (!empty($show) && !sportal_check_visibility($row['visibility']))
 			continue;
 
 		if (!isset($return[$row['id_block']]))
@@ -446,12 +445,10 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 				'column' => $row['col'],
 				'row' => $row['row'],
 				'permissions' => $row['permissions'],
+				'styles' => $row['styles'],
+				'visibility' => $row['visibility'],
 				'state' => empty($row['state']) ? 0 : 1,
 				'force_view' => $row['force_view'],
-				'mobile_view' => $row['mobile_view'],
-				'display' => $row['display'],
-				'display_custom' => $row['display_custom'],
-				'styles' => $row['styles'],
 				'collapsed' => $context['user']['is_guest'] ? !empty($_COOKIE['sp_block_' . $row['id_block']]) : !empty($options['sp_block_' . $row['id_block']]),
 				'parameters' => array(),
 			);
@@ -468,56 +465,38 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 /**
  * Function to get a block's display/show information.
  *
- * @param int|null $block_id
- * @param string|null $display
- * @param string|null $custom
+ * @param string[]|string|null $query
  */
-function getShowInfo($block_id = null, $display = null, $custom = null)
+function sportal_process_visibility($query)
 {
 	global $context, $modSettings;
-	static $variables;
 
-	$db = database();
-
-	// Do we have the display info?
-	if ($display === null || $custom === null)
+	// Fetch any page, category or article as needed
+	if (!empty($_GET['page']) && (empty($context['current_action']) || $context['current_action'] === 'portal'))
 	{
-		// Make sure that its an integer.
-		$block_id = (int) $block_id;
-
-		// We need an ID.
-		if (empty($block_id))
-			return false;
-
-		// Get the info.
-		$result = $db->query('', '
-			SELECT display, display_custom
-			FROM {db_prefix}sp_blocks
-			WHERE id_block = {int:id_block}
-			LIMIT 1',
-			array(
-				'id_block' => $block_id,
-			)
-		);
-		list ($display, $custom) = $db->fetch_row($result);
-		$db->free_result($result);
-	}
-
-	if (!empty($_GET['page']) && (empty($context['current_action']) || $context['current_action'] == 'portal'))
-	{
-		if (empty($context['SPortal']['permissions']))
-			sportal_load_permissions();
 		$page_info = sportal_get_pages($_GET['page'], true, true);
 	}
 
-	// Some variables for ease.
+	if (!empty($_GET['category']) && (empty($context['current_action']) || $context['current_action'] === 'portal'))
+	{
+		$category_info = sportal_get_categories($_GET['category'], true, true);
+	}
+
+	if (!empty($_GET['article']) && (empty($context['current_action']) || $context['current_action'] === 'portal'))
+	{
+		$article_info = sportal_get_articles($_GET['article'], true, true);
+	}
+
+	// Some variables for easy checking.
 	$action = !empty($context['current_action']) ? $context['current_action'] : '';
 	$sub_action = !empty($context['current_subaction']) ? $context['current_subaction'] : '';
 	$board = !empty($context['current_board']) ? 'b' . $context['current_board'] : '';
 	$topic = !empty($context['current_topic']) ? 't' . $context['current_topic'] : '';
 	$page = !empty($page_info['id']) ? 'p' . $page_info['id'] : '';
-	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] == 1) || $action == 'portal' || !empty($context['standalone'])
-		? true : false;
+	$category = !empty($category_info['id']) ? 'c' . $category_info['id'] : '';
+	$article = !empty($article_info['id']) ? 'a' . $article_info['id'] : '';
+	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK != 'SSI' && $modSettings['sp_portal_mode'] == 1) || $action == 'portal' || !empty($context['standalone']) ? true : false;
+	$forum = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK != 'SSI' && $modSettings['sp_portal_mode'] != 1) || $action == 'forum';
 
 	// Will hopefully get larger in the future.
 	$portal_actions = array(
@@ -532,7 +511,7 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 		'action' => array('portal'),
 	);
 
-	// Set some action exceptions.
+	// Set some action exceptions so they use a common root name
 	$exceptions = array(
 		'post' => array('announce', 'editpoll', 'emailuser', 'post2', 'sendtopic'),
 		'register' => array('activate', 'coppa'),
@@ -549,90 +528,129 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 		foreach ($_GET as $key => $value)
 		{
 			if (preg_match('~^news\d+$~', $key))
+			{
 				continue;
+			}
 
 			if (!isset($portal_actions[$key]))
+			{
 				$portal = false;
+			}
 			elseif (is_array($portal_actions[$key]) && !in_array($value, $portal_actions[$key]))
+			{
 				$portal = false;
+			}
 		}
 	}
 
-	// Set the action to more known one.
+	// Set the action to a common one, eg reminder => login
 	foreach ($exceptions as $key => $exception)
+	{
 		if (in_array($action, $exception))
+		{
 			$action = $key;
+		}
+	}
+
+	// Complex display options first...
+	if (($boundary = strpos($query, '$php')) !== false)
+	{
+		$code = substr($query, $boundary + 4);
+
+		$variables = array(
+				'{$action}' => "'$action'",
+				'{$sa}' => "'$sub_action'",
+				'{$board}' => "'$board'",
+				'{$topic}' => "'$topic'",
+				'{$page}' => "'$page'",
+				'{$category}' => "'$category'",
+				'{$article}' => "'$article'",
+				'{$portal}' => $portal,
+				'{$forum}' => $forum,
+		);
+
+		return eval(str_replace(array_keys($variables), array_values($variables), un_htmlspecialchars($code)) . ';');
+	}
+
+	if (!empty($query))
+	{
+		$query = explode(',', $query);
+	}
+	else
+	{
+		return false;
+	}
 
 	// Take care of custom actions.
 	$special = array();
 	$exclude = array();
-	if (!empty($custom))
+	foreach ($query as $value)
 	{
-		// Complex display options first...
-		if (substr($custom, 0, 4) === '$php')
+		if (!isset($value[0]))
 		{
-			if (!isset($variables))
-			{
-				$variables = array(
-					'{$action}' => "'$action'",
-					'{$sa}' => "'$sub_action'",
-					'{$board}' => "'$board'",
-					'{$topic}' => "'$topic'",
-					'{$page}' => "'$page'",
-					'{$portal}' => $portal,
-				);
-			}
-
-			return @eval(str_replace(array_keys($variables), array_values($variables), un_htmlspecialchars(substr($custom, 4))) . ';');
+			continue;
 		}
 
-		$custom = explode(',', $custom);
+		$name = '';
+		$item = '';
 
-		// This is special...
-		foreach ($custom as $key => $value)
+		// Is this a weird action?
+		if ($value[0] == '~')
 		{
-			$name = '';
-			$item = '';
-
-			// Is this a weird action?
-			if ($value[0] == '~')
+			if (strpos($value, '|') !== false)
 			{
-				@list($name, $item) = explode('|', substr($value, 1));
-
-				if (empty($item))
-					$special[$name] = true;
-				else
-					$special[$name][] = $item;
+				list ($name, $item) = explode('|', substr($value, 1));
+			}
+			else
+			{
+				$name = substr($value, 1);
 			}
 
-			// Might be excluding something!
-			elseif ($value[0] == '-')
+			if (empty($item))
 			{
-				// We still may have weird things...
-				if ($value[1] == '~')
+				$special[$name] = true;
+			}
+			else
+			{
+				$special[$name][] = $item;
+			}
+		}
+		// Might be excluding something!
+		elseif ($value[0] === '-')
+		{
+			// We still may have weird things...
+			if ($value[1] === '~')
+			{
+				if (strpos($value, '|') !== false)
 				{
-					@list($name, $item) = explode('|', substr($value, 2));
-
-					if (empty($item))
-						$exclude['special'][$name] = true;
-					else
-						$exclude['special'][$name][] = $item;
+					list ($name, $item) = explode('|', substr($value, 2));
 				}
 				else
-					$exclude['regular'][] = substr($value, 1);
+				{
+					$name = substr($value, 2);
+				}
+
+				if (empty($item))
+				{
+					$exclude['special'][$name] = true;
+				}
+				else
+				{
+					$exclude['special'][$name][] = $item;
+				}
+			}
+			else
+			{
+				$exclude['regular'][] = substr($value, 1);
 			}
 		}
-
-		// Add what we have to main variable.
-		if (!empty($display))
-			$display = $display . ',' . implode(',', $custom);
-		else
-			$display = $custom;
 	}
 
 	// We don't want to show it on this action/page/board?
-	if (!empty($exclude['regular']) && count(array_intersect(array($action, $page, $board), $exclude['regular'])) > 0)
+	if (!empty($exclude['regular']) && count(array_intersect(array($action, $page, $board, $category, $article), $exclude['regular'])) > 0)
+	{
 		return false;
+	}
 
 	// Maybe we don't want to show it in somewhere special.
 	if (!empty($exclude['special']))
@@ -642,50 +660,66 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 			if (isset($_GET[$key]))
 			{
 				if (is_array($value) && !in_array($_GET[$key], $value))
+				{
 					continue;
+				}
 				else
+				{
 					return false;
+				}
 			}
 		}
 	}
 
-	// If no display info and/or integration disabled and we are on portal; show it!
-	if ((empty($display) || empty($modSettings['sp_enableIntegration'])) && $portal)
-		return true;
-	// No display info and/or integration disabled and no portal; no need...
-	elseif (empty($display) || empty($modSettings['sp_enableIntegration']))
-		return false;
-	// Get ready for real action if you haven't yet.
-	elseif (!is_array($display))
-		$display = explode(',', $display);
-
 	// Did we disable all blocks for this action?
 	if (!empty($modSettings['sp_' . $action . 'IntegrationHide']))
+	{
 		return false;
+	}
 	// If we will display show the block.
-	elseif (in_array('all', $display))
+	elseif (in_array('all', $query))
+	{
 		return true;
+	}
 	// If we are on portal, show portal blocks; if we are on forum, show forum blocks.
-	elseif (($portal && (in_array('portal', $display) || in_array('sportal', $display))) || (!$portal && in_array('sforum', $display)))
+	elseif (($portal && in_array('portal', $query)) || ($forum && in_array('forum', $query)))
+	{
 		return true;
-	elseif (!empty($board) && (in_array('allboard', $display) || in_array($board, $display)))
+	}
+	elseif (!empty($action) && $action != 'portal' && (in_array('allaction', $query) || in_array($action, $query)))
+	{
 		return true;
-	elseif (!empty($action) && $action != 'portal' && (in_array('allaction', $display) || in_array($action, $display)))
+	}
+	elseif (!empty($board) && (in_array('allboard', $query) || in_array($board, $query)))
+	{
 		return true;
-	elseif (!empty($page) && (in_array('allpages', $display) || in_array($page, $display)))
+	}
+	elseif (!empty($page) && (in_array('allpage', $query) || in_array($page, $query)))
+	{
 		return true;
-	elseif (empty($action) && empty($board) && empty($_GET['page']) && !$portal && ($modSettings['sp_portal_mode'] == 2 || $modSettings['sp_portal_mode'] == 3) && in_array('forum', $display))
+	}
+	elseif (!empty($category) && (in_array('allcategory', $query) || in_array($category, $query)))
+	{
 		return true;
+	}
+	elseif (!empty($article) && (in_array('allarticle', $query) || in_array($article, $query)))
+	{
+		return true;
+	}
 
-	// For mods using weird urls...
+	// For addons using weird urls...
 	foreach ($special as $key => $value)
 	{
 		if (isset($_GET[$key]))
 		{
 			if (is_array($value) && !in_array($_GET[$key], $value))
+			{
 				continue;
+			}
 			else
+			{
 				return true;
+			}
 		}
 	}
 
@@ -694,7 +728,48 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 }
 
 /**
- * Loads a set of calendar data, holdays, birthdays, events
+ * Determines if the block should be shown for this area, action, etc
+ *
+ * @param int $visibility_id
+ *
+ * @return bool if to show the block or not
+ */
+function sportal_check_visibility($visibility_id)
+{
+	global $context;
+
+	static $visibilities;
+
+	// Load the visibility profiles so we can put them to use on the blocks
+	if (!isset($visibilities))
+	{
+		$visibilities = sportal_get_profiles(null, 3);
+	}
+
+	// See if we can show this block, here, now, for this ...
+	if ($visibility_id === '0' && !isset($visibilities[$visibility_id]))
+	{
+		// No id, assume its off
+		return false;
+	}
+	elseif (isset($visibilities[$visibility_id]))
+	{
+		// Can we show it here, should we?
+		if ($context['browser_body_id'] === 'mobile' && empty($visibilities[$visibility_id]['mobile_view']))
+			return false;
+		else
+			return sportal_process_visibility($visibilities[$visibility_id]['final']);
+	}
+	else
+	{
+		// No block for you
+		return false;
+	}
+}
+
+/**
+ * This is a simple function that returns nothing if the language file exist and english if it does not exist
+ * This will help to make it possible to load each time the english language!
  *
  * @param string $type type of data to load, events, birthdays, etc
  * @param string $low_date don't load data before this date
@@ -1326,7 +1401,8 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 			'id' => $row['id_profile'],
 			'name' => $row['name'],
 			'label' => isset($txt['sp_admin_profiles' . substr($row['name'], 1)])
-				? $txt['sp_admin_profiles' . substr($row['name'], 1)] : $row['name'],
+				? $txt['sp_admin_profiles' . substr($row['name'], 1)]
+				: $row['name'],
 			'type' => $row['type'],
 			'value' => $row['value'],
 		);
@@ -1341,9 +1417,22 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 				'groups_denied' => $groups_denied !== '' ? explode(',', $groups_denied) : array(),
 			));
 		}
+		// Styles
 		elseif ($row['type'] == 2)
 		{
 			$return[$row['id_profile']] = array_merge($return[$row['id_profile']], sportal_parse_style('explode', $row['value'], true));
+		}
+		// Visibility
+		elseif ($row['type'] == 3)
+		{
+			list ($selections, $query, $mobile_view) = array_pad(explode('|', $row['value']), 3, '');
+
+			$return[$row['id_profile']] = array_merge($return[$row['id_profile']], array(
+				'selections' => explode(',', $selections),
+				'query' => $query,
+				'mobile_view' => $mobile_view,
+				'final' => implode(',', array($selections, $query, $mobile_view)),
+			));
 		}
 	}
 

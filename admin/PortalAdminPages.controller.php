@@ -256,10 +256,6 @@ class ManagePortalPages_Controller extends Action_Controller
 			$_POST['content'] = $_REQUEST['content'];
 		}
 
-		// Load in the blocks that can be used on a page
-		$this->blocks = getBlockInfo();
-		$context['page_blocks'] = $this->_sportal_admin_page_load_blocks();
-
 		// Saving the work?
 		if (!empty($_POST['submit']) && !$pages_errors->hasErrors())
 		{
@@ -369,65 +365,6 @@ class ManagePortalPages_Controller extends Action_Controller
 	}
 
 	/**
-	 * Loads the block selection list for the page layout screen
-	 *
-	 * - Determines what blocks / areas can be displayed on a page
-	 * - Used to populate the selection list
-	 */
-	private function _sportal_admin_page_load_blocks()
-	{
-		global $context, $txt;
-
-		// Its our own cubicle
-		$context['sides'] = array(
-			5 => $txt['sp-positionHeader'],
-			1 => $txt['sp-positionLeft'],
-			2 => $txt['sp-positionTop'],
-			3 => $txt['sp-positionBottom'],
-			4 => $txt['sp-positionRight'],
-			6 => $txt['sp-positionFooter'],
-		);
-
-		// Load the sides with allowed blocks
-		$page_blocks = array();
-		foreach ($this->blocks as $block)
-		{
-			$shown = false;
-			$tests = array('all', 'allpages', 'sforum');
-			if (!$context['SPortal']['is_new'])
-				$tests[] = 'p' . ((int) $_REQUEST['page_id']);
-
-			foreach (array('display', 'display_custom') as $field)
-			{
-				if (substr($block[$field], 0, 4) === '$php')
-					continue 2;
-
-				$block[$field] = explode(',', $block[$field]);
-
-				if (!$context['SPortal']['is_new'] && in_array('-p' . ((int) $_REQUEST['page_id']), $block[$field]))
-					continue;
-
-				foreach ($tests as $test)
-				{
-					if (in_array($test, $block[$field]))
-					{
-						$shown = true;
-						break;
-					}
-				}
-			}
-
-			$page_blocks[$block['column']][] = array(
-				'id' => $block['id'],
-				'label' => $block['label'],
-				'shown' => $shown,
-			);
-		}
-
-		return $page_blocks;
-	}
-
-	/**
 	 * Does the actual saving of the page data
 	 *
 	 * - validates the data is safe to save
@@ -500,15 +437,6 @@ class ManagePortalPages_Controller extends Action_Controller
 		if ($pages_errors->hasErrors())
 			$this->action_edit();
 
-		// If you made it this far, we are going to save the work
-		if (!empty($_POST['blocks']) && is_array($_POST['blocks']))
-		{
-			foreach ($_POST['blocks'] as $id => $block)
-				$_POST['blocks'][$id] = (int) $block;
-		}
-		else
-			$_POST['blocks'] = array();
-
 		// The data for the fields
 		$page_info = array(
 			'id' => (int) $_POST['page_id'],
@@ -526,89 +454,6 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		// Save away
 		sp_save_page($page_info, $context['SPortal']['is_new']);
-
-		$to_show = array();
-		$not_to_show = array();
-		$changes = array();
-
-		foreach ($context['page_blocks'] as $page_blocks)
-		{
-			foreach ($page_blocks as $block)
-			{
-				if ($block['shown'] && !in_array($block['id'], $_POST['blocks']))
-					$not_to_show[] = $block['id'];
-				elseif (!$block['shown'] && in_array($block['id'], $_POST['blocks']))
-					$to_show[] = $block['id'];
-			}
-		}
-
-		foreach ($to_show as $id)
-		{
-			if ((empty($this->blocks[$id]['display']) && empty($this->blocks[$id]['display_custom'])) || $this->blocks[$id]['display'] == 'sportal')
-			{
-				$changes[$id] = array(
-					'display' => 'portal,p' . $page_info['id'],
-					'display_custom' => '',
-				);
-			}
-			elseif (in_array($this->blocks[$id]['display'], array('allaction', 'allboard')))
-			{
-				$changes[$id] = array(
-					'display' => '',
-					'display_custom' => $this->blocks[$id]['display'] . ',p' . $page_info['id'],
-				);
-			}
-			elseif (in_array('-p' . $page_info['id'], explode(',', $this->blocks[$id]['display_custom'])))
-			{
-				$changes[$id] = array(
-					'display' => $this->blocks[$id]['display'],
-					'display_custom' => implode(',', array_diff(explode(',', $this->blocks[$id]['display_custom']), array('-p' . $page_info['id']))),
-				);
-			}
-			elseif (empty($this->blocks[$id]['display_custom']))
-			{
-				$changes[$id] = array(
-					'display' => implode(',', array_merge(explode(',', $this->blocks[$id]['display']), array('p' . $page_info['id']))),
-					'display_custom' => '',
-				);
-			}
-			else
-			{
-				$changes[$id] = array(
-					'display' => $this->blocks[$id]['display'],
-					'display_custom' => implode(',', array_merge(explode(',', $this->blocks[$id]['display_custom']), array('p' . $page_info['id']))),
-				);
-			}
-		}
-
-		foreach ($not_to_show as $id)
-		{
-			if (count(array_intersect(array($this->blocks[$id]['display'], $this->blocks[$id]['display_custom']), array('sforum', 'allpages', 'all'))) > 0)
-			{
-				$changes[$id] = array(
-					'display' => '',
-					'display_custom' => $this->blocks[$id]['display'] . $this->blocks[$id]['display_custom'] . ',-p' . $page_info['id'],
-				);
-			}
-			elseif (empty($this->blocks[$id]['display_custom']))
-			{
-				$changes[$id] = array(
-					'display' => implode(',', array_diff(explode(',', $this->blocks[$id]['display']), array('p' . $page_info['id']))),
-					'display_custom' => '',
-				);
-			}
-			else
-			{
-				$changes[$id] = array(
-					'display' => implode(',', array_diff(explode(',', $this->blocks[$id]['display']), array('p' . $page_info['id']))),
-					'display_custom' => implode(',', array_diff(explode(',', $this->blocks[$id]['display_custom']), array('p' . $page_info['id']))),
-				);
-			}
-		}
-
-		// Update the blocks as needed
-		foreach ($changes as $id => $data)
-			sp_update_block_visibility($id, $data);
 
 		redirectexit('action=admin;area=portalpages');
 
