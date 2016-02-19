@@ -1267,8 +1267,7 @@ function sp_block_insert($blockInfo)
 		{db_prefix}sp_blocks',
 		array(
 			'label' => 'string', 'type' => 'string', 'col' => 'int', 'row' => 'int', 'permissions' => 'int', 'styles' => 'int',
-			'state' => 'int', 'force_view' => 'int', 'mobile_view' => 'int', 'display' => 'string', 'display_custom' => 'string',
-		),
+			'visibility' => 'int', 'state' => 'int', 'force_view' => 'int'		),
 		$blockInfo,
 		array('id_block')
 	);
