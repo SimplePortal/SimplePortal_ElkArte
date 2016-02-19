@@ -67,11 +67,12 @@ class Sportal_Controller extends Action_Controller
 	{
 		global $context, $modSettings;
 
+		$context['sub_template'] = 'portal_index';
+
 		// Showing articles on the index page?
 		if (!empty($modSettings['sp_articles_index']))
 		{
 			require_once(SUBSDIR . '/PortalArticle.subs.php');
-			$context['sub_template'] = 'portal_index';
 
 			// Set up the pages
 			$total_articles = sportal_get_articles_count();
