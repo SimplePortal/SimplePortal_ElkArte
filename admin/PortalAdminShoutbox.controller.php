@@ -90,7 +90,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			'id' => 'portal_shout',
 			'title' => $txt['sp_admin_shoutbox_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
-			'no_items_label' => $txt['error_sp_no_pages'],
+			'no_items_label' => $txt['error_sp_no_shoutbox'],
 			'base_href' => $scripturl . '?action=admin;area=portalshoutbox;sa=list;',
 			'default_sort_col' => 'name',
 			'get_items' => array(

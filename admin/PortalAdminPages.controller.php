@@ -77,7 +77,7 @@ class ManagePortalPages_Controller extends Action_Controller
 		// Build the listoption array to display the categories
 		$listOptions = array(
 			'id' => 'portal_pages',
-			'title' => $txt['sp_admin_articles_list'],
+			'title' => $txt['sp_admin_pages_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['error_sp_no_pages'],
 			'base_href' => $scripturl . '?action=admin;area=portalpages;sa=list;',
