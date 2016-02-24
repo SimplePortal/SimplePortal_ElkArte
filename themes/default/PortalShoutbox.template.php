@@ -152,11 +152,11 @@ function template_shoutbox_embed($shoutbox)
 	// Show an input box, if they can use it
 	if ($context['can_shout'])
 		echo '
-			<div class="submitbutton">
+			<div id="new_shout">
 				<input type="text" name="new_shout" id="new_shout_', $shoutbox['id'], '" class="shoutbox_input floatleft input_text"', isBrowser('is_ie8')
 			? ' onkeypress="if (sp_catch_enter(event)) { sp_submit_shout(' . $shoutbox['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false; }"'
 			: '', ' />
-				<input type="submit" name="submit_shout" value="', $txt['sp_shoutbox_button'], '" class="right_submit" onclick="sp_submit_shout(', $shoutbox['id'], ', \'', $context['session_var'], '\', \'', $context['session_id'], '\'); return false;" />
+				<button type="submit" name="submit_shout" value="', $txt['sp_shoutbox_button'], '" class="right_submit" onclick="sp_submit_shout(', $shoutbox['id'], ', \'', $context['session_var'], '\', \'', $context['session_id'], '\'); return false;">', $txt['sp_shoutbox_button'], '</button>
 			</div>';
 
 	echo '
