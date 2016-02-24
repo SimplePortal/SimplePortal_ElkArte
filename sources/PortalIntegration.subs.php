@@ -142,6 +142,20 @@ function sp_integrate_admin_areas(&$admin_areas)
 							'add' => array($txt['sp_admin_shoutbox_add']),
 						),
 					),
+					'portalmenus' => array(
+						'label' => $txt['sp_admin_menus_title'],
+						'file' => 'PortalAdminMenus.controller.php',
+						'function' => 'action_index',
+						'icon' => 'menus.png',
+						'permission' => array('sp_admin', 'sp_manage_menus'),
+						'subsections' => array(
+							'listmainitem' => array($txt['sp_admin_menus_main_item_list']),
+							'addmainitem' => array($txt['sp_admin_menus_main_item_add']),
+							'listcustommenu' => array($txt['sp_admin_menus_custom_menu_list']),
+							'addcustommenu' => array($txt['sp_admin_menus_custom_menu_add']),
+							'addcustomitem' => array($txt['sp_admin_menus_custom_item_add'], 'enabled' => !empty($_REQUEST['sa']) && $_REQUEST['sa'] === 'listcustomitem'),
+						),
+					),
 					'portalprofiles' => array(
 						'label' => $txt['sp_admin_profiles_title'],
 						'file' => 'PortalAdminProfiles.controller.php',
@@ -177,13 +191,17 @@ function sp_integrate_admin_areas(&$admin_areas)
  */
 function sp_integrate_load_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
 {
-	$permissionList['membergroup']['sp_admin'] = array(false, 'sp', 'sp');
-	$permissionList['membergroup']['sp_manage_settings'] = array(false, 'sp', 'sp');
-	$permissionList['membergroup']['sp_manage_blocks'] = array(false, 'sp', 'sp');
-	$permissionList['membergroup']['sp_manage_articles'] = array(false, 'sp', 'sp');
-	$permissionList['membergroup']['sp_manage_pages'] = array(false, 'sp', 'sp');
-	$permissionList['membergroup']['sp_manage_shoutbox'] = array(false, 'sp', 'sp');
-	$permissionList['membergroup']['sp_manage_profiles'] = array(false, 'sp', 'sp');
+
+	$permission_list['membergroup'] = array_merge($permission_list['membergroup'], array(
+		'sp_admin' => array(false, 'sp', 'sp'),
+		'sp_manage_settings' => array(false, 'sp', 'sp'),
+		'sp_manage_blocks' => array(false, 'sp', 'sp'),
+		'sp_manage_articles' => array(false, 'sp', 'sp'),
+		'sp_manage_pages' => array(false, 'sp', 'sp'),
+		'sp_manage_shoutbox' => array(false, 'sp', 'sp'),
+		'sp_manage_menus' => array(false, 'sp', 'sp'),
+		'sp_manage_profiles' => array(false, 'sp', 'sp'),
+	));
 
 	$permissionGroups['membergroup'][] = 'sp';
 
@@ -608,7 +626,8 @@ function sp_integrate_load_illegal_guest_permissions()
 		'sp_manage_articles',
 		'sp_manage_pages',
 		'sp_manage_shoutbox',
-		'sp_manage_profiles'
+		'sp_manage_profiles',
+		'sp_manage_menus',
 	));
 }
 
@@ -619,7 +638,7 @@ function sp_integrate_load_illegal_guest_permissions()
  * - Prevents parseBBC from working on these tags at all
  *
  * @param string $message
- * @param smixed[] $smileys
+ * @param mixed[] $smileys
  * @param string $cache_id
  * @param string[]|null $parse_tags
  */

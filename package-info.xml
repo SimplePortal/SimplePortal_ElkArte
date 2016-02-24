@@ -78,6 +78,8 @@
 		<remove-file name="ADMINDIR/PortalAdminPages.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminShoutbox.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminProfiles.controller.php" />
+		<remove-file name="ADMINDIR/PortalAdminCategories.controller.php" />
+		<remove-file name="SUBSDIR/PortalBlocks.subs.php" />
 		<remove-file name="SUBSDIR/Portal.subs.php" />
 		<remove-file name="SUBSDIR/PortalAdmin.subs.php" />
 		<remove-file name="SUBSDIR/PortalArticle.subs.php" />
@@ -95,6 +97,7 @@
 		<remove-file name="THEMEDIR/PortalAdminShoutbox.template.php" />
 		<remove-file name="THEMEDIR/PortalAdminProfiles.template.php" />
 		<remove-file name="THEMEDIR/PortalAdminCategories.template.php" />
+		<remove-file name="THEMEDIR/PortalAdminMenus.template.php" />
 		<remove-file name="LANGUAGEDIR/english/SPortal.english.php" />
 		<remove-file name="LANGUAGEDIR/english/SPortalAdmin.english.php" />
 		<remove-file name="LANGUAGEDIR/english/SPortalHelp.english.php" />

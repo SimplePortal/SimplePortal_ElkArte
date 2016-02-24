@@ -80,7 +80,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
-		// build the listoption array to display the categories
+		// Build the listoption array to display the categories
 		$listOptions = array(
 			'id' => 'portal_categories',
 			'title' => $txt['sp_admin_categories_list'],

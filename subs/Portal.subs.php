@@ -23,7 +23,7 @@ function sportal_init($standalone = false)
 
 	$sportal_version = '1.1.0 Beta 1';
 
-	if ((isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach'))
+	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 		return;
 
 	if ((isset($_REQUEST['xml']) || isset($_REQUEST['api'])) && ((isset($_REQUEST['action']) && $_REQUEST['action'] !== 'shoutbox')))
@@ -940,6 +940,8 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 			'style' => $txt['sp_shoutbox_style'],
 			'bin' => $txt['sp_shoutbox_prune'],
 			'move' => $txt['sp_move'],
+			'add' => $txt['sp_add'],
+			'items' => $txt['sp_items'],
 			'given' => $txt['sp_likes_given'],
 			'received' => $txt['sp_likes_received'],
 		);
@@ -1003,6 +1005,8 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 			'style' => $txt['sp_shoutbox_style'],
 			'bin' => $txt['sp_shoutbox_prune'],
 			'move' => $txt['sp_move'],
+			'add' => $txt['sp_add'],
+			'items' => $txt['sp_items'],
 			'given' => $txt['sp_likes_given'],
 			'received' => $txt['sp_likes_received'],
 		);
@@ -1351,7 +1355,96 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 				return $result;
 			break;
 	}
+
 	return false;
+}
+
+/**
+ * Return a specific menu, or all menus if none is provided
+ *
+ * @param int|null $menu_id
+ * @param string $sort
+ *
+ * @return array|mixed
+ */
+function sportal_get_custom_menus($menu_id = null, $sort = 'id_menu')
+{
+	$db = database();
+
+	$query = array();
+	$parameters = array('sort' => $sort);
+
+	if (isset($menu_id))
+	{
+		$query[] = 'id_menu = {int:menu_id}';
+		$parameters['menu_id'] = (int) $menu_id;
+	}
+
+	$request = $db->query('','
+		SELECT
+			id_menu, name
+		FROM {db_prefix}sp_custom_menus' . (!empty($query) ? '
+			WHERE ' . implode(' AND ', $query) : '') . '
+		ORDER BY {raw:sort}',
+		$parameters
+	);
+	$return = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$return[$row['id_menu']] = array(
+			'id' => $row['id_menu'],
+			'name' => $row['name'],
+		);
+	}
+	$db->free_result($request);
+
+	return !empty($menu_id) ? current($return) : $return;
+}
+
+/**
+ * Return menu items for a given id, or all if none is passed
+ *
+ * @param int|null $item_id
+ * @param string $sort
+ *
+ * @return array|mixed
+ */
+function sportal_get_menu_items($item_id = null, $sort = 'id_item')
+{
+	$db = database();
+
+	$query = array();
+	$parameters = array('sort' => $sort);
+
+	if (isset($item_id))
+	{
+		$query[] = 'id_item = {int:item_id}';
+		$parameters['item_id'] = (int) $item_id;
+	}
+
+	$request = $db->query('','
+		SELECT
+			id_item, id_menu, namespace, title, url, target
+		FROM {db_prefix}sp_menu_items' . (!empty($query) ? '
+			WHERE ' . implode(' AND ', $query) : '') . '
+		ORDER BY {raw:sort}',
+		$parameters
+	);
+	$return = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$return[$row['id_item']] = array(
+			'id' => $row['id_item'],
+			'id_menu' => $row['id_menu'],
+			'namespace' => $row['namespace'],
+			'title' => $row['title'],
+			'url' => $row['url'],
+			'target' => $row['target',
+		);
+	}
+	$db->free_result($request);
+
+	return !empty($item_id) ? current($return) : $return;
 }
 
 /**

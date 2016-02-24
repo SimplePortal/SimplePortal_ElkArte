@@ -52,8 +52,8 @@ $sp_tables = array(
 			array('name' => 'col', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
 			array('name' => 'row', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
 			array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
-			array('name' => 'styles', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true), 
-			array('name' => 'visibility', 'type' => 'mediumint', 'size' => 8, 'default' => 0),			
+			array('name' => 'styles', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+			array('name' => 'visibility', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
 			array('name' => 'state', 'type' => 'tinyint', 'size' => 4, 'default' => 1),
 			array('name' => 'force_view', 'type' => 'tinyint', 'size' => 2, 'default' => 0),
 		),
@@ -89,6 +89,15 @@ $sp_tables = array(
 			array('type' => 'primary', 'columns' => array('id_comment')),
 		),
 	),
+	'sp_custom_menus' => array(
+		'columns' => array(
+			array('name' => 'id_menu', 'type' => 'mediumint', 'size' => 8, 'auto' => true),
+			array('name' => 'name', 'type' => 'tinytext'),
+		),
+		'indexes' => array(
+			array('type' => 'primary', 'columns' => array('id_menu')),
+		),
+	),
 	'sp_functions' => array(
 		'columns' => array(
 			array('name' => 'id_function', 'type' => 'tinyint', 'size' => 4, 'auto' => true, 'unsigned' => true),
@@ -97,6 +106,19 @@ $sp_tables = array(
 		),
 		'indexes' => array(
 			array('type' => 'primary', 'columns' => array('id_function')),
+		),
+	),
+	'sp_menu_items' => array(
+		'columns' => array(
+			array('name' => 'id_item', 'type' => 'mediumint', 'size' => 8, 'auto' => true),
+			array('name' => 'id_menu', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
+			array('name' => 'namespace', 'type' => 'tinytext'),
+			array('name' => 'title', 'type' => 'tinytext'),
+			array('name' => 'href', 'type' => 'tinytext'),
+			array('name' => 'target', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
+		),
+		'indexes' => array(
+			array('type' => 'primary', 'columns' => array('id_item')),
 		),
 	),
 	'sp_pages' => array(
@@ -360,7 +382,7 @@ foreach (array('sp_articles', 'sp_blocks', 'sp_pages') as $sp_style)
 
 // If there are no style profiles, then add some defaults to use
 $result = $db->query('','
-	SELECT 
+	SELECT
 		id_profile
 	FROM {db_prefix}sp_profiles
 	WHERE type = {int:type}
@@ -395,7 +417,7 @@ if (empty($has_style_profiles))
 
 // Add / convert visibility profiles if none exist
 $result = $db->query('','
-	SELECT 
+	SELECT
 		id_profile
 	FROM {db_prefix}sp_profiles
 	WHERE type = {int:type}

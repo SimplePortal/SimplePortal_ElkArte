@@ -1535,21 +1535,6 @@ function sp_delete_permission_profile($profile_id)
 	);
 }
 
-function stuff()
-{
-	$request = $smcFunc['db_query']('','
-		SELECT id_page, title
-		FROM {db_prefix}sp_pages
-		ORDER BY title DESC'
-	);
-	$context['profile']['pages'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$context['profile']['pages']['p' . $row['id_page']] = $row['title'];
-	$smcFunc['db_free_result']($request);
-
-
-}
-
 /**
  * Loads boards and pages for template selection
  *
@@ -1612,4 +1597,237 @@ function sp_block_template_helpers()
 	while ($row = $db->fetch_assoc($request))
 		$context['profile']['articles']['a' . $row['id_article']] = $row['title'];
 	$db->free_result($request);
+
+	return $context['profile'];
+}
+
+/**
+ * Remove a group of menus from the system
+ *
+ * @param int|int[] $ids
+ */
+function sp_remove_menu($remove_ids)
+{
+	$db = database();
+
+	if (!is_array($remove_ids))
+		$remove_ids = array($remove_ids);
+
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_custom_menus
+		WHERE id_menu IN ({array_int:menus})',
+		array(
+			'menus' => $remove_ids,
+		)
+	);
+}
+
+/**
+ * Remove the menus items
+ *
+ * @param int|int[] $remove_ids
+ */
+function sp_remove_menu_items($remove_ids)
+{
+	$db = database();
+
+	if (!is_array($remove_ids))
+		$remove_ids = array($remove_ids);
+
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_menu_items
+		WHERE id_menu = {array_int:id}',
+		array(
+			'id' => $remove_ids,
+		)
+	);
+}
+
+/**
+ * Determine the menu count, used for create List
+ *
+ * @return int
+ */
+function sp_menu_count()
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}sp_custom_menus'
+	);
+	list ($total_menus) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_menus;
+}
+
+/**
+ * Return menu items, helper function for createlist
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ */
+function sp_menu_items($start, $items_per_page, $sort)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT
+			cm.id_menu, cm.name, COUNT(mi.id_item) AS items
+		FROM {db_prefix}sp_custom_menus AS cm
+			LEFT JOIN {db_prefix}sp_menu_items AS mi ON (mi.id_menu = cm.id_menu)
+		GROUP BY cm.id_menu
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:limit}',
+		array(
+			'sort' => $sort,
+			'start' => $start,
+			'limit' => $items_per_page,
+		)
+	);
+	$context['menus'] = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$context['menus'][$row['id_menu']] = array(
+			'id' => $row['id_menu'],
+			'name' => $row['name'],
+			'items' => $row['items'],
+			'actions' => array(
+				'add' => '<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=addcustomitem;menu_id=' . $row['id_menu'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('add') . '</a>',
+				'items' => '<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=listcustomitem;menu_id=' . $row['id_menu'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('items') . '</a>',
+				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=editcustommenu;menu_id=' . $row['id_menu'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
+				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=deletecustommenu;menu_id=' . $row['id_menu'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_menus_menu_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
+			)
+		);
+	}
+	$db->free_result($request);
+}
+
+/**
+ * Function to add or update a menu
+ *
+ * @param mixed[] $menu_info The data to insert/update
+ * @param bool $is_new if to update or insert
+ *
+ * @return int
+ */
+function sp_add_menu($menu_info, $is_new = false)
+{
+	$db = database();
+
+	// Our database fields
+	$fields = array(
+		'name' => 'string',
+	);
+
+	// A new profile?
+	if ($is_new)
+	{
+		// Don't need this, we will create it instead
+		unset($menu_info['id']);
+
+		$db->insert('',
+			'{db_prefix}sp_custom_menus',
+			$fields,
+			$menu_info,
+			array('id_menu')
+		);
+		$menu_info['id'] = $db->insert_id('{db_prefix}sp_custom_menus', 'id_menu');
+	}
+	// Or an edit, we do a little update
+	else
+	{
+		$update_fields = array();
+		foreach ($fields as $name => $type)
+		{
+			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+		}
+
+		$db->query('', '
+			UPDATE {db_prefix}sp_custom_menus
+			SET ' . implode(', ', $update_fields) . '
+			WHERE id_menu = {int:id}',
+			$menu_info
+		);
+	}
+
+	return (int) $menu_info['id'];
+}
+
+/**
+ * @param $id
+ * @param $namespace
+ *
+ * @return mixed
+ */
+function sp_menu_check_duplicate_items($id, $namespace)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT
+			id_item
+		FROM {db_prefix}sp_menu_items
+		WHERE namespace = {string:namespace}
+			AND id_item != {int:current}
+		LIMIT {int:limit}',
+		array(
+			'namespace' => $namespace,
+			'current' => $id,
+			'limit' => 1,
+	);
+	list ($has_duplicate) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $has_duplicate;
+}
+
+function sp_add_menu_item($item_info, $is_new)
+{
+	$db = database();
+
+	// Our database fields
+	$fields = array(
+		'id_menu' => 'int',
+		'namespace' => 'string',
+		'title' => 'string',
+		'url' => 'string',
+		'target' => 'int',
+	);
+
+	// Adding a new item
+	if ($is_new)
+	{
+		// We will get a new one for this
+		unset($item_info['id']);
+
+		$db->insert('',
+			'{db_prefix}sp_menu_items',
+			$fields,
+			$item_info,
+			array('id_item')
+		);
+
+		$item_info['id'] = $db->insert_id('{db_prefix}sp_menu_items', 'id_item');
+	}
+	// Update what we have
+	else
+	{
+		$update_fields = array();
+		foreach ($fields as $name => $type)
+		{
+			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+		}
+
+		$db->query('', '
+			UPDATE {db_prefix}sp_menu_items
+			SET ' . implode(', ', $update_fields) . '
+			WHERE id_item = {int:id}',
+			$item_info
+		);
+	}
+
+	return $item_info['id'];
 }
