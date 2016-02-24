@@ -123,31 +123,50 @@ function template_portal_above()
 	</div>';
 	}
 
+	// The main portal div
 	echo '
-	<table id="sp_main">
-		<tr>';
+	<div id="sp_main"
+		<div class="sp_main_row">';
 
 	// Output all the Left blocks
 	if (!empty($modSettings['showleft']) && !empty($context['SPortal']['blocks'][1]))
 	{
 		echo '
-			<td id="sp_left"', !empty($modSettings['leftwidth']) ? ' style="width:' . $modSettings['leftwidth'] . 'px"'
+			<div id="sp_left" class="sp_main_cell"', !empty($modSettings['leftwidth']) ? ' style="width:' . $modSettings['leftwidth'] . 'px"'
 			: '', $context['SPortal']['sides'][1]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
 			? ' style="display: none;"' : '', '>
-				<div id="sp_left_div" class="sp_column">';
+				<div class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][1] as $block)
 			template_block($block, 1);
 
 		echo '
 				</div>
-			</td>';
+			</div>';
+	}
+
+	// Then the right blocks
+	if (!empty($modSettings['showright']) && !empty($context['SPortal']['blocks'][4]))
+	{
+		echo '
+			<div id="sp_right" class="sp_main_cell"', !empty($modSettings['rightwidth'])
+			? ' style="width:' . $modSettings['rightwidth'] . 'px"'
+			: '', $context['SPortal']['sides'][4]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
+			? ' style="display: none;"' : '', '>
+				<div class="sp_column">';
+
+		foreach ($context['SPortal']['blocks'][4] as $block)
+			template_block($block, 4);
+
+		echo '
+				</div>
+			</div>';
 	}
 
 	// Followed by all the Top Blocks
 	echo '
-			<td id="sp_center">
-				<div id="sp_top_div" class="sp_column">';
+			<div id="sp_center" class="sp_main_cell">
+				<div class="sp_column">';
 
 	if (!empty($context['SPortal']['blocks'][2]))
 	{
@@ -185,29 +204,9 @@ function template_portal_below()
 
 	echo '
 				</div>
-			</td>';
-
-	// And now all the Right Blocks
-	if (!empty($modSettings['showright']) && !empty($context['SPortal']['blocks'][4]))
-	{
-		echo '
-			<td id="sp_right"', !empty($modSettings['rightwidth'])
-			? ' style="width:' . $modSettings['rightwidth'] . 'px"'
-			: '', $context['SPortal']['sides'][4]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
-			? ' style="display: none;"' : '', '>
-				<div id="sp_right_div" class="sp_column">';
-
-		foreach ($context['SPortal']['blocks'][4] as $block)
-			template_block($block, 4);
-
-		echo '
-				</div>
-			</td>';
-	}
-
-	echo '
-		</tr>
-	</table>';
+			</div>
+		</div>
+	</div>';
 
 	// Footer Blocks
 	if (!empty($context['SPortal']['blocks'][6]))

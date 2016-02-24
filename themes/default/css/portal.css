@@ -284,17 +284,38 @@ table.sp_articles,
 	line-height: 2em;
 }
 
+
 #sp_main {
-	margin-bottom: 2em;
 	width: 100%;
-	table-layout: fixed;
+	overflow: hidden;
 }
 
-#sp_left_div {
+#sp_main:after {
+	visibility: hidden;
+	display: block;
+	content: " ";
+	clear: both;
+}
+
+.sp_main_row {
+	clear: both;
+}
+
+.sp_main_cell {
+	overflow: hidden;
+}
+
+#sp_left, #sp_right, #sp_center {
+	vertical-align: top;
+}
+
+#sp_left {
+	float: left;
 	padding-right: .5em;
 }
 
-#sp_right_div {
+#sp_right {
+	float: right;
 	padding-left: .5em;
 }
 
@@ -304,10 +325,6 @@ table.sp_articles,
 
 #sp_header, #sp_footer {
 	margin: 0 0.4em;
-	vertical-align: top;
-}
-
-#sp_left, #sp_right, #sp_center {
 	vertical-align: top;
 }
 
@@ -322,12 +339,6 @@ div.sp_block {
 
 .sp_block_container h3 {
 	font-size: 1.214em;
-}
-
-table.sp_block {
-	width: 100%;
-	border-spacing: 0;
-	border-collapse: collapse;
 }
 
 .sp_block_padding {
@@ -380,6 +391,10 @@ h3.secondary_header {
 
 body {
 	min-width: 750px;
+}
+
+#new_shout {
+	margin-top: 4px;
 }
 
 .shoutbox_container {
@@ -444,7 +459,8 @@ body {
 }
 
 .shoutbox_input {
-	width: 65%;
+	width: 100%;
+	padding-right: 50px;
 }
 
 .shoutbox_warning {
@@ -452,6 +468,15 @@ body {
 	border-left: 3px solid #FF6666;
 	background: #FFDDDD;
 	color: #FF0000;
+}
+
+#new_shout button {
+	position: relative;
+	cursor: pointer;
+	width: 50px;
+	margin-left: -50px;
+	text-transform: uppercase;
+	border-radius: 0 2px 2px 0;
 }
 
 .shoutbox_me {
@@ -873,14 +898,20 @@ dl.sp_form img,
 }
 
 .category_toggle span {
+	background-repeat: no-repeat;
+	background-image: url(../images/_light/expcol.png);
 	position: absolute;
 	top: 50%;
-	left: 50%;
 	margin-top: -30px;
+	left: 50%;
 	margin-left: -58px;
 	padding: 47px 50px;
-	background: url(../images/_light/expcol.png) no-repeat;
 }
+
+.category_header {
+	padding: 4px 5px 2px 10px;
+}
+
 
 /* "dot" images as a sprite
 ------------------------------------------------- */
