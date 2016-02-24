@@ -286,15 +286,15 @@ table.sp_articles,
 
 
 #sp_main {
-	width: 100%;
 	overflow: hidden;
+	width: 100%;
 }
 
 #sp_main:after {
-	visibility: hidden;
 	display: block;
-	content: " ";
+	visibility: hidden;
 	clear: both;
+	content: " ";
 }
 
 .sp_main_row {
@@ -359,8 +359,8 @@ div.sp_block {
 }
 
 .sp_block_section.roundframe {
-	border-radius: 5px;
 	margin-top: 0;
+	border-radius: 5px;
 }
 
 h3.secondary_header {
@@ -459,8 +459,8 @@ body {
 }
 
 .shoutbox_input {
-	width: 100%;
 	padding-right: 50px;
+	width: 100%;
 }
 
 .shoutbox_warning {
@@ -472,11 +472,11 @@ body {
 
 #new_shout button {
 	position: relative;
-	cursor: pointer;
-	width: 50px;
 	margin-left: -50px;
-	text-transform: uppercase;
+	width: 50px;
 	border-radius: 0 2px 2px 0;
+	text-transform: uppercase;
+	cursor: pointer;
 }
 
 .shoutbox_me {
@@ -898,14 +898,14 @@ dl.sp_form img,
 }
 
 .category_toggle span {
-	background-repeat: no-repeat;
-	background-image: url(../images/_light/expcol.png);
 	position: absolute;
 	top: 50%;
-	margin-top: -30px;
 	left: 50%;
+	margin-top: -30px;
 	margin-left: -58px;
 	padding: 47px 50px;
+	background-image: url(../images/_light/expcol.png);
+	background-repeat: no-repeat;
 }
 
 .category_header {
@@ -972,25 +972,31 @@ dl.sp_form img,
 
 /* Experimental media query's */
 /*---------------------------*/
-@media screen and (max-width: 32em) {
+
+/* This one does 800 screens at default font size. */
+@media screen and (max-width: 50em) {
 	body {
 		min-width: 100%;
 	}
 
 	#sp_right {
-		left: 0;
-		display: block;
-		width: 100% !important;
+		float:left;
+		clear: both;
 	}
 
-	#sp_left {
-		left: 0;
-		display: block;
+    #sp_center {
+	    overflow: hidden;
+    }
+}
+/* This one does 540 and smaller screens at default font size. */
+@media screen and (max-width: 33.750em) {
+
+	#sp_left, #sp_right {
+		float: none;
 		width: 100% !important;
 	}
 
 	#sp_center {
-		display: block;
 		width: 100%;
 	}
 
