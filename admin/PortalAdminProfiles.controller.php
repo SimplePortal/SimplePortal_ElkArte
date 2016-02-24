@@ -743,7 +743,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 		);
 
 		// Load board, cat, page and article values for the template
-		sp_block_template_helpers();
+		$context['profile'] = array_merge($context['profile'], sp_block_template_helpers());
 
 		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_profiles_add'] : $txt['sp_admin_profiles_edit'];
 		$context['sub_template'] = 'visibility_profiles_edit';

@@ -1542,9 +1542,9 @@ function sp_delete_permission_profile($profile_id)
  */
 function sp_block_template_helpers()
 {
-	global $context;
-
 	$db = database();
+
+	$helpers = array();
 
 	// Get a list of board names for use in the template
 	$request = $db->query('', '
@@ -1557,9 +1557,9 @@ function sp_block_template_helpers()
 			'empty' => '',
 		)
 	);
-	$context['profile']['boards'] = array();
+	$helpers['boards'] = array();
 	while ($row = $db->fetch_assoc($request))
-		$context['profile']['boards']['b' . $row['id_board']] = $row['name'];
+		$helpers['boards']['b' . $row['id_board']] = $row['name'];
 	$db->free_result($request);
 
 	// Get all the pages loaded in the system for template use
@@ -1569,9 +1569,9 @@ function sp_block_template_helpers()
 		FROM {db_prefix}sp_pages
 		ORDER BY title DESC'
 	);
-	$context['profile']['pages'] = array();
+	$helpers['pages'] = array();
 	while ($row = $db->fetch_assoc($request))
-		$context['profile']['pages']['p' . $row['id_page']] = $row['title'];
+		$helpers['pages']['p' . $row['id_page']] = $row['title'];
 	$db->free_result($request);
 
 	// Same for categories
@@ -1581,9 +1581,9 @@ function sp_block_template_helpers()
 		FROM {db_prefix}sp_categories
 		ORDER BY name DESC'
 	);
-	$context['profile']['categories'] = array();
+	$helpers['categories'] = array();
 	while ($row = $db->fetch_assoc($request))
-		$context['profile']['categories']['c' . $row['id_category']] = $row['name'];
+		$helpers['categories']['c' . $row['id_category']] = $row['name'];
 	$db->free_result($request);
 
 	// And finish up with articles
@@ -1593,18 +1593,18 @@ function sp_block_template_helpers()
 		FROM {db_prefix}sp_articles
 		ORDER BY title DESC'
 	);
-	$context['profile']['articles'] = array();
+	$helpers['articles'] = array();
 	while ($row = $db->fetch_assoc($request))
-		$context['profile']['articles']['a' . $row['id_article']] = $row['title'];
+		$helpers['articles']['a' . $row['id_article']] = $row['title'];
 	$db->free_result($request);
 
-	return $context['profile'];
+	return $helpers;
 }
 
 /**
  * Remove a group of menus from the system
  *
- * @param int|int[] $ids
+ * @param int|int[] $remove_ids
  */
 function sp_remove_menu($remove_ids)
 {
@@ -1663,13 +1663,15 @@ function sp_menu_count()
 }
 
 /**
- * Return menu items, helper function for createlist
+ * Return menu & items, helper function for createlist
  *
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
+ *
+ * @return array
  */
-function sp_menu_items($start, $items_per_page, $sort)
+function sp_custom_menu_items($start, $items_per_page, $sort)
 {
 	$db = database();
 
@@ -1687,22 +1689,18 @@ function sp_menu_items($start, $items_per_page, $sort)
 			'limit' => $items_per_page,
 		)
 	);
-	$context['menus'] = array();
+	$menus = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$context['menus'][$row['id_menu']] = array(
+		$menus[$row['id_menu']] = array(
 			'id' => $row['id_menu'],
 			'name' => $row['name'],
 			'items' => $row['items'],
-			'actions' => array(
-				'add' => '<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=addcustomitem;menu_id=' . $row['id_menu'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('add') . '</a>',
-				'items' => '<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=listcustomitem;menu_id=' . $row['id_menu'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('items') . '</a>',
-				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=editcustommenu;menu_id=' . $row['id_menu'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
-				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=deletecustommenu;menu_id=' . $row['id_menu'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_menus_menu_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
-			)
 		);
 	}
 	$db->free_result($request);
+
+	return $menus;
 }
 
 /**
@@ -1734,6 +1732,7 @@ function sp_add_menu($menu_info, $is_new = false)
 			$menu_info,
 			array('id_menu')
 		);
+
 		$menu_info['id'] = $db->insert_id('{db_prefix}sp_custom_menus', 'id_menu');
 	}
 	// Or an edit, we do a little update
@@ -1757,6 +1756,8 @@ function sp_add_menu($menu_info, $is_new = false)
 }
 
 /**
+ * Check for duplicate items in a menu / namespace
+ *
  * @param $id
  * @param $namespace
  *
@@ -1777,6 +1778,7 @@ function sp_menu_check_duplicate_items($id, $namespace)
 			'namespace' => $namespace,
 			'current' => $id,
 			'limit' => 1,
+		)
 	);
 	list ($has_duplicate) = $db->fetch_row($result);
 	$db->free_result($result);
@@ -1784,6 +1786,14 @@ function sp_menu_check_duplicate_items($id, $namespace)
 	return $has_duplicate;
 }
 
+/**
+ * Add or update custom items to a custom menu
+ *
+ * @param $item_info
+ * @param $is_new
+ *
+ * @return mixed
+ */
 function sp_add_menu_item($item_info, $is_new)
 {
 	$db = database();
@@ -1793,7 +1803,7 @@ function sp_add_menu_item($item_info, $is_new)
 		'id_menu' => 'int',
 		'namespace' => 'string',
 		'title' => 'string',
-		'url' => 'string',
+		'href' => 'string',
 		'target' => 'int',
 	);
 
@@ -1830,4 +1840,73 @@ function sp_add_menu_item($item_info, $is_new)
 	}
 
 	return $item_info['id'];
+}
+
+/**
+ * Determine the menu count, used for create List
+ *
+ * @return int
+ */
+function sp_menu_item_count($menu_id)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}sp_menu_items
+		WHERE id_menu = {int:menu}',
+		array(
+			'menu' => $menu_id,
+		)
+	);
+	list ($total_menus) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_menus;
+}
+
+/**
+ * Return menu items, helper function for createlist
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $menu_id
+ *
+ * @return array
+ */
+function sp_menu_items($start, $items_per_page, $sort, $menu_id)
+{
+	global $txt;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT
+			id_item, title, namespace, target
+		FROM {db_prefix}sp_menu_items
+		WHERE id_menu = {int:menu}
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:limit}',
+		array(
+			'menu' => $menu_id,
+			'sort' => $sort,
+			'start' => $start,
+			'limit' => $items_per_page,
+		)
+	);
+	$items = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$items[$row['id_item']] = array(
+			'id' => $row['id_item'],
+			'menu' => $menu_id,
+			'title' => $row['title'],
+			'namespace' => $row['namespace'],
+			'target' => $txt['sp_admin_menus_link_target_' . $row['target']],
+		);
+	}
+	$db->free_result($request);
+
+	return $items;
 }

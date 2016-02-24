@@ -145,12 +145,13 @@ function sp_integrate_admin_areas(&$admin_areas)
 					'portalmenus' => array(
 						'label' => $txt['sp_admin_menus_title'],
 						'file' => 'PortalAdminMenus.controller.php',
+						'controller' => 'ManagePortalMenus_Controller',
 						'function' => 'action_index',
 						'icon' => 'menus.png',
 						'permission' => array('sp_admin', 'sp_manage_menus'),
 						'subsections' => array(
-							'listmainitem' => array($txt['sp_admin_menus_main_item_list']),
-							'addmainitem' => array($txt['sp_admin_menus_main_item_add']),
+							//'listmainitem' => array($txt['sp_admin_menus_main_item_list']),
+							//'addmainitem' => array($txt['sp_admin_menus_main_item_add']),
 							'listcustommenu' => array($txt['sp_admin_menus_custom_menu_list']),
 							'addcustommenu' => array($txt['sp_admin_menus_custom_menu_add']),
 							'addcustomitem' => array($txt['sp_admin_menus_custom_item_add'], 'enabled' => !empty($_REQUEST['sa']) && $_REQUEST['sa'] === 'listcustomitem'),

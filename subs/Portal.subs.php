@@ -1424,7 +1424,7 @@ function sportal_get_menu_items($item_id = null, $sort = 'id_item')
 
 	$request = $db->query('','
 		SELECT
-			id_item, id_menu, namespace, title, url, target
+			id_item, id_menu, namespace, title, href, target
 		FROM {db_prefix}sp_menu_items' . (!empty($query) ? '
 			WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}',
@@ -1438,8 +1438,8 @@ function sportal_get_menu_items($item_id = null, $sort = 'id_item')
 			'id_menu' => $row['id_menu'],
 			'namespace' => $row['namespace'],
 			'title' => $row['title'],
-			'url' => $row['url'],
-			'target' => $row['target',
+			'url' => $row['href'],
+			'target' => $row['target'],
 		);
 	}
 	$db->free_result($request);

@@ -25,7 +25,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $context, $sourcedir, $txt;
+		global $context, $txt;
 
 		// Admin or at least manage menu permissions
 		if (!allowedTo('sp_admin'))
@@ -34,7 +34,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 		}
 
 		// Going to need these
-		require_once($sourcedir . '/Subs-PortalAdmin.php');
+		require_once(SUBSDIR . '/PortalAdmin.subs.php');
 		loadTemplate('PortalAdminMenus');
 
 		$subActions = array(
@@ -42,10 +42,12 @@ class ManagePortalMenus_Controller extends Action_Controller
 			'addmainitem' => array($this, 'action_sportal_admin_menus_main_item_edit'),
 			'editmainitem' => array($this, 'action_sportal_admin_menus_main_item_edit'),
 			'deletemainitem' => array($this, 'action_sportal_admin_menus_main_item_delete'),
+
 			'listcustommenu' => array($this, 'action_sportal_admin_menus_custom_menu_list'),
 			'addcustommenu' => array($this, 'action_sportal_admin_menus_custom_menu_edit'),
 			'editcustommenu' => array($this, 'action_sportal_admin_menus_custom_menu_edit'),
 			'deletecustommenu' => array($this, 'action_sportal_admin_menus_custom_menu_delete'),
+
 			'listcustomitem' => array($this, 'action_sportal_admin_menus_custom_item_list'),
 			'addcustomitem' => array($this, 'action_sportal_admin_menus_custom_item_edit'),
 			'editcustomitem' => array($this, 'action_sportal_admin_menus_custom_item_edit'),
@@ -61,8 +63,8 @@ class ManagePortalMenus_Controller extends Action_Controller
 			'help' => 'sp_MenusArea',
 			'description' => $txt['sp_admin_menus_desc'],
 			'tabs' => array(
-				'listmainitem' => array(),
-				'addmainitem' => array(),
+			//	'listmainitem' => array(),
+			//	'addmainitem' => array(),
 				'listcustommenu' => array(),
 				'addcustommenu' => array(),
 			),
@@ -105,12 +107,12 @@ class ManagePortalMenus_Controller extends Action_Controller
 			sp_remove_menu($remove_ids);
 		}
 
-		// Build the listoption array to display the menus
+		// Build the list option array to display the menus
 		$listOptions = array(
 			'id' => 'portal_menus',
 			'title' => $txt['sp_admin_menus_custom_menu_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
-			'no_items_label' => $txt['error_sp_no_menus'],
+			'no_items_label' => $txt['sp_error_no_custom_menus'],
 			'base_href' => $scripturl . '?action=admin;area=portalmenus;sa=listcustommenu;',
 			'default_sort_col' => 'name',
 			'get_items' => array(
@@ -125,7 +127,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 						'value' => $txt['sp_admin_menus_col_name'],
 					),
 					'data' => array(
-						'db' => 'cm.name',
+						'db' => 'name',
 					),
 					'sort' => array(
 						'default' => 'cm.name ASC',
@@ -147,18 +149,18 @@ class ManagePortalMenus_Controller extends Action_Controller
 				'action' => array(
 					'header' => array(
 						'value' => $txt['sp_admin_menus_col_actions'],
-						'class' => 'centertext',
+						'class' => ' grid8 centertext',
 					),
 					'data' => array(
-						'sprintf' => array('format' => '
-							<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=addcustomitem;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('add') . '</a>
-							<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=listcustomitem;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('items') . '</a>
-						 	<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=editcustommenu;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>
-							<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=deletecustommenu;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_menus_menu_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
-
+						'sprintf' => array(
+							'format' => '
+								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=addcustomitem;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('add') . '</a>
+								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=listcustomitem;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('items') . '</a>
+						 		<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=editcustommenu;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>
+								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=deletecustommenu;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp_admin_menus_menu_delete_confirm'] . '\');">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
 								'id' => true,
-							),
+							)
 						),
 						'class' => 'centertext nowrap',
 					),
@@ -177,7 +179,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 		// Set the context values
 		$context['page_title'] = $txt['sp_admin_menus_custom_menu_list'];
 		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'portal_categories';
+		$context['default_list'] = 'portal_menus';
 
 		// Create the list.
 		require_once(SUBSDIR . '/GenericList.class.php');
@@ -194,16 +196,18 @@ class ManagePortalMenus_Controller extends Action_Controller
 	}
 
 	/**
-	 * Returns an array of menus
+	 * Returns an array of menus, passthru really
 	 * Callback for createList()
 	 *
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
+	 *
+	 * @return array
 	 */
 	public function list_spLoadMenus($start, $items_per_page, $sort)
 	{
-		return sp_menu_items($start, $items_per_page, $sort);
+		return sp_custom_menu_items($start, $items_per_page, $sort);
 	}
 
 	/**
@@ -231,7 +235,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 				'name' => Util::htmlspecialchars($_POST['name'], ENT_QUOTES),
 			);
 
-			sp_add_menu($menu_info, $is_new);
+			$menu_info['id'] = sp_add_menu($menu_info, $is_new);
 
 			redirectexit('action=admin;area=portalmenus;sa=listcustommenu');
 		}
@@ -250,6 +254,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 			$context['menu'] = sportal_get_custom_menus($menu_id);
 		}
 
+		// Final template bits
 		$context['page_title'] = $is_new ? $txt['sp_admin_menus_custom_menu_add'] : $txt['sp_admin_menus_custom_menu_edit'];
 		$context['sub_template'] = 'menus_custom_menu_edit';
 	}
@@ -274,7 +279,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 	 */
 	public function action_sportal_admin_menus_custom_item_list()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $scripturl, $txt, $modSettings;
 
 		// Want to remove some items from a menu?
 		if (!empty($_POST['remove_items']) && !empty($_POST['remove']) && is_array($_POST['remove']))
@@ -298,56 +303,146 @@ class ManagePortalMenus_Controller extends Action_Controller
 			fatal_lang_error('error_sp_menu_not_found', false);
 		}
 
-// CreateList ???
-$db = database();
-		$context['columns'] = array(
-			'title' => array(
-				'width' => '45%',
-				'label' => $txt['sp_admin_menus_col_title'],
-				'class' => 'first_th',
+		// Build the list option array to display the custom items in this custom menu
+		$listOptions = array(
+			'id' => 'portal_items',
+			'title' => $txt['sp_admin_menus_custom_item_list'],
+			'items_per_page' => $modSettings['defaultMaxMessages'],
+			'no_items_label' => $txt['sp_error_no_custom_menus'],
+			'base_href' => $scripturl . '?action=admin;area=portalmenus;sa=listcustomitem;',
+			'default_sort_col' => 'title',
+			'get_items' => array(
+				'function' => array($this, 'list_sp_menu_item'),
+				'params' => array(
+					$menu_id,
+				),
 			),
-			'namespace' => array(
-				'width' => '25%',
-				'label' => $txt['sp_admin_menus_col_namespace'],
+			'get_count' => array(
+				'function' => array($this, 'list_sp_menu_item_count'),
+				'params' => array(
+					$menu_id,
+				),
 			),
-			'target' => array(
-				'width' => '15%',
-				'label' => $txt['sp_admin_menus_col_target'],
+			'columns' => array(
+				'title' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_menus_col_title'],
+					),
+					'data' => array(
+						'db' => 'title',
+					),
+					'sort' => array(
+						'default' => 'title ASC',
+						'reverse' => 'title DESC',
+					),
+				),
+				'namespace' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_menus_col_namespace'],
+					),
+					'data' => array(
+						'db' => 'namespace',
+					),
+					'sort' => array(
+						'default' => 'namespace ASC',
+						'reverse' => 'namespace DESC',
+					),
+				),
+				'target' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_menus_col_target'],
+					),
+					'data' => array(
+						'db' => 'target',
+					),
+					'sort' => array(
+						'default' => 'target',
+						'reverse' => 'target DESC',
+					),
+				),
+				'action' => array(
+					'header' => array(
+						'value' => $txt['sp_admin_menus_col_actions'],
+						'class' => ' grid8 centertext',
+					),
+					'data' => array(
+						'sprintf' => array(
+							'format' => '
+								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=editcustomitem;menu_id=%1$s;item_id=%2$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>
+								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=deletecustomitem;menu_id=%1$s;item_id=%2$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp_admin_menus_item_delete_confirm'] . '\');">' . sp_embed_image('delete') . '</a>',
+							'params' => array(
+								'menu' => true,
+								'id' => true,
+							)
+						),
+						'class' => 'centertext nowrap',
+					),
+				),
+				'check' => array(
+					'header' => array(
+						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
+						'class' => 'centertext',
+					),
+					'data' => array(
+						'function' => create_function('$row', '
+							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
+						'),
+						'class' => 'centertext',
+					),
+				),
 			),
-			'actions' => array(
-				'width' => '15%',
-				'label' => $txt['sp_admin_menus_col_actions'],
+			'form' => array(
+				'href' => $scripturl . '?action=admin;area=portalmenus;sa=listcustomitem;menu_id=' . $menu_id,
+				'include_sort' => true,
+				'include_start' => true,
+				'hidden_fields' => array(
+					$context['session_var'] => $context['session_id'],
+				),
 			),
-		);
-
-		$request = $db->query('', '
-			SELECT
-				id_item, title, namespace, target
-			FROM {db_prefix}sp_menu_items
-			WHERE id_menu = {int:menu}
-			ORDER BY title',
+			'additional_rows' => array(
 				array(
-				'menu' => $menu_id,
-			)
+					'position' => 'below_table_data',
+					'value' => '
+						<input type="submit" name="remove_items" value="' . $txt['sp_admin_items_remove'] . '" class="right_submit" />',
+				),
+			),
 		);
-		$context['items'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$context['items'][$row['id_item']] = array(
-				'id' => $row['id_item'],
-				'title' => $row['title'],
-				'namespace' => $row['namespace'],
-				'target' => $txt['sp_admin_menus_link_target_' . $row['target']],
-				'actions' => array(
-					'edit' => '<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=editcustomitem;menu_id=' . $context['menu']['id'] . ';item_id=' . $row['id_item'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
-					'delete' => '<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=deletecustomitem;menu_id=' . $context['menu']['id'] . ';item_id=' . $row['id_item'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_menus_item_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
-				)
-			);
-		}
-		$db->free_result($request);
 
-		$context['sub_template'] = 'menus_custom_item_list';
+		// Set the context values
 		$context['page_title'] = $txt['sp_admin_menus_custom_item_list'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'portal_items';
+
+		// Create the list.
+		require_once(SUBSDIR . '/GenericList.class.php');
+		createList($listOptions);
+	}
+
+	/**
+	 * Returns the number of menus in the system
+	 * Callback for createList()
+	 *
+	 * @param int $menu_id
+	 */
+	public function list_sp_menu_item_count($menu_id)
+	{
+		return sp_menu_item_count($menu_id);
+	}
+
+	/**
+	 * Returns an array of menus, passthru really
+	 * Callback for createList()
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 * @param int $menu_id
+	 *
+	 * @return array
+	 */
+	public function list_sp_menu_item($start, $items_per_page, $sort, $menu_id)
+	{
+		return sp_menu_items($start, $items_per_page, $sort, $menu_id);
 	}
 
 	/**
@@ -422,7 +517,7 @@ $db = database();
 				'id_menu' => $context['menu']['id'],
 				'namespace' => $validator->namespace,
 				'title' => $validator->title,
-				'url' => $validator->url,
+				'href' => $validator->url,
 				'target' => $validator->target,
 			);
 
@@ -446,10 +541,10 @@ $db = database();
 					case 'page':
 					case 'category':
 					case 'article':
-						$item_info['url'] = '$scripturl?' . $link_type . '=' . $link_item_id;
+						$item_info['href'] = '$scripturl?' . $link_type . '=' . $link_item_id;
 						break;
 					case 'board':
-						$item_info['url'] = '$scripturl?' . $link_type . '=' . $link_item_id . '.0';
+						$item_info['href'] = '$scripturl?' . $link_type . '=' . $link_item_id . '.0';
 						break;
 				}
 			}
@@ -500,7 +595,7 @@ $db = database();
 			'who' => $txt['who_title'],
 		);
 
-		$context['items'] = sp_block_template_helpers();
+		$context['items'] = array_merge($context['items'], sp_block_template_helpers());
 
 		$context['page_title'] = $is_new ? $txt['sp_admin_menus_custom_item_add'] : $txt['sp_admin_menus_custom_item_edit'];
 		$context['sub_template'] = 'menus_custom_item_edit';
