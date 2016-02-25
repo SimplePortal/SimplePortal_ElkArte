@@ -955,6 +955,35 @@ function sp_save_page($page_info, $is_new = false)
 }
 
 /**
+ * Checks for duplicate page names in the same namespace
+ *
+ * @param string $namespace
+ * @param int $page_id
+ */
+function sp_check_duplicate_pages($namespace, $page_id)
+{
+	$db = database();
+
+	// Can't have the same name in the same space twice
+	$result = $db->query('', '
+		SELECT id_page
+		FROM {db_prefix}sp_pages
+		WHERE namespace = {string:namespace}
+			AND id_page != {int:current}
+		LIMIT {int:limit}',
+		array(
+			'limit' => 1,
+			'namespace' => Util::htmlspecialchars($namespace, ENT_QUOTES),
+			'current' => (int) $page_id,
+		)
+	);
+	list ($has_duplicate) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $has_duplicate;
+}
+
+/**
  * Returns the total count of shoutboxes in the system
  */
 function sp_count_shoutbox()
@@ -1042,6 +1071,171 @@ function sp_delete_shoutbox($shoutbox_ids = array())
 		WHERE id_shoutbox IN ({array_int:shoutbox})',
 		array(
 			'shoutbox' => $shoutbox_ids,
+		)
+	);
+}
+
+/**
+ * Checks if a shoutbox with the same name and id already exists
+ *
+ * @param string $name
+ * @param int $shoutbox_id
+ *
+ * @return int
+ */
+function sp_check_duplicate_shoutbox($name, $shoutbox_id)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT id_shoutbox
+		FROM {db_prefix}sp_shoutboxes
+		WHERE name = {string:name}
+			AND id_shoutbox != {int:current}
+		LIMIT {int:limit}',
+		array(
+			'limit' => 1,
+			'name' => Util::htmlspecialchars($name, ENT_QUOTES),
+			'current' => (int) $shoutbox_id,
+		)
+	);
+	list ($has_duplicate) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $has_duplicate;
+}
+
+/**
+ * Add or update a shoutbox on the system
+ *
+ * @param array $shoutbox_info
+ * @param bool $is_new
+ *
+ * @return int
+ */
+function sp_edit_shoutbox($shoutbox_info, $is_new = false)
+{
+	$db = database();
+
+	// Our base shoutbox database looks like this
+	$fields = array(
+		'name' => 'string',
+		'permissions' => 'int',
+		'moderator_groups' => 'string',
+		'warning' => 'string',
+		'allowed_bbc' => 'string',
+		'height' => 'int',
+		'num_show' => 'int',
+		'num_max' => 'int',
+		'reverse' => 'int',
+		'caching' => 'int',
+		'refresh' => 'int',
+		'status' => 'int',
+	);
+
+	// Brand new, insert it
+	if ($is_new)
+	{
+		// Drop any old id, get a new one
+		unset($shoutbox_info['id']);
+
+		$db->insert('', '
+			{db_prefix}sp_shoutboxes',
+			$fields,
+			$shoutbox_info,
+			array('id_shoutbox')
+		);
+		$shoutbox_info['id'] = $db->insert_id('{db_prefix}sp_shoutboxes', 'id_shoutbox');
+	}
+	// Then editing so we update what was there
+	else
+	{
+		$update_fields = array();
+		foreach ($fields as $name => $type)
+			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+
+		$db->query('', '
+			UPDATE {db_prefix}sp_shoutboxes
+			SET ' . implode(', ', $update_fields) . '
+			WHERE id_shoutbox = {int:id}', $shoutbox_info
+		);
+	}
+
+	return $shoutbox_info['id'];
+}
+
+/**
+ * Gets a members ID from their userid or display name, used to
+ * prune a members shouts from a box
+ *
+ * @param string $member
+ */
+function sp_shoutbox_prune_member($member)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_member
+		FROM {db_prefix}members
+		WHERE member_name = {string:member}
+			OR real_name = {string:member}
+		LIMIT {int:limit}',
+		array(
+			'member' => strtr(trim(Util::htmlspecialchars($member, ENT_QUOTES)), array('\'' => '&#039;')),
+			'limit' => 1,
+		)
+	);
+	list ($member_id) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return (int) $member_id;
+}
+
+/**
+ * Removes selectively some shouts or all shouts from a shoutbox
+ *
+ * @param int $shoutbox_id
+ * @param array $where
+ * @param array $parameters
+ * @param bool $all
+ */
+function sp_prune_shoutbox($shoutbox_id, $where, $parameters, $all = false)
+{
+	$db = database();
+
+	// Do the pruning
+	$db->query('', '
+		DELETE FROM {db_prefix}sp_shouts
+		WHERE ' . implode(' AND ', $where),
+		$parameters
+	);
+
+	// If we did not get them all, how many shouts are left?
+	$total_shouts = 0;
+	if (!$all)
+	{
+		$request = $db->query('', '
+			SELECT COUNT(*)
+			FROM {db_prefix}sp_shouts
+			WHERE id_shoutbox = {int:shoutbox_id}
+			LIMIT {int:limit}',
+			array(
+				'shoutbox_id' => $shoutbox_id,
+				'limit' => 1,
+			)
+		);
+		list ($total_shouts) = $db->fetch_row($request);
+		$db->free_result($request);
+	}
+
+	// Update the shout count
+	$db->query('', '
+		UPDATE {db_prefix}sp_shoutboxes
+		SET num_shouts = {int:total_shouts}
+		WHERE id_shoutbox = {int:shoutbox_id}',
+		array(
+			'shoutbox_id' => $shoutbox_id,
+			'total_shouts' => $total_shouts,
 		)
 	);
 }
@@ -1219,6 +1413,30 @@ function sp_update_block_row($current_row, $row, $col, $decrement = true)
 			)
 		);
 	}
+}
+
+/**
+ * Update a portals block display
+ *
+ * @param int $id
+ * @param array $data
+ */
+function sp_update_block_visibility($id, $data)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}sp_blocks
+		SET
+			display = {string:display},
+			display_custom = {string:display_custom}
+		WHERE id_block = {int:id}',
+		array(
+			'id' => $id,
+			'display' => $data['display'],
+			'display_custom' => $data['display_custom'],
+		)
+	);
 }
 
 /**
