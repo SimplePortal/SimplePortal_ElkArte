@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Shoutbox controller.
@@ -50,12 +52,17 @@ class Shoutbox_Controller extends Action_Controller
 		// We need to know which shoutbox this is for/from
 		$context['SPortal']['shoutbox'] = sportal_get_shoutbox($shoutbox_id, true, true);
 
+		// Shouting but no one is there to here you
 		if (empty($context['SPortal']['shoutbox']))
 		{
 			if (isset($_REQUEST['xml']))
+			{
 				obExit(false, false);
+			}
 			else
-			fatal_lang_error('error_sp_shoutbox_not_exist', false);
+			{
+				fatal_lang_error('error_sp_shoutbox_not_exist', false);
+			}
 		}
 
 		// Any warning title for the shoutbox, like Not For Support ;P
@@ -63,7 +70,9 @@ class Shoutbox_Controller extends Action_Controller
 
 		$can_moderate = allowedTo('sp_admin') || allowedTo('sp_manage_shoutbox');
 		if (!$can_moderate && !empty($context['SPortal']['shoutbox']['moderator_groups']))
+		{
 			$can_moderate = count(array_intersect($user_info['groups'], $context['SPortal']['shoutbox']['moderator_groups'])) > 0;
+		}
 
 		// Adding a shout
 		if (!empty($_REQUEST['shout']))
@@ -81,10 +90,14 @@ class Shoutbox_Controller extends Action_Controller
 				preparsecode($_REQUEST['shout']);
 
 				if (!empty($_REQUEST['shout']))
+				{
 					sportal_create_shout($context['SPortal']['shoutbox'], $_REQUEST['shout']);
+				}
 			}
 			else
+			{
 				$context['SPortal']['shoutbox']['warning'] = $flood;
+			}
 		}
 
 		// Removing a shout, regret saying that do you :P
@@ -93,12 +106,16 @@ class Shoutbox_Controller extends Action_Controller
 			checkSession('request');
 
 			if (!$can_moderate)
+			{
 				fatal_lang_error('error_sp_cannot_shoutbox_moderate', false);
+			}
 
 			$delete = (int) $_REQUEST['delete'];
 
 			if (!empty($delete))
+			{
 				sportal_delete_shout($shoutbox_id, $delete);
+			}
 		}
 
 		// Responding to an ajax request

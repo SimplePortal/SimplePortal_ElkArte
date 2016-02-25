@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Category controller.
@@ -67,24 +69,30 @@ class Categories_Controller extends Action_Controller
 		$category_id = !empty($_REQUEST['category']) ? $_REQUEST['category'] : 0;
 
 		if (is_int($category_id))
+		{
 			$category_id = (int) $category_id;
+		}
 		else
+		{
 			$category_id = Util::htmlspecialchars($category_id, ENT_QUOTES);
+		}
 
 		$context['category'] = sportal_get_categories($category_id, true, true);
 
 		if (empty($context['category']['id']))
+		{
 			fatal_lang_error('error_sp_category_not_found', false);
+		}
 
 		// Set up the pages
 		$total_articles = sportal_get_articles_in_cat_count($context['category']['id']);
-		$per_page = min($total_articles, !empty($modSettings['sp_articles_per_page'])
-			? $modSettings['sp_articles_per_page']
-			: 10);
+		$per_page = min($total_articles, !empty($modSettings['sp_articles_per_page']) ? $modSettings['sp_articles_per_page'] : 10);
 		$start = !empty($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 
 		if ($total_articles > $per_page)
+		{
 			$context['page_index'] = constructPageIndex($context['category']['href'] . ';start=%1$d', $start, $total_articles, $per_page, true);
+		}
 
 		// Load the articles in this category
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', $context['category']['id'], $per_page, $start);

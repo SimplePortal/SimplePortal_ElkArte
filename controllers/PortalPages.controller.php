@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Pages controller.
@@ -67,7 +69,9 @@ class Pages_Controller extends Action_Controller
 		// Fetch the page
 		$context['SPortal']['page'] = sportal_get_pages($page_id, true, true);
 		if (empty($context['SPortal']['page']['id']))
+		{
 			fatal_lang_error('error_sp_page_not_found', false);
+		}
 
 		// Fetch any style associated with the page
 		$context['SPortal']['page']['style'] = sportal_select_style($context['SPortal']['page']['styles']);
