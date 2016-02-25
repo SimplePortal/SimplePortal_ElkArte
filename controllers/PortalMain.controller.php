@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Portal controller.
@@ -54,10 +56,14 @@ class Sportal_Controller extends Action_Controller
 		$context['page_title'] = $context['forum_name'];
 
 		if (isset($context['page_title_html_safe']))
+		{
 			$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title']));
+		}
 
 		if (!empty($context['standalone']))
+		{
 			setupMenuContext();
+		}
 	}
 
 	/**
@@ -76,39 +82,42 @@ class Sportal_Controller extends Action_Controller
 
 			// Set up the pages
 
-		$total_articles = sportal_get_articles_count();
-			$total = min($total_articles, !empty($modSettings['sp_articles_index_total'])
-				? $modSettings['sp_articles_index_total'] : 20);
-			$per_page = min($total, !empty($modSettings['sp_articles_index_per_page'])
-				? $modSettings['sp_articles_index_per_page'] : 5);
-		$start = !empty($_REQUEST['articles']) ? (int) $_REQUEST['articles'] : 0;
+			$total_articles = sportal_get_articles_count();
+			$total = min($total_articles, !empty($modSettings['sp_articles_index_total']) ? $modSettings['sp_articles_index_total'] : 20);
+			$per_page = min($total, !empty($modSettings['sp_articles_index_per_page']) ? $modSettings['sp_articles_index_per_page'] : 5);
+			$start = !empty($_REQUEST['articles']) ? (int) $_REQUEST['articles'] : 0;
 
-		if ($total > $per_page)
-				$context['article_page_index'] = constructPageIndex($context['portal_url'] . '?articles=%1$d', $start, $total, $per_page, true);
-
-		// If we have some articles
-			require_once(SUBSDIR . '/PortalArticle.subs.php');
-		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
-		foreach ($context['articles'] as $article)
-		{
-			if (empty($modSettings['sp_articles_length']) && ($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
+			if ($total > $per_page)
 			{
-				$article['body'] = Util::substr($article['body'], 0, $cutoff);
-				if ($article['type'] === 'bbc')
-				{
-					require_once(SUBSDIR . '/Post.subs.php');
-					preparsecode($article['body']);
-				}
+				$context['article_page_index'] = constructPageIndex($context['portal_url'] . '?articles=%1$d', $start, $total, $per_page, true);
 			}
 
-			$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
-			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
+			// If we have some articles
+			require_once(SUBSDIR . '/PortalArticle.subs.php');
+			$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
 
-			// Just want a shorter look on the index page
-			if (!empty($modSettings['sp_articles_length']))
-				$context['articles'][$article['id']]['preview'] = Util::shorten_html($context['articles'][$article['id']]['preview'], $modSettings['sp_articles_length']);
+			foreach ($context['articles'] as $article)
+			{
+				if (empty($modSettings['sp_articles_length']) && ($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
+				{
+					$article['body'] = Util::substr($article['body'], 0, $cutoff);
+					if ($article['type'] === 'bbc')
+					{
+						require_once(SUBSDIR . '/Post.subs.php');
+						preparsecode($article['body']);
+					}
+				}
+
+				$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
+				$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
+
+				// Just want a shorter look on the index page
+				if (!empty($modSettings['sp_articles_length']))
+				{
+					$context['articles'][$article['id']]['preview'] = Util::shorten_html($context['articles'][$article['id']]['preview'], $modSettings['sp_articles_length']);
+				}
+			}
 		}
-	}
 	}
 
 	/**
@@ -121,8 +130,8 @@ class Sportal_Controller extends Action_Controller
 		loadLanguage('SPortalAdmin', sp_languageSelect('SPortalAdmin'));
 
 		require_once(ADMINDIR . '/PortalAdminMain.controller.php');
-		$adminmain = new ManagePortalConfig_Controller();
-		$adminmain->action_sportal_information(false);
+		$admin_main = new ManagePortalConfig_Controller();
+		$admin_main->action_information(false);
 	}
 
 	/**
@@ -149,7 +158,9 @@ class Sportal_Controller extends Action_Controller
 
 		// Should not happen, but no guest processing
 		if ($user_info['is_guest'] || $user_info['id'] == 0)
+		{
 			return;
+		}
 
 		// Start off with nothing
 		$context['xml_data'] = array();
@@ -164,6 +175,7 @@ class Sportal_Controller extends Action_Controller
 		if (empty($validation_session))
 		{
 			$block_tree = array();
+
 			// No questions that we are rearranging the blocks
 			if (isset($_POST['order'], $_POST['received'], $_POST['moved']))
 			{
@@ -177,7 +189,7 @@ class Sportal_Controller extends Action_Controller
 				);
 
 				// What block was drag and dropped? e.g. block_2,4
-				list ($block_moved, ) = explode(',', $_POST['moved']);
+				list ($block_moved,) = explode(',', $_POST['moved']);
 				$block_moved = (int) str_replace('block_', '', $block_moved);
 
 				// Where is it going
@@ -190,7 +202,9 @@ class Sportal_Controller extends Action_Controller
 
 					// Update the moved blocks column
 					if ($block == $block_moved)
+					{
 						$column = $target_column;
+					}
 
 					$block_tree[$column][] = $block;
 				}
@@ -201,7 +215,9 @@ class Sportal_Controller extends Action_Controller
 			updateThemeOptions(array($settings['theme_id'], $user_info['id'], 'sp_block_layout', serialize($block_tree)));
 
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
+			{
 				cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 60);
+			}
 
 			$order[] = array(
 				'value' => $txt['sp-blocks_success_arrange'],
@@ -209,7 +225,9 @@ class Sportal_Controller extends Action_Controller
 		}
 		// Failed validation, tough day for you
 		else
+		{
 			$errors[] = array('value' => $txt['sp-blocks_fail_arrange']);
+		}
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
