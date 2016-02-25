@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * SimplePortal Page Administration controller class.
@@ -30,7 +32,9 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		// Admin or pages permissions required
 		if (!allowedTo('sp_admin'))
+		{
 			isAllowedTo('sp_manage_pages');
+		}
 
 		// Can't do much without our little buddys
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
@@ -56,7 +60,7 @@ class ManagePortalPages_Controller extends Action_Controller
 			'tabs' => array(
 				'list' => array(),
 				'add' => array(),
-				),
+			),
 		);
 
 		// Default to the list action
@@ -175,9 +179,10 @@ class ManagePortalPages_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							return \'<input type="checkbox" name="remove[]" value="\' . $rowData[\'id\'] . \'" class="input_check" />\';
-						'),
+						'function' => function ($row)
+						{
+							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -214,7 +219,7 @@ class ManagePortalPages_Controller extends Action_Controller
 	 */
 	public function list_spCountPages()
 	{
-	   return sp_count_pages();
+		return sp_count_pages();
 	}
 
 	/**
@@ -224,6 +229,8 @@ class ManagePortalPages_Controller extends Action_Controller
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
+	 *
+	 * @return array
 	 */
 	public function list_spLoadPages($start, $items_per_page, $sort)
 	{
@@ -278,20 +285,26 @@ class ManagePortalPages_Controller extends Action_Controller
 			);
 
 			// Fix up bbc errors before we go to the preview
-			if ($context['SPortal']['page']['type'] == 'bbc')
+			if ($context['SPortal']['page']['type'] === 'bbc')
+			{
 				preparsecode($context['SPortal']['page']['body']);
+			}
 
 			loadTemplate('PortalPages');
 
 			// Showing errors or a preview?
 			if ($pages_errors->hasErrors())
+			{
 				$context['pages_errors'] = array(
 					'errors' => $pages_errors->prepareErrors(),
 					'type' => $pages_errors->getErrorType() == 0 ? 'minor' : 'serious',
 					'title' => $txt['sp_form_errors_detected'],
 				);
+			}
 			else
+			{
 				$context['SPortal']['preview'] = true;
+			}
 		}
 		// New page, set up with a random page ID
 		elseif ($context['SPortal']['is_new'])
@@ -315,7 +328,9 @@ class ManagePortalPages_Controller extends Action_Controller
 		}
 
 		if ($context['SPortal']['page']['type'] === 'bbc')
+		{
 			$context['SPortal']['page']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($context['SPortal']['page']['body']));
+		}
 
 		// Set up the editor, values, initial state, etc
 		if ($context['SPortal']['page']['type'] !== 'bbc')
@@ -336,7 +351,9 @@ class ManagePortalPages_Controller extends Action_Controller
 		$context['post_box_name'] = $editorOptions['id'];
 
 		if (isset($temp_editor))
+		{
 			$options['wysiwyg_default'] = $temp_editor;
+		}
 
 		// Set the editor box as needed (editor or textbox, etc)
 		addInlineJavascript('
@@ -348,27 +365,29 @@ class ManagePortalPages_Controller extends Action_Controller
 		// Permissions
 		$context['SPortal']['page']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		if (empty($context['SPortal']['page']['permission_profiles']))
+		{
 			fatal_lang_error('error_sp_no_permission_profiles', false);
+		}
 
 		// Styles
 		$context['SPortal']['page']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
 		if (empty($context['SPortal']['page']['style_profiles']))
+		{
 			fatal_lang_error('error_sp_no_style_profiles', false);
+		}
 
 		// And for the template
 		$context['SPortal']['page']['style'] = sportal_select_style($context['SPortal']['page']['styles']);
 		$context['SPortal']['page']['body'] = sportal_parse_content($context['SPortal']['page']['body'], $context['SPortal']['page']['type'], 'return');
-		$context['page_title'] = $context['SPortal']['is_new']
-			? $txt['sp_admin_pages_add']
-			: $txt['sp_admin_pages_edit'];
+		$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp_admin_pages_add'] : $txt['sp_admin_pages_edit'];
 		$context['sub_template'] = 'pages_edit';
 	}
 
 	/**
 	 * Does the actual saving of the page data
 	 *
-	 * - validates the data is safe to save
-	 * - updates existing pages or creates new ones
+	 * - Validates the data is safe to save
+	 * - Updates existing pages or creates new ones
 	 */
 	private function _sportal_admin_page_edit_save()
 	{
@@ -405,7 +424,9 @@ class ManagePortalPages_Controller extends Action_Controller
 		if (!$validator->validate($_POST))
 		{
 			foreach ($validator->validation_errors() as $id => $error)
+			{
 				$pages_errors->addError($error);
+			}
 
 			$this->action_edit();
 		}
@@ -413,14 +434,20 @@ class ManagePortalPages_Controller extends Action_Controller
 		// Can't have the same name in the same space twice
 		$has_duplicate = sp_check_duplicate_pages($_POST['namespace'], $_POST['page_id']);
 		if (!empty($has_duplicate))
+		{
 			$pages_errors->addError('sp_error_page_namespace_duplicate');
+		}
 
 		// Can't have a simple numeric namespace
 		if (preg_replace('~[0-9]+~', '', $_POST['namespace']) === '')
+		{
 			$pages_errors->addError('sp_error_page_namespace_numeric');
+		}
 
 		if ($_POST['type'] === 'php' && !allowedTo('admin_forum'))
+		{
 			fatal_lang_error('cannot_admin_forum', false);
+		}
 
 		// Running some php code, then we need to validate its legit code
 		if ($_POST['type'] === 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
@@ -430,12 +457,16 @@ class ManagePortalPages_Controller extends Action_Controller
 
 			// Bad PHP code
 			if (!$validator_php->validate(array('content' => $_POST['content'])))
+			{
 				$pages_errors->addError($validator_php->validation_errors());
+			}
 		}
 
 		// None shall pass ... with errors
 		if ($pages_errors->hasErrors())
+		{
 			$this->action_edit();
+		}
 
 		// The data for the fields
 		$page_info = array(
@@ -450,7 +481,9 @@ class ManagePortalPages_Controller extends Action_Controller
 		);
 
 		if ($page_info['type'] === 'bbc')
+		{
 			preparsecode($page_info['body']);
+		}
 
 		// Save away
 		sp_save_page($page_info, $context['SPortal']['is_new']);
@@ -486,7 +519,9 @@ class ManagePortalPages_Controller extends Action_Controller
 			checkSession();
 
 			foreach ($_POST['remove'] as $index => $page_id)
+			{
 				$page_ids[(int) $index] = (int) $page_id;
+			}
 		}
 		elseif (!empty($_REQUEST['page_id']))
 		{
@@ -496,7 +531,9 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		// If we have some to remove ....
 		if (!empty($page_ids))
+		{
 			sp_delete_pages($page_ids);
+		}
 
 		redirectexit('action=admin;area=portalpages');
 	}

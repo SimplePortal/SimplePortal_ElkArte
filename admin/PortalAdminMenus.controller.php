@@ -384,9 +384,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$row', '
-							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
-						'),
+						'function' => function($row) {return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';},
 						'class' => 'centertext',
 					),
 				),
@@ -423,6 +421,8 @@ class ManagePortalMenus_Controller extends Action_Controller
 	 * Callback for createList()
 	 *
 	 * @param int $menu_id
+	 *
+	 * @return int
 	 */
 	public function list_sp_menu_item_count($menu_id)
 	{
@@ -524,6 +524,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 			// Adjust the url for the link type
 			$link_type = !empty($_POST['link_type']) ? $_POST['link_type'] : '';
 			$link_item = !empty($_POST['link_item']) ? $_POST['link_item'] : '';
+			$link_item_id = 0;
 			if ($link_type !== 'custom')
 			{
 				if (preg_match('~^\d+|[A-Za-z0-9_\-]+$~', $link_item, $match))
@@ -596,7 +597,6 @@ class ManagePortalMenus_Controller extends Action_Controller
 		);
 
 		$context['items'] = array_merge($context['items'], sp_block_template_helpers());
-
 		$context['page_title'] = $is_new ? $txt['sp_admin_menus_custom_item_add'] : $txt['sp_admin_menus_custom_item_edit'];
 		$context['sub_template'] = 'menus_custom_item_edit';
 	}

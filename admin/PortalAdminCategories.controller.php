@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * SimplePortal Category Administration controller class.
@@ -35,7 +37,9 @@ class ManagePortalCategories_Controller extends Action_Controller
 
 		// You need to be an admin or have manage permissions to change category settings
 		if (!allowedTo('sp_admin'))
+		{
 			isAllowedTo('sp_manage_categories');
+		}
 
 		// We'll need the utility functions from here.
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
@@ -58,10 +62,8 @@ class ManagePortalCategories_Controller extends Action_Controller
 			'help' => 'sp_CategoriesArea',
 			'description' => $txt['sp_admin_categories_desc'],
 			'tabs' => array(
-				'list' => array(
-				),
-				'add' => array(
-				),
+				'list' => array(),
+				'add' => array(),
 			),
 		);
 
@@ -154,7 +156,8 @@ class ManagePortalCategories_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=portalcategories;sa=edit;category_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
+							'format' => '
+								<a href="?action=admin;area=portalcategories;sa=edit;category_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
 								<a href="?action=admin;area=portalcategories;sa=delete;category_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_categories_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
 								'id' => true,
@@ -169,9 +172,10 @@ class ManagePortalCategories_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$row', '
-							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
-						'),
+						'function' => function ($row)
+						{
+							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -208,7 +212,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 	 */
 	public function list_spCountCategories()
 	{
-	   return sp_count_categories();
+		return sp_count_categories();
 	}
 
 	/**
@@ -218,6 +222,8 @@ class ManagePortalCategories_Controller extends Action_Controller
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
+	 *
+	 * @return array
 	 */
 	public function list_spLoadCategories($start, $items_per_page, $sort)
 	{
@@ -248,19 +254,29 @@ class ManagePortalCategories_Controller extends Action_Controller
 			$description = isset($_POST['description']) ? Util::htmlspecialchars($_POST['description'], ENT_QUOTES) : '';
 
 			if (empty($name))
+			{
 				fatal_lang_error('sp_error_category_name_empty', false);
+			}
 
 			if (empty($namespace))
+			{
 				fatal_lang_error('sp_error_category_namespace_empty', false);
+			}
 
 			if (sp_check_duplicate_category($current, $namespace))
+			{
 				fatal_lang_error('sp_error_category_namespace_duplicate', false);
+			}
 
 			if (preg_match('~[^A-Za-z0-9_]+~', $namespace) != 0)
+			{
 				fatal_lang_error('sp_error_category_namespace_invalid_chars', false);
+			}
 
 			if (preg_replace('~[0-9]+~', '', $namespace) === '')
+			{
 				fatal_lang_error('sp_error_category_namespace_numeric', false);
+			}
 
 			$category_info = array(
 				'id' => (int) $_POST['category_id'],
@@ -328,7 +344,9 @@ class ManagePortalCategories_Controller extends Action_Controller
 			checkSession();
 
 			foreach ($_POST['remove'] as $index => $category_id)
+			{
 				$category_ids[(int) $index] = (int) $category_id;
+			}
 		}
 		elseif (!empty($_REQUEST['category_id']))
 		{
@@ -338,7 +356,9 @@ class ManagePortalCategories_Controller extends Action_Controller
 
 		// If we have some to remove
 		if (!empty($category_ids))
+		{
 			sp_delete_categories($category_ids);
+		}
 
 		redirectexit('action=admin;area=portalcategories');
 	}

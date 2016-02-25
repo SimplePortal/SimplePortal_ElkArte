@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
@@ -250,7 +250,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'force_view' => 0,
 				'parameters' => !empty($start_parameters) ? $start_parameters : array(),
 				'options' => $block->parameters(),
-				'list_blocks' => !empty($_POST['block_column']) ? getBlockInfo($_POST['block_column']) : array(),
+				'list_blocks' => !empty($_POST['block_column']) ? getBlockInfo((int) $_POST['block_column']) : array(),
 			);
 		}
 		// Saving the block to one of the zones
@@ -347,7 +347,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		if (!empty($_POST['selected_type']) || !empty($_POST['preview_block']) || (!$context['SPortal']['is_new'] && empty($_POST['add_block'])))
 		{
 			// Only the admin can use PHP blocks
-			if ($context['SPortal']['block']['type'] == 'sp_php' && !allowedTo('admin_forum'))
+			if ($context['SPortal']['block']['type'] === 'sp_php' && !allowedTo('admin_forum'))
 				fatal_lang_error('cannot_admin_forum', false);
 
 			loadLanguage('SPortalHelp');
@@ -374,7 +374,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			foreach ($context['SPortal']['block']['options'] as $name => $type)
 			{
 				// Selectable Boards :D
-				if ($type == 'board_select' || $type == 'boards')
+				if ($type === 'board_select' || $type === 'boards')
 				{
 					if (empty($boards))
 					{
@@ -429,7 +429,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 							{
 								// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
 								if ($i % 4 == 0)
-									$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', create_function('$m', 'return "[html]" . preg_replace(\'~<br\s?/?>~i\', \'&lt;br /&gt;<br />\', "$m[1]") . "[/html]";'), $parts[$i]);
+									$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', function($m) {return '[html]' . preg_replace('~<br\s?/?>~i', '&lt;br /&gt;<br />', $m[1]) . '[/html]';}, $parts[$i]);
 							}
 							$form_message = implode('', $parts);
 						}
@@ -468,14 +468,14 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			checkSession();
 
 			// Only the admin can do php here
-			if ($_POST['block_type'] == 'sp_php' && !allowedTo('admin_forum'))
+			if ($_POST['block_type'] === 'sp_php' && !allowedTo('admin_forum'))
 				fatal_lang_error('cannot_admin_forum', false);
 
 			// Make sure the block name is something safe
-			if (!isset($_POST['block_name']) || Util::htmltrim(Util::htmlspecialchars($_POST['block_name']), ENT_QUOTES) === '')
+			if (!isset($_POST['block_name']) || Util::htmltrim(Util::htmlspecialchars($_POST['block_name'], ENT_QUOTES)) === '')
 				fatal_lang_error('error_sp_name_empty', false);
 
-			if ($_POST['block_type'] == 'sp_php' && !empty($_POST['parameters']['content']) && empty($modSettings['sp_disable_php_validation']))
+			if ($_POST['block_type'] === 'sp_php' && !empty($_POST['parameters']['content']) && empty($modSettings['sp_disable_php_validation']))
 			{
 				require_once(SUBSDIR . '/DataValidator.class.php');
 
@@ -515,7 +515,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				else
 					sp_update_block_row($current_row, $row, $_POST['block_column'], false);
 			}
-			elseif (!empty($_POST['placement']) && $_POST['placement'] == 'nochange')
+			elseif (!empty($_POST['placement']) && $_POST['placement'] === 'nochange')
 				$row = 0;
 			else
 			{
@@ -608,7 +608,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			if (!empty($_REQUEST['bbc_' . $_POST['bbc_name'] . '_mode']) && isset($_POST['parameters'][$_POST['bbc_name']]))
 			{
 				require_once(SUBSDIR . '/Html2BBC.class.php');
-				$bbc_converter = new Convert_BBC($_POST['parameters'][$_POST['bbc_name']]);
+				$bbc_converter = new Html_2_BBC($_POST['parameters'][$_POST['bbc_name']]);
 				$_POST['parameters'][$_POST['bbc_name']] = $bbc_converter->get_bbc();
 
 				// We need to unhtml it now as it gets done shortly.
@@ -643,13 +643,13 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			// Store now the correct and fixed value ;)
 			$_POST['parameters'][$name] = $value;
 		}
-		elseif ($type == 'boards' || $type == 'board_select')
+		elseif ($type === 'boards' || $type === 'board_select')
 			$_POST['parameters'][$name] = is_array($_POST['parameters'][$name]) ? implode('|', $_POST['parameters'][$name]) : $_POST['parameters'][$name];
-		elseif ($type == 'int' || $type == 'select')
+		elseif ($type === 'int' || $type === 'select')
 			$_POST['parameters'][$name] = (int) $_POST['parameters'][$name];
-		elseif ($type == 'text' || $type == 'textarea' || is_array($type))
+		elseif ($type === 'text' || $type === 'textarea' || is_array($type))
 			$_POST['parameters'][$name] = Util::htmlspecialchars($_POST['parameters'][$name], ENT_QUOTES);
-		elseif ($type == 'check')
+		elseif ($type === 'check')
 			$_POST['parameters'][$name] = !empty($_POST['parameters'][$name]) ? 1 : 0;
 	}
 
@@ -847,7 +847,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		if (!allowedTo('admin_forum'))
 		{
 			$context['SPortal']['block'] = current(getBlockInfo(null, $_REQUEST['block_id']));
-			if ($context['SPortal']['block']['type'] == 'sp_php' && !allowedTo('admin_forum'))
+			if ($context['SPortal']['block']['type'] === 'sp_php' && !allowedTo('admin_forum'))
 				fatal_lang_error('cannot_admin_forum', false);
 		}
 

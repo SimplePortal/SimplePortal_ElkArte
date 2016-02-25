@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
@@ -200,7 +200,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=portalarticles;sa=edit;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
+							'format' => '
+								<a href="?action=admin;area=portalarticles;sa=edit;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
 								<a href="?action=admin;area=portalarticles;sa=delete;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_articles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
 								'id' => true,
@@ -215,9 +216,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$row', '
-							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
-						'),
+						'function' => function($row)
+						{
+							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -264,6 +266,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
+	 *
+	 * @return array
 	 */
 	public function list_spLoadArticles($start, $items_per_page, $sort)
 	{
@@ -287,11 +291,11 @@ class ManagePortalArticles_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Editor.subs.php');
 
 		// Convert this to BBC?
-		if (!empty($_REQUEST['content_mode']) && $_POST['type'] == 'bbc')
+		if (!empty($_REQUEST['content_mode']) && $_POST['type'] === 'bbc')
 		{
 			$convert = $_REQUEST['content'];
 			require_once(SUBSDIR . '/Html2BBC.class.php');
-			$bbc_converter = new Convert_BBC($convert);
+			$bbc_converter = new Html_2_BBC($convert);
 			$convert = $bbc_converter->get_bbc();
 			$convert = un_htmlspecialchars($convert);
 			$_POST['content'] = $convert;
@@ -310,7 +314,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			$context['article'] = $this->_sportal_admin_article_preview();
 
 			// Fix any bbc errors they have created
-			if ($context['article']['type'] == 'bbc')
+			if ($context['article']['type'] === 'bbc')
 				preparsecode($context['article']['body']);
 
 			loadTemplate('PortalArticles');

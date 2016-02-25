@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * SimplePortal Shoutbox Administration controller class.
@@ -40,7 +42,9 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 		// You must have admin or shoutbox privileges to be here
 		if (!allowedTo('sp_admin'))
+		{
 			isAllowedTo('sp_manage_shoutbox');
+		}
 
 		loadTemplate('PortalAdminShoutbox');
 
@@ -65,7 +69,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			'tabs' => array(
 				'list' => array(),
 				'add' => array(),
-				),
+			),
 		);
 
 		// Default the action to list if none or no valid option is given
@@ -162,7 +166,8 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=portalshoutbox;sa=edit;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="m">' . sp_embed_image('modify') . '</a>&nbsp;
+							'format' => '
+								<a href="?action=admin;area=portalshoutbox;sa=edit;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="m">' . sp_embed_image('modify') . '</a>&nbsp;
 								<a href="?action=admin;area=portalshoutbox;sa=prune;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="p">' . sp_embed_image('bin') . '</a>&nbsp;
 								<a href="?action=admin;area=portalshoutbox;sa=delete;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_shoutbox_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
@@ -178,9 +183,10 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => create_function('$row', '
-							return \'<input type="checkbox" name="remove[]" value="\' . $row[\'id\'] . \'" class="input_check" />\';
-						'),
+						'function' => function($row)
+						{
+							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -217,7 +223,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	 */
 	public function list_spCountShoutbox()
 	{
-	   return sp_count_shoutbox();
+		return sp_count_shoutbox();
 	}
 
 	/**
@@ -247,32 +253,44 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			checkSession();
 
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
+			{
 				fatal_lang_error('sp_error_shoutbox_name_empty', false);
+			}
 
 			// No two the same
 			$has_duplicate = sp_check_duplicate_shoutbox($_POST['name'], $_POST['shoutbox_id']);
 			if (!empty($has_duplicate))
+			{
 				fatal_lang_error('sp_error_shoutbox_name_duplicate', false);
+			}
 
 			if (isset($_POST['moderator_groups']) && is_array($_POST['moderator_groups']) && count($_POST['moderator_groups']) > 0)
 			{
 				foreach ($_POST['moderator_groups'] as $id => $group)
+				{
 					$_POST['moderator_groups'][$id] = (int) $group;
+				}
 
 				$_POST['moderator_groups'] = implode(',', $_POST['moderator_groups']);
 			}
 			else
+			{
 				$_POST['moderator_groups'] = '';
+			}
 
 			if (!empty($_POST['allowed_bbc']) && is_array($_POST['allowed_bbc']))
 			{
 				foreach ($_POST['allowed_bbc'] as $id => $tag)
+				{
 					$_POST['allowed_bbc'][$id] = Util::htmlspecialchars($tag, ENT_QUOTES);
+				}
 
 				$_POST['allowed_bbc'] = implode(',', $_POST['allowed_bbc']);
 			}
 			else
+			{
 				$_POST['allowed_bbc'] = '';
+			}
 
 			$shoutbox_info = array(
 				'id' => (int) $_POST['shoutbox_id'],
@@ -296,9 +314,13 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			sportal_update_shoutbox($shoutbox_info['id']);
 
 			if ($context['SPortal']['is_new'] && (allowedTo(array('sp_admin', 'sp_manage_blocks'))))
+			{
 				redirectexit('action=admin;area=portalshoutbox;sa=blockredirect;shoutbox=' . $shoutbox_info['id']);
+			}
 			else
+			{
 				redirectexit('action=admin;area=portalshoutbox');
+			}
 		}
 
 		if ($context['SPortal']['is_new'])
@@ -331,7 +353,9 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 		sp_loadMemberGroups($context['SPortal']['shoutbox']['moderator_groups'], 'moderator', 'moderator_groups');
 
 		if (empty($context['SPortal']['shoutbox']['permission_profiles']))
+		{
 			fatal_lang_error('error_sp_no_permission_profiles', false);
+		}
 
 		// We only allow some BBC in the shoutbox
 		$context['allowed_bbc'] = array(
@@ -357,14 +381,20 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 		// Remove the ones the admin does not allow
 		$disabled_tags = array();
 		if (!empty($modSettings['disabledBBC']))
+		{
 			$disabled_tags = explode(',', $modSettings['disabledBBC']);
+		}
 		if (empty($modSettings['enableEmbeddedFlash']))
+		{
 			$disabled_tags[] = 'flash';
+		}
 
 		foreach ($disabled_tags as $tag)
 		{
 			if ($tag == 'list')
+			{
 				$context['disabled_tags']['orderlist'] = true;
+			}
 
 			$context['disabled_tags'][trim($tag)] = true;
 		}
@@ -386,7 +416,9 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 		$context['shoutbox'] = sportal_get_shoutbox($shoutbox_id);
 
 		if (empty($context['shoutbox']))
+		{
 			fatal_lang_error('error_sp_shoutbox_not_exist', false);
+		}
 
 		// Time to remove some chitta-chatta
 		if (!empty($_POST['submit']))
@@ -444,7 +476,9 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			checkSession();
 
 			foreach ($_POST['remove'] as $index => $page_id)
+			{
 				$shoutbox_ids[(int) $index] = (int) $page_id;
+			}
 		}
 		elseif (!empty($_REQUEST['shoutbox_id']))
 		{
@@ -454,7 +488,9 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 		// If we have some to remove ....
 		if (!empty($shoutbox_ids))
+		{
 			sp_delete_shoutbox($shoutbox_ids);
+		}
 
 		redirectexit('action=admin;area=portalshoutbox');
 	}
@@ -479,7 +515,9 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 		global $context, $scripturl, $txt;
 
 		if (!allowedTo('sp_admin'))
+		{
 			isAllowedTo('sp_manage_blocks');
+		}
 
 		$context['page_title'] = $txt['sp_admin_shoutbox_add'];
 		$context['redirect_message'] = sprintf($txt['sp_admin_shoutbox_block_redirect_message'], $scripturl . '?action=admin;area=portalblocks;sa=add;selected_type=sp_shoutbox;parameters[]=shoutbox;shoutbox=' . $_GET['shoutbox'], $scripturl . '?action=admin;area=portalshoutbox');

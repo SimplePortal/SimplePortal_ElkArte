@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * SimplePortal Configuration controller class.
@@ -47,7 +49,9 @@ class ManagePortalConfig_Controller extends Action_Controller
 
 		// You need to be an admin or have manage setting permissions to change anything
 		if (!allowedTo('sp_admin'))
+		{
 			isAllowedTo('sp_manage_settings');
+		}
 
 		// Some helpful friends
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
@@ -94,7 +98,6 @@ class ManagePortalConfig_Controller extends Action_Controller
 		require_once(ADMINDIR . '/ManagePermissions.controller.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
 		require_once(SUBSDIR . '/SettingsForm.class.php');
-
 
 		// Initialize the form
 		$this->_initGeneralSettingsForm();
@@ -171,22 +174,34 @@ class ManagePortalConfig_Controller extends Action_Controller
 				if (!empty($_POST[$pos . 'width']))
 				{
 					if (stripos($_POST[$pos . 'width'], 'px') !== false)
+					{
 						$suffix = 'px';
+					}
 					elseif (strpos($_POST[$pos . 'width'], '%') !== false)
+					{
 						$suffix = '%';
+					}
 					else
+					{
 						$suffix = '';
+					}
 
 					preg_match_all('/(?:([0-9]+)|.)/i', $_POST[$pos . 'width'], $matches);
 
 					$number = (int) implode('', $matches[1]);
 					if (!empty($number) && $number > 0)
+					{
 						$_POST[$pos . 'width'] = $number . $suffix;
+					}
 					else
+					{
 						$_POST[$pos . 'width'] = '';
+					}
 				}
 				else
+				{
 					$_POST[$pos . 'width'] = '';
+				}
 			}
 
 			unset($config_vars[7]);
@@ -381,13 +396,11 @@ class ManagePortalConfig_Controller extends Action_Controller
 					),
 					array(
 						'title' => $txt['sp-info_groups_founder'],
-						'members' => array(
-						),
+						'members' => array(),
 					),
 					array(
 						'title' => $txt['sp-info_groups_original_pm'],
-						'members' => array(
-						),
+						'members' => array(),
 					),
 					array(
 						'title' => $txt['sp-info_fam_fam'],
@@ -416,7 +429,9 @@ class ManagePortalConfig_Controller extends Action_Controller
 			if ($manager_ids)
 			{
 				foreach ($manager_ids as $member)
+				{
 					$context['sp_managers'][] = '<a href="' . $scripturl . '?action=profile;u=' . $user_profile[$member]['id_member'] . '">' . $user_profile[$member]['real_name'] . '</a>';
+				}
 			}
 		}
 
