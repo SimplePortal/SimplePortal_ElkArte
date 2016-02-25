@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Article controller.
@@ -52,7 +54,9 @@ class Article_Controller extends Action_Controller
 		$start = !empty($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 
 		if ($total_articles > $per_page)
+		{
 			$context['page_index'] = constructPageIndex($scripturl . '?action=portal;sa=articles;start=%1$d', $start, $total_articles, $per_page, true);
+		}
 
 		// Fetch the article page
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
@@ -90,32 +94,38 @@ class Article_Controller extends Action_Controller
 	 */
 	public function action_sportal_article()
 	{
-		global $context, $scripturl, $user_info;
+		global $context, $scripturl, $user_info, $modSettings;
 
 		$article_id = !empty($_REQUEST['article']) ? $_REQUEST['article'] : 0;
 
 		if (is_int($article_id))
+		{
 			$article_id = (int) $article_id;
+		}
 		else
+		{
 			$article_id = Util::htmlspecialchars($article_id, ENT_QUOTES);
+		}
 
 		// Fetch and render the article
 		$context['article'] = sportal_get_articles($article_id, true, true);
 		if (empty($context['article']['id']))
+		{
 			fatal_lang_error('error_sp_article_not_found', false);
+		}
 
 		$context['article']['style'] = sportal_select_style($context['article']['styles']);
 		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
 
 		// Set up for the comment pagination
 		$total_comments = sportal_get_article_comment_count($context['article']['id']);
-		$per_page = min($total_comments, !empty($modSettings['sp_articles_comments_per_page'])
-			? $modSettings['sp_articles_comments_per_page']
-			: 20);
+		$per_page = min($total_comments, !empty($modSettings['sp_articles_comments_per_page']) ? $modSettings['sp_articles_comments_per_page'] : 20);
 		$start = !empty($_REQUEST['comments']) ? (int) $_REQUEST['comments'] : 0;
 
 		if ($total_comments > $per_page)
+		{
 			$context['page_index'] = constructPageIndex($scripturl . '?article=' . $context['article']['article_id'] . ';comments=%1$d', $start, $total_comments, $per_page, true);
+		}
 
 		// Load in all the comments for the article
 		$context['article']['comments'] = sportal_get_comments($context['article']['id'], $per_page, $start);
@@ -142,19 +152,23 @@ class Article_Controller extends Action_Controller
 			{
 				if (!empty($_POST['comment']))
 				{
-					list ($comment_id, $author_id, ) = sportal_fetch_article_comment((int) $_POST['comment']);
+					list ($comment_id, $author_id,) = sportal_fetch_article_comment((int) $_POST['comment']);
 					if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
+					{
 						fatal_lang_error('error_sp_cannot_comment_modify', false);
+					}
 
 					sportal_modify_article_comment($comment_id, $body);
 				}
 				else
+				{
 					sportal_create_article_comment($context['article']['id'], $body);
+				}
 			}
 
 			// Set a anchor
 			$anchor = '#comment' . (!empty($comment_id) ? $comment_id : ($total_comments > 0 ? $total_comments - 1 : 1));
-			redirectexit('article=' . $context['article']['article_id']. $anchor);
+			redirectexit('article=' . $context['article']['article_id'] . $anchor);
 		}
 
 		// Prepare to edit an existing comment
@@ -164,7 +178,9 @@ class Article_Controller extends Action_Controller
 
 			list ($comment_id, $author_id, $body) = sportal_fetch_article_comment((int) $_GET['modify']);
 			if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
+			{
 				fatal_lang_error('error_sp_cannot_comment_modify', false);
+			}
 
 			require_once(SUBSDIR . '/Post.subs.php');
 
@@ -180,7 +196,9 @@ class Article_Controller extends Action_Controller
 			checkSession('get');
 
 			if (sportal_delete_article_comment((int) $_GET['delete']) === false)
+			{
 				fatal_lang_error('error_sp_cannot_comment_delete', false);
+			}
 
 			redirectexit('article=' . $context['article']['article_id']);
 		}
