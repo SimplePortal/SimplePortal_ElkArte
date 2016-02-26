@@ -18,7 +18,7 @@ if (!defined('ELK'))
  * Staff Block, show the list of forum staff members
  *
  * @param mixed[] $parameters
- *        'lmod' => set to include local moderators as well
+ *   'lmod' => set to include local moderators as well
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -50,7 +50,7 @@ class Staff_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $scripturl, $color_profile;
+		global $scripturl;
 
 		require_once(SUBSDIR . '/Members.subs.php');
 
@@ -65,7 +65,9 @@ class Staff_Block extends SP_Abstract_Block
 			);
 			$local_mods = array();
 			while ($row = $this->_db->fetch_assoc($request))
+			{
 				$local_mods[$row['id_member']] = $row['id_member'];
+			}
 			$this->_db->free_result($request);
 
 			if (count($local_mods) > 10)
@@ -135,11 +137,16 @@ class Staff_Block extends SP_Abstract_Block
 		}
 		$this->_db->free_result($request);
 
+		// Get this in an order or importance
 		ksort($this->data['staff_list']);
 		$this->data['staff_count'] = count($this->data['staff_list']);
 		$this->data['icons'] = array(1 => 'admin', 'gmod', 'lmod');
 
+		// Color ID's
 		$this->_color_ids();
+
+		// How we will display the data
+		$this->setTemplate('template_sp_staff');
 	}
 
 	/**

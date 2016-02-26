@@ -90,6 +90,9 @@ class Calendar_Block extends SP_Abstract_Block
 		{
 			$this->data['calendar_title'] = $title_text;
 		}
+
+		// How we will display the data
+		$this->setTemplate('template_sp_calendar');
 	}
 }
 

@@ -203,7 +203,7 @@ function template_sp_rssFeed_error($data)
  */
 function template_sp_rssFeed($data)
 {
-	if ($this->data['show_content'])
+	if ($data['show_content'])
 	{
 		echo '
 		<div class="sp_rss_flow">
@@ -218,6 +218,7 @@ function template_sp_rssFeed($data)
 					<strong>', $item['link'], '</strong>', ($data['show_date'] && !empty($item['date']) ? ' - ' . $item['date'] : ''), '
 				</li>';
 			}
+
 			echo '
 				<li', empty($item['is_last']) ? ' class="sp_list_divider"' : '', '>', $item['content'], '</li>';
 		}
