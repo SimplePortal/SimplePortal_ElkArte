@@ -285,7 +285,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			sportal_init_headers();
 			loadTemplate('Portal');
 
-			$type_parameters = $_POST['block_type'](array(), 0, true);
+			$block = sp_instantiate_block($_POST['block_type']);
+			$type_parameters = $block->parameters();
 
 			if (!empty($_POST['parameters']) && is_array($_POST['parameters']) && !empty($type_parameters))
 			{
@@ -297,8 +298,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			}
 			else
 				$_POST['parameters'] = array();
-
-			$block = sp_instantiate_block($_POST['block_type']);
 
 			// Create all the information we know about this block
 			$context['SPortal']['block'] = array(
@@ -523,7 +522,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				$row = sp_block_nextrow($_POST['block_column'], $block_id);
 			}
 
-			$type_parameters = $_POST['block_type'](array(), 0, true);
+			$block = sp_instantiate_block($_POST['block_type']);
+			$type_parameters = $block->parameters();
 
 			if (!empty($_POST['parameters']) && is_array($_POST['parameters']) && !empty($type_parameters))
 			{
