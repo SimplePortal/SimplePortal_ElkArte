@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Initializes the portal, outputs all the blocks as needed
@@ -21,13 +23,17 @@ function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings, $maintenance, $sportal_version;
 
-	$sportal_version = '1.1.0 Beta 1';
+	$sportal_version = '1.0.0 Beta 2';
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
+	{
 		return;
+	}
 
 	if ((isset($_REQUEST['xml']) || isset($_REQUEST['api'])) && ((isset($_REQUEST['action']) && $_REQUEST['action'] !== 'shoutbox')))
+	{
 		return;
+	}
 
 	// Not running standalone then we need to load in some template information
 	if (!$standalone)
@@ -37,17 +43,25 @@ function sportal_init($standalone = false)
 
 		// rtl css as well?
 		if (!empty($context['right_to_left']))
+		{
 			loadCSSFile('portal_rtl.css');
+		}
 
 		if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], array('admin')))
+		{
 			loadLanguage('SPortalAdmin');
+		}
 
 		if (!isset($settings['sp_images_url']))
 		{
 			if (file_exists($settings['theme_dir'] . '/images/sp'))
+			{
 				$settings['sp_images_url'] = $settings['theme_url'] . '/images/sp';
+			}
 			else
+			{
 				$settings['sp_images_url'] = $settings['default_theme_url'] . '/images/sp';
+			}
 		}
 	}
 
@@ -60,7 +74,9 @@ function sportal_init($standalone = false)
 		{
 			$get_string = '';
 			foreach ($_GET as $get_var => $get_value)
+			{
 				$get_string .= $get_var . (!empty($get_value) ? '=' . $get_value : '') . ';';
+			}
 
 			redirectexit(substr($get_string, 0, -1));
 		}
@@ -75,43 +91,61 @@ function sportal_init($standalone = false)
 
 		// Not running via ssi then we need to get SSI for its functions
 		if (ELK !== 'SSI')
+		{
 			require_once(BOARDDIR . '/SSI.php');
+		}
 
 		// Portal specific templates and language
 		loadTemplate('Portal');
 		loadLanguage('SPortal');
 
 		if (!empty($modSettings['sp_maintenance']) && !allowedTo('sp_admin'))
+		{
 			$modSettings['sp_portal_mode'] = 0;
+		}
 
 		if (empty($modSettings['sp_standalone_url']))
+		{
 			$modSettings['sp_standalone_url'] = '';
+		}
 
 		if ($modSettings['sp_portal_mode'] == 3)
+		{
 			$context += array(
 				'portal_url' => $modSettings['sp_standalone_url'],
 				'page_title' => $context['forum_name'],
 			);
+		}
 		else
+		{
 			$context += array(
 				'portal_url' => $scripturl,
 			);
+		}
 
 		if ($modSettings['sp_portal_mode'] == 1)
+		{
 			$context['linktree'][0] = array(
 				'url' => $scripturl . '?action=forum',
 				'name' => $context['forum_name'],
 			);
+		}
 
 		if (!empty($context['linktree']) && $modSettings['sp_portal_mode'] == 1)
 		{
 			foreach ($context['linktree'] as $key => $tree)
+			{
 				if (strpos($tree['url'], '#c') !== false && strpos($tree['url'], 'action=forum#c') === false)
+				{
 					$context['linktree'][$key]['url'] = str_replace('#c', '?action=forum#c', $tree['url']);
+				}
+			}
 		}
 	}
 	else
+	{
 		$_GET['action'] = 'portal';
+	}
 
 	// Load the headers if necessary.
 	sportal_init_headers();
@@ -128,7 +162,9 @@ function sportal_init($standalone = false)
 
 	// Add the portal template
 	if (!Template_Layers::getInstance()->hasLayers(true) && !in_array('portal', Template_Layers::getInstance()->getLayers()))
+	{
 		Template_Layers::getInstance()->add('portal');
+	}
 }
 
 /**
@@ -141,16 +177,22 @@ function sportal_init_headers()
 
 	// If already loaded just return
 	if (!empty($initialized))
+	{
 		return $initialized;
+	}
 
 	// Generate a safe scripturl
 	$safe_scripturl = $scripturl;
 	$current_request = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] : $_SERVER['HTTP_HOST'];
 
 	if (strpos($scripturl, 'www.') !== false && strpos($current_request, 'www.') === false)
+	{
 		$safe_scripturl = str_replace('://www.', '://', $scripturl);
+	}
 	elseif (strpos($scripturl, 'www.') === false && strpos($current_request, 'www.') !== false)
+	{
 		$safe_scripturl = str_replace('://', '://www.', $scripturl);
+	}
 
 	// The shoutbox may fail to function in certain cases without using a safe scripturl
 	addJavascriptVar(array('sp_script_url' => '\'' . $safe_scripturl . '\''));
@@ -166,6 +208,7 @@ function sportal_init_headers()
 
 		// Javascript to allow D&D ordering of the front page blocks, not for guests
 		if (empty($_REQUEST['action']) && !($user_info['is_guest'] || $user_info['id'] == 0))
+		{
 			$javascript .= '
 				// Set up our sortable call
 				$().elkSortable({
@@ -182,6 +225,7 @@ function sportal_init_headers()
 					placeholder: "ui-state-highlight",
 					axis: "",
 				});';
+		}
 	}
 
 	if ($modSettings['sp_resize_images'])
@@ -193,7 +237,9 @@ function sportal_init_headers()
 
 	// Let the template know we have some inline JS to display
 	if (!empty($javascript))
+	{
 		addInlineJavascript($javascript, true);
+	}
 
 	// Mark it as done so we don't do it again
 	$initialized = true;
@@ -216,12 +262,18 @@ function sportal_load_permissions()
 		$result = false;
 
 		if (!empty($profile['groups_denied']) && count(array_intersect($user_info['groups'], $profile['groups_denied'])) > 0)
+		{
 			$result = false;
+		}
 		elseif (!empty($profile['groups_allowed']) && count(array_intersect($user_info['groups'], $profile['groups_allowed'])) > 0)
+		{
 			$result = true;
+		}
 
 		if ($result)
+		{
 			$allowed[] = $profile['id'];
+		}
 	}
 
 	$context['SPortal']['permissions'] = array(
@@ -280,18 +332,24 @@ function sportal_load_blocks()
 
 		// If some bad arrangement data found its way in
 		if ($layout === false)
+		{
 			resetMemberLayout();
+		}
 		else
 		{
 			foreach ($layout as $id => $column)
 			{
 				if (empty($column) || empty($id) || !$context['SPortal']['sides'][$id]['active'])
+				{
 					continue;
+				}
 
 				foreach ($column as $item)
 				{
 					if (empty($blocks[$item]))
+					{
 						continue;
+					}
 
 					$blocks[$item]['style'] = sportal_parse_style('explode', $blocks[$item]['style'], true);
 					$context['SPortal']['blocks'][$id][] = $blocks[$item];
@@ -304,13 +362,17 @@ function sportal_load_blocks()
 	}
 
 	if (!isset($context['SPortal']['blocks']))
+	{
 		$context['SPortal']['blocks'] = array();
+	}
 
 	// For each active block, instantiate it and do the Block->setup()
 	foreach ($blocks as $block)
 	{
 		if (!$context['SPortal']['sides'][$block['column']]['active'] || empty($block['type']))
+		{
 			continue;
+		}
 
 		$block['style'] = sportal_select_style($block['styles']);
 
@@ -321,14 +383,16 @@ function sportal_load_blocks()
 		$context['SPortal']['blocks'][$block['column']][] = $block;
 	}
 
-	foreach($context['SPortal']['sides'] as $side)
+	foreach ($context['SPortal']['sides'] as $side)
 	{
 		if (empty($context['SPortal']['blocks'][$side['id']]))
+		{
 			$context['SPortal']['sides'][$side['id']]['active'] = false;
+		}
 
 		$context['SPortal']['sides'][$side['id']]['collapsed'] = $context['user']['is_guest']
- ? !empty($_COOKIE['sp_' . $side['name']])
- : !empty($options['sp_' . $side['name']]);
+			? !empty($_COOKIE['sp_' . $side['name']])
+			: !empty($options['sp_' . $side['name']]);
 	}
 }
 
@@ -342,11 +406,14 @@ function sp_instantiate_block($name)
 	static $instances = array(), $db = null;
 
 	if ($db === null)
+	{
 		$db = database();
+	}
 
 	if (!isset($instances[$name]))
 	{
 		require_once(SUBSDIR . '/spblocks/' . str_replace('_', '', $name) . '.block.php');
+
 		$class = $name . '_Block';
 		$instances[$name] = new $class($db);
 	}
@@ -357,7 +424,7 @@ function sp_instantiate_block($name)
 }
 
 /**
- * If a member has arranged blocks in some bizare fashion, this will reset the layout to
+ * If a member has arranged blocks in some bizarre fashion, this will reset the layout to
  * the default one
  */
 function resetMemberLayout()
@@ -390,6 +457,8 @@ function resetMemberLayout()
  * @param boolean|null $state
  * @param boolean|null $show
  * @param boolean|null $permission
+ *
+ * @return array of block values
  */
 function getBlockInfo($column_id = null, $block_id = null, $state = null, $show = null, $permission = null)
 {
@@ -412,7 +481,9 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 	}
 
 	if (!empty($permission))
+	{
 		$query[] = sprintf($context['SPortal']['permissions']['query'], 'spb.permissions');
+	}
 
 	if (!empty($state))
 	{
@@ -433,7 +504,9 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($show) && !sportal_check_visibility($row['visibility']))
+		{
 			continue;
+		}
 
 		if (!isset($return[$row['id_block']]))
 		{
@@ -455,7 +528,9 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 		}
 
 		if (!empty($row['variable']))
+		{
 			$return[$row['id_block']]['parameters'][$row['variable']] = $row['value'];
+		}
 	}
 	$db->free_result($request);
 
@@ -466,6 +541,8 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
  * Function to get a block's display/show information.
  *
  * @param string[]|string|null $query
+ *
+ * @return array
  */
 function sportal_process_visibility($query)
 {
@@ -495,8 +572,8 @@ function sportal_process_visibility($query)
 	$page = !empty($page_info['id']) ? 'p' . $page_info['id'] : '';
 	$category = !empty($category_info['id']) ? 'c' . $category_info['id'] : '';
 	$article = !empty($article_info['id']) ? 'a' . $article_info['id'] : '';
-	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK != 'SSI' && $modSettings['sp_portal_mode'] == 1) || $action == 'portal' || !empty($context['standalone']) ? true : false;
-	$forum = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK != 'SSI' && $modSettings['sp_portal_mode'] != 1) || $action == 'forum';
+	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] == 1) || $action === 'portal' || !empty($context['standalone']) ? true : false;
+	$forum = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] != 1) || $action === 'forum';
 
 	// Will hopefully get larger in the future.
 	$portal_actions = array(
@@ -558,15 +635,15 @@ function sportal_process_visibility($query)
 		$code = substr($query, $boundary + 4);
 
 		$variables = array(
-				'{$action}' => "'$action'",
-				'{$sa}' => "'$sub_action'",
-				'{$board}' => "'$board'",
-				'{$topic}' => "'$topic'",
-				'{$page}' => "'$page'",
-				'{$category}' => "'$category'",
-				'{$article}' => "'$article'",
-				'{$portal}' => $portal,
-				'{$forum}' => $forum,
+			'{$action}' => "'$action'",
+			'{$sa}' => "'$sub_action'",
+			'{$board}' => "'$board'",
+			'{$topic}' => "'$topic'",
+			'{$page}' => "'$page'",
+			'{$category}' => "'$category'",
+			'{$article}' => "'$article'",
+			'{$portal}' => $portal,
+			'{$forum}' => $forum,
 		);
 
 		return eval(str_replace(array_keys($variables), array_values($variables), un_htmlspecialchars($code)) . ';');
@@ -595,7 +672,7 @@ function sportal_process_visibility($query)
 		$item = '';
 
 		// Is this a weird action?
-		if ($value[0] == '~')
+		if ($value[0] === '~')
 		{
 			if (strpos($value, '|') !== false)
 			{
@@ -686,7 +763,7 @@ function sportal_process_visibility($query)
 	{
 		return true;
 	}
-	elseif (!empty($action) && $action != 'portal' && (in_array('allaction', $query) || in_array($action, $query)))
+	elseif (!empty($action) && $action !== 'portal' && (in_array('allaction', $query) || in_array($action, $query)))
 	{
 		return true;
 	}
@@ -747,7 +824,7 @@ function sportal_check_visibility($visibility_id)
 	}
 
 	// See if we can show this block, here, now, for this ...
-	if ($visibility_id === '0' && !isset($visibilities[$visibility_id]))
+	if ($visibility_id == '0' && !isset($visibilities[$visibility_id]))
 	{
 		// No id, assume its off
 		return false;
@@ -756,9 +833,13 @@ function sportal_check_visibility($visibility_id)
 	{
 		// Can we show it here, should we?
 		if ($context['browser_body_id'] === 'mobile' && empty($visibilities[$visibility_id]['mobile_view']))
+		{
 			return false;
+		}
 		else
+		{
 			return sportal_process_visibility($visibilities[$visibility_id]['final']);
+		}
 	}
 	else
 	{
@@ -768,12 +849,13 @@ function sportal_check_visibility($visibility_id)
 }
 
 /**
- * This is a simple function that returns nothing if the language file exist and english if it does not exist
- * This will help to make it possible to load each time the english language!
+ * This is a simple function that loads calendar data for the portal as infrequently as possible
  *
  * @param string $type type of data to load, events, birthdays, etc
  * @param string $low_date don't load data before this date
  * @param string|boolean $high_date don't load data after this date, false for no limit
+ *
+ * @return array
  */
 function sp_loadCalendarData($type, $low_date, $high_date = false)
 {
@@ -791,9 +873,13 @@ function sp_loadCalendarData($type, $low_date, $high_date = false)
 	}
 
 	if (!empty($loaded[$type]))
+	{
 		return $loaded[$type]($low_date, ($high_date === false ? $low_date : $high_date));
+	}
 	else
+	{
 		return array();
+	}
 }
 
 /**
@@ -809,11 +895,15 @@ function sp_loadColors($users = array())
 
 	// This is for later, if you like to disable colors ;)
 	if (!empty($modSettings['sp_disableColor']))
+	{
 		return false;
+	}
 
 	// Can't just look for no users. :P
 	if (empty($users))
+	{
 		return false;
+	}
 
 	// MemberColorLink compatible, cache more data, handle also some special member color link colors
 	if (!empty($modSettings['MemberColorLinkInstalled']))
@@ -822,7 +912,9 @@ function sp_loadColors($users = array())
 
 		// This happen only on not existing Members... but given ids...
 		if (empty($colorData))
+		{
 			return false;
+		}
 
 		$loaded_ids = array_keys($colorData);
 
@@ -834,6 +926,7 @@ function sp_loadColors($users = array())
 				$color_profile[$id]['colored_name'] = $colorData[$id]['colored_name'];
 			}
 		}
+
 		return empty($loaded_ids) ? false : $loaded_ids;
 	}
 
@@ -846,29 +939,40 @@ function sp_loadColors($users = array())
 		$u = (int) $u;
 
 		if (empty($u))
+		{
 			unset($users[$k]);
+		}
 		else
+		{
 			$users[$k] = $u;
+		}
 	}
 
 	$loaded_ids = array();
+
 	// Is this a totally new variable?
 	if (empty($color_profile))
+	{
 		$color_profile = array();
+	}
 	// Otherwise, we will need to do some reformating of the old data.
 	else
 	{
 		foreach ($users as $k => $u)
+		{
 			if (isset($color_profile[$u]))
 			{
 				$loaded_ids[] = $u;
 				unset($users[$k]);
 			}
+		}
 	}
 
 	// Make sure that we have some users.
 	if (empty($users))
+	{
 		return empty($loaded_ids) ? false : $loaded_ids;
+	}
 
 	// Correct array pointer for the user
 	reset($users);
@@ -877,7 +981,8 @@ function sp_loadColors($users = array())
 	$request = $db->query('', '
 		SELECT
 			mem.id_member, mem.member_name, mem.real_name, mem.id_group,
-			mg.online_color AS member_group_color, pg.online_color AS post_group_color
+			mg.online_color AS member_group_color,
+			pg.online_color AS post_group_color
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}membergroups AS pg ON (pg.id_group = mem.id_post_group)
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)
@@ -887,7 +992,6 @@ function sp_loadColors($users = array())
 			'current' => (int) current($users),
 		)
 	);
-
 	// Go through each of the users.
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -896,10 +1000,10 @@ function sp_loadColors($users = array())
 		$onlineColor = !empty($row['member_group_color']) ? $row['member_group_color'] : $row['post_group_color'];
 		$color_profile[$row['id_member']]['color'] = $onlineColor;
 		$color_profile[$row['id_member']]['link'] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '"' . (!empty($onlineColor)
-				? ' style="color: ' . $onlineColor . ';"' : '') . '>' . $row['real_name'] . '</a>';
+			? ' style="color: ' . $onlineColor . ';"' : '') . '>' . $row['real_name'] . '</a>';
 		$color_profile[$row['id_member']]['colored_name'] = (!empty($onlineColor)
-				? '<span style="color: ' . $onlineColor . ';">' : '') . $row['real_name'] . (!empty($onlineColor)
-				? '</span>' : '');
+			? '<span style="color: ' . $onlineColor . ';">' : '') . $row['real_name'] . (!empty($onlineColor)
+			? '</span>' : '');
 	}
 	$db->free_result($request);
 
@@ -916,6 +1020,8 @@ function sp_loadColors($users = array())
  * @param int|null $height
  * @param string|boolean $title
  * @param int|null $id
+ *
+ * @return string
  */
 function sp_embed_image($name, $alt = '', $width = null, $height = null, $title = true, $id = null)
 {
@@ -948,28 +1054,39 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 	}
 
 	if (!isset($randomizer) || $randomizer > 7)
+	{
 		$randomizer = 0;
+	}
+
 	$randomizer++;
 
 	// Use a default alt text if available and none was supplied
 	if (empty($alt) && isset($default_alt[$name]))
+	{
 		$alt = $default_alt[$name];
+	}
 
 	// You want a title, use the alt text if we can
 	if ($title === true)
+	{
 		$title = !empty($alt) ? $alt : '';
+	}
 
 	if (empty($alt))
+	{
 		$alt = $name;
+	}
 
 	// dots using random colors
 	if (in_array($name, array('dot', 'star')) && empty($modSettings['sp_disable_random_bullets']))
+	{
 		$name .= $randomizer;
+	}
 
 	// Build the image tag
 	$image = '<img src="' . $settings['sp_images_url'] . '/' . $name . '.png" alt="' . $alt . '"' . (!empty($title)
-			? ' title="' . $title . '"' : '') . (!empty($width) ? ' width="' . $width . '"' : '') . (!empty($height)
-			? ' height="' . $height . '"' : '') . (!empty($id) ? ' id="' . $id . '"' : '') . ' />';
+		? ' title="' . $title . '"' : '') . (!empty($width) ? ' width="' . $width . '"' : '') . (!empty($height)
+		? ' height="' . $height . '"' : '') . (!empty($id) ? ' id="' . $id . '"' : '') . ' />';
 
 	return $image;
 }
@@ -981,6 +1098,8 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
  * @param string $title
  * @param string $extraclass
  * @param string $spriteclass
+ *
+ * @return string
  */
 function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'dot')
 {
@@ -1014,23 +1133,29 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 
 	// Use a default title text if available and none was supplied
 	if (empty($title) && isset($default_title[$name]))
+	{
 		$title = $default_title[$name];
+	}
 	else
+	{
 		$title = $name;
+	}
 
 	// dots / start using colors
 	if (in_array($name, array('dot', 'star')) && empty($modSettings['sp_disable_random_bullets']))
 	{
 		// Loop through the dot colors
 		if (!isset($randomizer) || $randomizer > 7)
+		{
 			$randomizer = 0;
+		}
+
 		$randomizer++;
 		$name = $name . $randomizer;
 	}
 
 	// Build the attributes
-	return 'class="' . $spriteclass . ' ' . $name . (!empty($extraclass)
-		? ' ' . $extraclass : '') . '" title="' . $title . '"';
+	return 'class="' . $spriteclass . ' ' . $name . (!empty($extraclass) ? ' ' . $extraclass : '') . '" title="' . $title . '"';
 }
 
 /**
@@ -1039,6 +1164,8 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
  * @param string $action implode or explode
  * @param string $setting string of style options joined on name~value|name~value
  * @param boolean $process
+ *
+ * @return array()
  */
 function sportal_parse_style($action, $setting = '', $process = false)
 {
@@ -1061,13 +1188,21 @@ function sportal_parse_style($action, $setting = '', $process = false)
 		);
 
 		foreach ($style_parameters as $parameter)
+		{
 			if (isset($_POST[$parameter]))
+			{
 				$style .= $parameter . '~' . Util::htmlspecialchars(Util::htmltrim($_POST[$parameter]), ENT_QUOTES) . '|';
+			}
 			else
+			{
 				$style .= $parameter . '~|';
+			}
+		}
 
 		if (!empty($style))
+		{
 			$style = substr($style, 0, -1);
+		}
 	}
 	elseif ($action === 'explode')
 	{
@@ -1103,25 +1238,35 @@ function sportal_parse_style($action, $setting = '', $process = false)
 				$style['title']['class'] = $style['title_default_class'];
 
 				if (!empty($style['title_custom_class']))
+				{
 					$style['title']['class'] .= ' ' . $style['title_custom_class'];
+				}
 
 				$style['title']['style'] = $style['title_custom_style'];
 			}
 
 			if (empty($style['no_body']))
+			{
 				$style['body']['class'] = $style['body_default_class'];
+			}
 			else
+			{
 				$style['body']['class'] = '';
+			}
 
 			if (!empty($style['body_custom_class']))
+			{
 				$style['body']['class'] .= ' ' . $style['body_custom_class'];
+			}
 
 			$style['body']['style'] = $style['body_custom_style'];
 
 			$process_cache[$setting] = $style;
 		}
 		elseif ($process)
+		{
 			$style = $process_cache[$setting];
+		}
 	}
 
 	return $style;
@@ -1134,6 +1279,8 @@ function sportal_parse_style($action, $setting = '', $process = false)
  * @param boolean $active
  * @param boolean $allowed
  * @param string $sort
+ *
+ * @return array()
  */
 function sportal_get_categories($category_id = null, $active = false, $allowed = false, $sort = 'name')
 {
@@ -1158,7 +1305,9 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 
 	// Check permissions to access this category
 	if (!empty($allowed))
+	{
 		$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
+	}
 
 	// Check if the category is even active
 	if (!empty($active))
@@ -1170,8 +1319,7 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 	// Lets see what we can find
 	$request = $db->query('', '
 		SELECT
-			id_category, namespace, name, description,
-			permissions, articles, status
+			id_category, namespace, name, description, permissions, articles, status
 		FROM {db_prefix}sp_categories' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}', $parameters
@@ -1202,23 +1350,33 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
  *
  * @param string $name
  * @param int $id
+ *
+ * @return bool|null
  */
 function sportal_increase_viewcount($name, $id)
 {
 	$db = database();
 
-	if ($name == 'page')
+	if ($name === 'page')
+	{
 		$query = array(
 			'table' => 'sp_pages',
 			'query_id' => 'id_page',
 			'id' => $id
-	);
-	elseif ($name == 'article')
+		);
+	}
+	elseif ($name === 'article')
+	{
 		$query = array(
 			'table' => 'sp_articles',
 			'query_id' => 'id_article',
 			'id' => $id
-	);
+		);
+	}
+	else
+	{
+		return false;
+	}
 
 	$db->query('', '
 		UPDATE {db_prefix}{raw:table}
@@ -1239,6 +1397,8 @@ function sportal_increase_viewcount($name, $id)
  * @param boolean $active
  * @param boolean $allowed
  * @param string $sort
+ *
+ * @return array
  */
 function sportal_get_pages($page_id = null, $active = false, $allowed = false, $sort = 'title')
 {
@@ -1250,7 +1410,9 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 	// If we already have the information, just return it
 	$cache_name = implode(':', array($page_id, $active, $allowed));
 	if (isset($cache[$cache_name]))
+	{
 		$return = $cache[$cache_name];
+	}
 	else
 	{
 		$query = array();
@@ -1270,7 +1432,9 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 
 		// Use permissions?
 		if (!empty($allowed))
+		{
 			$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
+		}
 
 		// Only active pages?
 		if (!empty($active))
@@ -1319,25 +1483,37 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
  * @param string $body the string of text to treat as $type
  * @param string $type one of html, bbc, php
  * @param string $output_method if echo will echo the results, otherwise returns the string
+ *
+ * @return string|bool
  */
 function sportal_parse_content($body, $type, $output_method = 'echo')
 {
 	if (($type === 'bbc' || $type === 'html') && strpos($body, '[cutoff]') !== false)
+	{
 		$body = str_replace('[cutoff]', '', $body);
+	}
 
 	switch ($type)
 	{
 		case 'bbc':
-			if ($output_method == 'echo')
+			if ($output_method === 'echo')
+			{
 				echo parse_bbc($body);
+			}
 			else
+			{
 				return parse_bbc($body);
+			}
 			break;
 		case 'html':
-			if ($output_method == 'echo')
+			if ($output_method === 'echo')
+			{
 				echo un_htmlspecialchars($body);
+			}
 			else
+			{
 				return un_htmlspecialchars($body);
+			}
 			break;
 		case 'php':
 			$body = trim(un_htmlspecialchars($body));
@@ -1349,10 +1525,14 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 			$result = ob_get_contents();
 			ob_end_clean();
 
-			if ($output_method == 'echo')
+			if ($output_method === 'echo')
+			{
 				echo $result;
+			}
 			else
+			{
 				return $result;
+			}
 			break;
 	}
 
@@ -1380,7 +1560,7 @@ function sportal_get_custom_menus($menu_id = null, $sort = 'id_menu')
 		$parameters['menu_id'] = (int) $menu_id;
 	}
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT
 			id_menu, name
 		FROM {db_prefix}sp_custom_menus' . (!empty($query) ? '
@@ -1422,7 +1602,7 @@ function sportal_get_menu_items($item_id = null, $sort = 'id_item')
 		$parameters['item_id'] = (int) $item_id;
 	}
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT
 			id_item, id_menu, namespace, title, href, target
 		FROM {db_prefix}sp_menu_items' . (!empty($query) ? '
@@ -1456,7 +1636,9 @@ function sportal_get_menu_items($item_id = null, $sort = 'id_item')
  *
  * @param int|null $profile_id
  * @param int|null $type
- * @param string $sort
+ * @param string|null $sort
+ *
+ * @return array
  */
 function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 {
@@ -1538,6 +1720,8 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
  * Fetch a style based on its id
  *
  * @param int $style_id
+ *
+ * @return string
  */
 function sportal_select_style($style_id)
 {
@@ -1579,9 +1763,13 @@ function sp_prevent_flood($type, $fatal = true)
 	);
 
 	if (!allowedTo('admin_forum'))
+	{
 		$time_limit = isset($limits[$type]) ? $limits[$type] : $modSettings['spamWaitTime'];
+	}
 	else
+	{
 		$time_limit = 2;
+	}
 
 	// Remove old blocks
 	$db->query('', '
@@ -1606,10 +1794,14 @@ function sp_prevent_flood($type, $fatal = true)
 	if ($db->affected_rows() != 1)
 	{
 		if ($fatal)
+		{
 			fatal_lang_error('error_sp_flood_' . $type, false, array($time_limit));
+		}
 		else
+		{
 			return isset($txt['error_sp_flood_' . $type]) ? sprintf($txt['error_sp_flood_' . $type], $time_limit)
 				: true;
+		}
 	}
 
 	return false;

@@ -10,7 +10,9 @@
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Load a shoutboxs parameters by ID
@@ -18,6 +20,8 @@ if (!defined('ELK'))
  * @param int|null $shoutbox_id
  * @param boolean $active
  * @param boolean $allowed
+ *
+ * @return array
  */
 function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = false)
 {
@@ -35,7 +39,9 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 	}
 
 	if (!empty($allowed))
+	{
 		$query[] = sprintf($context['SPortal']['permissions']['query'], 'permissions');
+	}
 
 	if (!empty($active))
 	{
@@ -45,9 +51,8 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 
 	$request = $db->query('', '
 		SELECT
-			id_shoutbox, name, permissions, moderator_groups, warning,
-			allowed_bbc, height, num_show, num_max, refresh, reverse,
-			caching, status, num_shouts, last_update
+			id_shoutbox, name, permissions, moderator_groups, warning, allowed_bbc, height,
+			num_show, num_max, refresh, reverse, caching, status, num_shouts, last_update
 		FROM {db_prefix}sp_shoutboxes' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY name',
@@ -85,7 +90,7 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
  * @param int $shoutbox id of the shoutbox to get data from
  * @param mixed[] $parameters
  *
- * @return type
+ * @return array
  */
 function sportal_get_shouts($shoutbox, $parameters)
 {
@@ -107,9 +112,11 @@ function sportal_get_shouts($shoutbox, $parameters)
 	{
 		$request = $db->query('', '
 			SELECT
-				sh.id_shout, sh.body, IFNULL(mem.id_member, 0) AS id_member,
-				IFNULL(mem.real_name, sh.member_name) AS member_name, sh.log_time,
-				mg.online_color AS member_group_color, pg.online_color AS post_group_color
+				sh.id_shout, sh.body, sh.log_time,
+				IFNULL(mem.id_member, 0) AS id_member,
+				IFNULL(mem.real_name, sh.member_name) AS member_name,
+				mg.online_color AS member_group_color,
+				pg.online_color AS post_group_color
 			FROM {db_prefix}sp_shouts AS sh
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = sh.id_member)
 				LEFT JOIN {db_prefix}membergroups AS pg ON (pg.id_group = mem.id_post_group)
@@ -147,7 +154,9 @@ function sportal_get_shouts($shoutbox, $parameters)
 		$db->free_result($request);
 
 		if (empty($start) && $cache)
+		{
 			cache_put_data('shoutbox_shouts-' . $shoutbox, $shouts, 240);
+		}
 	}
 
 	foreach ($shouts as $shout)
@@ -162,11 +171,9 @@ function sportal_get_shouts($shoutbox, $parameters)
 		$shouts[$shout['id']] += array(
 			'is_me' => preg_match('~^<div\sclass="meaction">\* ' . preg_quote($shout['author']['name'], '~') . '.+</div>$~', $shout['text']) != 0,
 			'delete_link' => $can_delete
-				? '<a class="dot dotdelete" href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"></a> '
-				: '',
+				? '<a class="dot dotdelete" href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"></a> ' : '',
 			'delete_link_js' => $can_delete
-				? '<a class="dot dotdelete" href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="sp_delete_shout(' . $shoutbox . ', ' . $shout['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false;"></a> '
-				: '',
+				? '<a class="dot dotdelete" href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="sp_delete_shout(' . $shoutbox . ', ' . $shout['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false;"></a> ' : '',
 		);
 
 		// Prepare for display in the box
@@ -177,11 +184,15 @@ function sportal_get_shouts($shoutbox, $parameters)
 
 		// Ignored user, hide the shout with option to show it
 		if (!empty($modSettings['enable_buddylist']) && in_array($shout['author']['id'], $context['user']['ignoreusers']))
+		{
 			$shouts[$shout['id']]['text'] = '<a href="#toggle" id="ignored_shout_link_' . $shout['id'] . '" onclick="sp_show_ignored_shout(' . $shout['id'] . '); return false;">[' . $txt['sp_shoutbox_show_ignored'] . ']</a><span id="ignored_shout_' . $shout['id'] . '" style="display: none;">' . $shouts[$shout['id']]['text'] . '</span>';
+		}
 	}
 
 	if ($reverse)
+	{
 		$shouts = array_reverse($shouts);
+	}
 
 	return $shouts;
 }
@@ -190,6 +201,8 @@ function sportal_get_shouts($shoutbox, $parameters)
  * Return the number of shouts in a given shoutbox
  *
  * @param int $shoutbox_id ID of the shoutbox
+ *
+ * @return int
  */
 function sportal_get_shoutbox_count($shoutbox_id)
 {
@@ -217,6 +230,8 @@ function sportal_get_shoutbox_count($shoutbox_id)
  *
  * @param int $shoutbox
  * @param string $shout
+ *
+ * @return bool
  */
 function sportal_create_shout($shoutbox, $shout)
 {
@@ -226,14 +241,20 @@ function sportal_create_shout($shoutbox, $shout)
 
 	// If a guest shouts in the woods, and no one is there to hear them
 	if ($user_info['is_guest'])
+	{
 		return false;
+	}
 
 	// What, its not like we can shout to nothing
 	if (empty($shoutbox))
+	{
 		return false;
+	}
 
 	if (trim(strip_tags(parse_bbc($shout, false), '<img>')) === '')
+	{
 		return false;
+	}
 
 	// Add the shout
 	$db->insert('', '
@@ -266,7 +287,9 @@ function sportal_create_shout($shoutbox, $shout)
 		sportal_delete_shout($shoutbox['id'], $old_shouts, true);
 	}
 	else
+	{
 		sportal_update_shoutbox($shoutbox['id'], true);
+	}
 
 	return true;
 }
@@ -276,14 +299,18 @@ function sportal_create_shout($shoutbox, $shout)
  *
  * @param int $shoutbox_id
  * @param int[]|int $shouts
- * @param boolean $prune
+ * @param bool $prune
+ *
+ * @return null
  */
 function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
 {
 	$db = database();
 
 	if (!is_array($shouts))
+	{
 		$shouts = array($shouts);
+	}
 
 	// Remove it
 	$db->query('', '
@@ -305,7 +332,9 @@ function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
  * Use true to increment by 1
  *
  * @param int $shoutbox_id
- * @param int|boolean $num_shouts if true increase the count by 1
+ * @param int|bool $num_shouts if true increase the count by 1
+ *
+ * @return null
  */
 function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
 {

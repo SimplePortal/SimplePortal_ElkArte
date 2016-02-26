@@ -10,19 +10,25 @@
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Returns the number of views and comments for a given article
  *
  * @param int $id the id of the article
+ *
+ * @return array
  */
 function sportal_get_article_views_comments($id)
 {
 	$db = database();
 
 	if (empty($id))
+	{
 		return array(0, 0);
+	}
 
 	// Make the request
 	$request = $db->query('', '
@@ -57,6 +63,8 @@ function sportal_get_article_views_comments($id)
  * @param int|null $category_id id of the category
  * @param int|null $limit limit the number of results
  * @param int|null $start start number for pages
+ *
+ * @return array
  */
 function sportal_get_articles($article_id = null, $active = false, $allowed = false, $sort = 'spa.title', $category_id = null, $limit = null, $start = null)
 {
@@ -130,7 +138,9 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row['id_author']))
+		{
 			$member_ids[$row['id_author']] = $row['id_author'];
+		}
 
 		$return[$row['id_article']] = array(
 			'id' => $row['id_article'],
@@ -179,7 +189,9 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 		foreach ($return as $key => $value)
 		{
 			if (!empty($color_profile[$value['author']['id']]['link']))
+			{
 				$return[$key]['author']['link'] = $color_profile[$value['author']['id']]['link'];
+			}
 		}
 	}
 
@@ -190,7 +202,9 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 /**
  * Returns the count of articles in a given category
  *
- * @param ing $catid category identifier
+ * @param int $catid category identifier
+ *
+ * @return int
  */
 function sportal_get_articles_in_cat_count($catid)
 {
@@ -220,6 +234,8 @@ function sportal_get_articles_in_cat_count($catid)
 
 /**
  * Returns the number of articles in the system that a user can see
+ *
+ * @return int
  */
 function sportal_get_articles_count()
 {
@@ -254,6 +270,8 @@ function sportal_get_articles_count()
  * Fetches the number of comments a given article has received
  *
  * @param int $id article id
+ *
+ * @return int
  */
 function sportal_get_article_comment_count($id)
 {
@@ -287,7 +305,8 @@ function sportal_fetch_article_comment($id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_comment, id_member, body
+		SELECT
+			id_comment, id_member, body
 		FROM {db_prefix}sp_comments
 		WHERE id_comment = {int:comment_id}
 		LIMIT {int:limit}',
@@ -308,6 +327,8 @@ function sportal_fetch_article_comment($id)
  * @param int|null $article_id
  * @param int|null $limit limit the number of results
  * @param int|null $start start number for pages
+ *
+ * @return array
  */
 function sportal_get_comments($article_id = null, $limit = null, $start = null)
 {
@@ -339,7 +360,9 @@ function sportal_get_comments($article_id = null, $limit = null, $start = null)
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row['id_author']))
+		{
 			$member_ids[$row['id_author']] = $row['id_author'];
+		}
 
 		$return[$row['id_comment']] = array(
 			'id' => $row['id_comment'],
@@ -371,7 +394,9 @@ function sportal_get_comments($article_id = null, $limit = null, $start = null)
 		foreach ($return as $key => $value)
 		{
 			if (!empty($color_profile[$value['author']['id']]['link']))
+			{
 				$return[$key]['author']['link'] = $color_profile[$value['author']['id']]['link'];
+			}
 		}
 	}
 
@@ -383,6 +408,8 @@ function sportal_get_comments($article_id = null, $limit = null, $start = null)
  *
  * @param int $article_id id of the article commented on
  * @param string $body text of the comment
+ *
+ * @return null
  */
 function sportal_create_article_comment($article_id, $body)
 {
@@ -438,6 +465,8 @@ function sportal_modify_article_comment($comment_id, $body)
  * Removes an comment from an article
  *
  * @param int $comment_id comment it
+ *
+ * @return null
  */
 function sportal_delete_article_comment($comment_id)
 {
@@ -460,7 +489,9 @@ function sportal_delete_article_comment($comment_id)
 
 	// You do have a right to remove the comment?
 	if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
+	{
 		return false;
+	}
 
 	// Poof ... gone
 	$db->query('', '
@@ -481,6 +512,8 @@ function sportal_delete_article_comment($comment_id)
  * Recounts all comments made on an article and updates the DB with the new value
  *
  * @param int $article_id
+ *
+ * @return null
  */
 function sportal_recount_comments($article_id)
 {

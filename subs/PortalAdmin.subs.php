@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Toggles the current state of a block / control
@@ -24,25 +26,33 @@ if (!defined('ELK'))
 function sportal_admin_state_change($type, $id)
 {
 	if (!in_array($type, array('block', 'category', 'article')))
+	{
 		fatal_lang_error('error_sp_id_empty', false);
+	}
 
 	// Toggle the current state
 	sp_changeState($type, $id);
 
 	// Based on the type, find our way back
-	if ($type == 'block')
+	if ($type === 'block')
 	{
 		$sides = array(1 => 'left', 2 => 'top', 3 => 'bottom', 4 => 'right');
 		$list = !empty($_GET['redirect']) && isset($sides[$_GET['redirect']]) ? $sides[$_GET['redirect']] : 'list';
 
 		redirectexit('action=admin;area=portalblocks;sa=' . $list);
 	}
-	elseif ($type == 'category')
+	elseif ($type === 'category')
+	{
 		redirectexit('action=admin;area=portalarticles;sa=categories');
-	elseif ($type == 'article')
+	}
+	elseif ($type === 'article')
+	{
 		redirectexit('action=admin;area=portalarticles;sa=articles');
+	}
 	else
+	{
 		redirectexit('action=admin;area=portalconfig');
+	}
 }
 
 /**
@@ -54,6 +64,8 @@ function sportal_admin_state_change($type, $id)
  * - Uses naming pattern of subs/spblocks/xyz.block.php
  *
  * @param string|null $function
+ *
+ * @return array
  */
 function getFunctionInfo($function = null)
 {
@@ -67,7 +79,9 @@ function getFunctionInfo($function = null)
 		$pattern = SUBSDIR . '/spblocks/' . $function . '.block.php';
 	}
 	else
+	{
 		$pattern = SUBSDIR . '/spblocks/*.block.php';
+	}
 
 	// Iterates through a file system in a similar fashion to glob().
 	$fs = new GlobIterator($pattern);
@@ -81,12 +95,16 @@ function getFunctionInfo($function = null)
 		// Load the block, make sure we can access it
 		require_once($item->getPathname());
 		if (!class_exists($class))
+		{
 			continue;
+		}
 
 		// Ensure they have permissions to view this block
 		$perms = $class::permissionsRequired();
 		if (!allowedTo($perms))
+		{
 			continue;
+		}
 
 		// Add it to our allowed lists
 		$return[] = array(
@@ -116,7 +134,9 @@ function fixColumnRows($column_id = null)
 	$blockIds = array();
 
 	foreach ($blockList as $block)
+	{
 		$blockIds[] = $block['id'];
+	}
 
 	$counter = 0;
 
@@ -142,48 +162,62 @@ function fixColumnRows($column_id = null)
  *
  * @param string|null $type type of control
  * @param int|null $id specific id of the control
+ *
+ * @return bool
  */
 function sp_changeState($type = null, $id = null)
 {
 	$db = database();
 
-	if ($type == 'block')
+	if ($type === 'block')
+	{
 		$query = array(
 			'column' => 'state',
 			'table' => 'sp_blocks',
 			'query_id' => 'id_block',
 			'id' => $id
 		);
-	elseif ($type == 'category')
+	}
+	elseif ($type === 'category')
+	{
 		$query = array(
 			'column' => 'status',
 			'table' => 'sp_categories',
 			'query_id' => 'id_category',
 			'id' => $id
 		);
-	elseif ($type == 'article')
+	}
+	elseif ($type === 'article')
+	{
 		$query = array(
 			'column' => 'status',
 			'table' => 'sp_articles',
 			'query_id' => 'id_article',
 			'id' => $id
 		);
-	elseif ($type == 'page')
+	}
+	elseif ($type === 'page')
+	{
 		$query = array(
 			'column' => 'status',
 			'table' => 'sp_pages',
 			'query_id' => 'id_page',
 			'id' => $id
 		);
-	elseif ($type == 'shout')
+	}
+	elseif ($type === 'shout')
+	{
 		$query = array(
 			'column' => 'status',
 			'table' => 'sp_shoutboxes',
 			'query_id' => 'id_shoutbox',
 			'id' => $id
 		);
+	}
 	else
+	{
 		return false;
+	}
 
 	// Clap on, Clap off
 	$db->query('', '
@@ -214,7 +248,8 @@ function sp_general_load_themes()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_theme, value AS name
+		SELECT
+			id_theme, value AS name
 		FROM {db_prefix}themes
 		WHERE variable = {string:name}
 			AND id_member = {int:member}
@@ -238,10 +273,12 @@ function sp_general_load_themes()
  * @param int[]|string $selectedGroups - all groups who should be shown as selected, if you like to check all than
  *     insert an 'all' You can also Give the function a string with '2,3,4'
  * @param string $show - 'normal' => will show all groups, and add a guest and regular member (Standard)
- *						 'post' => will load only post groups
- *						 'master' => will load only not postbased groups
+ *                       'post' => will load only post groups
+ *                       'master' => will load only not postbased groups
  * @param string $contextName - where the data should stored in the $context
  * @param string $subContext
+ *
+ * @return null
  */
 function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $contextName = 'member_groups', $subContext = 'SPortal')
 {
@@ -254,31 +291,47 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 
 	// Make sure its empty
 	if (!empty($subContext))
+	{
 		$context[$subContext][$contextName] = array();
+	}
 	else
+	{
 		$context[$contextName] = array();
+	}
 
 	// Presetting some things :)
 	if (!is_array($selectedGroups))
-		$checked = strtolower($selectedGroups) == 'all';
+	{
+		$checked = strtolower($selectedGroups) === 'all';
+	}
 	else
+	{
 		$checked = false;
+	}
 
-	if (!$checked && isset($selectedGroups) && $selectedGroups === '0')
+	if (!$checked && isset($selectedGroups) && $selectedGroups == '0')
+	{
 		$selectedGroups = array(0);
+	}
 	elseif (!$checked && !empty($selectedGroups))
 	{
 		if (!is_array($selectedGroups))
+		{
 			$selectedGroups = explode(',', $selectedGroups);
+		}
 
 		// Remove all strings, i will only allow ids :P
 		foreach ($selectedGroups as $k => $i)
+		{
 			$selectedGroups[$k] = (int) $i;
+		}
 
 		$selectedGroups = array_unique($selectedGroups);
 	}
 	else
+	{
 		$selectedGroups = array();
+	}
 
 	// Okay let's checkup the show function
 	$show_option = array(
@@ -291,12 +344,14 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 	$show = strtolower($show);
 
 	if (!isset($show_option[$show]))
+	{
 		$show = 'normal';
+	}
 
 	// Guest and Members are added manually. Only on normal and master View =)
-	if ($show == 'normal' || $show == 'master' || $show == 'moderator')
+	if ($show === 'normal' || $show === 'master' || $show === 'moderator')
 	{
-		if ($show != 'moderator')
+		if ($show !== 'moderator')
 		{
 			$context[$contextName][-1] = array(
 				'id' => -1,
@@ -305,6 +360,7 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 				'is_post_group' => false,
 			);
 		}
+
 		$context[$contextName][0] = array(
 			'id' => 0,
 			'name' => $txt['membergroups_members'],
@@ -315,7 +371,8 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 
 	// Load membergroups.
 	$request = $db->query('', '
-		SELECT group_name, id_group, min_posts
+		SELECT
+			group_name, id_group, min_posts
 		FROM {db_prefix}membergroups
 		WHERE {raw:show}
 		ORDER BY min_posts, id_group != {int:global_moderator}, group_name',
@@ -339,9 +396,11 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 /**
  * Loads the membergroups in the system
  *
- * - excludes moderator groups
- * - loads id and name for each group
- * - used for template group select lists / permissions
+ * - Excludes moderator groups
+ * - Loads id and name for each group
+ * - Used for template group select lists / permissions
+ *
+ * @return array
  */
 function sp_load_membergroups()
 {
@@ -378,6 +437,8 @@ function sp_load_membergroups()
 
 /**
  * Returns the total count of categories in the system
+ *
+ * @return int
  */
 function sp_count_categories()
 {
@@ -401,6 +462,8 @@ function sp_count_categories()
  * @param int|null $start
  * @param int|null $items_per_page
  * @param string|null $sort
+ *
+ * @return array
  */
 function sp_load_categories($start = null, $items_per_page = null, $sort = null)
 {
@@ -409,7 +472,8 @@ function sp_load_categories($start = null, $items_per_page = null, $sort = null)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_category, name, namespace, articles, status
+		SELECT
+			id_category, name, namespace, articles, status
 		FROM {db_prefix}sp_categories' . (isset($sort) ? '
 		ORDER BY {raw:sort}' : '') . (isset($start) ? '
 		LIMIT {int:start}, {int:limit}' : ''),
@@ -475,6 +539,8 @@ function sp_check_duplicate_category($id, $namespace)
  *
  * @param mixed[] $data field name to value for use in query
  * @param boolean $is_new
+ *
+ * @return int
  */
 function sp_update_category($data, $is_new = false)
 {
@@ -509,7 +575,9 @@ function sp_update_category($data, $is_new = false)
 		$update_fields = array();
 
 		foreach ($fields as $name => $type)
+		{
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+		}
 
 		$db->query('', '
 			UPDATE {db_prefix}sp_categories
@@ -525,6 +593,8 @@ function sp_update_category($data, $is_new = false)
  * Removes a category or group of categories by id
  *
  * @param int[] $category_ids
+ *
+ * @return null
  */
 function sp_delete_categories($category_ids = array())
 {
@@ -553,6 +623,8 @@ function sp_delete_categories($category_ids = array())
  * Updates the total articles in a category
  *
  * @param int $category_id
+ *
+ * @return null
  */
 function sp_category_update_total($category_id)
 {
@@ -570,6 +642,8 @@ function sp_category_update_total($category_id)
 
 /**
  * Returns the total count of articles in the system
+ *
+ * @return int
  */
 function sp_count_articles()
 {
@@ -592,6 +666,8 @@ function sp_count_articles()
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
+ *
+ * @return array
  */
 function sp_load_articles($start, $items_per_page, $sort)
 {
@@ -601,9 +677,10 @@ function sp_load_articles($start, $items_per_page, $sort)
 
 	$request = $db->query('', '
 		SELECT
-			spa.id_article, spa.id_category, spc.name, spc.namespace AS category_namespace,
+			spa.id_article, spa.id_category, spa.title, spa.type, spa.date, spa.status,
+			spc.name, spc.namespace AS category_namespace,
 			IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name,
-			spa.namespace AS article_namespace, spa.title, spa.type, spa.date, spa.status
+			spa.namespace AS article_namespace
 		FROM {db_prefix}sp_articles AS spa
 			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spa.id_member)
@@ -645,8 +722,8 @@ function sp_load_articles($start, $items_per_page, $sort)
 			'date' => standardTime($row['date']),
 			'status' => $row['status'],
 			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status'])
-					? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de'
-					: '') . 'activate']) . '</a>',
+				? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de'
+				: '') . 'activate']) . '</a>',
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=edit;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=delete;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_articles_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
@@ -668,7 +745,9 @@ function sp_delete_articles($article_ids = array())
 	$db = database();
 
 	if (!is_array($article_ids))
+	{
 		$article_ids = array($article_ids);
+	}
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_articles
@@ -686,6 +765,8 @@ function sp_delete_articles($article_ids = array())
  *
  * @param int $article_id
  * @param string $namespace
+ *
+ * @return bool
  */
 function sp_duplicate_articles($article_id, $namespace)
 {
@@ -719,6 +800,8 @@ function sp_duplicate_articles($article_id, $namespace)
  * @param mixed[] $article_info array of fields details to save/update
  * @param boolean $is_new true for new insertion, false to update
  * @param boolean $update_counts true to update category counts
+ *
+ * @return int
  */
 function sp_save_article($article_info, $is_new = false, $update_counts = true)
 {
@@ -772,7 +855,9 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 	{
 		$update_fields = array();
 		foreach ($fields as $name => $type)
+		{
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+		}
 
 		$db->query('', '
 			UPDATE {db_prefix}sp_articles
@@ -816,6 +901,8 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 
 /**
  * Returns the total count of pages in the system
+ *
+ * @return int
  */
 function sp_count_pages()
 {
@@ -838,6 +925,8 @@ function sp_count_pages()
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
+ *
+ * @return array
  */
 function sp_load_pages($start, $items_per_page, $sort)
 {
@@ -846,7 +935,8 @@ function sp_load_pages($start, $items_per_page, $sort)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_page, namespace, title, type, views, status
+		SELECT
+			id_page, namespace, title, type, views, status
 		FROM {db_prefix}sp_pages
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:limit}',
@@ -904,10 +994,12 @@ function sp_delete_pages($page_ids = array())
 /**
  * Saves or updates an page
  *
- * - add items as a new page is is_new is true otherwise updates and existing one
+ * - Add items as a new page is is_new is true otherwise updates and existing one
  *
  * @param mixed[] $page_info array of fields details to save/update
  * @param boolean $is_new true for new insertion, false to update
+ *
+ * @return int
  */
 function sp_save_page($page_info, $is_new = false)
 {
@@ -935,6 +1027,7 @@ function sp_save_page($page_info, $is_new = false)
 			$page_info,
 			array('id_page')
 		);
+
 		$page_info['id'] = $db->insert_id('{db_prefix}sp_pages', 'id_page');
 	}
 	// The editing so we update what was there
@@ -942,7 +1035,9 @@ function sp_save_page($page_info, $is_new = false)
 	{
 		$update_fields = array();
 		foreach ($fields as $name => $type)
+		{
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+		}
 
 		$db->query('', '
 			UPDATE {db_prefix}sp_pages
@@ -985,6 +1080,8 @@ function sp_check_duplicate_pages($namespace, $page_id)
 
 /**
  * Returns the total count of shoutboxes in the system
+ *
+ * @return int
  */
 function sp_count_shoutbox()
 {
@@ -1007,6 +1104,8 @@ function sp_count_shoutbox()
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
+ *
+ * @return array
  */
 function sp_load_shoutbox($start, $items_per_page, $sort)
 {
@@ -1015,7 +1114,8 @@ function sp_load_shoutbox($start, $items_per_page, $sort)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_shoutbox, name, caching, status, num_shouts
+		SELECT
+			id_shoutbox, name, caching, status, num_shouts
 		FROM {db_prefix}sp_shoutboxes
 		ORDER BY id_shoutbox, {raw:sort}
 		LIMIT {int:start}, {int:limit}',
@@ -1088,7 +1188,8 @@ function sp_check_duplicate_shoutbox($name, $shoutbox_id)
 	$db = database();
 
 	$result = $db->query('', '
-		SELECT id_shoutbox
+		SELECT
+			id_shoutbox
 		FROM {db_prefix}sp_shoutboxes
 		WHERE name = {string:name}
 			AND id_shoutbox != {int:current}
@@ -1145,6 +1246,7 @@ function sp_edit_shoutbox($shoutbox_info, $is_new = false)
 			$shoutbox_info,
 			array('id_shoutbox')
 		);
+
 		$shoutbox_info['id'] = $db->insert_id('{db_prefix}sp_shoutboxes', 'id_shoutbox');
 	}
 	// Then editing so we update what was there
@@ -1152,7 +1254,9 @@ function sp_edit_shoutbox($shoutbox_info, $is_new = false)
 	{
 		$update_fields = array();
 		foreach ($fields as $name => $type)
+		{
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+		}
 
 		$db->query('', '
 			UPDATE {db_prefix}sp_shoutboxes
@@ -1169,13 +1273,16 @@ function sp_edit_shoutbox($shoutbox_info, $is_new = false)
  * prune a members shouts from a box
  *
  * @param string $member
+ *
+ * @return int
  */
 function sp_shoutbox_prune_member($member)
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_member
+		SELECT
+			id_member
 		FROM {db_prefix}members
 		WHERE member_name = {string:member}
 			OR real_name = {string:member}
@@ -1257,7 +1364,7 @@ function sp_count_profiles($type = 1)
 			'type' => $type,
 		)
 	);
-	list ($total_profiles) =  $db->fetch_row($request);
+	list ($total_profiles) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $total_profiles;
@@ -1271,6 +1378,8 @@ function sp_count_profiles($type = 1)
  * @param int $items_per_page
  * @param string $sort
  * @param int $type (1 = permissions, 2 = styles)
+ *
+ * @return array
  */
 function sp_load_profiles($start, $items_per_page, $sort, $type = 1)
 {
@@ -1372,12 +1481,13 @@ function sp_delete_profiles($remove_ids = array())
  * Updates the position of the block in the portal (column and row in column)
  *
  * - Makes room above or below a position where a new block is inserted by renumbering
- * - returns nothing
  *
  * @param int $current_row
  * @param int $row
  * @param int $col
  * @param boolean $decrement
+ *
+ * @return null
  */
 function sp_update_block_row($current_row, $row, $col, $decrement = true)
 {
@@ -1420,6 +1530,8 @@ function sp_update_block_row($current_row, $row, $col, $decrement = true)
  *
  * @param int $id
  * @param array $data
+ *
+ * @return null
  */
 function sp_update_block_visibility($id, $data)
 {
@@ -1458,7 +1570,7 @@ function sp_block_nextrow($block_column, $block_id = 0)
 			row
 		FROM {db_prefix}sp_blocks
 		WHERE col = {int:col}' . (!empty($block_id) ? '
-			AND id_block != {int:current_id}' : '' ) . '
+			AND id_block != {int:current_id}' : '') . '
 		ORDER BY row DESC
 		LIMIT 1',
 		array(
@@ -1485,7 +1597,7 @@ function sp_block_insert($blockInfo)
 		{db_prefix}sp_blocks',
 		array(
 			'label' => 'string', 'type' => 'string', 'col' => 'int', 'row' => 'int', 'permissions' => 'int', 'styles' => 'int',
-			'visibility' => 'int', 'state' => 'int', 'force_view' => 'int'		),
+			'visibility' => 'int', 'state' => 'int', 'force_view' => 'int'),
 		$blockInfo,
 		array('id_block')
 	);
@@ -1516,9 +1628,13 @@ function sp_block_update($blockInfo)
 	);
 
 	if (!empty($blockInfo['row']))
+	{
 		$block_fields[] = "row = {int:row}";
+	}
 	else
+	{
 		unset($blockInfo['row']);
+	}
 
 	// Update all the blocks fields
 	$db->query('', '
@@ -1549,11 +1665,13 @@ function sp_block_insert_parameters($new_parameters, $id_block)
 
 	$parameters = array();
 	foreach ($new_parameters as $variable => $value)
+	{
 		$parameters[] = array(
 			'id_block' => $id_block,
 			'variable' => $variable,
 			'value' => $value,
 		);
+	}
 
 	$db->insert('', '
 		{db_prefix}sp_parameters',
@@ -1567,13 +1685,16 @@ function sp_block_insert_parameters($new_parameters, $id_block)
  * Returns the current column and row for a given block id
  *
  * @param int $block_id
+ *
+ * @return array
  */
 function sp_block_get_position($block_id)
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT col, row
+		SELECT
+			col, row
 		FROM {db_prefix}sp_blocks
 		WHERE id_block = {int:block_id}
 		LIMIT 1',
@@ -1584,7 +1705,7 @@ function sp_block_get_position($block_id)
 	list ($current_side, $current_row) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	return array($current_side,$current_row);
+	return array($current_side, $current_row);
 }
 
 /**
@@ -1615,8 +1736,7 @@ function sp_block_move_col($block_id, $target_side)
 /**
  * Adds the portal block to the new row position
  *
- * - Opens up space in the column by shift all rows below the insertion point
- * down one
+ * - Opens up space in the column by shift all rows below the insertion point down one
  * - Adds the block ID to the specified column and row
  *
  * @param int $block_id
@@ -1715,6 +1835,7 @@ function sp_add_permission_profile($profile_info, $is_new = false)
 			$profile_info,
 			array('id_profile')
 		);
+
 		$profile_info['id'] = $db->insert_id('{db_prefix}sp_profiles', 'id_profile');
 	}
 	// Or an edit, we do a little update
@@ -1722,7 +1843,9 @@ function sp_add_permission_profile($profile_info, $is_new = false)
 	{
 		$update_fields = array();
 		foreach ($fields as $name => $type)
+		{
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
+		}
 
 		$db->query('', '
 			UPDATE {db_prefix}sp_profiles
@@ -1757,6 +1880,8 @@ function sp_delete_permission_profile($profile_id)
  * Loads boards and pages for template selection
  *
  * - Returns the results in $context for the template
+ *
+ * @return array
  */
 function sp_block_template_helpers()
 {
@@ -1793,7 +1918,7 @@ function sp_block_template_helpers()
 	$db->free_result($request);
 
 	// Same for categories
-	$request =  $db->query('', '
+	$request = $db->query('', '
 		SELECT
 			id_category, name
 		FROM {db_prefix}sp_categories
@@ -1805,7 +1930,7 @@ function sp_block_template_helpers()
 	$db->free_result($request);
 
 	// And finish up with articles
-	$request =  $db->query('', '
+	$request = $db->query('', '
 		SELECT
 			id_article, title
 		FROM {db_prefix}sp_articles
@@ -1829,7 +1954,9 @@ function sp_remove_menu($remove_ids)
 	$db = database();
 
 	if (!is_array($remove_ids))
+	{
 		$remove_ids = array($remove_ids);
+	}
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_custom_menus
@@ -1850,7 +1977,9 @@ function sp_remove_menu_items($remove_ids)
 	$db = database();
 
 	if (!is_array($remove_ids))
+	{
 		$remove_ids = array($remove_ids);
+	}
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_menu_items
