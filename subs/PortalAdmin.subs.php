@@ -1863,7 +1863,7 @@ function sp_add_permission_profile($profile_info, $is_new = false)
  *
  * @param int $profile_id
  */
-function sp_delete_permission_profile($profile_id)
+function sp_delete_profile($profile_id)
 {
 	$db = database();
 
