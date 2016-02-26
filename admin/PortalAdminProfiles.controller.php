@@ -75,7 +75,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	/**
 	 * Show page listing of all permission groups in the system
 	 */
-	public function action_list()
+	public function action_permission_profiles_list()
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
@@ -260,7 +260,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	/**
 	 * Add or edit a portal wide permissions profile
 	 */
-	public function action_edit()
+	public function action_permission_profiles_edit()
 	{
 		global $context, $txt;
 
@@ -801,7 +801,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	}
 
 	/**
-	 * Remove a style profile from the system
+	 * Remove a profile (style/visibility/permission) from the system
 	 */
 	public function action_profiles_delete()
 	{
@@ -811,7 +811,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 
 		$profile_id = !empty($_REQUEST['profile_id']) ? (int) $_REQUEST['profile_id'] : 0;
 
-		sp_delete_permission_profile($profile_id);
+		sp_delete_profile($profile_id);
 
 		redirectexit('action=admin;area=portalprofiles;sa=list' . str_replace('delete', '', $context['sub_action']));
 	}
