@@ -215,7 +215,7 @@ function template_sp_rssFeed($data)
 			{
 				echo '
 				<li ', sp_embed_class('post', '', 'sp_list_top'), '>
-					<strong>', $item['link'], '</strong>', ($this->data['show_date'] && !empty($item['date']) ? ' - ' . $item['date'] : ''), '
+					<strong>', $item['link'], '</strong>', ($data['show_date'] && !empty($item['date']) ? ' - ' . $item['date'] : ''), '
 				</li>';
 			}
 			echo '
@@ -234,7 +234,7 @@ function template_sp_rssFeed($data)
 		foreach ($data['items'] as $item)
 		{
 			echo '
-			<li ', sp_embed_class('dot_feed'), '> ', $item['link'], ($this->data['show_date'] && !empty($item['date']) ? ' - ' . $item['date'] : ''), '</li>';
+			<li ', sp_embed_class('dot_feed'), '> ', $item['link'], ($data['show_date'] && !empty($item['date']) ? ' - ' . $item['date'] : ''), '</li>';
 		}
 
 		echo '
