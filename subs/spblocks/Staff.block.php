@@ -6,22 +6,26 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Staff Block, show the list of forum staff members
  *
  * @param mixed[] $parameters
- *		'lmod' => set to include local moderators as well
+ *        'lmod' => set to include local moderators as well
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
 class Staff_Block extends SP_Abstract_Block
 {
+	protected $color_ids = array();
+
 	/**
 	 * Constructor, used to define block parameters
 	 *
@@ -54,10 +58,10 @@ class Staff_Block extends SP_Abstract_Block
 		if (empty($parameters['lmod']))
 		{
 			$request = $this->_db->query('', '
-				SELECT id_member
+				SELECT
+					id_member
 				FROM {db_prefix}moderators',
-				array(
-				)
+				array()
 			);
 			$local_mods = array();
 			while ($row = $this->_db->fetch_assoc($request))
@@ -65,14 +69,20 @@ class Staff_Block extends SP_Abstract_Block
 			$this->_db->free_result($request);
 
 			if (count($local_mods) > 10)
+			{
 				$local_mods = array();
+			}
 		}
 		else
+		{
 			$local_mods = array();
+		}
 
+		// Admins and global moderator list
 		$global_mods = membersAllowedTo('moderate_board', 0);
 		$admins = membersAllowedTo('admin_forum');
 
+		// You only get one listing, highest authority
 		$all_staff = array_merge($local_mods, $global_mods, $admins);
 		$all_staff = array_unique($all_staff);
 
@@ -91,17 +101,22 @@ class Staff_Block extends SP_Abstract_Block
 			)
 		);
 		$this->data['staff_list'] = array();
-		$colorids = array();
 		while ($row = $this->_db->fetch_assoc($request))
 		{
-			$colorids[$row['id_member']] = $row['id_member'];
+			$this->color_ids[$row['id_member']] = $row['id_member'];
 
 			if (in_array($row['id_member'], $admins))
+			{
 				$row['type'] = 1;
+			}
 			elseif (in_array($row['id_member'], $global_mods))
+			{
 				$row['type'] = 2;
+			}
 			else
+			{
 				$row['type'] = 3;
+			}
 
 			$this->data['staff_list'][$row['type'] . '-' . $row['id_member']] = array(
 				'id' => $row['id_member'],
@@ -124,12 +139,24 @@ class Staff_Block extends SP_Abstract_Block
 		$this->data['staff_count'] = count($this->data['staff_list']);
 		$this->data['icons'] = array(1 => 'admin', 'gmod', 'lmod');
 
-		if (!empty($colorids) && sp_loadColors($colorids) !== false)
+		$this->_colorids();
+	}
+
+	/**
+	 * Provide the color profile id's
+	 */
+	private function _colorids()
+	{
+		global $color_profile;
+
+		if (sp_loadColors($this->color_ids) !== false)
 		{
 			foreach ($this->data['staff_list'] as $k => $p)
 			{
 				if (!empty($color_profile[$p['id']]['link']))
+				{
 					$this->data['staff_list'][$k]['link'] = $color_profile[$p['id']]['link'];
+				}
 			}
 		}
 	}
@@ -145,22 +172,24 @@ function template_sp_staff($data)
 	global $scripturl;
 
 	echo '
-								<table class="sp_fullwidth">';
+		<table class="sp_fullwidth">';
 
 	$count = 0;
 	foreach ($data['staff_list'] as $staff)
+	{
 		echo '
-									<tr>
-										<td class="sp_staff centertext">', !empty($staff['avatar']['href']) ? '
-											<a href="' . $scripturl . '?action=profile;u=' . $staff['id'] . '">
-												<img src="' . $staff['avatar']['href'] . '" alt="' . $staff['name'] . '" style="max-width:40px" />
-											</a>' : '', '
-										</td>
-										<td ', sp_embed_class($data['icons'][$staff['type']], '', 'sp_staff_info'. $data['staff_count'] != ++$count ? ' sp_staff_divider' : ''), '>',
-											$staff['link'], '<br />', $staff['group'], '
-										</td>
-									</tr>';
+			<tr>
+				<td class="sp_staff centertext">', !empty($staff['avatar']['href']) ? '
+					<a href="' . $scripturl . '?action=profile;u=' . $staff['id'] . '">
+						<img src="' . $staff['avatar']['href'] . '" alt="' . $staff['name'] . '" style="max-width:40px" />
+					</a>' : '', '
+				</td>
+				<td ', sp_embed_class($data['icons'][$staff['type']], '', 'sp_staff_info' . $data['staff_count'] != ++$count ? ' sp_staff_divider' : ''), '>',
+					$staff['link'], '<br />', $staff['group'], '
+				</td>
+			</tr>';
+	}
 
 	echo '
-								</table>';
+		</table>';
 }

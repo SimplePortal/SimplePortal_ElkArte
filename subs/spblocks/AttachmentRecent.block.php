@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
@@ -46,12 +46,34 @@ class Attachment_Recent_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
+		global $txt;
+
 		$limit = empty($parameters['limit']) ? 5 : (int) $parameters['limit'];
 
 		$this->data['items'] = ssi_recentAttachments($limit, array(), 'array');
 
+		// No attachments, at least none that they can see
+		if (empty($this->data['items']))
+		{
+			$this->data['error_msg'] = $txt['error_sp_no_attachments_found'];
+			$this->setTemplate('template_sp_attachmentRecent_error');
+
+			return;
+		}
+
 		$this->setTemplate('template_sp_attachmentRecent');
 	}
+}
+
+/**
+ * Error template for this block
+ */
+function template_sp_attachmentRecent_error()
+{
+	global $txt;
+
+	echo '
+								', $txt['error_sp_no_attachments_found'];
 }
 
 /**
@@ -62,14 +84,6 @@ class Attachment_Recent_Block extends SP_Abstract_Block
 function template_sp_attachmentRecent($data)
 {
 	global $txt;
-
-	// No items they can see
-	if (empty($data['items']))
-	{
-		echo '
-								', $txt['error_sp_no_attachments_found'];
-		return;
-	}
 
 	echo '
 								<ul class="sp_list">';

@@ -6,17 +6,19 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Generic PHP Block, creates a PHP block to do whatever you can imagine :D
  *
  * @param mixed[] $parameters
- *		'textarea' =>
+ *        'textarea' =>
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -47,14 +49,18 @@ class Php_Block extends SP_Abstract_Block
 	public function setup($parameters, $id)
 	{
 		$this->data['content'] = !empty($parameters['content']) ? $parameters['content'] : '';
-
 		$this->data['content'] = trim(un_htmlspecialchars($this->data['content']));
 
 		// Strip leading / trailing php wrapper
 		if (substr($this->data['content'], 0, 5) == '<?php')
+		{
 			$this->data['content'] = substr($this->data['content'], 5);
+		}
+
 		if (substr($this->data['content'], -2) == '?>')
+		{
 			$this->data['content'] = substr($this->data['content'], 0, -2);
+		}
 
 		$this->setTemplate('template_sp_php');
 	}

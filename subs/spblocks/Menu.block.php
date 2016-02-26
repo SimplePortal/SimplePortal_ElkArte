@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Menu Block, creates a sidebar menu block based on the system main menu
@@ -35,7 +37,9 @@ class Menu_Block extends SP_Abstract_Block
 		global $context;
 
 		if (empty($context['menu_buttons']))
+		{
 			setupMenuContext();
+		}
 
 		$this->setTemplate('template_sp_menu');
 	}
@@ -51,33 +55,35 @@ function template_sp_menu($data)
 	global $context;
 
 	echo '
-								<ul id="sp_menu" class="sp_list">';
+		<ul id="sp_menu" class="sp_list">';
 
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
 		echo '
-									<li ', sp_embed_class('dot'), '>
-										<a title="', strip_tags($button['title']), '" href="', $button['href'], '">', ($button['active_button'] ? '<strong>' : ''), $button['title'], ($button['active_button'] ? '</strong>' : ''), '</a>';
+			<li ', sp_embed_class('dot'), '>
+				<a title="', strip_tags($button['title']), '" href="', $button['href'], '">', ($button['active_button'] ? '<strong>' : ''), $button['title'], ($button['active_button'] ? '</strong>' : ''), '</a>';
 
 		if (!empty($button['sub_buttons']))
 		{
 			echo '
-										<ul class="sp_list">';
+				<ul class="sp_list">';
 
 			foreach ($button['sub_buttons'] as $sub_button)
+			{
 				echo '
-											<li ', sp_embed_class('dot', '', 'sp_list_indent'), '>
-												<a title="', $sub_button['title'], '" href="', $sub_button['href'], '">', $sub_button['title'], '</a></li>';
+					<li ', sp_embed_class('dot', '', 'sp_list_indent'), '>
+						<a title="', $sub_button['title'], '" href="', $sub_button['href'], '">', $sub_button['title'], '</a></li>';
+}
 
 			echo '
-										</ul>';
+				</ul>';
 		}
 
 		echo '</li>';
 	}
 
 	echo '
-								</ul>';
+		</ul>';
 
 	// Superfish the menu
 	$javascript = "

@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Abstract Simple Portal block
@@ -45,7 +47,7 @@ abstract class SP_Abstract_Block
 	protected $template = '';
 
 	/**
-	 * Class constuctor, makes db availalbe
+	 * Class constructor, makes db available
 	 *
 	 * @param Database|null $db
 	 */
@@ -85,7 +87,9 @@ abstract class SP_Abstract_Block
 	public function render()
 	{
 		if (is_callable($this->template))
+		{
 			call_user_func_array($this->template, array($this->data));
+		}
 	}
 
 	/**

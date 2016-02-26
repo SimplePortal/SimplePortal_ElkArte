@@ -6,23 +6,27 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Top Posters block, shows the top posters on the site, with avatar and name
  *
  * @param mixed[] $parameters
- *		'limit' => number of top posters to show
- *		'type' => period to determine the top poster, 0 all time, 1 today, 2 week, 3 month
+ *        'limit' => number of top posters to show
+ *        'type' => period to determine the top poster, 0 all time, 1 today, 2 week, 3 month
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
 class Top_Poster_Block extends SP_Abstract_Block
 {
+	protected $color_ids = array();
+
 	/**
 	 * Constructor, used to define block parameters
 	 *
@@ -48,7 +52,7 @@ class Top_Poster_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $scripturl, $color_profile;
+		global $scripturl;
 
 		$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
 		$type = !empty($parameters['type']) ? (int) $parameters['type'] : 0;
@@ -64,7 +68,9 @@ class Top_Poster_Block extends SP_Abstract_Block
 			}
 			// This week
 			elseif ($type == 2)
+			{
 				$start_time = mktime(0, 0, 0, date("n"), date("j"), date("Y")) - (date("N") * 3600 * 24);
+			}
 			// This month
 			elseif ($type == 3)
 			{
@@ -109,13 +115,14 @@ class Top_Poster_Block extends SP_Abstract_Block
 			);
 		}
 		$this->data['members'] = array();
-		$colorids = array();
-		// Load the member data
 		while ($row = $this->_db->fetch_assoc($request))
 		{
 			if (!empty($row['id_member']))
-				$colorids[$row['id_member']] = $row['id_member'];
+			{
+				$this->color_ids[$row['id_member']] = $row['id_member'];
+			}
 
+			// Load the member data
 			$this->data['members'][] = array(
 				'id' => $row['id_member'],
 				'name' => $row['real_name'],
@@ -134,16 +141,27 @@ class Top_Poster_Block extends SP_Abstract_Block
 		$this->_db->free_result($request);
 
 		// Profile colors?
-		if (!empty($colorids) && sp_loadColors($colorids) !== false)
-		{
-			foreach ($this->data['members'] as $k => $p)
-			{
-				if (!empty($color_profile[$p['id']]['link']))
-					$this->data['members'][$k]['link'] = $color_profile[$p['id']]['link'];
-			}
-		}
+		$this->_colorids();
 
 		$this->setTemplate('template_sp_topPoster');
+	}
+
+	/**
+	 * Provide the color profile id's
+	 */
+	private function _colorids()
+	{
+		global $color_profile;
+
+		if (sp_loadColors($this->color_ids) !== false)
+		{
+			{
+				if (!empty($color_profile[$p['id']]['link']))
+				{
+					$this->data['members'][$k]['link'] = $color_profile[$p['id']]['link'];
+				}
+			}
+		}
 	}
 }
 
@@ -161,6 +179,7 @@ function template_sp_topPoster($data)
 	{
 		echo '
 								', $txt['error_sp_no_members_found'];
+
 		return;
 	}
 
@@ -169,6 +188,7 @@ function template_sp_topPoster($data)
 								<table class="sp_fullwidth">';
 
 	foreach ($data['members'] as $member)
+	{
 		echo '
 									<tr>
 										<td class="sp_top_poster centertext">', !empty($member['avatar']['href']) ? '
@@ -181,6 +201,7 @@ function template_sp_topPoster($data)
 											<span class="smalltext">', $member['posts'], ' ', $txt['posts'], '</span>
 										</td>
 									</tr>';
+	}
 
 	echo '
 								</table>';

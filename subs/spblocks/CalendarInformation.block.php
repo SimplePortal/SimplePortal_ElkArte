@@ -6,20 +6,22 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Calendar Info Block, Displays basic calendar ... birthdays, events and holidays.
  *
  * @param mixed[] $parameters
- *		'events' => show events
- *		'future' => how many months out to look for items
- *		'birthdays' => show birthdays
- *		'holidays' => show holidays
+ *        'events' => show events
+ *        'future' => how many months out to look for items
+ *        'birthdays' => show birthdays
+ *        'holidays' => show holidays
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -84,9 +86,13 @@ class Calendar_Information_Block extends SP_Abstract_Block
 		{
 			// Just today's events or looking forward a few days?
 			if (!empty($event_future))
+			{
 				$event_future_date = date("Y-m-d", ($now + $event_future * 86400));
+			}
 			else
+			{
 				$event_future_date = $today_date;
+			}
 
 			// Load them in
 			$events = sp_loadCalendarData('getEvents', $today_date, $event_future_date);
@@ -98,9 +104,13 @@ class Calendar_Information_Block extends SP_Abstract_Block
 				foreach ($day_events as $event_key => $event)
 				{
 					if (in_array($event['id'], $displayed))
+					{
 						unset($events[$day][$event_key]);
+					}
 					else
+					{
 						$displayed[] = $event['id'];
+					}
 				}
 			}
 
@@ -150,8 +160,8 @@ class Calendar_Information_Block extends SP_Abstract_Block
  */
 function template_sp_calendarInformation_error($data)
 {
-		echo '
-								', $data['error_msg'];
+	echo '
+		', $data['error_msg'];
 }
 
 /**
@@ -164,55 +174,79 @@ function template_sp_calendarInformation($data)
 	global $txt, $scripturl;
 
 	echo '
-								<ul class="sp_list">';
+		<ul class="sp_list">';
 
 	if (!empty($data['calendar']['todayHolidays']))
 	{
 		if ($data['show_titles'])
+		{
 			echo '
-									<li><strong>', $txt['sp_calendar_holidays'], '</strong></li>';
+			<li>
+				<strong>', $txt['sp_calendar_holidays'], '</strong>
+			</li>';
+		}
 
 		foreach ($data['calendar']['todayHolidays'] as $holiday)
+		{
 			echo '
-									<li ', sp_embed_class('holiday'), '>', $holiday, '</li>';
+			<li ', sp_embed_class('holiday'), '>', $holiday, '</li>';
+		}
 	}
 
 	if (!empty($data['calendar']['todayBirthdays']))
 	{
 		if ($data['show_titles'])
+		{
 			echo '
-									<li><strong>', $txt['sp_calendar_birthdays'], '</strong></li>';
+			<li>
+				<strong>', $txt['sp_calendar_birthdays'], '</strong>
+			</li>';
+		}
 
 		foreach ($data['calendar']['todayBirthdays'] as $member)
+		{
 			echo '
-									<li ', sp_embed_class('birthday'), '><a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a></li>';
+			<li ', sp_embed_class('birthday'), '><a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a></li>';
+		}
 	}
 
 	if (!empty($data['calendar']['todayEvents']))
 	{
 		if ($data['show_titles'])
+		{
 			echo '
-									<li><strong>', $txt['sp_calendar_events'], '</strong></li>';
+			<li>
+				<strong>', $txt['sp_calendar_events'], '</strong>
+			</li>';
+		}
 
 		foreach ($data['calendar']['todayEvents'] as $event)
+		{
 			echo '
-									<li ', sp_embed_class('event'), '>', $event['link'], !$data['show_titles'] ? ' - ' . standardTime(forum_time(), '%d %b') : '', '</li>';
+			<li ', sp_embed_class('event'), '>', $event['link'], !$data['show_titles'] ? ' - ' . standardTime(forum_time(), '%d %b') : '', '</li>';
+		}
 	}
 
 	if (!empty($data['calendar']['futureEvents']))
 	{
 		if ($data['show_titles'])
+		{
 			echo '
-									<li><strong>', $txt['sp_calendar_upcomingEvents'], '</strong></li>';
+			<li>
+				<strong>', $txt['sp_calendar_upcomingEvents'], '</strong>
+			</li>';
+		}
 
 		foreach ($data['calendar']['futureEvents'] as $startdate => $events)
 		{
 			foreach ($events as $event)
+			{
 				echo '
-									<li ', sp_embed_class('event'), '>', $event['link'], ' - ', timeformat(strtotime($startdate), '%d %b'), '</li>';
+			<li ', sp_embed_class('event'), '>', $event['link'], ' - ', timeformat(strtotime($startdate), '%d %b'), '</li>';
+			}
 		}
 	}
 
 	echo '
-								</ul>';
+		</ul>';
 }

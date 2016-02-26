@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * News Block, Displays the forum news
@@ -45,5 +47,5 @@ function template_sp_news($data)
 	global $context;
 
 	echo '
-								<div class="centertext">', $context['random_news_line'], '</div>';
+		<div class="centertext">', $context['random_news_line'], '</div>';
 }

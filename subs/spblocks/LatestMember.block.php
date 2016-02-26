@@ -6,22 +6,26 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Latest member block, shows name and join date for X latest members
  *
  * @param mixed[] $parameters
- *		'limit' => number of members to show
+ *        'limit' => number of members to show
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
 class Latest_Member_Block extends SP_Abstract_Block
 {
+	protected $colorids = array();
+
 	/**
 	 * Constructor, used to define block parameters
 	 *
@@ -53,13 +57,15 @@ class Latest_Member_Block extends SP_Abstract_Block
 		$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
 		$rows = recentMembers($limit);
 
-		// Get them ready for color ids and the template
+		// Get them ready the template
 		$this->data['members'] = array();
-		$colorids = array();
+
 		foreach ($rows as $row)
 		{
 			if (!empty($row['id_member']))
-				$colorids[$row['id_member']] = $row['id_member'];
+			{
+				$this->colorids[$row['id_member']] = $row['id_member'];
+			}
 
 			$this->data['members'][] = array(
 				'id' => $row['id_member'],
@@ -71,16 +77,28 @@ class Latest_Member_Block extends SP_Abstract_Block
 		}
 
 		// Using member profile colors
-		if (!empty($colorids) && sp_loadColors($colorids) !== false)
+		$this->_colorids();
+
+		$this->setTemplate('template_sp_latestMember');
+	}
+
+	/**
+	 * Provide the color profile id's
+	 */
+	private function _colorids()
+	{
+		global $color_profile;
+
+		if (sp_loadColors($this->colorids) !== false)
 		{
 			foreach ($this->data['members'] as $k => $p)
 			{
 				if (!empty($color_profile[$p['id']]['link']))
+				{
 					$this->data['members'][$k]['link'] = $color_profile[$p['id']]['link'];
+				}
 			}
 		}
-
-		$this->setTemplate('template_sp_latestMember');
 	}
 }
 
@@ -97,18 +115,20 @@ function template_sp_latestMember($data)
 	if (empty($data['members']))
 	{
 		echo '
-									', $txt['error_sp_no_members_found'];
+			', $txt['error_sp_no_members_found'];
 
 		return;
 	}
 
 	echo '
-									<ul class="sp_list">';
+			<ul class="sp_list">';
 
 	foreach ($data['members'] as $member)
+	{
 		echo '
-										<li ', sp_embed_class('dot'), '>', $member['link'], ' - <span class="smalltext">', $member['date'], '</span></li>';
+				<li ', sp_embed_class('dot'), '>', $member['link'], ' - <span class="smalltext">', $member['date'], '</span></li>';
+	}
 
 	echo '
-									</ul>';
+			</ul>';
 }

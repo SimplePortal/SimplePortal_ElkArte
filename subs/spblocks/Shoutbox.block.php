@@ -6,17 +6,19 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Shoutbox Block, show the shoutbox thoughts box
  *
  * @param mixed[] $parameters
- *		'shoutbox' => list of shoutboxes to choose from
+ *        'shoutbox' => list of shoutboxes to choose from
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -30,6 +32,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 	public function __construct($db = null)
 	{
 		require_once(SUBSDIR . '/PortalShoutbox.subs.php');
+
 		$this->block_parameters = array(
 			'shoutbox' => array(),
 		);
@@ -50,7 +53,8 @@ class Shoutbox_Block extends SP_Abstract_Block
 		$in_use = array();
 
 		$request = $this->_db->query('', '
-			SELECT id_block, value
+			SELECT
+				id_block, value
 			FROM {db_prefix}sp_parameters
 			WHERE variable = {string:name}',
 			array(
@@ -60,17 +64,25 @@ class Shoutbox_Block extends SP_Abstract_Block
 		while ($row = $this->_db->fetch_assoc($request))
 		{
 			if (empty($_REQUEST['block_id']) || $_REQUEST['block_id'] != $row['id_block'])
+			{
 				$in_use[] = $row['value'];
+			}
 		}
 		$this->_db->free_result($request);
 
 		// Load up all the shoutboxes that are NOT being used
 		foreach ($shoutboxes as $shoutbox)
+		{
 			if (!in_array($shoutbox['id'], $in_use))
+			{
 				$this->block_parameters['shoutbox'][$shoutbox['id']] = $shoutbox['name'];
+			}
+		}
 
 		if (empty($this->block_parameters['shoutbox']))
+		{
 			fatal_error(allowedTo(array('sp_admin', 'sp_manage_shoutbox')) ? $txt['error_sp_no_shoutbox'] . '<br />' . sprintf($txt['error_sp_no_shoutbox_sp_moderator'], $scripturl . '?action=admin;area=portalshoutbox;sa=add') : $txt['error_sp_no_shoutbox_normaluser'], false);
+		}
 
 		return $this->block_parameters;
 	}
@@ -98,6 +110,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 		{
 			$this->data['error_msg'] = $txt['error_sp_shoutbox_not_exist'];
 			$this->setTemplate('template_sp_shoutbox_error');
+
 			return;
 		}
 
@@ -116,16 +129,22 @@ class Shoutbox_Block extends SP_Abstract_Block
 				preparsecode($_POST['new_shout']);
 
 				if (!empty($_POST['new_shout']))
+				{
 					sportal_create_shout($this->data, $_POST['new_shout']);
+				}
 			}
 			else
+			{
 				$this->data['warning'] = $flood;
+			}
 		}
 
 		// Can they moderate the shoutbox (delete shouts?)
 		$can_moderate = allowedTo('sp_admin') || allowedTo('sp_manage_shoutbox');
 		if (!$can_moderate && !empty($this->data['moderator_groups']))
+		{
 			$can_moderate = count(array_intersect($user_info['groups'], $this->data['moderator_groups'])) > 0;
+		}
 
 		$shout_parameters = array(
 			'limit' => $this->data['num_show'],
@@ -145,30 +164,16 @@ class Shoutbox_Block extends SP_Abstract_Block
 			$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'];
 			$this->data['smileys'] = array('normal' => array(), 'popup' => array());
 			if (empty($modSettings['smiley_enable']))
-				$this->data['smileys']['normal'] = array(
-					array('code' => ':)', 'filename' => 'smiley.gif', 'description' => $txt['icon_smiley']),
-					array('code' => ';)', 'filename' => 'wink.gif', 'description' => $txt['icon_wink']),
-					array('code' => ':D', 'filename' => 'cheesy.gif', 'description' => $txt['icon_cheesy']),
-					array('code' => ';D', 'filename' => 'grin.gif', 'description' => $txt['icon_grin']),
-					array('code' => '>:(', 'filename' => 'angry.gif', 'description' => $txt['icon_angry']),
-					array('code' => ':(', 'filename' => 'sad.gif', 'description' => $txt['icon_sad']),
-					array('code' => ':o', 'filename' => 'shocked.gif', 'description' => $txt['icon_shocked']),
-					array('code' => '8)', 'filename' => 'cool.gif', 'description' => $txt['icon_cool']),
-					array('code' => '???', 'filename' => 'huh.gif', 'description' => $txt['icon_huh']),
-					array('code' => '::)', 'filename' => 'rolleyes.gif', 'description' => $txt['icon_rolleyes']),
-					array('code' => ':P', 'filename' => 'tongue.gif', 'description' => $txt['icon_tongue']),
-					array('code' => ':-[', 'filename' => 'embarrassed.gif', 'description' => $txt['icon_embarrassed']),
-					array('code' => ':-X', 'filename' => 'lipsrsealed.gif', 'description' => $txt['icon_lips']),
-					array('code' => ':-\\', 'filename' => 'undecided.gif', 'description' => $txt['icon_undecided']),
-					array('code' => ':-*', 'filename' => 'kiss.gif', 'description' => $txt['icon_kiss']),
-					array('code' => ':\'(', 'filename' => 'cry.gif', 'description' => $txt['icon_cry'])
-				);
+			{
+				$this->data['smileys']['normal'] = $this->_smileys();
+			}
 			else
 			{
 				if (($temp = cache_get_data('shoutbox_smileys', 3600)) == null)
 				{
 					$request = $this->_db->query('', '
-						SELECT code, filename, description, smiley_row, hidden
+						SELECT
+							code, filename, description, smiley_row, hidden
 						FROM {db_prefix}smileys
 						WHERE hidden IN ({array_int:hidden})
 						ORDER BY smiley_row, smiley_order',
@@ -188,7 +193,9 @@ class Shoutbox_Block extends SP_Abstract_Block
 					cache_put_data('shoutbox_smileys', $this->data['smileys'], 3600);
 				}
 				else
+				{
 					$this->data['smileys'] = $temp;
+				}
 			}
 
 			foreach (array_keys($this->data['smileys']) as $location)
@@ -201,28 +208,65 @@ class Shoutbox_Block extends SP_Abstract_Block
 				}
 
 				if (!empty($this->data['smileys'][$location]))
+				{
 					$this->data['smileys'][$location][$n - 1]['last'] = true;
+				}
 			}
 
 			// Basic shoutbox bbc we allow
-			$this->data['bbc'] = array(
-				'bold' => array('code' => 'b', 'before' => '[b]', 'after' => '[/b]', 'description' => $editortxt['Bold']),
-				'italicize' => array('code' => 'i', 'before' => '[i]', 'after' => '[/i]', 'description' => $editortxt['Italic']),
-				'underline' => array('code' => 'u', 'before' => '[u]', 'after' => '[/u]', 'description' => $editortxt['Underline']),
-				'strike' => array('code' => 's', 'before' => '[s]', 'after' => '[/s]', 'description' => $editortxt['Strikethrough']),
-				'pre' => array('code' => 'pre', 'before' => '[pre]', 'after' => '[/pre]', 'description' => $editortxt['Preformatted Text']),
-				'img' => array('code' => 'img', 'before' => '[img]', 'after' => '[/img]', 'description' => $editortxt['Insert an image']),
-				'url' => array('code' => 'url', 'before' => '[url]', 'after' => '[/url]', 'description' => $editortxt['Insert a link']),
-				'email' => array('code' => 'email', 'before' => '[email]', 'after' => '[/email]', 'description' => $editortxt['Insert an email']),
-				'sup' => array('code' => 'sup', 'before' => '[sup]', 'after' => '[/sup]', 'description' => $editortxt['Superscript']),
-				'sub' => array('code' => 'sub', 'before' => '[sub]', 'after' => '[/sub]', 'description' => $editortxt['Subscript']),
-				'tele' => array('code' => 'tt', 'before' => '[tt]', 'after' => '[/tt]', 'description' => $editortxt['Teletype']),
-				'code' => array('code' => 'code', 'before' => '[code]', 'after' => '[/code]', 'description' => $editortxt['Code']),
-				'quote' => array('code' => 'quote', 'before' => '[quote]', 'after' => '[/quote]', 'description' => $editortxt['Insert a Quote']),
-			);
+			$this->data['bbc'] = $this->_bbc();
 		}
 
 		$this->setTemplate('template_shoutbox_embed');
+	}
+
+	private function _bbc()
+	{
+		global $editortxt;
+
+		return array(
+			'bold' => array('code' => 'b', 'before' => '[b]', 'after' => '[/b]', 'description' => $editortxt['Bold']),
+			'italicize' => array('code' => 'i', 'before' => '[i]', 'after' => '[/i]', 'description' => $editortxt['Italic']),
+			'underline' => array('code' => 'u', 'before' => '[u]', 'after' => '[/u]', 'description' => $editortxt['Underline']),
+			'strike' => array('code' => 's', 'before' => '[s]', 'after' => '[/s]', 'description' => $editortxt['Strikethrough']),
+			'pre' => array('code' => 'pre', 'before' => '[pre]', 'after' => '[/pre]', 'description' => $editortxt['Preformatted Text']),
+			'img' => array('code' => 'img', 'before' => '[img]', 'after' => '[/img]', 'description' => $editortxt['Insert an image']),
+			'url' => array('code' => 'url', 'before' => '[url]', 'after' => '[/url]', 'description' => $editortxt['Insert a link']),
+			'email' => array('code' => 'email', 'before' => '[email]', 'after' => '[/email]', 'description' => $editortxt['Insert an email']),
+			'sup' => array('code' => 'sup', 'before' => '[sup]', 'after' => '[/sup]', 'description' => $editortxt['Superscript']),
+			'sub' => array('code' => 'sub', 'before' => '[sub]', 'after' => '[/sub]', 'description' => $editortxt['Subscript']),
+			'tele' => array('code' => 'tt', 'before' => '[tt]', 'after' => '[/tt]', 'description' => $editortxt['Teletype']),
+			'code' => array('code' => 'code', 'before' => '[code]', 'after' => '[/code]', 'description' => $editortxt['Code']),
+			'quote' => array('code' => 'quote', 'before' => '[quote]', 'after' => '[/quote]', 'description' => $editortxt['Insert a Quote']),
+		);
+	}
+
+	/**
+	 * Load up the standard smileys for use
+	 * @return array
+	 */
+	private function _smileys()
+	{
+		global $txt;
+
+		return array(
+			array('code' => ':)', 'filename' => 'smiley.gif', 'description' => $txt['icon_smiley']),
+			array('code' => ';)', 'filename' => 'wink.gif', 'description' => $txt['icon_wink']),
+			array('code' => ':D', 'filename' => 'cheesy.gif', 'description' => $txt['icon_cheesy']),
+			array('code' => ';D', 'filename' => 'grin.gif', 'description' => $txt['icon_grin']),
+			array('code' => '>:(', 'filename' => 'angry.gif', 'description' => $txt['icon_angry']),
+			array('code' => ':(', 'filename' => 'sad.gif', 'description' => $txt['icon_sad']),
+			array('code' => ':o', 'filename' => 'shocked.gif', 'description' => $txt['icon_shocked']),
+			array('code' => '8)', 'filename' => 'cool.gif', 'description' => $txt['icon_cool']),
+			array('code' => '???', 'filename' => 'huh.gif', 'description' => $txt['icon_huh']),
+			array('code' => '::)', 'filename' => 'rolleyes.gif', 'description' => $txt['icon_rolleyes']),
+			array('code' => ':P', 'filename' => 'tongue.gif', 'description' => $txt['icon_tongue']),
+			array('code' => ':-[', 'filename' => 'embarrassed.gif', 'description' => $txt['icon_embarrassed']),
+			array('code' => ':-X', 'filename' => 'lipsrsealed.gif', 'description' => $txt['icon_lips']),
+			array('code' => ':-\\', 'filename' => 'undecided.gif', 'description' => $txt['icon_undecided']),
+			array('code' => ':-*', 'filename' => 'kiss.gif', 'description' => $txt['icon_kiss']),
+			array('code' => ':\'(', 'filename' => 'cry.gif', 'description' => $txt['icon_cry'])
+		);
 	}
 }
 
@@ -233,6 +277,6 @@ class Shoutbox_Block extends SP_Abstract_Block
  */
 function template_sp_shoutbox_error($data)
 {
-		echo '
-								', $data['error_msg'];
+	echo '
+		', $data['error_msg'];
 }

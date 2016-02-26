@@ -6,23 +6,25 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * RSS Block, Displays rss feed in a block.
  *
  * @param mixed[] $parameters
- *		'url' => url of the feed
- *		'show_title' => Show the feed title
- *		'show_content' => Show the content of the feed
- *		'show_date' => Show the date of the feed item
- *		'strip_preserve' => preserve tags
- * 		'count' => number of items to show
- * 		'limit' => number of characters of content to show
+ *        'url' => url of the feed
+ *        'show_title' => Show the feed title
+ *        'show_content' => Show the content of the feed
+ *        'show_date' => Show the date of the feed item
+ *        'strip_preserve' => preserve tags
+ *        'count' => number of items to show
+ *        'limit' => number of characters of content to show
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -90,14 +92,18 @@ class Rss_Feed_Block extends SP_Abstract_Block
 		{
 			// Use iconv if its available
 			if (function_exists('iconv'))
+			{
 				$data = @iconv($charset[1], 'UTF-8//TRANSLIT//IGNORE', $data);
+			}
 
 			// No iconv or a false response from it
 			if (!function_exists('iconv') || ($data == false))
 			{
 				// PHP (some 5.4 versions) mishandles //TRANSLIT//IGNORE and returns false: see https://bugs.php.net/bug.php?id=61484
 				if ($data == false)
+				{
 					$data = $data_save;
+				}
 
 				if (function_exists('mb_convert_encoding'))
 				{
@@ -106,7 +112,9 @@ class Rss_Feed_Block extends SP_Abstract_Block
 					$data = @mb_convert_encoding($data, 'UTF-8', $charset[1]);
 				}
 				elseif (function_exists('recode_string'))
+				{
 					$data = @recode_string($charset[1] . '..' . 'UTF-8', $data);
+				}
 			}
 		}
 
@@ -118,14 +126,18 @@ class Rss_Feed_Block extends SP_Abstract_Block
 		foreach ($items[1] as $item_id => $item)
 		{
 			if ($item_id === $count)
+			{
 				break;
+			}
 
 			preg_match_all('~<([A-Za-z]+)>(.+?)</\\1>~', $item, $match);
 
 			foreach ($match[0] as $tag_id => $dummy)
 			{
 				if (Util::strpos($match[2][$tag_id], '#cdata_escape_encode#') === 0)
+				{
 					$match[2][$tag_id] = stripslashes(un_htmlspecialchars(Util::substr($match[2][$tag_id], 21)));
+				}
 
 				$rss[$item_id][strtolower($match[1][$tag_id])] = un_htmlspecialchars($match[2][$tag_id]);
 			}
@@ -150,7 +162,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 			$this->data['items'][] = array(
 				'title' => $item['title'],
 				'href' => $item['link'],
-				'link' => $item['title'] == '' ? '' : ($item['link'] == '' ? $item['title'] : '<a href="' . $item['link'] . '" target="_blank" class="new_win">' . $item['title'] . '</a>'),
+				'link' => $item['title'] === '' ? '' : ($item['link'] === '' ? $item['title'] : '<a href="' . $item['link'] . '" target="_blank" class="new_win">' . $item['title'] . '</a>'),
 				'content' => $limit > 0 ? Util::shorten_text($item['description'], $limit, true) : $item['description'],
 				'date' => !empty($item['pubdate']) ? standardTime(strtotime($item['pubdate']), '%d %B') : '',
 			);
@@ -165,7 +177,9 @@ class Rss_Feed_Block extends SP_Abstract_Block
 			return;
 		}
 		else
+		{
 			$this->data['items'][count($this->data['items']) - 1]['is_last'] = true;
+		}
 
 		$this->setTemplate('template_sp_rssFeed');
 	}
@@ -178,8 +192,8 @@ class Rss_Feed_Block extends SP_Abstract_Block
  */
 function template_sp_rssFeed_error($data)
 {
-		echo '
-								', $data['error_msg'];
+	echo '
+		', $data['error_msg'];
 }
 
 /**
@@ -192,32 +206,38 @@ function template_sp_rssFeed($data)
 	if ($this->data['show_content'])
 	{
 		echo '
-								<div class="sp_rss_flow">
-									<ul class="sp_list">';
+		<div class="sp_rss_flow">
+			<ul class="sp_list">';
 
 		foreach ($data['items'] as $item)
 		{
 			if ($data['show_title'] && !empty($item['link']))
+			{
 				echo '
-										<li ', sp_embed_class('post', '', 'sp_list_top'), '><strong>', $item['link'], '</strong>', ($this->data['show_date'] && !empty($item['date']) ? ' - ' . $item['date'] : ''), '</li>';
+				<li ', sp_embed_class('post', '', 'sp_list_top'), '>
+					<strong>', $item['link'], '</strong>', ($this->data['show_date'] && !empty($item['date']) ? ' - ' . $item['date'] : ''), '
+				</li>';
+			}
 			echo '
-										<li', empty($item['is_last']) ? ' class="sp_list_divider"' : '', '>', $item['content'], '</li>';
+				<li', empty($item['is_last']) ? ' class="sp_list_divider"' : '', '>', $item['content'], '</li>';
 		}
 
 		echo '
-									</ul>
-								</div>';
+			</ul>
+		</div>';
 	}
 	else
 	{
 		echo '
-								<ul class="sp_list">';
+		<ul class="sp_list">';
 
 		foreach ($data['items'] as $item)
+		{
 			echo '
-									<li ', sp_embed_class('dot_feed'), '> ', $item['link'], ($this->data['show_date'] && !empty($item['date']) ? ' - ' . $item['date'] : ''), '</li>';
+			<li ', sp_embed_class('dot_feed'), '> ', $item['link'], ($this->data['show_date'] && !empty($item['date']) ? ' - ' . $item['date'] : ''), '</li>';
+		}
 
 		echo '
-								</ul>';
+		</ul>';
 	}
 }

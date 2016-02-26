@@ -6,11 +6,13 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Quick Search Block, Displays a quick search box
@@ -38,19 +40,17 @@ class Quick_Search_Block extends SP_Abstract_Block
 
 /**
  * Main template for this block
- *
- * @param mixed[] $data
  */
-function template_sp_quickSearch($data)
+function template_sp_quickSearch()
 {
 	global $txt, $scripturl;
 
 	echo '
-								<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
-									<div class="centertext">
-										<input type="text" name="search" value="" class="sp_search" /><br />
-										<input type="submit" name="submit" value="', $txt['search'], '" class="button_submit" />
-										<input type="hidden" name="advanced" value="0" />
-									</div>
-								</form>';
+		<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
+			<div class="centertext">
+				<input type="text" name="search" value="" class="sp_search" /><br />
+				<input type="submit" name="submit" value="', $txt['search'], '" class="button_submit" />
+				<input type="hidden" name="advanced" value="0" />
+			</div>
+		</form>';
 }

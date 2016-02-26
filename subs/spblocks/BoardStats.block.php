@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
@@ -62,6 +62,8 @@ class Board_Stats_Block extends SP_Abstract_Block
 		if ($this->data['averages'])
 		{
 			require_once(SUBSDIR . '/Stats.subs.php');
+
+			// All of the average data for the system
 			$averages = getAverages();
 
 			// The number of days the forum has been up...
@@ -97,25 +99,25 @@ function template_sp_boardStats($data)
 	global $txt, $scripturl;
 
 	echo '
-								<ul class="sp_list">
-									<li ', sp_embed_class('portalstats'), '>', $txt['total_members'], ': <a href="', $scripturl . '?action=memberlist">', comma_format($data['totals']['members']), '</a></li>
-									<li ', sp_embed_class('portalstats'), '>', $txt['total_posts'], ': ', comma_format($data['totals']['posts']), '</li>
-									<li ', sp_embed_class('portalstats'), '>', $txt['total_topics'], ': ', comma_format($data['totals']['topics']), '</li>
-									<li ', sp_embed_class('portalstats'), '>', $txt['total_cats'], ': ', comma_format($data['totals']['categories']), '</li>
-									<li ', sp_embed_class('portalstats'), '>', $txt['total_boards'], ': ', comma_format($data['totals']['boards']), '</li>
-									<li ', sp_embed_class('portalstats'), '>', $txt['most_online'], ': ', comma_format($data['totals']['mostOnline']), '</li>
-								</ul>';
+		<ul class="sp_list">
+			<li ', sp_embed_class('portalstats'), '>', $txt['total_members'], ': <a href="', $scripturl . '?action=memberlist">', comma_format($data['totals']['members']), '</a></li>
+			<li ', sp_embed_class('portalstats'), '>', $txt['total_posts'], ': ', comma_format($data['totals']['posts']), '</li>
+			<li ', sp_embed_class('portalstats'), '>', $txt['total_topics'], ': ', comma_format($data['totals']['topics']), '</li>
+			<li ', sp_embed_class('portalstats'), '>', $txt['total_cats'], ': ', comma_format($data['totals']['categories']), '</li>
+			<li ', sp_embed_class('portalstats'), '>', $txt['total_boards'], ': ', comma_format($data['totals']['boards']), '</li>
+			<li ', sp_embed_class('portalstats'), '>', $txt['most_online'], ': ', comma_format($data['totals']['mostOnline']), '</li>
+		</ul>';
 
 	// And the averages if required
 	if ($data['averages'])
 	{
 		echo '
-								<hr />
-								<ul class="sp_list">
-									<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_posts'], ': ', comma_format($data['totals']['average_posts']), '</li>
-									<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_topics'], ': ', comma_format($data['totals']['average_topics']), '</li>
-									<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_members'], ': ', comma_format($data['totals']['average_members']), '</li>
-									<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_online'], ': ', comma_format($data['totals']['average_online']), '</li>
-								</ul>';
+		<hr />
+		<ul class="sp_list">
+			<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_posts'], ': ', comma_format($data['totals']['average_posts']), '</li>
+			<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_topics'], ': ', comma_format($data['totals']['average_topics']), '</li>
+			<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_members'], ': ', comma_format($data['totals']['average_members']), '</li>
+			<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_online'], ': ', comma_format($data['totals']['average_online']), '</li>
+		</ul>';
 	}
 }

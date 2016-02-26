@@ -6,29 +6,32 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Top stats block, shows the top x members who has achieved top position of various stats
  * Designed to be flexible so adding additional member stats is easy
  *
  * @param mixed[] $parameters
- *		'limit' => number of top posters to show
- *		'type' => top stat to show
- *		'sort_asc' => direction to show the list
- * 		'last_active_limit'
- * 		'enable_label' => use the label
- * 		'list_label' => title for the list
+ *        'limit' => number of top posters to show
+ *        'type' => top stat to show
+ *        'sort_asc' => direction to show the list
+ *        'last_active_limit'
+ *        'enable_label' => use the label
+ *        'list_label' => title for the list
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
 class Top_Stats_Member_Block extends SP_Abstract_Block
 {
 	protected $sp_topStatsSystem = array();
+	protected $color_ids = array();
 
 	/**
 	 * Constructor, used to define block parameters
@@ -65,7 +68,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 		* 'order' - What is the field name i need to be sort after
 		* 'where' - Here you can add additional where statements
 		* 'output_text' - What should be displayed after the avatar and nickname
-		*				For example if your field is karmaGood 'output_text' => $txt['karma'] . '%karmaGood%';
+		*	 - For example if your field is karmaGood 'output_text' => $txt['karma'] . '%karmaGood%';
 		* 'output_function' - With this you can add to the $row of the query some information.
 		* 'reverse' - On true it change the reverse cause, if not set it will be false :)
 		* 'enabled' - true = mod exists or is possible to use :D
@@ -177,7 +180,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $context, $scripturl, $user_info, $user_info, $modSettings, $color_profile;
+		global $context, $scripturl, $modSettings;
 
 		// Standard Variables
 		$type = !empty($parameters['type']) ? $parameters['type'] : 0;
@@ -217,9 +220,13 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 			$data = explode(';', $modSettings[$chache_id]);
 
 			if ($data[0] == $type && $data[1] == $limit && !empty($data[2]) == $sort_asc && $data[3] > time() - 300) // 5 Minute cache
+			{
 				$where[] = 'mem.id_member IN (' . $data[4] . ')';
+			}
 			else
+			{
 				unset($modSettings[$chache_id]);
+			}
 		}
 
 		// Last active remove
@@ -230,13 +237,19 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 		}
 
 		if (!empty($current_system['where']))
+		{
 			$where[] = $current_system['where'];
+		}
 
 		if (!empty($where))
+		{
 			$where = 'WHERE (' . implode(')
 				AND (', $where) . ')';
+		}
 		else
+		{
 			$where = "";
+		}
 
 		// Finally make the query with the parameters we built
 		$request = $this->_db->query('', '
@@ -259,7 +272,6 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 			)
 		);
 		$this->data['members'] = array();
-		$colorids = array();
 		$count = 1;
 		$chache_member_ids = array();
 		while ($row = $this->_db->fetch_assoc($request))
@@ -267,22 +279,28 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 			// Collect some to cache data
 			$chache_member_ids[$row['id_member']] = $row['id_member'];
 			if ($count++ > $limit)
+			{
 				continue;
+			}
 
-			$colorids[$row['id_member']] = $row['id_member'];
+			$this->color_ids[$row['id_member']] = $row['id_member'];
 
 			// Setup the row
 			$output = '';
 
 			// Prepare some data of the row?
 			if (!empty($current_system['output_function']))
+			{
 				$current_system['output_function']($row);
+			}
 
 			if (!empty($current_system['output_text']))
 			{
 				$output = $current_system['output_text'];
 				foreach ($row as $item => $replacewith)
+				{
 					$output = str_replace('%' . $item . '%', $replacewith, $output);
+				}
 			}
 
 			$this->data['members'][] = array(
@@ -311,17 +329,34 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 		}
 		// One time error, if this happens the cache needs an update
 		elseif (!empty($modSettings[$chache_id]))
+		{
 			updateSettings(array($chache_id => '0;0;0;1000;0'));
+		}
 
-		if (!empty($colorids) && sp_loadColors($colorids) !== false)
+		// Color the id's
+		$this->_colorids();
+
+		// Set the template to use
+		$this->setTemplate('template_sp_topStatsMember');
+	}
+
+	/**
+	 * Provide the color profile id's
+	 */
+	private function _colorids()
+	{
+		global $color_profile;
+
+		if (sp_loadColors($this->color_ids) !== false)
 		{
 			foreach ($this->data['members'] as $k => $p)
 			{
 				if (!empty($color_profile[$p['id']]['link']))
+				{
 					$this->data['members'][$k]['link'] = $color_profile[$p['id']]['link'];
+				}
 			}
 		}
-		$this->setTemplate('template_sp_topStatsMember');
 	}
 }
 
@@ -348,37 +383,40 @@ function template_sp_topStatsMember($data)
 	if (empty($data['members']))
 	{
 		echo '
-								', $txt['error_sp_no_members_found'];
+			', $txt['error_sp_no_members_found'];
+
 		return;
 	}
 
 	// Finally, output the block
 	echo '
-								<table class="sp_fullwidth">';
+			<table class="sp_fullwidth">';
 
 	if ($data['enable_label'])
+	{
 		echo '
-									<tr>
-										<td class="sp_top_poster centertext" colspan="2">
-											<strong>', $data['list_label'], '</strong>
-										</td>
-									</tr>';
+				<tr>
+					<td class="sp_top_poster centertext" colspan="2">
+						<strong>', $data['list_label'], '</strong>
+					</td>
+				</tr>';
+	}
 
 	foreach ($data['members'] as $member)
 	{
 		echo '
-									<tr>
-										<td class="sp_top_poster centertext">', !empty($member['avatar']['href']) ? '
-											<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '">
-												<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" style="max-width:40px" />
-											</a>' : '', '
-										</td>
-										<td>
-											', $member['link'], '<br /><span class="smalltext">', $member['output'], '</span>
-										</td>
-									</tr>';
+				<tr>
+					<td class="sp_top_poster centertext">', !empty($member['avatar']['href']) ? '
+						<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '">
+							<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" style="max-width:40px" />
+						</a>' : '', '
+					</td>
+					<td>
+						', $member['link'], '<br /><span class="smalltext">', $member['output'], '</span>
+					</td>
+				</tr>';
 	}
 
 	echo '
-								</table>';
+			</table>';
 }

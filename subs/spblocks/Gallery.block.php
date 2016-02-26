@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (!defined('ELK'))
@@ -50,20 +50,25 @@ class Gallery_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $scripturl, $txt, $scripturl, $modSettings;
+		global  $txt, $modSettings;
 
 		$limit = empty($parameters['limit']) ? 1 : (int) $parameters['limit'];
 		$type = empty($parameters['type']) ? 0 : 1;
 		$this->data['direction'] = empty($parameters['direction']) ? 0 : 1;
 
+		// Find what gallery is installed
 		$this->data['mod'] = $this->_getGallery();
 
+		// No gallery, no images I'm afraid
 		if (empty($this->data['mod']))
 		{
 			$this->data['error_msg'] = $txt['error_sp_no_gallery_found'];
 			$this->setTemplate('template_sp_gallery_error');
+
 			return;
 		}
+
+		// Set the approraite template for the gallery in use
 		$this->data['gallery_template'] = 'template_sp_gallery_' . $this->data['mod'];
 
 		$this->data['items'] = $this->_getItems($limit, $type);
@@ -74,23 +79,24 @@ class Gallery_Block extends SP_Abstract_Block
 		{
 			$this->data['error_msg'] = $txt['error_sp_no_pictures_found'];
 			$this->setTemplate('template_sp_gallery_error');
+
 			return;
 		}
 	}
 
 	/**
-	 * Returns of list of gallerys that this block can work with
+	 * Returns of list of gallery's that this block can work with
 	 *
 	 * @return string
 	 */
 	protected function _getGallery()
 	{
-		// right now we only know about one gallery, but more may be added,
+		$mod = '';
+
+		// Right now we only know about one gallery, but more may be added,
 		// maybe even ones we can tell folks about :P
 		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
 			$mod = 'aeva_media';
-		else
-			$mod = '';
 
 		return $mod;
 	}
@@ -103,12 +109,16 @@ class Gallery_Block extends SP_Abstract_Block
 	 */
 	protected function _getItems($limit, $type)
 	{
+		$data = array();
+
 		if ($this->data['mod'] === 'aeva_media')
 		{
 			require_once(SUBSDIR . '/Aeva-Subs.php');
 
-			return aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC');
+			$data = aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC');
 		}
+
+		return $data;
 	}
 }
 
@@ -119,8 +129,8 @@ class Gallery_Block extends SP_Abstract_Block
  */
 function template_sp_gallery_error($data)
 {
-		echo '
-								', $data['error_msg'];
+	echo '
+		', $data['error_msg'];
 }
 
 /**
@@ -133,13 +143,13 @@ function template_sp_gallery_aeva_media($item, $data)
 	global $scripturl, $txt;
 
 	echo '
-												<a href="', $scripturl, '?action=media;sa=item;in=', $item['id'], '">', $item['title'], '</a><br />' . ($data['fancybox_enabled'] ? '
-												<a href="' . $scripturl . '?action=media;sa=media;in=' . $item['id'] . '" rel="gallery" class="fancybox">' : '
-												<a href="' . $scripturl . '?action=media;sa=item;in=' . $item['id'] . '">') . '
-												<img src="', $scripturl, '?action=media;sa=media;in=', $item['id'], ';thumb" alt="" /></a><br />
-												', $txt['aeva_views'], ': ', $item['views'], '<br />
-												', $txt['aeva_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
-												', $txt['aeva_in_album'], ': <a href="', $scripturl, '?action=media;sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>';
+		<a href="', $scripturl, '?action=media;sa=item;in=', $item['id'], '">', $item['title'], '</a><br />' . ($data['fancybox_enabled'] ? '
+		<a href="' . $scripturl . '?action=media;sa=media;in=' . $item['id'] . '" rel="gallery" class="fancybox">' : '
+		<a href="' . $scripturl . '?action=media;sa=item;in=' . $item['id'] . '">') . '
+		<img src="', $scripturl, '?action=media;sa=media;in=', $item['id'], ';thumb" alt="" /></a><br />
+		', $txt['aeva_views'], ': ', $item['views'], '<br />
+		', $txt['aeva_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
+		', $txt['aeva_in_album'], ': <a href="', $scripturl, '?action=media;sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>';
 }
 
 /**
@@ -151,27 +161,29 @@ function template_sp_gallery($data)
 {
 	// We have gallery items to show!
 	echo '
-								<table class="sp_auto_align">', $data['direction'] ? '
-									<tr>' : '';
+		<table class="sp_auto_align">', $data['direction'] ? '
+			<tr>' : '';
 
 	$before = $data['direction'] ? '' : '
-									<tr>';
+			<tr>';
+
 	$after = $data['direction'] ? '' : '
-									</tr>';
+			</tr>';
+
 	foreach ($data['items'] as $item)
 	{
 		echo $before, '
-										<td>
-											<div class="sp_image smalltext">';
+				<td>
+					<div class="sp_image smalltext">';
 
 		$data['gallery_template']($item, $data);
 
 		echo '
-											</div>
-										</td>', $after;
+					</div>
+				</td>', $after;
 	}
 
 	echo $data['direction'] ? '
-									</tr>' : '', '
-								</table>';
+			</tr>' : '', '
+		</table>';
 }
