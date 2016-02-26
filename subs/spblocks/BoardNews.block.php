@@ -18,18 +18,31 @@ if (!defined('ELK'))
  * Board Block, Displays a list of posts from selected board(s)
  *
  * @param mixed[] $parameters
- *        'board' => Board(s) to select posts from
- *        'limit' => max number of posts to show
- *        'start' => id of post to start from
- *        'length' => preview length of the post
- *        'avatar' => show the poster avatar
- *        'per_page' => number of posts per page to show
+ * 			'board' => Board(s) to select posts from
+ *        	'limit' => max number of posts to show
+ *        	'start' => id of post to start from
+ *        	'length' => preview length of the post
+ *        	'avatar' => show the poster avatar
+ *        	'per_page' => number of posts per page to show
+ * 			'attachment' => Show the first attachment as image in post
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
 class Board_News_Block extends SP_Abstract_Block
 {
-	protected $colorids = array();
+	/**
+	 * @var array
+	 */
+	protected $attachments = array();
+
+	/**
+	 * @var array
+	 */
+	protected $color_ids = array();
+
+	/**
+	 * @var array
+	 */
 	protected $icon_sources = array();
 
 	/**
@@ -59,7 +72,7 @@ class Board_News_Block extends SP_Abstract_Block
 	 * @param mixed[] $parameters
 	 * @param int $id
 	 */
-	public function setup($parameters, $id)
+	function setup($parameters, $id)
 	{
 		global $scripturl, $txt, $settings, $modSettings, $context;
 
@@ -69,12 +82,12 @@ class Board_News_Block extends SP_Abstract_Block
 		$start = !empty($parameters['start']) ? (int) $parameters['start'] : 0;
 		$length = isset($parameters['length']) ? (int) $parameters['length'] : 250;
 		$avatars = !empty($parameters['avatar']);
+		$attachments = !empty($parameters['attachments']);
 		$per_page = !empty($parameters['per_page']) ? (int) $parameters['per_page'] : 0;
 
 		$limit = max(0, $limit);
 		$start = max(0, $start);
 
-		// Language
 		loadLanguage('Stats');
 
 		// Common message icons
@@ -104,10 +117,12 @@ class Board_News_Block extends SP_Abstract_Block
 		);
 		$posts = array();
 		while ($row = $this->_db->fetch_assoc($request))
+		{
 			$posts[] = $row['id_first_msg'];
+		}
 		$this->_db->free_result($request);
 
-		// No posts, then set the error template an return
+		// No posts, basic error message it is
 		if (empty($posts))
 		{
 			$this->setTemplate('template_sp_boardNews_error');
@@ -144,6 +159,13 @@ class Board_News_Block extends SP_Abstract_Block
 				'limit' => !empty($per_page) ? $per_page : $limit,
 			)
 		);
+
+		// Get the first attachment for each post for this group
+		if (!empty($attachments))
+		{
+			$this->loadAttachments($posts);
+		}
+
 		$this->data['news'] = array();
 		while ($row = $this->_db->fetch_assoc($request))
 		{
@@ -161,6 +183,8 @@ class Board_News_Block extends SP_Abstract_Block
 			// Good time to do this is ... now
 			censorText($row['subject']);
 			censorText($row['body']);
+
+			$attach = !empty($attachments) ? $this->getMessageAttach($row['id_msg'], $row['id_topic'], $row['body']) : '';
 			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
 			// Shorten the text if needed, link the ellipsis if the body has been shortened.
@@ -182,7 +206,7 @@ class Board_News_Block extends SP_Abstract_Block
 
 			if (!empty($row['id_member']))
 			{
-				$this->colorids[$row['id_member']] = $row['id_member'];
+				$this->color_ids[$row['id_member']] = $row['id_member'];
 			}
 
 			// Build an array of message information for output
@@ -209,11 +233,12 @@ class Board_News_Block extends SP_Abstract_Block
 				'locked' => !empty($row['locked']),
 				'is_last' => false,
 				'avatar' => $avatars ? determineAvatar($row) : array(),
+				'attachment' => $attach,
 			);
 		}
 		$this->_db->free_result($request);
 
-		// Nothing found, say so and exit
+		// Nothing found, set the message and return
 		if (empty($this->data['news']))
 		{
 			$this->setTemplate('template_sp_boardNews_error');
@@ -223,16 +248,110 @@ class Board_News_Block extends SP_Abstract_Block
 		}
 
 		$this->data['news'][count($this->data['news']) - 1]['is_last'] = true;
+		$this->setTemplate('template_sp_boardNews');
 
 		// If we want color id's then lets add them in
 		$this->_color_ids();
 
-		// And posts may have videos to show
+		// Account for embedded videos
 		$this->data['embed_videos'] = !empty($modSettings['enableVideoEmbeding']);
 
 		if (!empty($per_page))
 		{
-			$context['sp_boardNews_page_index'] = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, true);
+			$context['sp_boardNews_page_index'] = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, false);
+		}
+	}
+
+	/**
+	 * Load the first available attachments in a message (if any) for a group of messages
+	 *
+	 * @param array $posts
+	 */
+	protected function loadAttachments($posts)
+	{
+		global $modSettings, $attachments;
+
+		require_once(SUBSDIR . '/Attachments.subs.php');
+
+		// We will show attachments in the block, regardless, so save and restore
+		$attachmentShowImages = $modSettings['attachmentShowImages'];
+		$modSettings['attachmentShowImages'] = 1;
+		$this->attachments = getAttachments($posts, false);
+		$modSettings['attachmentShowImages'] = $attachmentShowImages;
+
+		if (!isset($attachments))
+		{
+			$attachments = array();
+		}
+
+		// For each message, use the first attachment in that message and no more
+		foreach ($this->attachments as $id_msg => $attachs)
+		{
+			if (!isset($attachments[$id_msg]))
+			{
+				foreach ($attachs as $key => $val)
+				{
+					$attachments[$id_msg][$key] = $val;
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Load the attachment details into context
+	 *
+	 * - If the message was found to have attachments (via loadAttachments) then
+	 * it will load that attachment data into context.
+	 * - If the message did not have attachments, it is then searched for the first
+	 * bbc IMG tag, and that image is used.
+	 *
+	 * @param int $id_msg
+	 * @param int $id_topic
+	 * @param string $body
+	 *
+	 * @return array|string
+	 */
+	protected function getMessageAttach($id_msg, $id_topic, &$body)
+	{
+		global $topic;
+
+		if (!empty($this->attachments[$id_msg]))
+		{
+			// A little razzle dazzle since loadAttachment is dependant on this
+			// poor behavior
+			$o_topic = isset($topic) && $topic !== null ? $topic : null;
+			$topic = $id_topic;
+			$this_attachs = loadAttachmentContext($id_msg);
+			$topic = $o_topic;
+
+			// Just one, and it must be an image
+			$attachment = array_shift($this_attachs);
+			if (!$attachment['is_image'])
+			{
+				return array();
+			}
+
+			return array(
+				'id' => $attachment['id'],
+				'href' => $attachment['href'] . ';image',
+				'name' => $attachment['name'],
+			);
+		}
+		// No attachments, perhaps an IMG tag then?
+		else
+		{
+			$pos = strpos($body, '[img');
+			if ($pos === false)
+			{
+				return '';
+			}
+
+			$img_tag = substr($body, $pos, strpos($body, '[/img]', $pos) + 6);
+			$img_html = parse_bbc($img_tag);
+			$body = str_replace($img_tag, '<div class="sp_attachment_thumb">' . $img_html . '</div>', $body);
+
+			return array();
 		}
 	}
 
@@ -243,7 +362,7 @@ class Board_News_Block extends SP_Abstract_Block
 	{
 		global $color_profile;
 
-		if (sp_loadColors($this->colorids) !== false)
+		if (sp_loadColors($this->color_ids) !== false)
 		{
 			foreach ($this->data['news'] as $k => $p)
 			{
@@ -300,41 +419,59 @@ function template_sp_boardNews($data)
 	// Output all the details we have found
 	foreach ($data['news'] as $news)
 	{
+		$attachment = $news['attachment'];
+
 		echo '
-				<h3 class="category_header">
-					<span class="floatleft sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
-				</h3>
-				<div id="msg_', $news['message_id'], '" class="sp_article_content">
-					<div class="sp_content_padding">';
+			<h3 class="category_header">
+				<span class="floatleft sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
+			</h3>
+			<div id="msg_', $news['message_id'], '" class="sp_article_content">
+				<div class="sp_content_padding">';
 
 		// @todo replace the <img> with $news['avatar']['img'] and some css for the max-width
 		if (!empty($news['avatar']['href']))
 		{
 			echo '
-						<a href="', $scripturl, '?action=profile;u=', $news['poster']['id'], '">
-							<img src="', $news['avatar']['href'], '" alt="', $news['poster']['name'], '" style="max-width:40px" class="floatright" />
-						</a>
-						<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], '<br />', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
+					<a href="', $scripturl, '?action=profile;u=', $news['poster']['id'], '">
+						<img src="', $news['avatar']['href'], '" alt="', $news['poster']['name'], '" style="max-width:40px" class="floatright" />
+					</a>
+					<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], '<br />', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
 		}
 		else
 		{
 			echo '
-						<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], ' | ', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
+					<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], ' | ', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
 		}
 
 		echo '
-						<div class="post"><hr />', $news['body'], '</div>
-						<div class="righttext">', $news['link'], ' ', $news['new_comment'], '</div>
+					<div class="post"><hr />';
+
+		if (!empty($attachment))
+		{
+			echo '
+						<div class="sp_attachment_thumb">';
+
+			// If you want Fancybox to tag this, remove nfb_ from the id
+			echo '
+							<a href="', $news['href'], '" id="nfb_link_', $attachment['id'], '"><img src="', $attachment['href'], '" alt="" title="', $attachment['name'], '" id="thumb_', $attachment['id'], '" /></a>';
+
+			echo '
+						</div>';
+		}
+
+		echo $news['body'], '
 					</div>
-				</div>';
+				<div class="righttext">', $news['link'], ' ', $news['new_comment'], '</div>
+			</div>
+		</div>';
 	}
 
-	// Pagenation is a good thing
+	// Pagination is a good thing
 	if (!empty($context['sp_boardNews_page_index']))
 	{
 		echo '
-				<div class="sp_page_index">',
-					template_pagesection(false, '', array('page_index' => 'sp_boardNews_page_index')), '
-				</div>';
+		<div class="sp_page_index">',
+		template_pagesection(false, '', array('page_index' => 'sp_boardNews_page_index')), '
+		</div>';
 	}
 }
