@@ -160,8 +160,7 @@ class Calendar_Information_Block extends SP_Abstract_Block
  */
 function template_sp_calendarInformation_error($data)
 {
-	echo '
-		', $data['error_msg'];
+	echo $data['error_msg'];
 }
 
 /**

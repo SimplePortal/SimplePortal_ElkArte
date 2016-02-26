@@ -139,13 +139,13 @@ class Staff_Block extends SP_Abstract_Block
 		$this->data['staff_count'] = count($this->data['staff_list']);
 		$this->data['icons'] = array(1 => 'admin', 'gmod', 'lmod');
 
-		$this->_colorids();
+		$this->_color_ids();
 	}
 
 	/**
 	 * Provide the color profile id's
 	 */
-	private function _colorids()
+	private function _color_ids()
 	{
 		global $color_profile;
 

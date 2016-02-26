@@ -58,6 +58,5 @@ class Bbc_Block extends SP_Abstract_Block
  */
 function template_sp_bbc($data)
 {
-	echo '
-								', $data['content'];
+	echo $data['content'];
 }

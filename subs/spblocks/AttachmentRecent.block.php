@@ -67,13 +67,12 @@ class Attachment_Recent_Block extends SP_Abstract_Block
 
 /**
  * Error template for this block
+ *
+ * @param mixed[] $data
  */
-function template_sp_attachmentRecent_error()
+function template_sp_attachmentRecent_error($data)
 {
-	global $txt;
-
-	echo '
-								', $txt['error_sp_no_attachments_found'];
+	echo $data['error_msg'];
 }
 
 /**
@@ -86,17 +85,17 @@ function template_sp_attachmentRecent($data)
 	global $txt;
 
 	echo '
-								<ul class="sp_list">';
+		<ul class="sp_list">';
 
 	$embed_class = sp_embed_class('attach');
 	foreach ($data['items'] as $item)
 		echo '
-									<li ', $embed_class, '>
-										<a href="', $item['file']['href'], '">', $item['file']['filename'], '</a>
-									</li>
-									<li class="smalltext">', $txt['downloads'], ': ', $item['file']['downloads'], '</li>
-									<li class="smalltext">', $txt['filesize'], ': ', $item['file']['filesize'], '</li>';
+			<li ', $embed_class, '>
+				<a href="', $item['file']['href'], '">', $item['file']['filename'], '</a>
+			</li>
+			<li class="smalltext">', $txt['downloads'], ': ', $item['file']['downloads'], '</li>
+			<li class="smalltext">', $txt['filesize'], ': ', $item['file']['filesize'], '</li>';
 
 	echo '
-								</ul>';
+		</ul>';
 }

@@ -106,7 +106,7 @@ class Articles_Block extends SP_Abstract_Block
 		}
 
 		// Doing the color thing
-		$this->_colorids();
+		$this->_color_ids();
 
 		// Set the template name
 		$this->setTemplate('template_sp_articles');
@@ -115,7 +115,7 @@ class Articles_Block extends SP_Abstract_Block
 	/**
 	 * Provide the color profile id's
 	 */
-	private function _colorids()
+	private function _color_ids()
 	{
 		global $color_profile;
 
@@ -148,8 +148,7 @@ class Articles_Block extends SP_Abstract_Block
  */
 function template_sp_articles_error($data)
 {
-	echo '
-								', $data['error_msg'];
+	echo $data['error_msg'];
 }
 
 /**

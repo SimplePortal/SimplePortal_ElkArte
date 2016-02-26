@@ -225,7 +225,7 @@ class Board_News_Block extends SP_Abstract_Block
 		$this->data['news'][count($this->data['news']) - 1]['is_last'] = true;
 
 		// If we want color id's then lets add them in
-		$this->_colorids();
+		$this->_color_ids();
 
 		// And posts may have videos to show
 		$this->data['embed_videos'] = !empty($modSettings['enableVideoEmbeding']);
@@ -239,7 +239,7 @@ class Board_News_Block extends SP_Abstract_Block
 	/**
 	 * Provide the color profile id's
 	 */
-	private function _colorids()
+	private function _color_ids()
 	{
 		global $color_profile;
 
@@ -276,8 +276,7 @@ class Board_News_Block extends SP_Abstract_Block
  */
 function template_sp_boardNews_error($data)
 {
-	echo '
-				', $data['error_msg'];
+	echo $data['error_msg'];
 }
 
 /**

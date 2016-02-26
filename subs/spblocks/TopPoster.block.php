@@ -25,6 +25,9 @@ if (!defined('ELK'))
  */
 class Top_Poster_Block extends SP_Abstract_Block
 {
+	/**
+	 * @var array
+	 */
 	protected $color_ids = array();
 
 	/**
@@ -52,7 +55,7 @@ class Top_Poster_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $scripturl;
+		global $txt, $scripturl;
 
 		$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
 		$type = !empty($parameters['type']) ? (int) $parameters['type'] : 0;
@@ -141,20 +144,29 @@ class Top_Poster_Block extends SP_Abstract_Block
 		$this->_db->free_result($request);
 
 		// Profile colors?
-		$this->_colorids();
+		$this->_color_ids();
 
-		$this->setTemplate('template_sp_topPoster');
+		if (empty($this->data['members']))
+		{
+			$this->data['error_msg'] = $txt['error_sp_no_members_found'];
+			$this->setTemplate('template_sp_topPoster_error');
+		}
+		else
+		{
+			$this->setTemplate('template_sp_topPoster');
+		}
 	}
 
 	/**
 	 * Provide the color profile id's
 	 */
-	private function _colorids()
+	private function _color_ids()
 	{
 		global $color_profile;
 
 		if (sp_loadColors($this->color_ids) !== false)
 		{
+			foreach ($this->data['members'] as $k => $p)
 			{
 				if (!empty($color_profile[$p['id']]['link']))
 				{
@@ -170,39 +182,40 @@ class Top_Poster_Block extends SP_Abstract_Block
  *
  * @param mixed[] $data
  */
+function template_sp_topPoster_error($data)
+{
+	echo $data['error_msg'];
+}
+
+/**
+ * Main template for this block
+ *
+ * @param mixed[] $data
+ */
 function template_sp_topPoster($data)
 {
-	global $txt, $scripturl;
-
-	// No results, say so
-	if (empty($data['members']))
-	{
-		echo '
-								', $txt['error_sp_no_members_found'];
-
-		return;
-	}
+	global $scripturl, $txt;
 
 	// And output the block
 	echo '
-								<table class="sp_fullwidth">';
+		<table class="sp_fullwidth">';
 
 	foreach ($data['members'] as $member)
 	{
 		echo '
-									<tr>
-										<td class="sp_top_poster centertext">', !empty($member['avatar']['href']) ? '
-											<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '">
-												<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" style="max-width:40px" />
-											</a>' : '', '
-										</td>
-										<td>
-											', $member['link'], '<br />
-											<span class="smalltext">', $member['posts'], ' ', $txt['posts'], '</span>
-										</td>
-									</tr>';
+			<tr>
+				<td class="sp_top_poster centertext">', !empty($member['avatar']['href']) ? '
+					<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '">
+						<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" style="max-width:40px" />
+					</a>' : '', '
+				</td>
+				<td>
+					', $member['link'], '<br />
+					<span class="smalltext">', $member['posts'], ' ', $txt['posts'], '</span>
+				</td>
+			</tr>';
 	}
 
 	echo '
-								</table>';
+		</table>';
 }
