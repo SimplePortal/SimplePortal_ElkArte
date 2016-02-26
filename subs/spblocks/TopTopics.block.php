@@ -93,6 +93,8 @@ function template_sp_topTopics_error($data)
  */
 function template_sp_topTopics($data)
 {
+	global $txt;
+
 	echo '
 		<ul class="sp_list">';
 
