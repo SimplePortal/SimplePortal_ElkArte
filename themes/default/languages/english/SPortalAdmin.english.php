@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 // Configuration area
@@ -42,7 +42,6 @@ $txt['leftwidth'] = 'Width of Left Side Blocks';
 $txt['rightwidth'] = 'Width of Right Side Blocks';
 $txt['sp_IntegrationHide'] = 'Hide Blocks in Forum Areas';
 $txt['sp_IntegrationHide_desc'] = 'The <em>Display blocks in Forum</em> setting must be enabled for this to work';
-
 
 // Article settings
 $txt['sp_articles_index'] = 'Display Articles on Portal Page';
@@ -127,6 +126,7 @@ $txt['sp_function_Menu_label'] = 'Forum Menu';
 $txt['sp_function_Bbc_label'] = 'Custom BBC';
 $txt['sp_function_Html_label'] = 'Custom HTML';
 $txt['sp_function_Php_label'] = 'Custom PHP';
+$txt['sp_function_Admin_Info_label'] = 'Admin Information Center';
 
 // Block descriptions
 $txt['sp_function_Latest_Member_desc'] = 'Displays the latest members and their registration dates.';
@@ -159,10 +159,12 @@ $txt['sp_function_Menu_desc'] = 'Displays a vertical forum menu.';
 $txt['sp_function_Bbc_desc'] = 'A custom block where BBC content can be added.';
 $txt['sp_function_Html_desc'] = 'A custom block where HTML content can be added.';
 $txt['sp_function_Php_desc'] = 'A custom block where PHP content can be added.';
+$txt['sp_function_Admin_Info_desc'] = 'Quick glance for actions that require admin/moderation attention';
 
 // Block parameters
 $txt['sp_param_Latest_Member_limit'] = 'Members to Show';
 $txt['sp_param_Whos_Online_online_today'] = 'Users Online Today';
+$txt['sp_param_Whos_Online_avatars'] = 'Show user avatar';
 $txt['sp_param_Board_Stats_averages'] = 'Show Averages';
 $txt['sp_param_Top_Poster_limit'] = 'Top Posters to Display';
 $txt['sp_param_Top_Poster_type'] = 'Display';
@@ -186,6 +188,7 @@ $txt['sp_param_Board_News_limit'] = 'Topics to Display';
 $txt['sp_param_Board_News_start'] = 'Starting Post ID';
 $txt['sp_param_Board_News_length'] = 'Maximum Characters';
 $txt['sp_param_Board_News_avatar'] = 'Display Avatars';
+$txt['sp_param_Board_News_attachment'] = 'Display first attachment';
 $txt['sp_param_Board_News_per_page'] = 'Posts Per Page';
 $txt['sp_param_Attachment_Image_limit'] = 'Images to Display';
 $txt['sp_param_Attachment_Image_direction'] = 'List Direction';

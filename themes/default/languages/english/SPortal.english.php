@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 // General strings
@@ -86,11 +86,6 @@ $txt['sp_shoutbox_prune'] = 'Prune';
 $txt['sp_shoutbox_show_ignored'] = 'show ignored shout';
 $txt['sp_topstats_unknown_type'] = 'Unknown or unsupported Top Stats Type.';
 $txt['sp_topstats_type_error'] = 'Incomplete Type Setup.';
-$txt['sp_sashop_no_exist'] = 'Sorry, we could not find the SA Shop Mod modification';
-$txt['sp_shop_no_exist'] = 'Sorry, we could not find the SMF Shop Mod modification';
-$txt['sp_eliana_no_exist'] = 'Sorry, we could not find the Automatic Karma system modification, it\'s either not installed or it\'s disabled';
-$txt['sp_thankomatic_no_exist'] = 'Sorry, we could not find the Thank-O-Matic modification.';
-$txt['sp_reputation_no_exist'] = 'Sorry, we could not find the Advanced Reputation modification, it\'s either not installed or it\'s disabled';
 $txt['sp_karma_is_disabled'] = 'Karma System is disabled';
 $txt['sp_likes_is_disabled'] = 'Likes System is disabled';
 $txt['sp_topStatsMember_total_time_logged_in'] = 'Total Time Logged In';
@@ -101,6 +96,16 @@ $txt['sp_topStatsMember_Karma_Total'] = 'Total Karma';
 $txt['sp_topStatsMember_Likes_Received'] = 'Likes Received';
 $txt['sp_topStatsMember_Likes_Given'] = 'Likes Given';
 $txt['sp_topStatsMember_Likes_Total'] = 'Likes Total';
+$txt['sp_admincount_approval'] = 'Requiring Approval';
+$txt['sp_admincount_attachments'] = 'Attachments';
+$txt['sp_admincount_emailmod'] = 'Email Postings';
+$txt['sp_admincount_topics'] = 'Topics';
+$txt['sp_admincount_posts'] = 'Posts';
+$txt['sp_admincount_groupreq'] = 'Group requests';
+$txt['sp_admincount_memberreq'] = 'Members';
+$txt['sp_admincount_reports'] = 'Reported posts';
+$txt['sp_admincount_errors'] = 'Error log entries';
+$txt['sp_admincount_awaiting_activation'] = 'Waiting activation';
 
 // Who area strings
 $txt['sp_who_index'] = 'Viewing the <a href="%s">Portal</a>.';
