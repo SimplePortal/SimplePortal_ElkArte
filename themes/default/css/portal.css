@@ -4,7 +4,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 hr {
@@ -112,6 +112,12 @@ hr {
 .sp_blog,
 .sp_articles {
 	width: 45px;
+}
+
+.sp_who_avatar a img {
+	vertical-align: middle;
+	max-width: 25px;
+	padding-left: 10px;
 }
 
 .sp_staff_info {
@@ -240,6 +246,22 @@ table.sp_articles,
 	margin: 0.5em 0;
 }
 
+.sp_article_content .sp_attachment_thumb {
+	float: left;
+	margin: 5px 10px 0 0;
+}
+
+.sp_article_content .post:after {
+	content: '';
+	display: block;
+	width: 100%;
+	clear: both;
+}
+
+.action_home .post .sp_attachment_thumb img {
+	max-width: 240px;
+}
+
 .sp_article_detail h4 {
 	font-size: 1.3em;
 	line-height: 35px;
@@ -284,7 +306,6 @@ table.sp_articles,
 	line-height: 2em;
 }
 
-
 #sp_main {
 	overflow: hidden;
 	width: 100%;
@@ -317,10 +338,6 @@ table.sp_articles,
 #sp_right {
 	float: right;
 	padding-left: .5em;
-}
-
-#sp_bottom_div {
-	margin-top: -1.5em;
 }
 
 #sp_header, #sp_footer {
