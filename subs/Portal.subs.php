@@ -344,6 +344,7 @@ function sportal_load_blocks()
 					continue;
 				}
 
+				// For each custom arranged block
 				foreach ($column as $item)
 				{
 					if (empty($blocks[$item]))
@@ -351,8 +352,15 @@ function sportal_load_blocks()
 						continue;
 					}
 
-					$blocks[$item]['style'] = sportal_parse_style('explode', $blocks[$item]['style'], true);
+					// Style information for the block, based on its style profile
+					$blocks[$item]['style'] = sportal_select_style($blocks[$item]['styles']);
+
+					// For each moved block, instantiate it and run setup
+					$blocks[$item]['instance'] = sp_instantiate_block($blocks[$item]['type']);
+					$blocks[$item]['instance']->setup($blocks[$item]['parameters'], $block['id']);
 					$context['SPortal']['blocks'][$id][] = $blocks[$item];
+
+					// Don't do this again
 					unset($blocks[$item]);
 				}
 
@@ -366,7 +374,7 @@ function sportal_load_blocks()
 		$context['SPortal']['blocks'] = array();
 	}
 
-	// For each active block, instantiate it and do the Block->setup()
+	// For each active block, determine it style and get and instance of it for use
 	foreach ($blocks as $block)
 	{
 		if (!$context['SPortal']['sides'][$block['column']]['active'] || empty($block['type']))
