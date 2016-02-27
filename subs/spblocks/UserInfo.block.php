@@ -56,7 +56,7 @@ class User_Info_Block extends SP_Abstract_Block
 			'unreadreplies' => $scripturl . '?action=unreadreplies',
 		);
 
-		// Give them a oportunity to logon
+		// Give them a opportunity to logon
 		if ($user_info['is_guest'])
 		{
 			loadJavascriptFile('sha256.js');

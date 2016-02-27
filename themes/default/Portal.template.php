@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 /**
@@ -54,7 +54,7 @@ function template_portal_index()
 					</span>
 				</div>
 				<hr />
-				<p>', $article['preview'], '<a href="', $article['href'], '">...</a></p>
+				<p>', $article['preview'], '<a href="', $article['href'], '">&hellip;</a></p>
 				<div class="sp_article_extra">
 					<a href="', $article['href'], '">', $txt['sp_read_more'], '</a> | <a href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
 				</div>
@@ -67,7 +67,7 @@ function template_portal_index()
 	echo '
 		<div class="sp_page_index">',
 			template_pagesection(), '
-	</div>';
+		</div>';
 
 	echo '
 	</div>';
@@ -88,13 +88,13 @@ function template_portal_above()
 
 		if ($context['SPortal']['sides'][1]['active'])
 			echo '
-		<a id="sp_collapse_side1" class="dot ', $context['SPortal']['sides'][1]['collapsed'] ? 'expand'
-				: 'collapse', '" href="#side" onclick="return sp_collapseSide(1)"></a>';
+		<a id="sp_collapse_side1" class="dot ', $context['SPortal']['sides'][1]['collapsed']
+			? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(1)"></a>';
 
 		if ($context['SPortal']['sides'][4]['active'])
 			echo '
-		<a id="sp_collapse_side4" class="dot ', $context['SPortal']['sides'][1]['collapsed'] ? 'expand'
-				: 'collapse', '" href="#side" onclick="return sp_collapseSide(4)"></a>';
+		<a id="sp_collapse_side4" class="dot ', $context['SPortal']['sides'][1]['collapsed']
+			? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(4)"></a>';
 
 		if (!empty($context['SPortal']['blocks']['custom_arrange']) && $context['site_action'] === 'sportal')
 			echo '
@@ -145,13 +145,13 @@ function template_portal_above()
 			</div>';
 	}
 
-	// Then the right blocks
+	// Then the right blocks due to float
 	if (!empty($modSettings['showright']) && !empty($context['SPortal']['blocks'][4]))
 	{
 		echo '
 			<div id="sp_right" class="sp_main_cell"', !empty($modSettings['rightwidth'])
-			? ' style="width:' . $modSettings['rightwidth'] . 'px"'
-			: '', $context['SPortal']['sides'][4]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
+			? ' style="width:' . $modSettings['rightwidth'] . 'px"' : '',
+			$context['SPortal']['sides'][4]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
 			? ' style="display: none;"' : '', '>
 				<div class="sp_column">';
 
@@ -265,7 +265,7 @@ function template_block($block, $side = -1)
  */
 function template_block_default($block, $side)
 {
-		echo '
+	echo '
 					<div class="sp_block_container" id="block_' . $block['id'] . ',' . $side . '">';
 
 	// Show a title bar or not, some blocks have their own bars
@@ -279,8 +279,7 @@ function template_block_default($block, $side)
 			echo '
 							<span class="category_toggle">&nbsp;
 								<a href="javascript:sp_collapseBlock(\'', $block['id'], '\')">
-									<span id="sp_collapse_', $block['id'], '" class="', $block['collapsed'] ? 'expand'
-				: 'collapse', '"></span>
+									<span id="sp_collapse_', $block['id'], '" class="', $block['collapsed'] ? 'expand' : 'collapse', '"></span>
 								</a>
 							</span>';
 
@@ -291,12 +290,13 @@ function template_block_default($block, $side)
 
 	echo '
 						<div id="sp_block_' . $block['id'] . '" class="sp_block_section', empty($block['style']['no_body'])
-								? (empty($block['style']['body']['class']) ? '"' : ' ' . $block['style']['body']['class'] . '"') : ' sp_no_body_style"',
-						$block['collapsed'] && empty($block['force_view'])
+								? (empty($block['style']['body']['class'])
+									? '"' : ' ' . $block['style']['body']['class'] . '"')
+								: ' sp_no_body_style"',
+							$block['collapsed'] && empty($block['force_view'])
 								? ' style="display: none;"' : '', '>
 							<div class="', 	$block['type'] != 'sp_menu'
-								? 'sp_block' : 'sp_content_padding', '"',
-						!empty($block['style']['body']['style'])
+								? 'sp_block' : 'sp_content_padding', '"', !empty($block['style']['body']['style'])
 								? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
 
 	// Call the block routine

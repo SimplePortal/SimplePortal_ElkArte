@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 /**
@@ -384,21 +384,16 @@ function template_block_select_type()
 		$this_title = !empty($this_block) ? sprintf($txt['sp-adminBlockInuse'], $context['location'][$this_block['column']]) . ': ' . (!empty($this_block['state']) ? '(' . $txt['sp-blocksActive'] . ')' : '') : '';
 
 		echo '
-						<li class="content">
-								<input type="radio" name="selected_type[]" id="block_', $type['function'], '" value="', $type['function'], '" class="input_radio" />
-								<strong><label ', (!empty($this_block) ? 'class="sp_block_active" ' : ''), 'for="block_', $type['function'], '" title="', $this_title, '">', $txt['sp_function_' . $type['function'] . '_label'], '</label></strong>
-								<p class="smalltext">', $txt['sp_function_' . $type['function'] . '_desc'], '</p>';
-
-		echo '
-						</li>
-						';
+				<li class="content">
+					<input type="radio" name="selected_type[]" id="block_', $type['function'], '" value="', $type['function'], '" class="input_radio" />
+					<strong><label ', (!empty($this_block) ? 'class="sp_block_active" ' : ''), 'for="block_', $type['function'], '" title="', $this_title, '">', isset($txt['sp_function_' . $type['function'] . '_label']) ? $txt['sp_function_' . $type['function'] . '_label'] : $type['function'], '</label></strong>
+					<p class="smalltext">', isset($txt['sp_function_' . $type['function'] . '_desc']) ? $txt['sp_function_' . $type['function'] . '_desc'] : $txt['not_applicable'], '</p>
+				</li>';
 	}
 
 	echo '
-<li>
-					<input type="submit" name="select_type" value="', $txt['sp-blocksSelectType'], '" class="right_submit" />
-						</li>
-					</ul>';
+				</ul>
+				<input type="submit" name="select_type" value="', $txt['sp-blocksSelectType'], '" class="right_submit" />';
 
 	if (!empty($context['SPortal']['block']['column']))
 		echo '
