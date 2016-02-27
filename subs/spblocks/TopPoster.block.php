@@ -166,7 +166,7 @@ class Top_Poster_Block extends SP_Abstract_Block
 
 		if (sp_loadColors($this->color_ids) !== false)
 		{
-			foreach ($this->data['members'] as $k => $p)
+
 			{
 				if (!empty($color_profile[$p['id']]['link']))
 				{
