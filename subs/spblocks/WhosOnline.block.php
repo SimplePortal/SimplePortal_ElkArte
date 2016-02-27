@@ -33,6 +33,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 	{
 		$this->block_parameters = array(
 			'online_today' => 'check',
+			'avatars' => 'check',
 		);
 
 		parent::__construct($db);
@@ -66,7 +67,57 @@ class Whos_Online_Block extends SP_Abstract_Block
 
 		$this->data['stats'] = ssi_whosOnline('array');
 
+		// Show the avatar next to the online name?
+		if (!empty($parameters['avatars']))
+		{
+			$this->_online_avatars();
+			$this->data['avatars'] = true;
+		}
+
 		$this->setTemplate('template_sp_whosOnline');
+	}
+
+	/**
+	 * Fetch the avatars for the online users
+	 */
+	private function _online_avatars()
+	{
+		$users = array();
+		foreach ($this->data['stats']['users_online'] as $user)
+		{
+			$users[] = $user['id'];
+		}
+
+		$request = $this->_db->query('', '
+			SELECT
+				m.id_member,  m.avatar, m.email_address,
+				a.id_attach, a.attachment_type, a.filename
+			FROM {db_prefix}members AS m
+				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
+			WHERE m.id_member IN ({array_int:users})',
+			array(
+				'users' => $users,
+			)
+		);
+		$avatars = array();
+		while ($row = $this->_db->fetch_assoc($request))
+		{
+			// Load the member data
+			$avatars[$row['id_member']] = determineAvatar(array(
+				'avatar' => $row['avatar'],
+				'filename' => $row['filename'],
+				'id_attach' => $row['id_attach'],
+				'email_address' => $row['email_address'],
+				'attachment_type' => $row['attachment_type'])
+			);
+
+		}
+		$this->_db->free_result($request);
+
+		foreach ($this->data['stats']['users_online'] as $key => $user)
+		{
+			$this->data['stats']['users_online'][$key]['avatar'] = $avatars[$this->data['stats']['users_online'][$key]['id']];
+		}
 	}
 }
 
@@ -105,8 +156,21 @@ function template_sp_whosOnline($data)
 
 		foreach ($data['stats']['users_online'] as $user)
 		{
-			echo '
+			if (!empty($data['avatars']))
+			{
+				echo '
+					<li class="sp_who_avatar">', !empty($user['avatar']['href']) ? '
+						<a href="' . $scripturl . '?action=profile;u=' . $user['id'] . '">
+							<img src="' . $user['avatar']['href'] . '" alt="' . $user['name'] . '" />
+						</a>' : '',
+				$user['hidden'] ? '<em>' . $user['link'] . '</em>' : $user['link'],
+				'</li>';
+			}
+			else
+			{
+				echo '
 					<li ', sp_embed_class($user['name'] === 'H' ? 'tux' : 'user', '', 'sp_list_indent'), '>', $user['hidden'] ? '<em>' . $user['link'] . '</em>' : $user['link'], '</li>';
+			}
 		}
 
 		echo '
