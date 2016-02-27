@@ -19,12 +19,12 @@ if (!defined('ELK'))
  *
  * @param mixed[] $parameters
  * 			'board' => Board(s) to select posts from
- *        	'limit' => max number of posts to show
- *        	'start' => id of post to start from
- *        	'length' => preview length of the post
- *        	'avatar' => show the poster avatar
- *        	'per_page' => number of posts per page to show
- * 			'attachment' => Show the first attachment as image in post
+ * 			'limit' => max number of posts to show
+ * 			'start' => id of post to start from
+ *			'length' => preview length of the post
+ *			'avatar' => show the poster avatar
+ *			'per_page' => number of posts per page to show
+ *			'attachment' => Show the first attachment as "blog" image
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -58,6 +58,7 @@ class Board_News_Block extends SP_Abstract_Block
 			'start' => 'int',
 			'length' => 'int',
 			'avatar' => 'check',
+			'attachment' => 'check',
 			'per_page' => 'int',
 		);
 
@@ -72,7 +73,7 @@ class Board_News_Block extends SP_Abstract_Block
 	 * @param mixed[] $parameters
 	 * @param int $id
 	 */
-	function setup($parameters, $id)
+	public function setup($parameters, $id)
 	{
 		global $scripturl, $txt, $settings, $modSettings, $context;
 
@@ -471,7 +472,7 @@ function template_sp_boardNews($data)
 	{
 		echo '
 		<div class="sp_page_index">',
-		template_pagesection(false, '', array('page_index' => 'sp_boardNews_page_index')), '
+			template_pagesection(false, '', array('page_index' => 'sp_boardNews_page_index')), '
 		</div>';
 	}
 }
