@@ -135,7 +135,7 @@ function template_portal_above()
 			<div id="sp_left" class="sp_main_cell"', !empty($modSettings['leftwidth']) ? ' style="width:' . $modSettings['leftwidth'] . 'px"'
 			: '', $context['SPortal']['sides'][1]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
 			? ' style="display: none;"' : '', '>
-				<div class="sp_column">';
+				<div id="sp_left_div" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][1] as $block)
 			template_block($block, 1);
@@ -153,7 +153,7 @@ function template_portal_above()
 			? ' style="width:' . $modSettings['rightwidth'] . 'px"' : '',
 			$context['SPortal']['sides'][4]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
 			? ' style="display: none;"' : '', '>
-				<div class="sp_column">';
+				<div id="sp_right_div" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][4] as $block)
 			template_block($block, 4);
@@ -166,7 +166,7 @@ function template_portal_above()
 	// Followed by all the Top Blocks
 	echo '
 			<div id="sp_center" class="sp_main_cell">
-				<div class="sp_column">';
+				<div id="sp_top_div" class="sp_column">';
 
 	if (!empty($context['SPortal']['blocks'][2]))
 	{
@@ -290,14 +290,19 @@ function template_block_default($block, $side)
 
 	echo '
 						<div id="sp_block_' . $block['id'] . '" class="sp_block_section', empty($block['style']['no_body'])
-								? (empty($block['style']['body']['class'])
-									? '"' : ' ' . $block['style']['body']['class'] . '"')
-								: ' sp_no_body_style"',
+							? (empty($block['style']['body']['class'])
+								? '"'
+								: ' ' . $block['style']['body']['class'] . '"')
+							: ' sp_no_body_style"',
 							$block['collapsed'] && empty($block['force_view'])
-								? ' style="display: none;"' : '', '>
+								? ' style="display: none;"'
+								: '', '>
 							<div class="', 	$block['type'] != 'sp_menu'
-								? 'sp_block' : 'sp_content_padding', '"', !empty($block['style']['body']['style'])
-								? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
+								? 'sp_block '
+								: 'sp_content_padding ', strtolower($block['type']), '"',
+							!empty($block['style']['body']['style'])
+								? ' style="' . $block['style']['body']['style'] . '"'
+								: '', '>';
 
 	// Call the block routine
 	$block['instance']->render();
