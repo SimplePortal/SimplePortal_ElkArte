@@ -82,6 +82,9 @@ class Whos_Online_Block extends SP_Abstract_Block
 	 */
 	private function _online_avatars()
 	{
+		if (empty($this->data['stats']['users_online']))
+			return;
+
 		$users = array();
 		foreach ($this->data['stats']['users_online'] as $user)
 		{

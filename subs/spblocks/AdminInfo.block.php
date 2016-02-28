@@ -55,7 +55,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 				$this->data['admin']['errors'] = numErrors(null);
 
 				$activation_numbers = countInactiveMembers();
-				$this->data['awaiting_activation'] = 0;
+				$this->data['admin']['awaiting_activation'] = 0;
 				foreach ($activation_numbers as $activation_type => $total_members)
 				{
 					if (in_array($activation_type, array(0, 2)))
