@@ -228,6 +228,7 @@ function template_shoutbox_embed($shoutbox)
 		{
 			echo '
 					["', $smiley['code'], '","', $smiley['filename'], '","', $smiley['js_description'], '"]';
+
 			if (empty($smiley['last']))
 			{
 				echo ',';

@@ -228,7 +228,7 @@ function sportal_get_shoutbox_count($shoutbox_id)
  * - Prevents guest from adding a shout
  * - Checks the shout total and archives if over the display limit for the box
  *
- * @param int $shoutbox
+ * @param array $shoutbox
  * @param string $shout
  *
  * @return bool
@@ -269,7 +269,8 @@ function sportal_create_shout($shoutbox, $shout)
 	if ($shoutbox['num_shouts'] > $shoutbox['num_max'])
 	{
 		$request = $db->query('', '
-			SELECT id_shout
+			SELECT
+				id_shout
 			FROM {db_prefix}sp_shouts
 			WHERE id_shoutbox = {int:shoutbox}
 			ORDER BY log_time
@@ -342,9 +343,7 @@ function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
 
 	$db->query('', '
 		UPDATE {db_prefix}sp_shoutboxes
-		SET last_update = {int:time}' . ($num_shouts === 0
-			? ''
-			: ',
+		SET last_update = {int:time}' . ($num_shouts === 0 ? '' : ',
 			num_shouts = {raw:shouts}') . '
 		WHERE id_shoutbox = {int:shoutbox}',
 		array(
