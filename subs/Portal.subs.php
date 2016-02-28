@@ -357,7 +357,7 @@ function sportal_load_blocks()
 
 					// For each moved block, instantiate it and run setup
 					$blocks[$item]['instance'] = sp_instantiate_block($blocks[$item]['type']);
-					$blocks[$item]['instance']->setup($blocks[$item]['parameters'], $block['id']);
+					$blocks[$item]['instance']->setup($blocks[$item]['parameters'], $blocks[$item]['id']);
 					$context['SPortal']['blocks'][$id][] = $blocks[$item];
 
 					// Don't do this again
