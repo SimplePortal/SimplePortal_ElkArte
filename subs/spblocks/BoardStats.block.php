@@ -33,6 +33,7 @@ class Board_Stats_Block extends SP_Abstract_Block
 	{
 		$this->block_parameters = array(
 			'averages' => 'check',
+			'refresh_value' => 'int'
 		);
 
 		parent::__construct($db);
@@ -77,9 +78,24 @@ class Board_Stats_Block extends SP_Abstract_Block
 			);
 		}
 
+		// Set the template to use
 		$this->setTemplate('template_sp_boardStats');
+
+		// Enabling auto refresh?
+		if (!empty($parameters['refresh_value']))
+		{
+			$this->refresh = array('sa' => 'boardstats', 'class' => '.board_stats', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
+			$this->auto_refresh('.board_stats');
+		}
 	}
 
+	/**
+	 * Make the averages look normal 1,222.xx
+	 *
+	 * @param $value
+	 *
+	 * @return float|null|string
+	 */
 	protected function formatAvg($value)
 	{
 		if (empty($this->total_days_up))

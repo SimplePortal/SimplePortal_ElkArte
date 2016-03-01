@@ -165,6 +165,7 @@ $txt['sp_function_Admin_Info_desc'] = 'Quick glance for actions that require adm
 $txt['sp_param_Latest_Member_limit'] = 'Members to Show';
 $txt['sp_param_Whos_Online_online_today'] = 'Users Online Today';
 $txt['sp_param_Whos_Online_avatars'] = 'Show user avatar';
+$txt['sp_param_Whos_Online_refresh_value'] = 'Refresh value in seconds, 0 or blank to disable.';
 $txt['sp_param_Board_Stats_averages'] = 'Show Averages';
 $txt['sp_param_Top_Poster_limit'] = 'Top Posters to Display';
 $txt['sp_param_Top_Poster_type'] = 'Display';
@@ -232,6 +233,10 @@ $txt['sp_param_Blog_sort'] = 'Display';
 $txt['sp_param_Html_content'] = 'Custom HTML';
 $txt['sp_param_Bbc_content'] = 'Custom BBC';
 $txt['sp_param_Php_content'] = 'Custom PHP';
+$txt['sp_param_Recent_refresh_value'] = 'Refresh value in seconds, 0 or blank to disable.';
+$txt['sp_param_Board_Stats_refresh_value'] = 'Refresh value in seconds, 0 or blank to disable.';
+
+
 
 // Parameter options
 $txt['sp_param_Top_Poster_type_options'] = 'All Time|Today|This Week|This Month';

@@ -39,6 +39,7 @@ class Recent_Block extends SP_Abstract_Block
 			'limit' => 'int',
 			'type' => 'select',
 			'display' => 'select',
+			'refresh_value' => 'int'
 		);
 
 		parent::__construct($db);
@@ -72,6 +73,13 @@ class Recent_Block extends SP_Abstract_Block
 
 		// Color id's
 		$this->_colorids();
+
+		// Enabling auto refresh?
+		if (!empty($parameters['refresh_value']))
+		{
+			$this->refresh = array('sa' => 'recent', 'class' => '.recent', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
+			$this->auto_refresh();
+		}
 
 		// Off you go
 		$this->setTemplate('template_sp_recent');

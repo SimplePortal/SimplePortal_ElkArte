@@ -17,9 +17,6 @@ if (!defined('ELK'))
 /**
  * Who's online block, shows count of users online names
  *
- * @param mixed[] $parameters
- *        'online_today' => shows all users that were online today (requires user online today addon)
- * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
 class Whos_Online_Block extends SP_Abstract_Block
@@ -34,6 +31,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 		$this->block_parameters = array(
 			'online_today' => 'check',
 			'avatars' => 'check',
+			'refresh_value' => 'int'
 		);
 
 		parent::__construct($db);
@@ -45,6 +43,9 @@ class Whos_Online_Block extends SP_Abstract_Block
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
 	 * @param mixed[] $parameters
+	 * 		'online_today' => shows all users that were online today (requires user online today addon)
+	 * 		'avatars' => shows the user avatar if available
+	 * 		'refresh' => if we auto refresh the block
 	 * @param int $id
 	 */
 	public function setup($parameters, $id)
@@ -74,7 +75,15 @@ class Whos_Online_Block extends SP_Abstract_Block
 			$this->data['avatars'] = true;
 		}
 
+		// The output template
 		$this->setTemplate('template_sp_whosOnline');
+
+		// Enabling auto refresh?
+		if (!empty($parameters['refresh_value']))
+		{
+			$this->refresh = array('sa' => 'whos', 'class' => '.whos_online', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
+			$this->auto_refresh();
+		}
 	}
 
 	/**
@@ -83,7 +92,9 @@ class Whos_Online_Block extends SP_Abstract_Block
 	private function _online_avatars()
 	{
 		if (empty($this->data['stats']['users_online']))
+		{
 			return;
+		}
 
 		$users = array();
 		foreach ($this->data['stats']['users_online'] as $user)
@@ -113,7 +124,6 @@ class Whos_Online_Block extends SP_Abstract_Block
 				'email_address' => $row['email_address'],
 				'attachment_type' => $row['attachment_type'])
 			);
-
 		}
 		$this->_db->free_result($request);
 

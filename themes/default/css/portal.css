@@ -114,10 +114,16 @@ hr {
 	width: 45px;
 }
 
+.sp_who_avatar {
+	margin-left: 35px;
+}
+
 .sp_who_avatar a img {
 	vertical-align: middle;
 	max-width: 25px;
+	width: 25px;
 	padding-left: 10px;
+	margin-left: -35px;
 }
 
 .sp_staff_info {
@@ -341,7 +347,7 @@ table.sp_articles,
 }
 
 #sp_header, #sp_footer {
-	margin: 0 0.4em;
+	margin: 0;
 	vertical-align: top;
 }
 
@@ -791,11 +797,6 @@ dl.sp_form img,
 #sp_add_articles_list_header a img {
 	position: relative;
 	top: 2px;
-}
-
-.sp_button_container {
-	padding-top: 1.5em;
-	text-align: center;
 }
 
 #sp_rich_editor {
