@@ -48,7 +48,7 @@ abstract class SP_Abstract_Block
 
 	/**
 	 * If the block supports refreshing, sets the time in seconds
-	 * @var int
+	 * @var array
 	 */
 	protected $refresh = array();
 

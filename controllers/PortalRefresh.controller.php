@@ -84,7 +84,8 @@ class PortalRefresh_Controller extends Action_Controller
 	private function _process()
 	{
 		// Details about the block to refresh, check that its enabled, and permissions
-		$block_details = array_shift(getBlockInfo(null, $this->_block_id, true, false, true));
+		$block_details = getBlockInfo(null, $this->_block_id, true, false, true);
+		$block_details = array_shift($block_details);
 
 		// Load the block and render it
 		$block = sp_instantiate_block($block_details['type'], $this->_block_id);
@@ -100,7 +101,7 @@ class PortalRefresh_Controller extends Action_Controller
 	 */
 	private function _check_access()
 	{
-		global $context, $modSettings, $user_info;
+		global $context, $modSettings, $user_info, $settings, $maintenance;
 
 		// Not for guests etc
 		if ($user_info['is_guest'] || $user_info['id'] == 0 || $user_info['possibly_robot'])

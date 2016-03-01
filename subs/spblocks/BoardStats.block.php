@@ -85,7 +85,7 @@ class Board_Stats_Block extends SP_Abstract_Block
 		if (!empty($parameters['refresh_value']))
 		{
 			$this->refresh = array('sa' => 'boardstats', 'class' => '.board_stats', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
-			$this->auto_refresh('.board_stats');
+			$this->auto_refresh();
 		}
 	}
 
