@@ -285,6 +285,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			sportal_init_headers();
 			loadTemplate('Portal');
 
+			// Start the block and get its parameters for display
 			$block = sp_instantiate_block((string) $_POST['block_type']);
 			$type_parameters = $block->parameters();
 
@@ -298,6 +299,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			}
 			else
 				$_POST['parameters'] = array();
+
+			// Prepare a preview with the form parameters
+			$block->setup($_POST['parameters']);
 
 			// Create all the information we know about this block
 			$context['SPortal']['block'] = array(
@@ -317,6 +321,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'options' => $block->parameters(),
 				'list_blocks' => getBlockInfo($_POST['block_column']),
 				'collapsed' => false,
+				'instance' => $block,
 			);
 
 			if (strpos($modSettings['leftwidth'], '%') !== false || strpos($modSettings['leftwidth'], 'px') !== false)
