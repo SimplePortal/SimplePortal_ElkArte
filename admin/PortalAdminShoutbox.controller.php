@@ -233,6 +233,8 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
+	 *
+	 * @return array
 	 */
 	public function list_spLoadShoutbox($start, $items_per_page, $sort)
 	{

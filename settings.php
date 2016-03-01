@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
@@ -15,7 +15,9 @@ if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
 	require_once(dirname(__FILE__) . '/SSI.php');
 }
 elseif (!defined('ELK'))
+{
 	exit('<b>Error:</b> Cannot install - please verify you put this in the same place as ELK\'s index.php.');
+}
 
 global $modSettings, $package_cache;
 
@@ -35,7 +37,7 @@ $defaults = array(
 );
 
 $updates = array(
-	'sp_version' => '2.4',
+	'sp_version' => '1.0 Beta 2',
 );
 
 foreach ($defaults as $index => $value)
@@ -47,8 +49,11 @@ foreach ($defaults as $index => $value)
 updateSettings($updates);
 
 $standalone_file = BOARDDIR . '/PortalStandalone.php';
+
 if (isset($package_cache[$standalone_file]))
+{
 	$package_cache[$standalone_file] = str_replace('full/path/to/forum', BOARDDIR, $package_cache[$standalone_file]);
+}
 elseif (file_exists($standalone_file))
 {
 	$current_data = file_get_contents($standalone_file);

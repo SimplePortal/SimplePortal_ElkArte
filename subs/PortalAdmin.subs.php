@@ -2192,6 +2192,7 @@ function sp_add_menu_item($item_info, $is_new)
 /**
  * Determine the menu count, used for create List
  *
+ * @param int $menu_id
  * @return int
  */
 function sp_menu_item_count($menu_id)

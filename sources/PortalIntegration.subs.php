@@ -10,7 +10,9 @@
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * integration hook integrate_actions
@@ -23,7 +25,9 @@ function sp_integrate_actions(&$actions)
 	global $context;
 
 	if (!empty($context['disable_sp']))
+	{
 		return;
+	}
 
 	$actions['forum'] = array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_boardindex');
 	$actions['portal'] = array('PortalMain.controller.php', 'Sportal_Controller', 'action_index');
@@ -213,9 +217,11 @@ function sp_integrate_load_permissions(&$permissionGroups, &$permissionList, &$l
 
 /**
  * Whos online hook, integrate_whos_online, called from who.subs
- * translates custom actions to allow show what area a user is in
+ * translates custom actions to allow us to show what area a user is in
  *
  * @param string $actions
+ *
+ * @return array
  */
 function sp_integrate_whos_online($actions)
 {
@@ -233,13 +239,19 @@ function sp_integrate_whos_online($actions)
 		$txt['whoall_forum'] = sprintf($txt['sp_who_forum'], $scripturl);
 	}
 	elseif ($modSettings['sp_portal_mode'] == 3)
+	{
 		$txt['whoall_portal'] = sprintf($txt['sp_who_index'], $scripturl);
+	}
 
 	// If its a portal action, lets check it out.
 	if (isset($actions['page']))
+	{
 		$data = sp_whos_online_page($actions['page']);
+	}
 	elseif (isset($actions['article']))
+	{
 		$data = sp_whos_online_article($actions['article']);
+	}
 
 	return $data;
 }
@@ -248,6 +260,8 @@ function sp_integrate_whos_online($actions)
  * Page online hook, helper function to determine the page a user is viewing
  *
  * @param string $page_id
+ *
+ * @return string
  */
 function sp_whos_online_page($page_id)
 {
@@ -261,15 +275,23 @@ function sp_whos_online_page($page_id)
 	$page_where = '';
 
 	if (is_numeric($page_id))
+	{
 		$numeric_ids = (int) $page_id;
+	}
 	else
+	{
 		$string_ids = $page_id;
+	}
 
 	if (!empty($numeric_ids))
+	{
 		$page_where = 'id_page IN ({int:numeric_ids})';
+	}
 
 	if (!empty($string_ids))
+	{
 		$page_where = 'namespace IN ({string:string_ids})';
+	}
 
 	$query = sprintf($context['SPortal']['permissions']['query'], 'permissions');
 
@@ -299,10 +321,14 @@ function sp_whos_online_page($page_id)
 	if (!empty($page_data))
 	{
 		if (isset($page_data['id']))
+		{
 			$data = sprintf($txt['sp_who_page'], $page_data['id'], censorText($page_data['title']), $scripturl);
+		}
 
 		if (isset($page_data['namespace']))
+		{
 			$data = sprintf($txt['sp_who_page'], $page_data['namespace'], censorText($page_data['title']), $scripturl);
+		}
 	}
 
 	return $data;
@@ -312,6 +338,8 @@ function sp_whos_online_page($page_id)
  * Article online hook, helper function to determine the page a user is viewing
  *
  * @param string $article_id
+ *
+ * @return string
  */
 function sp_whos_online_article($article_id)
 {
@@ -325,15 +353,23 @@ function sp_whos_online_article($article_id)
 	$article_where = '';
 
 	if (is_numeric($article_id))
+	{
 		$numeric_ids = (int) $article_id;
+	}
 	else
+	{
 		$string_ids = $article_id;
+	}
 
 	if (!empty($numeric_ids))
+	{
 		$article_where = 'id_article IN ({int:numeric_ids})';
+	}
 
 	if (!empty($string_ids))
+	{
 		$article_where = 'namespace IN ({string:string_ids})';
+	}
 
 	$query = sprintf($context['SPortal']['permissions']['query'], 'permissions');
 
@@ -363,10 +399,14 @@ function sp_whos_online_article($article_id)
 	if (!empty($article_data))
 	{
 		if (isset($article_data['id']))
+		{
 			$data = sprintf($txt['sp_who_article'], $article_data['id'], censorText($article_data['title']), $scripturl);
+		}
 
 		if (isset($article_data['namespace']))
+		{
 			$data = sprintf($txt['sp_who_article'], $article_data['namespace'], censorText($article_data['title']), $scripturl);
+		}
 	}
 
 	return $data;
@@ -442,7 +482,7 @@ function sp_integrate_frontpage(&$default_action)
  */
 function sp_integrate_quickhelp()
 {
-	require_once (SUBSDIR . '/Portal.subs.php');
+	require_once(SUBSDIR . '/Portal.subs.php');
 
 	// Load the Simple Portal Help file.
 	loadLanguage('SPortalHelp');
@@ -454,6 +494,8 @@ function sp_integrate_quickhelp()
  * Used to modify the output buffer before its sent, here we add in our copyright
  *
  * @param string $tourniquet
+ *
+ * @return string
  */
 function sp_integrate_buffer($tourniquet)
 {
@@ -462,11 +504,15 @@ function sp_integrate_buffer($tourniquet)
 	$fix = str_replace('{version}', $sportal_version, '<a href="http://www.simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-2014</a>');
 
 	if ((ELK == 'SSI' && empty($context['standalone'])) || !Template_Layers::getInstance()->hasLayers() || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
+	{
 		return $tourniquet;
+	}
 
 	// Don't display copyright for things like SSI.
 	if (!isset($forum_version))
+	{
 		return '';
+	}
 
 	// Append our cp notice at the end of the line
 	$finds = array(
@@ -503,14 +549,18 @@ function sp_integrate_menu_buttons(&$buttons)
 
 	// Set the right portalurl based on what integration mode the portal is using
 	if ($modSettings['sp_portal_mode'] == 1 && empty($context['disable_sp']))
+	{
 		$sportal_url = $scripturl . '?action=forum';
+	}
 	elseif ($modSettings['sp_portal_mode'] == 3 && empty($context['disable_sp']))
 	{
 		$buttons['home']['href'] = $modSettings['sp_standalone_url'];
 		$sportal_url = $modSettings['sp_standalone_url'];
 	}
 	else
+	{
 		return;
+	}
 
 	// Define the new menu item(s), show it for modes 1 and 3 only
 	$buttons = elk_array_insert($buttons, 'home', array(
@@ -540,18 +590,26 @@ function sp_integrate_redirect(&$setLocation)
 	{
 		// Redirect the user to the forum.
 		if (!empty($modSettings['sp_disableForumRedirect']))
+		{
 			$setLocation = '?action=forum';
+		}
 		// Redirect the user to the SSI.php standalone portal.
 		elseif ($modSettings['sp_portal_mode'] == 3)
+		{
 			$setLocation = $context['portal_url'];
+		}
 	}
 	// If we are using Search engine friendly URLs then lets do the same for page links
 	elseif (!empty($modSettings['queryless_urls']) && (empty($context['server']['is_cgi']) || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && (!empty($context['server']['is_apache']) || !empty($context['server']['is_lighttpd']) || !empty($context['server']['is_litespeed'])))
 	{
 		if (defined('SID') && SID != '')
+		{
 			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:page)=[^#]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
+		}
 		else
+		{
 			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?((?:page)=[^#"]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
+		}
 	}
 }
 
@@ -564,7 +622,9 @@ function sp_integrate_boardindex()
 	global $context;
 
 	if (!empty($_GET) && $_GET !== array('action' => 'forum'))
+	{
 		$context['robot_no_index'] = true;
+	}
 }
 
 /**
@@ -578,11 +638,15 @@ function sp_integrate_current_action(&$current_action)
 
 	// If it is home, it may be something else
 	if ($current_action == 'home')
+	{
 		$current_action = $modSettings['sp_portal_mode'] == 3 && empty($context['standalone']) && empty($context['disable_sp'])
 			? 'forum' : 'home';
+	}
 
 	if (empty($context['disable_sp']) && ((isset($_GET['board']) || isset($_GET['topic']) || in_array($context['current_action'], array('unread', 'unreadreplies', 'collapse', 'recent', 'stats', 'who'))) && in_array($modSettings['sp_portal_mode'], array(1, 3))))
+	{
 		$current_action = 'forum';
+	}
 }
 
 /**
@@ -606,11 +670,15 @@ function sp_integrate_pre_log_stats(&$no_stat_actions)
 {
 	// Don't track who actions for the shoutbox
 	if (isset($_REQUEST['action']) && ($_REQUEST['action'] === 'shoutbox' && isset($_GET['xml'])))
+	{
 		$no_stat_actions[] = 'shoutbox';
+	}
 
 	// Don't track stats of portal xml actions.
 	if (isset($_REQUEST['action']) && ($_REQUEST['action'] === 'portal' && isset($_GET['xml'])))
+	{
 		$no_stat_actions[] = 'portal';
+	}
 }
 
 /**
@@ -648,5 +716,7 @@ function sp_integrate_load_illegal_guest_permissions()
 function sp_integrate_pre_parsebbc(&$message, &$smileys, &$cache_id, &$parse_tags)
 {
 	if (strpos($message, '[cutoff]') !== false)
+	{
 		$message = str_replace('[cutoff]', '', $message);
+	}
 }

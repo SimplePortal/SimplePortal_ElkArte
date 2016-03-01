@@ -7,14 +7,14 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  *
  * This version of SimplePortal ElkArte is based on SimplePortal core 2.4
  */
 -->
 <modification xmlns="http://www.elkarte.net/site/modification" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
-	<version>1.1.0 Beta 1</version>
+	<version>1.0.0 Beta 2</version>
 
 	<file name="SOURCEDIR/Load.php">
 		<operation>
