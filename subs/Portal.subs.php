@@ -356,7 +356,7 @@ function sportal_load_blocks()
 					$blocks[$item]['style'] = sportal_select_style($blocks[$item]['styles']);
 
 					// For each moved block, instantiate it and run setup
-					$blocks[$item]['instance'] = sp_instantiate_block($blocks[$item]['type']);
+					$blocks[$item]['instance'] = sp_instantiate_block($blocks[$item]['type'], $blocks[$item]['id']);
 					$blocks[$item]['instance']->setup($blocks[$item]['parameters'], $blocks[$item]['id']);
 					$context['SPortal']['blocks'][$id][] = $blocks[$item];
 
@@ -374,7 +374,7 @@ function sportal_load_blocks()
 		$context['SPortal']['blocks'] = array();
 	}
 
-	// For each active block, determine it style and get and instance of it for use
+	// For each active block, determine it style and get an instance of it for use
 	foreach ($blocks as $block)
 	{
 		if (!$context['SPortal']['sides'][$block['column']]['active'] || empty($block['type']))
@@ -384,7 +384,7 @@ function sportal_load_blocks()
 
 		$block['style'] = sportal_select_style($block['styles']);
 
-		$block['instance'] = sp_instantiate_block($block['type']);
+		$block['instance'] = sp_instantiate_block($block['type'], $block['id']);
 		$block['instance']->setup($block['parameters'], $block['id']);
 
 		$context['SPortal']['sides'][$block['column']]['last'] = $block['id'];
@@ -407,9 +407,10 @@ function sportal_load_blocks()
 /**
  * A shortcut that takes care of instantiating the block and returning the instance
  *
- * @param string $name The name of the block (without "_Block" at the end)
+ * @param string $name The type of the block (without "_Block" at the end)
+ * @param int $id The id of the block, to allow multiple same types on the page
  */
-function sp_instantiate_block($name)
+function sp_instantiate_block($name, $id = 0)
 {
 	static $instances = array(), $db = null;
 
@@ -418,15 +419,15 @@ function sp_instantiate_block($name)
 		$db = database();
 	}
 
-	if (!isset($instances[$name]))
+	if (!isset($instances[$name . '_' . $id]))
 	{
 		require_once(SUBSDIR . '/spblocks/' . str_replace('_', '', $name) . '.block.php');
 
 		$class = $name . '_Block';
-		$instances[$name] = new $class($db);
+		$instances[$name. '_' . $id] = new $class($db);
 	}
 
-	$instance = $instances[$name];
+	$instance = $instances[$name. '_' . $id];
 
 	return $instance;
 }
@@ -462,9 +463,9 @@ function resetMemberLayout()
  *
  * @param int|null $column_id
  * @param int|null $block_id
- * @param boolean|null $state
- * @param boolean|null $show
- * @param boolean|null $permission
+ * @param bool|null $state
+ * @param bool|null $show
+ * @param bool|null $permission
  *
  * @return array of block values
  */
@@ -1007,11 +1008,8 @@ function sp_loadColors($users = array())
 		$color_profile[$row['id_member']] = $row;
 		$onlineColor = !empty($row['member_group_color']) ? $row['member_group_color'] : $row['post_group_color'];
 		$color_profile[$row['id_member']]['color'] = $onlineColor;
-		$color_profile[$row['id_member']]['link'] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '"' . (!empty($onlineColor)
-			? ' style="color: ' . $onlineColor . ';"' : '') . '>' . $row['real_name'] . '</a>';
-		$color_profile[$row['id_member']]['colored_name'] = (!empty($onlineColor)
-			? '<span style="color: ' . $onlineColor . ';">' : '') . $row['real_name'] . (!empty($onlineColor)
-			? '</span>' : '');
+		$color_profile[$row['id_member']]['link'] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '"' . (!empty($onlineColor) ? ' style="color: ' . $onlineColor . ';"' : '') . '>' . $row['real_name'] . '</a>';
+		$color_profile[$row['id_member']]['colored_name'] = (!empty($onlineColor) ? '<span style="color: ' . $onlineColor . ';">' : '') . $row['real_name'] . (!empty($onlineColor) ? '</span>' : '');
 	}
 	$db->free_result($request);
 
@@ -1100,7 +1098,7 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 }
 
 /**
- * Builds an sprite class tag for use in templates
+ * Builds a sprite class tag for use in templates
  *
  * @param string $name
  * @param string $title
