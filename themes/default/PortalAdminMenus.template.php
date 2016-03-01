@@ -28,8 +28,8 @@ function template_menus_custom_menu_edit()
 						<input type="text" name="name" id="menu_name" value="', $context['menu']['name'], '" class="input_text" />
 					</dd>
 				</dl>
-				<div class="sp_button_container">
-					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
+				<div class="submitbutton">
+					<input type="submit" name="submit" value="', $context['page_title'], '" class="button_submit" />
 				</div>
 			</div>
 			<input type="hidden" name="menu_id" value="', $context['menu']['id'], '" />

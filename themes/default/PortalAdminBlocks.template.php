@@ -95,7 +95,7 @@ function template_block_list()
  */
 function template_block_edit()
 {
-	global $context, $settings, $options, $scripturl, $txt, $helptxt, $modSettings;
+	global $context, $settings, $options, $scripturl, $txt, $helptxt;
 
 	// Want to take a look before you save?
 	if (!empty($context['SPortal']['preview']))
@@ -190,11 +190,11 @@ function template_block_edit()
 							</a>';
 
 		echo '
-							<label for="', $type == 'bbc' ? 'bbc_content' : $name, '">', $txt['sp_param_' . $context['SPortal']['block']['type'] . '_' . $name], ':</label>
+							<label for="', $type === 'bbc' ? 'bbc_content' : $name, '">', $txt['sp_param_' . $context['SPortal']['block']['type'] . '_' . $name], ':</label>
 						</dt>
 						<dd>';
 
-		if ($type == 'bbc')
+		if ($type === 'bbc')
 		{
 			echo '
 						</dd>
@@ -208,12 +208,12 @@ function template_block_edit()
 					</div>
 					<dl class="sp_form">';
 		}
-		elseif ($type == 'boards' || $type == 'board_select')
+		elseif ($type === 'boards' || $type === 'board_select')
 		{
 					echo '
 							<input type="hidden" name="parameters[', $name, ']" value="" />';
 
-				if ($type == 'boards')
+				if ($type === 'boards')
 					echo '
 							<select name="parameters[', $name, '][]" id="', $name, '" size="7" multiple="multiple">';
 				else
@@ -227,16 +227,16 @@ function template_block_edit()
 				echo '
 							</select>';
 		}
-		elseif ($type == 'int')
+		elseif ($type === 'int')
 			echo '
 							<input type="text" name="parameters[', $name, ']" id="', $name, '" value="', $context['SPortal']['block']['parameters'][$name],'" size="7" class="input_text" />';
-		elseif ($type == 'text')
+		elseif ($type === 'text')
 			echo '
 							<input type="text" name="parameters[', $name, ']" id="', $name, '" value="', $context['SPortal']['block']['parameters'][$name],'" size="25" class="input_text" />';
-		elseif ($type == 'check')
+		elseif ($type === 'check')
 				echo '
 							<input type="checkbox" name="parameters[', $name, ']" id="', $name, '"', !empty($context['SPortal']['block']['parameters'][$name]) ? ' checked="checked"' : '', ' class="input_check" />';
-		elseif ($type == 'select')
+		elseif ($type === 'select')
 		{
 				$options = explode('|', $txt['sp_param_' . $context['SPortal']['block']['type'] . '_' . $name . '_options']);
 
@@ -262,7 +262,7 @@ function template_block_edit()
 				echo '
 							</select>';
 		}
-		elseif ($type == 'textarea')
+		elseif ($type === 'textarea')
 		{
 			echo '
 						</dd>
@@ -308,8 +308,8 @@ function template_block_edit()
 						<dd>
 							<select id="order" name="placement"', !$context['SPortal']['is_new'] ? ' onchange="this.form.block_row.disabled = this.options[this.selectedIndex].value == \'\';"' : '', '>
 								', !$context['SPortal']['is_new'] ? '<option value="nochange">' . $txt['sp-placementUnchanged'] . '</option>' : '', '
-								<option value="before"', (!empty($context['SPortal']['block']['placement']) && $context['SPortal']['block']['placement'] == 'before' ? ' selected="selected"' : ''), '>', $txt['sp-placementBefore'], '...</option>
-								<option value="after"', (!empty($context['SPortal']['block']['placement']) && $context['SPortal']['block']['placement'] == 'after' ? ' selected="selected"' : ''), '>', $txt['sp-placementAfter'], '...</option>
+								<option value="before"', (!empty($context['SPortal']['block']['placement']) && $context['SPortal']['block']['placement'] === 'before' ? ' selected="selected"' : ''), '>', $txt['sp-placementBefore'], '...</option>
+								<option value="after"', (!empty($context['SPortal']['block']['placement']) && $context['SPortal']['block']['placement'] === 'after' ? ' selected="selected"' : ''), '>', $txt['sp-placementAfter'], '...</option>
 							</select>
 							<select id="block_row" name="block_row"', !$context['SPortal']['is_new'] ? ' disabled="disabled"' : '', '>';
 
@@ -343,9 +343,9 @@ function template_block_edit()
 					<input type="checkbox" name="block_active" id="block_active" value="1"', $context['SPortal']['block']['state'] ? ' checked="checked"' : '', ' class="input_check" />
 				</dd>
 			</dl>
-			<div class="sp_button_container">
-				<input type="submit" name="preview_block" value="', $txt['sp-blocksPreview'], '" class="right_submit" />
-				<input type="submit" name="add_block" value="', !$context['SPortal']['is_new'] ? $txt['sp-blocksEdit'] : $txt['sp-blocksAdd'], '" class="right_submit" />
+			<div class="submitbutton">
+				<input type="submit" name="preview_block" value="', $txt['sp-blocksPreview'], '" class="button_submit" />
+				<input type="submit" name="add_block" value="', !$context['SPortal']['is_new'] ? $txt['sp-blocksEdit'] : $txt['sp-blocksAdd'], '" class="button_submit" />
 			</div>
 		</div>';
 

@@ -125,7 +125,7 @@ function template_portal_above()
 
 	// The main portal div
 	echo '
-	<div id="sp_main"
+	<div id="sp_main">
 		<div class="sp_main_row">';
 
 	// Output all the Left blocks
