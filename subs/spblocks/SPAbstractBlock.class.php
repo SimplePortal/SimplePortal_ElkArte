@@ -47,6 +47,12 @@ abstract class SP_Abstract_Block
 	protected $template = '';
 
 	/**
+	 * If the block supports refreshing, sets the time in seconds
+	 * @var int
+	 */
+	protected $refresh = array();
+
+	/**
 	 * Class constructor, makes db available
 	 *
 	 * @param Database|null $db
@@ -100,5 +106,32 @@ abstract class SP_Abstract_Block
 	public static function permissionsRequired()
 	{
 		return array();
+	}
+
+	/**
+	 * Adds javascript to make a block refresh call in the background
+	 */
+	public function auto_refresh()
+	{
+		// Lets be reasonable on the refresh, let not beat on the server
+		$refresh = ((int) $this->refresh['refresh_value'] < 30 ? 30 : (int) $this->refresh['refresh_value']) * 1000;
+
+		addInlineJavascript('
+			$(document).ready(function()
+			{
+				var $block = $("#sp_block_' . (int) $this->refresh['id'] . '"),
+					$container = $block.find("' . $this->refresh['class'] . '"),
+					params = {"block" : ' . (int) $this->refresh['id'] . '};
+
+				params[elk_session_var] = elk_session_id;
+
+				setInterval(function()
+				{
+					$container.load(
+						elk_prepareScriptUrl(sp_script_url) + "action=PortalRefresh;sa=' . $this->refresh['sa'] . ';api",
+						params);
+				}, ' . $refresh . ');
+			});
+		');
 	}
 }
