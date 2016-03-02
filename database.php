@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  */
 
 if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
@@ -15,13 +15,16 @@ if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
 	require_once(dirname(__FILE__) . '/SSI.php');
 }
 elseif (!defined('ELK'))
+{
 	die('<b>Error:</b> Cannot install - please verify you put this in the same place as ELK\'s index.php.');
+}
 
 global $db_prefix, $db_package_log;
 
 $db = database();
 $db_table = db_table();
 
+// Define the portal tables
 $sp_tables = array(
 	'sp_articles' => array(
 		'columns' => array(
@@ -196,8 +199,11 @@ $sp_tables = array(
 	),
 );
 
+// Create the tables, if they don't already exist
 foreach ($sp_tables as $sp_table => $data)
+{
 	$db_table->db_create_table('{db_prefix}' . $sp_table, $data['columns'], $data['indexes'], array(), 'ignore');
+}
 
 // From the "old" (pre-classes) to the "new" (blocks as classes) format
 $replace_array = array(
@@ -242,16 +248,18 @@ foreach ($replace_array as $from => $to)
 	);
 }
 
+// See if we have any blocks defined, like would be found during an upgrade
 $result = $db->query('', '
-	SELECT id_block
+	SELECT 
+		id_block
 	FROM {db_prefix}sp_blocks
 	LIMIT 1',
-	array(
-	)
+	array()
 );
 list ($has_block) = $db->fetch_row($result);
 $db->free_result($result);
 
+// No blocks yet, since this is a new install, lets set some up to show off the portal
 if (empty($has_block))
 {
 	$welcome_text = '<h2 style="text-align: center;">Welcome to SimplePortal!</h2>
@@ -275,15 +283,18 @@ if (empty($has_block))
 		'top_boards' => array('label' => 'Top Boards', 'type' => 'TopBoards', 'col' => 4, 'row' => 5, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
 	);
 
+	// Add the blocks to the system
 	$db->insert('ignore',
 		'{db_prefix}sp_blocks',
 		array('label' => 'text', 'type' => 'text', 'col' => 'int', 'row' => 'int', 'permissions' => 'int', 'styles' => 'int', 'visibility' => 'int'),
 		$default_blocks,
 		array('id_block', 'state')
-		);
+	);
 
+	// Set some opional block parameters
 	$request = $db->query('', '
-		SELECT MIN(id_block) AS id, type
+		SELECT 
+			MIN(id_block) AS id, type
 		FROM {db_prefix}sp_blocks
 		WHERE type IN ({array_string:types})
 		GROUP BY type
@@ -315,9 +326,10 @@ if (empty($has_block))
 	);
 }
 
-// Update to use permission profiles if they have not been added
+// Have any permission profiles been added yet, or is this an upgrade
 $result = $db->query('', '
-	SELECT id_profile
+	SELECT 
+		id_profile
 	FROM {db_prefix}sp_profiles
 	WHERE type = {int:type}
 	LIMIT {int:limit}',
@@ -328,11 +340,13 @@ $result = $db->query('', '
 );
 list ($has_permission_profiles) = $db->fetch_row($result);
 $db->free_result($result);
-// No profiles, so add some defaults to get started
+
+// No permission profiles, so add some default profiles to get started
 if (empty($has_permission_profiles))
 {
 	$request = $db->query('', '
-		SELECT id_group
+		SELECT
+			id_group
 		FROM {db_prefix}membergroups
 		WHERE min_posts != {int:min_posts}',
 		array(
@@ -358,16 +372,11 @@ if (empty($has_permission_profiles))
 
 // Update the page table to accept more data
 $dbtbl = db_table();
-if (empty($modSettings['sp_version']) || $modSettings['sp_version'] < '2.4.1')
+$page_cols = $dbtbl->db_list_columns('{db_prefix}sp_pages', true);
+if (isset($page_cols['body']) && $page_cols['body']['type'] == 'text')
 {
-	$page_cols = $dbtbl->db_list_columns('{db_prefix}sp_pages', true);
-
-	if (isset($page_cols['body']) && $page_cols['body']['type'] == 'text')
-		$dbtbl->db_change_column('{db_prefix}sp_pages', 'body', array('type' => 'mediumtext'));
+	$dbtbl->db_change_column('{db_prefix}sp_pages', 'body', array('type' => 'mediumtext'));
 }
-
-// Update the block table to include the mobile column if needed
-$dbtbl->db_add_column('{db_prefix}sp_blocks', array('name' => 'mobile_view', 'type' => 'tinyint',  'size' => 4, 'default' => 0, 'unsigned' => true), 'ignore');
 
 // Update tables to use style profiles in place of style
 foreach (array('sp_articles', 'sp_blocks', 'sp_pages') as $sp_style)
@@ -380,8 +389,8 @@ foreach (array('sp_articles', 'sp_blocks', 'sp_pages') as $sp_style)
 	}
 }
 
-// If there are no style profiles, then add some defaults to use
-$result = $db->query('','
+// Do style profiles exist already?
+$result = $db->query('', '
 	SELECT
 		id_profile
 	FROM {db_prefix}sp_profiles
@@ -394,6 +403,8 @@ $result = $db->query('','
 );
 list ($has_style_profiles) = $db->fetch_row($result);
 $db->free_result($result);
+
+// If there are no style profiles, then add some defaults to use
 if (empty($has_style_profiles))
 {
 	$db->insert('replace',
@@ -415,8 +426,8 @@ if (empty($has_style_profiles))
 	);
 }
 
-// Add / convert visibility profiles if none exist
-$result = $db->query('','
+// Do visibility profiles exist?
+$result = $db->query('', '
 	SELECT
 		id_profile
 	FROM {db_prefix}sp_profiles
@@ -429,6 +440,8 @@ $result = $db->query('','
 );
 list ($has_visibility_profiles) = $db->fetch_row($result);
 $db->free_result($result);
+
+// Add default visibility profiles if there are no defined ones 
 if (empty($has_visibility_profiles))
 {
 	$db->insert('replace',
@@ -457,12 +470,17 @@ foreach (array('sp_blocks') as $sp_visibility)
 		$dbtbl->db_add_column('{db_prefix}' . $sp_visibility, array('name' => 'visibility', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true));
 		//$dbtbl->db_remove_column('{db_prefix}' . $sp_style, 'display');
 		//$dbtbl->db_remove_column('{db_prefix}' . $sp_style, 'display_custom');
+		//$dbtbl->db_remove_column('{db_prefix}' . $sp_style, 'mobile_view');
 	}
 }
 
 $db_package_log = array();
 foreach ($sp_tables as $sp_table_name => $null)
+{
 	$db_package_log[] = array('remove_table', $db_prefix . $sp_table_name);
+}
 
 if (ELK === 'SSI')
+{
 	echo 'Database changes were carried out successfully.';
+}

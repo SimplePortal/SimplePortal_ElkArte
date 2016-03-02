@@ -7,7 +7,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.1.0 Beta 1
+ * @version 1.0.0 Beta 2
  *
  * This version of SimplePortal ElkArte is based on SimplePortal core 2.4
  */
@@ -15,10 +15,10 @@
 <package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
 	<name>SimplePortal</name>
-	<version>1.1.0 Beta 1</version>
+	<version>1.0.0 Beta 2</version>
 	<type>modification</type>
 	<install for="1.0.3 - 1.0.99">
-		<readme type="inline">This will install SimplePortal 1.1.0 Beta 1 for Elkarte.</readme>
+		<readme type="inline">This will install SimplePortal for Elkarte.</readme>
 		<modification>modification.xml</modification>
 		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
 		<require-dir name="sources" destination="BOARDDIR" />
@@ -71,6 +71,7 @@
 		<remove-file name="CONTROLLERDIR/PortalPages.controller.php" />
 		<remove-file name="CONTROLLERDIR/PortalShoutbox.controller.php" />
 		<remove-file name="CONTROLLERDIR/PortalCategories.controller.php" />
+		<remove-file name="CONTROLLERDIR/PortalRefresh.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminArticles.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminBlocks.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminCategories.controller.php" />
@@ -83,7 +84,31 @@
 		<remove-file name="SUBSDIR/Portal.subs.php" />
 		<remove-file name="SUBSDIR/PortalAdmin.subs.php" />
 		<remove-file name="SUBSDIR/PortalArticle.subs.php" />
-		<remove-file  name="SUBSDIR/PortalShoutbox.subs.php" />
+		<remove-file name="SUBSDIR/PortalShoutbox.subs.php" />
+		<remove-file name="SUBSDIR/spblocks/Gallery.block.php" />
+		<remove-file name="SUBSDIR/spblocks/Html.block.php" />
+		<remove-file name="SUBSDIR/spblocks/LatestMember.block.php" />
+		<remove-file name="SUBSDIR/spblocks/Menu.block.php" />
+		<remove-file name="SUBSDIR/spblocks/News.block.php" />
+		<remove-file name="SUBSDIR/spblocks/Php.block.php" />
+		<remove-file name="SUBSDIR/spblocks/QuickSearch.block.php" />
+		<remove-file name="SUBSDIR/spblocks/ShowPoll.block.php" />
+		<remove-file name="SUBSDIR/spblocks/ThemeSelect.block.php" />
+		<remove-file name="SUBSDIR/spblocks/TopBoards.block.php" />
+		<remove-file name="SUBSDIR/spblocks/TopStatsMember.block.php" />
+		<remove-file name="SUBSDIR/spblocks/AttachmentImage.block.php" />
+		<remove-file name="SUBSDIR/spblocks/Articles.block.php" />
+		<remove-file name="SUBSDIR/spblocks/Bbc.block.php" />
+		<remove-file name="SUBSDIR/spblocks/AttachmentRecent.block.php" />
+		<remove-file name="SUBSDIR/spblocks/CalendarInformation.block.php" />
+		<remove-file name="SUBSDIR/spblocks/TopTopics.block.php" />
+		<remove-file name="SUBSDIR/spblocks/RssFeed.block.php" />
+		<remove-file name="SUBSDIR/spblocks/Staff.block.php" />
+		<remove-file name="SUBSDIR/spblocks/Calendar.block.php" />
+		<remove-file name="SUBSDIR/spblocks/BoardNews.block.php" />
+		<remove-file name="SUBSDIR/spblocks/UserInfo.block.php" />
+		<remove-file name="SUBSDIR/spblocks/Shoutbox.block.php" />
+		<remove-file name="SUBSDIR/spblocks/SPAbstractBlock.class.php" />
 		<remove-file name="SOURCEDIR/PortalIntegration.subs.php" />
 		<remove-file name="THEMEDIR/Portal.template.php" />
 		<remove-file name="THEMEDIR/PortalArticles.template.php" />
@@ -98,6 +123,9 @@
 		<remove-file name="THEMEDIR/PortalAdminProfiles.template.php" />
 		<remove-file name="THEMEDIR/PortalAdminCategories.template.php" />
 		<remove-file name="THEMEDIR/PortalAdminMenus.template.php" />
+		<remove-file name="THEMEDIR/css/portal.css" />
+		<remove-file name="THEMEDIR/css/portal_rtl.css" />
+		<remove-file name="THEMEDIR/scripts/portal.js" />
 		<remove-file name="LANGUAGEDIR/english/SPortal.english.php" />
 		<remove-file name="LANGUAGEDIR/english/SPortalAdmin.english.php" />
 		<remove-file name="LANGUAGEDIR/english/SPortalHelp.english.php" />
@@ -109,8 +137,5 @@
 		<remove-file name="IMAGESDIR/admin/pages.png" />
 		<remove-file name="IMAGESDIR/admin/profiles.png" />
 		<remove-file name="IMAGESDIR/admin/shoutbox.png" />
-		<remove-file name="THEMEDIR/css/portal.css" />
-		<remove-file name="THEMEDIR/css/portal_rtl.css" />
-		<remove-file name="THEMEDIR/scripts/portal.js" />
 	</uninstall>
 </package-info>
