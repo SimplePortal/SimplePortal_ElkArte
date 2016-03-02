@@ -895,6 +895,8 @@ function sp_loadCalendarData($type, $low_date, $high_date = false)
  * This is a small script to load colors for SPortal.
  *
  * @param int[] $users
+ *
+ * @return bool|array
  */
 function sp_loadColors($users = array())
 {
@@ -912,31 +914,6 @@ function sp_loadColors($users = array())
 	if (empty($users))
 	{
 		return false;
-	}
-
-	// MemberColorLink compatible, cache more data, handle also some special member color link colors
-	if (!empty($modSettings['MemberColorLinkInstalled']))
-	{
-		$colorData = load_onlineColors($users);
-
-		// This happen only on not existing Members... but given ids...
-		if (empty($colorData))
-		{
-			return false;
-		}
-
-		$loaded_ids = array_keys($colorData);
-
-		foreach ($loaded_ids as $id)
-		{
-			if (!empty($id) && !isset($color_profile[$id]['link']))
-			{
-				$color_profile[$id]['link'] = $colorData[$id]['colored_link'];
-				$color_profile[$id]['colored_name'] = $colorData[$id]['colored_name'];
-			}
-		}
-
-		return empty($loaded_ids) ? false : $loaded_ids;
 	}
 
 	// Make sure it's an array.
@@ -1394,6 +1371,8 @@ function sportal_increase_viewcount($name, $id)
 			'id' => $id,
 		)
 	);
+
+	return null;
 }
 
 /**
