@@ -256,7 +256,7 @@ class ManagePortalPages_Controller extends Action_Controller
 		if (!empty($_REQUEST['content_mode']) && $_POST['type'] === 'bbc')
 		{
 			require_once(SUBSDIR . 'Html2BBC.class.php');
-			$bbc_converter = new Convert_BBC($_REQUEST['content']);
+			$bbc_converter = new Html_2_BBC($_REQUEST['content']);
 			$_REQUEST['content'] = $bbc_converter->get_bbc();
 
 			$_REQUEST['content'] = un_htmlspecialchars($_REQUEST['content']);
