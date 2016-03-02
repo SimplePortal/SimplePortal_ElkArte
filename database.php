@@ -267,20 +267,20 @@ if (empty($has_block))
 <p>All this and SimplePortal has remained Simple! SimplePortal is built for simplicity and ease of use; ensuring the average forum administrator can install SimplePortal, configure a few settings, and show off the brand new portal to the users in minutes. Confusing menus, undesired pre-loaded blocks and settings that cannot be found are all avoided as much as possible. Because when it comes down to it, SimplePortal is YOUR portal, and should reflect your taste as much as possible.</p>';
 
 	$default_blocks = array(
-		'user_info' => array('label' => 'User Info', 'type' => 'UserInfo', 'col' => 1, 'row' => 1, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
-		'whos_online' => array('label' => 'Who&#039;s Online', 'type' => 'WhosOnline', 'col' => 1, 'row' => 2, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
-		'board_stats' => array('label' => 'Board Stats', 'type' => 'BoardStats', 'col' => 1, 'row' => 3, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
-		'theme_select' => array('label' => 'Theme Select', 'type' => 'ThemeSelect', 'col' => 1, 'row' => 4, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
-		'search' => array('label' => 'Search', 'type' => 'QuickSearch', 'col' => 1, 'row' => 5, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
+		'user_info' => array('label' => 'User Info', 'type' => 'User_Info', 'col' => 1, 'row' => 1, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
+		'whos_online' => array('label' => 'Who&#039;s Online', 'type' => 'Whos_Online', 'col' => 1, 'row' => 2, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
+		'board_stats' => array('label' => 'Board Stats', 'type' => 'Board_Stats', 'col' => 1, 'row' => 3, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
+		'theme_select' => array('label' => 'Theme Select', 'type' => 'Theme_Select', 'col' => 1, 'row' => 4, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
+		'search' => array('label' => 'Search', 'type' => 'Quick_Search', 'col' => 1, 'row' => 5, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
 		'news' => array('label' => 'News', 'type' => 'News', 'col' => 2, 'row' => 1, 'permissions' => 3, 'styles' => 8, 'visibility' => 14),
 		'welcome' => array('label' => 'Welcome', 'type' => 'Html', 'col' => 2, 'row' => 2, 'permissions' => 3, 'styles' => 8, 'visibility' => 14),
-		'board_news' => array('label' => 'Board News', 'type' => 'BoardNews', 'col' => 2, 'row' => 3, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
+		'board_news' => array('label' => 'Board News', 'type' => 'Board_News', 'col' => 2, 'row' => 3, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
 		'recent_topics' => array('label' => 'Recent Topics', 'type' => 'Recent', 'col' => 3, 'row' => 1, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
-		'top_poster' => array('label' => 'Top Poster', 'type' => 'TopPoster', 'col' => 4, 'row' => 1, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
+		'top_poster' => array('label' => 'Top Poster', 'type' => 'Top_Poster', 'col' => 4, 'row' => 1, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
 		'recent_posts' => array('label' => 'Recent Posts', 'type' => 'Recent', 'col' => 4, 'row' => 2, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
 		'staff' => array('label' => 'Forum Staff', 'type' => 'Staff', 'col' => 4, 'row' => 3, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
 		'calendar' => array('label' => 'Calendar', 'type' => 'Calendar', 'col' => 4, 'row' => 4, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
-		'top_boards' => array('label' => 'Top Boards', 'type' => 'TopBoards', 'col' => 4, 'row' => 5, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
+		'top_boards' => array('label' => 'Top Boards', 'type' => 'Top_Boards', 'col' => 4, 'row' => 5, 'permissions' => 3, 'styles' => 4, 'visibility' => 14),
 	);
 
 	// Add the blocks to the system
@@ -291,7 +291,7 @@ if (empty($has_block))
 		array('id_block', 'state')
 	);
 
-	// Set some opional block parameters
+	// Set some optional block parameters
 	$request = $db->query('', '
 		SELECT 
 			MIN(id_block) AS id, type
@@ -300,22 +300,23 @@ if (empty($has_block))
 		GROUP BY type
 		LIMIT 4',
 		array(
-			'types' => array('sp_html', 'sp_boardNews', 'sp_calendar', 'sp_recent'),
+			'types' => array('Html', 'Board_News', 'Calendar', 'Recent'),
 		)
 	);
+	$block_ids = array();
 	while ($row = $db->fetch_assoc($request))
 		$block_ids[$row['type']] = $row['id'];
 	$db->free_result($request);
 
 	$default_parameters = array(
-		array('id_block' => $block_ids['sp_html'], 'variable' => 'content', 'value' => htmlspecialchars($welcome_text)),
-		array('id_block' => $block_ids['sp_boardNews'], 'variable' => 'avatar', 'value' => 1),
-		array('id_block' => $block_ids['sp_boardNews'], 'variable' => 'per_page', 'value' => 3),
-		array('id_block' => $block_ids['sp_calendar'], 'variable' => 'events', 'value' => 1),
-		array('id_block' => $block_ids['sp_calendar'], 'variable' => 'birthdays', 'value' => 1),
-		array('id_block' => $block_ids['sp_calendar'], 'variable' => 'holidays', 'value' => 1),
-		array('id_block' => $block_ids['sp_recent'], 'variable' => 'type', 'value' => 1),
-		array('id_block' => $block_ids['sp_recent'], 'variable' => 'display', 'value' => 1),
+		array('id_block' => $block_ids['Html'], 'variable' => 'content', 'value' => htmlspecialchars($welcome_text)),
+		array('id_block' => $block_ids['Board_News'], 'variable' => 'avatar', 'value' => 1),
+		array('id_block' => $block_ids['Board_News'], 'variable' => 'per_page', 'value' => 3),
+		array('id_block' => $block_ids['Calendar'], 'variable' => 'events', 'value' => 1),
+		array('id_block' => $block_ids['Calendar'], 'variable' => 'birthdays', 'value' => 1),
+		array('id_block' => $block_ids['Calendar'], 'variable' => 'holidays', 'value' => 1),
+		array('id_block' => $block_ids['Recent'], 'variable' => 'type', 'value' => 1),
+		array('id_block' => $block_ids['Recent'], 'variable' => 'display', 'value' => 1),
 	);
 
 	$db->insert('replace',
