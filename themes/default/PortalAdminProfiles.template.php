@@ -208,7 +208,7 @@ function template_visibility_profiles_edit()
 
 		echo '
 						<li>
-							<input type="checkbox" onclick="invertAll(this, this.form, ', $type, '[]);" class="input_check" /><em>', $txt['check_all'], '</em>
+							<input type="checkbox" onclick="invertAll(this, this.form, \'', $type, '[\');" class="input_check" /><em>', $txt['check_all'], '</em>
 						</li>
 					</ul>
 					<br />';
