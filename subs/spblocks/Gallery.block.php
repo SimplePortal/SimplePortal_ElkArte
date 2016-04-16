@@ -48,7 +48,7 @@ class Gallery_Block extends SP_Abstract_Block
 	 * @param mixed[] $parameters
 	 * @param int $id
 	 */
-	public function setup($parameters, $id)
+	public function setup($parameters, $id = 0)
 	{
 		global  $txt, $modSettings;
 
@@ -114,7 +114,9 @@ class Gallery_Block extends SP_Abstract_Block
 		if ($this->data['mod'] === 'aeva_media')
 		{
 			require_once(SUBSDIR . '/Aeva-Subs.php');
+			require_once(SUBSDIR . '/Aeva-Subs-Vital.php');
 
+			aeva_loadSettings();
 			$data = aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC');
 		}
 
