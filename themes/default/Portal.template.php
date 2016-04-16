@@ -271,7 +271,6 @@ function template_block_default($block, $side)
 	// Show a title bar or not, some blocks have their own bars
 	if (empty($block['style']['no_title']))
 	{
-
 		echo '
 						<h3 class="', strpos($block['style']['title']['class'], 'custom') === false ? $block['style']['title']['class'] : '', ' sp_drag_header"', !empty($block['style']['title']['style']) ? ' style="' . $block['style']['title']['style'] . '"' : '', '>';
 
@@ -297,9 +296,9 @@ function template_block_default($block, $side)
 							$block['collapsed'] && empty($block['force_view'])
 								? ' style="display: none;"'
 								: '', '>
-							<div class="', 	$block['type'] != 'sp_menu'
-								? 'sp_block '
-								: 'sp_content_padding ', strtolower($block['type']), '"',
+							<div class="', 	$block['type'] !== 'sp_menu'
+								? 'sp_block sp_'
+								: 'sp_content_padding sp_', strtolower($block['type']), '"',
 							!empty($block['style']['body']['style'])
 								? ' style="' . $block['style']['body']['style'] . '"'
 								: '', '>';
