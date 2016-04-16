@@ -46,7 +46,7 @@ class Php_Block extends SP_Abstract_Block
 	 * @param mixed[] $parameters
 	 * @param int $id
 	 */
-	public function setup($parameters, $id)
+	public function setup($parameters, $id = 0)
 	{
 		$this->data['content'] = !empty($parameters['content']) ? $parameters['content'] : '';
 		$this->data['content'] = trim(un_htmlspecialchars($this->data['content']));

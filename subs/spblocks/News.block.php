@@ -47,5 +47,5 @@ function template_sp_news($data)
 	global $context;
 
 	echo '
-		<div class="centertext">', $context['random_news_line'], '</div>';
+		<div class="centertext">', !empty($context['random_news_line']) ? $context['random_news_line'] : '', '</div>';
 }
