@@ -696,14 +696,14 @@ class ManagePortalProfile_Controller extends Action_Controller
 				fatal_lang_error('sp_error_profile_name_empty', false);
 
 			// Get the form values
-			list($selections, $query) = $this->_profile_visibility();
+			list($selections, $query, $mobile) = $this->_profile_visibility();
 
 			// Add the data to place in the fields
 			$profile_info = array(
 				'id' => (int) $_POST['profile_id'],
 				'type' => 3,
 				'name' => Util::htmlspecialchars($_POST['name'], ENT_QUOTES),
-				'value' => implode('|', array(implode(',', $selections), implode(',', $query))),
+				'value' => implode('|', array(implode(',', $selections), implode(',', $query))) . '|' . $mobile,
 			);
 
 			// New we simply insert, or if editing update
@@ -770,6 +770,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 	{
 		$selections = array();
 		$query = array();
+		$mobile = 0;
 
 		$types = array('actions', 'boards', 'pages', 'categories', 'articles');
 		foreach ($types as $type)
@@ -797,7 +798,12 @@ class ManagePortalProfile_Controller extends Action_Controller
 			}
 		}
 
-		return array($selections, $query);
+		if (!empty($_POST['block_mobile']))
+		{
+			$mobile = 1;
+		}
+
+		return array($selections, $query, $mobile);
 	}
 
 	/**
