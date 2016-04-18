@@ -906,7 +906,7 @@ dl.sp_form img,
 }
 
 /* Upshrink image in the block headers */
-.category_toggle {
+.sp_category_toggle {
 	position: relative;
 	display: block;
 	float: right;
@@ -915,7 +915,7 @@ dl.sp_form img,
 	border-radius: 2px;
 }
 
-.category_toggle span {
+.sp_category_toggle span {
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -926,8 +926,8 @@ dl.sp_form img,
 	background-repeat: no-repeat;
 }
 
-.category_header {
-	padding: 4px 5px 2px 10px;
+.sp_category_header {
+	padding-right: 5px;
 }
 
 
