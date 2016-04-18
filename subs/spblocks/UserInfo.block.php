@@ -69,7 +69,6 @@ class User_Info_Block extends SP_Abstract_Block
 			$this->data['is_guest'] = false;
 
 			// load up the members details
-			// @todo why? $user_info data should already be loaded, otherwise we wouldn't even be here
 			loadMemberData($user_info['id']);
 			loadMemberContext($user_info['id'], true);
 

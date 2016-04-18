@@ -272,11 +272,11 @@ function template_block_default($block, $side)
 	if (empty($block['style']['no_title']))
 	{
 		echo '
-						<h3 class="', strpos($block['style']['title']['class'], 'custom') === false ? $block['style']['title']['class'] : '', ' sp_drag_header"', !empty($block['style']['title']['style']) ? ' style="' . $block['style']['title']['style'] . '"' : '', '>';
+						<h3 class="sp_category_header ', strpos($block['style']['title']['class'], 'custom') === false ? $block['style']['title']['class'] : '', ' sp_drag_header"', !empty($block['style']['title']['style']) ? ' style="' . $block['style']['title']['style'] . '"' : '', '>';
 
 		if (empty($block['force_view']))
 			echo '
-							<span class="category_toggle">&nbsp;
+							<span class="sp_category_toggle">&nbsp;
 								<a href="javascript:sp_collapseBlock(\'', $block['id'], '\')">
 									<span id="sp_collapse_', $block['id'], '" class="', $block['collapsed'] ? 'expand' : 'collapse', '"></span>
 								</a>
