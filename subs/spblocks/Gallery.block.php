@@ -68,22 +68,19 @@ class Gallery_Block extends SP_Abstract_Block
 			return;
 		}
 
-		// So there is a gallery ??
+		// Set the appropriate template for the gallery in use
+		$this->data['gallery_template'] = 'template_sp_gallery_' . $this->data['mod'];
 		$this->data['items'] = $this->_getItems($limit, $type);
+		$this->data['fancybox_enabled'] = !empty($modSettings['fancybox_enabled']);
 
+		// No items in the gallery?
 		if (empty($this->data['items']))
 		{
-			// No items in the gallery?
 			$this->data['error_msg'] = $txt['error_sp_no_pictures_found'];
 			$this->setTemplate('template_sp_gallery_error');
 		}
 		else
 		{
-			// Set the appropriate sub-template for the gallery in use
-			$this->data['gallery_template'] = 'template_sp_gallery_' . $this->data['mod'];
-			$this->data['fancybox_enabled'] = !empty($modSettings['fancybox_enabled']);
-
-			// The main template, it will call the gallery_template sub-template
 			$this->setTemplate('template_sp_gallery');
 		}
 	}
@@ -110,8 +107,6 @@ class Gallery_Block extends SP_Abstract_Block
 	 *
 	 * @param int $limit
 	 * @param string $type
-	 *
-	 * @return array
 	 */
 	protected function _getItems($limit, $type)
 	{
@@ -122,9 +117,10 @@ class Gallery_Block extends SP_Abstract_Block
 			require_once(SUBSDIR . '/Aeva-Subs.php');
 			require_once(SUBSDIR . '/Aeva-Subs-Vital.php');
 
-			// @todo this will redirect oddly on login if the block is used with guests
 			aeva_loadSettings();
-			$data = aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC');
+
+			// Just images
+			$data = aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC', true, array(), 'm.type = \'image\'');
 		}
 
 		return $data;
