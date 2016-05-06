@@ -460,6 +460,11 @@ body {
 	border-left: 3px solid #DADADA;
 }
 
+.shoutbox_list_compact li img, .shoutbox_list_all li img {
+	max-height: 100px;
+	max-width: 100px;
+}
+
 .shoutbox_time {
 	border-bottom: 1px dashed #CCCCCC;
 	color: #777777;
