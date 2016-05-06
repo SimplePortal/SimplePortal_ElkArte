@@ -199,7 +199,7 @@ function sp_integrate_admin_areas(&$admin_areas)
 function sp_integrate_load_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
 {
 
-	$permission_list['membergroup'] = array_merge($permission_list['membergroup'], array(
+	$permissionList['membergroup'] = array_merge($permissionList['membergroup'], array(
 		'sp_admin' => array(false, 'sp', 'sp'),
 		'sp_manage_settings' => array(false, 'sp', 'sp'),
 		'sp_manage_blocks' => array(false, 'sp', 'sp'),

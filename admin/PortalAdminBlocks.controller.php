@@ -301,7 +301,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				$_POST['parameters'] = array();
 
 			// Prepare a preview with the form parameters
-			$block->setup($_POST['parameters']);
+			$block->setup($_POST['parameters'], false);
 
 			// Create all the information we know about this block
 			$context['SPortal']['block'] = array(
