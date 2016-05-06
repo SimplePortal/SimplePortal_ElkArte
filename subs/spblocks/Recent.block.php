@@ -77,7 +77,7 @@ class Recent_Block extends SP_Abstract_Block
 		// Enabling auto refresh?
 		if (!empty($parameters['refresh_value']))
 		{
-			$this->refresh = array('sa' => 'recent', 'class' => '.recent', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
+			$this->refresh = array('sa' => 'recent', 'class' => '.sp_recent', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
 			$this->auto_refresh();
 		}
 
@@ -154,13 +154,16 @@ function template_sp_recent($data)
 				<tr>
 					<td ', $embed_class, '></td>
 					<td class="sp_recent_subject">',
-			$item['new'] ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
+						$item['new'] ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
 						<a href="', $item['href'], '">', $item['subject'], '</a>
 						<br />[', $item['board']['link'], ']
 					</td>
 					<td class="sp_recent_info righttext">
-						', $item['poster']['link'], '<br />', $item['time'], '
+						', $item['poster']['link'], '<br />', $item['html_time'], '
 					</td>
+				</tr>
+				<tr>
+					<td colspan="3"><hr></td>
 				</tr>';
 		}
 
