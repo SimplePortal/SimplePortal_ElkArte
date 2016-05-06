@@ -81,7 +81,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 		// Enabling auto refresh?
 		if (!empty($parameters['refresh_value']))
 		{
-			$this->refresh = array('sa' => 'whos', 'class' => '.whos_online', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
+			$this->refresh = array('sa' => 'whos', 'class' => '.sp_whos_online', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
 			$this->auto_refresh();
 		}
 	}
