@@ -117,7 +117,7 @@ function template_sp_boardStats($data)
 	echo '
 		<ul class="sp_list">
 			<li ', sp_embed_class('portalstats'), '>', $txt['total_members'], ': <a href="', $scripturl . '?action=memberlist">', comma_format($data['totals']['members']), '</a></li>
-			<li ', sp_embed_class('portalstats'), '>', $txt['total_posts'], ': ', comma_format($data['totals']['posts']), '</li>
+			<li ', sp_embed_class('portalstats'), '>', $txt['total_posts'], ': <a href="', $scripturl . '?action=stats">', comma_format($data['totals']['posts']), '</a></li>
 			<li ', sp_embed_class('portalstats'), '>', $txt['total_topics'], ': ', comma_format($data['totals']['topics']), '</li>
 			<li ', sp_embed_class('portalstats'), '>', $txt['total_cats'], ': ', comma_format($data['totals']['categories']), '</li>
 			<li ', sp_embed_class('portalstats'), '>', $txt['total_boards'], ': ', comma_format($data['totals']['boards']), '</li>
