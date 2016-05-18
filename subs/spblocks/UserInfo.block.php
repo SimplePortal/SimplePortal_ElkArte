@@ -153,7 +153,7 @@ function template_sp_userInfo($data)
 							<label for="sp_user">', $txt['username'], ':</label>&nbsp;
 						</td>
 						<td>
-							<input type="text" id="sp_user" name="user" size="8" value="', $data['username'], '" />
+							<input type="text" autocomplete="off" id="sp_user" name="user" size="8" value="', $data['username'], '" />
 						</td>
 					</tr>
 					<tr>
