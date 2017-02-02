@@ -240,7 +240,7 @@ $txt['sp_param_Board_Stats_refresh_value'] = 'Refresh value in seconds, 0 or bla
 
 // Parameter options
 $txt['sp_param_Top_Poster_type_options'] = 'All Time|Today|This Week|This Month';
-$txt['sp_param_Top_Stats_Member_type_options'] = 'Total Time Logged In|Posts|Good Karma|Bad Karma|Total  Karma|Thank-O-Matic Top Given|Thank-O-Matic Top Received|Automatic Karma Good|Automatic Karma Bad|Automatic Karma Total|Advanced Reputation System Best|Advanced Reputation System Worst';
+$txt['sp_param_Top_Stats_Member_type_options'] = 'Total Time Logged In|Posts|Good Karma|Bad Karma|Total Karma';
 $txt['sp_param_Recent_type_options'] = 'Posts|Topics';
 $txt['sp_param_Recent_display_options'] = 'Compact|Full';
 $txt['sp_param_Top_Topics_type_options'] = 'Replies|Views';
