@@ -171,8 +171,8 @@ function template_block_edit()
 					<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['block']['visibility'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
 
 	echo '
-					</select>
-				</dd>';
+						</select>
+					</dd>';
 
 	// Display any options that are available for this block
 	foreach ($context['SPortal']['block']['options'] as $name => $type)
@@ -189,8 +189,13 @@ function template_block_edit()
 								<img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" />
 							</a>';
 
+		if ($type === 'space')
+			echo '';
+		else
+			echo '
+							<label for="', $type === 'bbc' ? 'bbc_content' : $name, '">', $txt['sp_param_' . $context['SPortal']['block']['type'] . '_' . $name], ':</label>';
+
 		echo '
-							<label for="', $type === 'bbc' ? 'bbc_content' : $name, '">', $txt['sp_param_' . $context['SPortal']['block']['type'] . '_' . $name], ':</label>
 						</dt>
 						<dd>';
 
@@ -274,6 +279,14 @@ function template_block_edit()
 					</div>
 					<dl class="sp_form">';
 		}
+		elseif ($type === 'space')
+		{
+			echo '
+						</dd>
+					</dl>
+					<hr>
+					<dl class="sp_form">';
+		}
 
 		if ($type != 'bbc')
 			echo '
@@ -324,7 +337,7 @@ function template_block_edit()
 						</dd>';
 	}
 
-	if ($context['SPortal']['block']['type'] != 'sp_boardNews')
+	if ($context['SPortal']['block']['type'] !== 'sp_boardNews')
 	{
 		echo '
 						<dt>
