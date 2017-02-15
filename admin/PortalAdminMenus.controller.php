@@ -63,8 +63,8 @@ class ManagePortalMenus_Controller extends Action_Controller
 			'help' => 'sp_MenusArea',
 			'description' => $txt['sp_admin_menus_desc'],
 			'tabs' => array(
-			//	'listmainitem' => array(),
-			//	'addmainitem' => array(),
+				//	'listmainitem' => array(),
+				//	'addmainitem' => array(),
 				'listcustommenu' => array(),
 				'addcustommenu' => array(),
 			),
@@ -384,7 +384,9 @@ class ManagePortalMenus_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row) {return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';},
+						'function' => function ($row) {
+							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -496,7 +498,9 @@ class ManagePortalMenus_Controller extends Action_Controller
 			{
 				// @todo, should set  Error_Context::context and display in tempalte instead
 				foreach ($validator->validation_errors() as $id => $error)
+				{
 					fatal_lang_error($error, false);
+				}
 			}
 
 			// Can't have the same name in the same menu twice

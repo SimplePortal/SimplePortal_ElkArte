@@ -16,7 +16,8 @@ if (!defined('ELK'))
 
 /**
  * SimplePortal Shoutbox Administration controller class.
- * This class handles the administration of the shoutbox
+ *
+ * - This class handles the administration of the shoutbox
  */
 class ManagePortalShoutbox_Controller extends Action_Controller
 {
@@ -34,7 +35,8 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 	/**
 	 * Main dispatcher.
-	 * This function checks permissions and passes control through.
+	 *
+	 * - This function checks permissions and passes control through.
 	 */
 	public function action_index()
 	{
@@ -183,7 +185,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row)
+						'function' => function ($row)
 						{
 							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
 						},

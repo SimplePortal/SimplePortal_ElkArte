@@ -16,7 +16,8 @@ if (!defined('ELK'))
 
 /**
  * Refresh controller.
- * This class handles requests for block updates
+ *
+ * - This class handles requests for block updates
  */
 class PortalRefresh_Controller extends Action_Controller
 {
@@ -105,19 +106,27 @@ class PortalRefresh_Controller extends Action_Controller
 
 		// Not for guests etc
 		if ($user_info['is_guest'] || $user_info['id'] == 0 || $user_info['possibly_robot'])
+		{
 			$this->_request = false;
+		}
 
 		// And not if the site or portal is disabled / maintenance / etc
 		if (!empty($modSettings['sp_disableMobile']) || !empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest'])))
+		{
 			$this->_request = false;
+		}
 
 		// Refreshing what, nothing ?
 		if (empty($_POST['block']))
+		{
 			$this->_request = false;
+		}
 
- 		// Not this time then
+		// Not this time then
 		if (!$this->_request)
+		{
 			obExit(false);
+		}
 
 		// You should have a valid session with the request as well
 		checkSession();

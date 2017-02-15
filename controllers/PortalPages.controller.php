@@ -16,7 +16,8 @@ if (!defined('ELK'))
 
 /**
  * Pages controller.
- * This class handles requests for Page Functionality
+ *
+ * - This class handles requests for Page Functionality
  */
 class Pages_Controller extends Action_Controller
 {

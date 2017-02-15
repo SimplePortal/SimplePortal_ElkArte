@@ -16,7 +16,8 @@ if (!defined('ELK'))
 
 /**
  * SimplePortal Page Administration controller class.
- * This class handles the adding/editing/listing of pages
+ *
+ * - This class handles the adding/editing/listing of pages
  */
 class ManagePortalPages_Controller extends Action_Controller
 {
@@ -110,7 +111,12 @@ class ManagePortalPages_Controller extends Action_Controller
 						'value' => $txt['sp_admin_pages_col_namespace'],
 					),
 					'data' => array(
-						'db' => 'page_id',
+						'sprintf' => array(
+							'format' => '<a href="?page=%1$s">%1$s</a>',
+							'params' => array(
+								'page_id' => true
+							),
+						),
 					),
 					'sort' => array(
 						'default' => 'namespace',
@@ -168,6 +174,7 @@ class ManagePortalPages_Controller extends Action_Controller
 								<a href="?action=admin;area=portalpages;sa=delete;page_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_pages_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
 								'id' => true,
+								'page_id' => true
 							),
 						),
 						'class' => 'centertext nowrap',
