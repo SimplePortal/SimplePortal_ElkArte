@@ -145,34 +145,34 @@ function template_block_edit()
 									<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['block']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
 
 	echo '
-						</select>
-					</dd>
-					<dt>
-						<label for="block_styles">', $txt['sp_admin_blocks_col_styles'], ':</label>
-					</dt>
-					<dd>
-						<select name="styles" id="block_styles">';
+							</select>
+						</dd>
+						<dt>
+							<label for="block_styles">', $txt['sp_admin_blocks_col_styles'], ':</label>
+						</dt>
+						<dd>
+							<select name="styles" id="block_styles">';
 
 	foreach ($context['SPortal']['block']['style_profiles'] as $profile)
 		echo '
 							<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['block']['styles'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
 
 	echo '
-						</select>
-					</dd>
-					<dt>
-						<label for="block_visibility">', $txt['sp_admin_blocks_col_visibility'], ':</label>
-					</dt>
-					<dd>
-						<select name="visibility" id="block_visibility">';
+							</select>
+						</dd>
+						<dt>
+							<label for="block_visibility">', $txt['sp_admin_blocks_col_visibility'], ':</label>
+						</dt>
+						<dd>
+							<select name="visibility" id="block_visibility">';
 
 	foreach ($context['SPortal']['block']['visibility_profiles'] as $profile)
 		echo '
 					<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['block']['visibility'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
 
 	echo '
-						</select>
-					</dd>';
+							</select>
+						</dd>';
 
 	// Display any options that are available for this block
 	foreach ($context['SPortal']['block']['options'] as $name => $type)
@@ -215,21 +215,21 @@ function template_block_edit()
 		}
 		elseif ($type === 'boards' || $type === 'board_select')
 		{
-					echo '
+			echo '
 							<input type="hidden" name="parameters[', $name, ']" value="" />';
 
-				if ($type === 'boards')
+			if ($type === 'boards')
 					echo '
 							<select name="parameters[', $name, '][]" id="', $name, '" size="7" multiple="multiple">';
-				else
+			else
 					echo '
 							<select name="parameters[', $name, '][]" id="', $name, '">';
 
-				foreach ($context['SPortal']['block']['board_options'][$name] as $option)
-					echo '
+			foreach ($context['SPortal']['block']['board_options'][$name] as $option)
+				echo '
 								<option value="', $option['value'], '"', ($option['selected'] ? ' selected="selected"' : ''), ' >', $option['text'], '</option>';
 
-				echo '
+			echo '
 							</select>';
 		}
 		elseif ($type === 'int')

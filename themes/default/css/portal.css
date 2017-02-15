@@ -107,13 +107,6 @@ hr {
 	height: 300px !important;
 }
 
-.sp_top_poster,
-.sp_staff,
-.sp_blog,
-.sp_articles {
-	width: 45px;
-}
-
 .sp_who_avatar {
 	margin-left: 35px;
 }
@@ -785,7 +778,7 @@ dl.sp_form dt strong {
 }
 
 dl.sp_form dt span {
-	display: block;
+	display: inline-block;
 }
 
 dl.sp_form dd {
