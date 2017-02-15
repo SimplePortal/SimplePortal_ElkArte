@@ -10,11 +10,14 @@
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * SimplePortal Profiles Administration controller class.
- * This class handles the adding/editing/listing of profiles for permissions, styles and display
+ *
+ * - This class handles the adding/editing/listing of profiles for permissions, styles and display
  */
 class ManagePortalProfile_Controller extends Action_Controller
 {
@@ -42,8 +45,8 @@ class ManagePortalProfile_Controller extends Action_Controller
 			'deletestyle' => array($this, 'action_profiles_delete', 'permission' => 'sp_manage_profiles'),
 			'listvisibility' => array($this, 'action_visibility_profiles_list', 'permission' => 'sp_manage_profiles'),
 			'addvisibility' => array($this, 'action_visibility_profiles_edit', 'permission' => 'sp_manage_profiles'),
-			'editvisibility' => array($this, 'action_visibility_profiles_edit','permission' => 'sp_manage_profiles'),
-			'deletevisibility' => array($this, 'action_profiles_delete','permission' => 'sp_manage_profiles'),
+			'editvisibility' => array($this, 'action_visibility_profiles_edit', 'permission' => 'sp_manage_profiles'),
+			'deletevisibility' => array($this, 'action_profiles_delete', 'permission' => 'sp_manage_profiles'),
 		);
 
 		// Start up the controller, provide a hook since we can
@@ -115,7 +118,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row)
+						'function' => function ($row)
 						{
 							return empty($row['articles']) ? '0' : $row['articles'];
 						},
@@ -128,7 +131,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row)
+						'function' => function ($row)
 						{
 							return empty($row['blocks']) ? '0' : $row['blocks'];
 						},
@@ -141,7 +144,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row)
+						'function' => function ($row)
 						{
 							return empty($row['categories']) ? '0' : $row['categories'];
 						},
@@ -154,7 +157,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row)
+						'function' => function ($row)
 						{
 							return empty($row['pages']) ? '0' : $row['pages'];
 						},
@@ -167,7 +170,8 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row) {
+						'function' => function ($row)
+						{
 							return empty($row['shoutboxes']) ? '0' : $row['shoutboxes'];
 						},
 						'class' => 'centertext',
@@ -196,7 +200,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row)
+						'function' => function ($row)
 						{
 							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
 						},
@@ -275,7 +279,9 @@ class ManagePortalProfile_Controller extends Action_Controller
 
 			// Always clean the name
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
+			{
 				fatal_lang_error('sp_error_profile_name_empty', false);
+			}
 
 			list($groups_allowed, $groups_denied) = $this->_group_permissions();
 
@@ -401,7 +407,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row)
+						'function' => function ($row)
 						{
 							return empty($row['articles']) ? '0' : $row['articles'];
 						},
@@ -414,7 +420,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row)
+						'function' => function ($row)
 						{
 							return empty($row['blocks']) ? '0' : $row['blocks'];
 						},
@@ -427,7 +433,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row)
+						'function' => function ($row)
 						{
 							return empty($row['pages']) ? '0' : $row['pages'];
 						},
@@ -458,7 +464,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row)
+						'function' => function ($row)
 						{
 							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
 						},
@@ -510,7 +516,9 @@ class ManagePortalProfile_Controller extends Action_Controller
 
 			// Always clean the profile name
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
+			{
 				fatal_lang_error('sp_error_profile_name_empty', false);
+			}
 
 			// Add the data to place in the fields
 			$profile_info = array(
@@ -612,8 +620,10 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row) {
-							return empty($row['blocks']) ? '0' : $row['blocks'];},
+						'function' => function ($row)
+						{
+							return empty($row['blocks']) ? '0' : $row['blocks'];
+						},
 						'class' => 'centertext',
 					),
 				),
@@ -641,7 +651,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row)
+						'function' => function ($row)
 						{
 							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
 						},
@@ -693,7 +703,9 @@ class ManagePortalProfile_Controller extends Action_Controller
 
 			// Always clean the profile name
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
+			{
 				fatal_lang_error('sp_error_profile_name_empty', false);
+			}
 
 			// Get the form values
 			list($selections, $query, $mobile) = $this->_profile_visibility();
@@ -836,7 +848,9 @@ class ManagePortalProfile_Controller extends Action_Controller
 
 			$remove = array();
 			foreach ($_POST['remove'] as $index => $profile_id)
+			{
 				$remove[(int) $index] = (int) $profile_id;
+			}
 
 			sp_delete_profiles($remove);
 		}

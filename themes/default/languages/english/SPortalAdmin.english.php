@@ -54,7 +54,7 @@ $txt['sp_articles_length'] = 'Maximum Characters Before Article Cut-off';
 // Blocks area
 $txt['sp-adminBlockListName'] = 'Block List';
 $txt['sp-adminBlockInuse'] = 'Used in %s Block';
-$txt['sp-adminBlockListDesc'] = 'This page displays a list of all blocks which have been created for the portal or the forum. To move a block to a new location you use a simple drag and drop action.';
+$txt['sp-adminBlockListDesc'] = 'This page displays a list of all blocks which have been created for the portal or the forum. To move a block to a new location you use a simple <strong>drag and drop</strong> action.';
 $txt['sp-adminBlockAddName'] = 'Add Block';
 $txt['sp-adminBlockAddDesc'] = 'This page enables new blocks to be created and added to the portal page or the forum.';
 $txt['sp-adminBlockLeftListDesc'] = 'This page displays a list of all left side blocks which have been created. These blocks can be modified by selecting the appropriate options.';
@@ -174,7 +174,7 @@ $txt['sp_param_Top_Stats_Member_limit'] = 'Members to display';
 $txt['sp_param_Top_Stats_Member_enable_label'] = 'Enable label for list';
 $txt['sp_param_Top_Stats_Member_list_label'] = 'List label';
 $txt['sp_param_Top_Stats_Member_sort_asc'] = 'Sort in reverse order';
-$txt['sp_param_Top_Stats_Member_last_active_limit'] = 'Remove inactive Members from the List<br /><span class="smalltext">(Time in days)</span>';
+$txt['sp_param_Top_Stats_Member_last_active_limit'] = 'Remove inactive Members from the List<span class="smalltext">(Time in days)</span>';
 $txt['sp_param_Recent_limit'] = 'Recent Posts or Topics to Display';
 $txt['sp_param_Recent_type'] = 'Display';
 $txt['sp_param_Recent_display'] = 'Display type';

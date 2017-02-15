@@ -16,7 +16,8 @@ if (!defined('ELK'))
 
 /**
  * Article controller.
- * This class handles requests for Article Functionality
+ *
+ * - This class handles requests for Article Functionality
  */
 class Article_Controller extends Action_Controller
 {

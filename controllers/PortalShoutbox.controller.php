@@ -16,7 +16,8 @@ if (!defined('ELK'))
 
 /**
  * Shoutbox controller.
- * This class handles requests for Shoutbox Functionality
+ *
+ * - This class handles requests for Shoutbox Functionality
  */
 class Shoutbox_Controller extends Action_Controller
 {

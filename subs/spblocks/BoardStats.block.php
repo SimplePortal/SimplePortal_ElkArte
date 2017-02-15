@@ -130,10 +130,10 @@ function template_sp_boardStats($data)
 		echo '
 		<hr />
 		<ul class="sp_list">
-			<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_posts'], ': ', comma_format($data['totals']['average_posts']), '</li>
-			<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_topics'], ': ', comma_format($data['totals']['average_topics']), '</li>
-			<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_members'], ': ', comma_format($data['totals']['average_members']), '</li>
-			<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_online'], ': ', comma_format($data['totals']['average_online']), '</li>
+			<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_posts'], ': ', $data['totals']['average_posts'], '</li>
+			<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_topics'], ': ', $data['totals']['average_topics'], '</li>
+			<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_members'], ': ', $data['totals']['average_members'], '</li>
+			<li ', sp_embed_class('portalaverages'), '>', $txt['sp-average_online'], ': ', $data['totals']['average_online'], '</li>
 		</ul>';
 	}
 }

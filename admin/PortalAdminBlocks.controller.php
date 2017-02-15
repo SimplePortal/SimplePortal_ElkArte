@@ -10,7 +10,9 @@
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * SimplePortal Blocks Administration controller class.
@@ -20,7 +22,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 {
 	/**
 	 * Main dispatcher.
-	 * This function checks permissions and passes control through.
+	 *
+	 * - This function checks permissions and passes control through.
 	 */
 	public function action_index()
 	{
@@ -28,7 +31,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 		// You need to be an admin or have block permissions
 		if (!allowedTo('sp_admin'))
+		{
 			isAllowedTo('sp_manage_blocks');
+		}
 
 		// We'll need the utility functions from here.
 		require_once(SUBSDIR . '/PortalAdmin.subs.php');
@@ -150,7 +155,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			foreach ($sides as $side)
 			{
 				if ($context['sub_action'] != $side)
+				{
 					unset($context['sides'][$side]);
+				}
 			}
 
 			$context['sp_blocks_single_side_list'] = true;
@@ -222,12 +229,16 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			// Create a list of the blocks in use
 			$in_use = getBlockInfo();
 			foreach ($in_use as $block)
+			{
 				$context['SPortal']['block_inuse'][$block['type']] = array('state' => $block['state'], 'column' => $block['column']);
+			}
 
 			$context['location'] = array(1 => $txt['sp-positionLeft'], $txt['sp-positionTop'], $txt['sp-positionBottom'], $txt['sp-positionRight'], $txt['sp-positionHeader'], $txt['sp-positionFooter']);
 
 			if (!empty($_REQUEST['col']))
+			{
 				$context['SPortal']['block']['column'] = $_REQUEST['col'];
+			}
 
 			$context['sub_template'] = 'block_select_type';
 			$context['page_title'] = $txt['sp-blocksAdd'];
@@ -294,11 +305,15 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				foreach ($type_parameters as $name => $type)
 				{
 					if (isset($_POST['parameters'][$name]))
+					{
 						$this->_prepare_parameters($type, $name);
+					}
 				}
 			}
 			else
+			{
 				$_POST['parameters'] = array();
+			}
 
 			// Prepare a preview with the form parameters
 			$block->setup($_POST['parameters'], false);
@@ -325,14 +340,22 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			);
 
 			if (strpos($modSettings['leftwidth'], '%') !== false || strpos($modSettings['leftwidth'], 'px') !== false)
+			{
 				$context['widths'][1] = $modSettings['leftwidth'];
+			}
 			else
+			{
 				$context['widths'][1] = $modSettings['leftwidth'] . 'px';
+			}
 
 			if (strpos($modSettings['rightwidth'], '%') !== false || strpos($modSettings['rightwidth'], 'px') !== false)
+			{
 				$context['widths'][4] = $modSettings['rightwidth'];
+			}
 			else
+			{
 				$context['widths'][4] = $modSettings['rightwidth'] . 'px';
+			}
 
 			if (strpos($context['widths'][1], '%') !== false)
 			{
@@ -352,24 +375,32 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		{
 			// Only the admin can use PHP blocks
 			if ($context['SPortal']['block']['type'] === 'sp_php' && !allowedTo('admin_forum'))
+			{
 				fatal_lang_error('cannot_admin_forum', false);
+			}
 
 			loadLanguage('SPortalHelp');
 
 			// Load up the permissions
 			$context['SPortal']['block']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 			if (empty($context['SPortal']['block']['permission_profiles']))
+			{
 				fatal_lang_error('error_sp_no_permission_profiles', false);
+			}
 
 			// Load in the style profiles
 			$context['SPortal']['block']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
 			if (empty($context['SPortal']['block']['style_profiles']))
+			{
 				fatal_lang_error('error_sp_no_style_profiles', false);
+			}
 
 			// Load in the display profiles
 			$context['SPortal']['block']['visibility_profiles'] = sportal_get_profiles(null, 3, 'name');
 			if (empty($context['SPortal']['block']['visibility_profiles']))
+			{
 				fatal_lang_error('error_sp_no_visibility_profiles', false);
+			}
 
 			$context['SPortal']['block']['style'] = sportal_select_style($context['SPortal']['block']['styles']);
 
@@ -388,9 +419,13 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 					// Merge the array ;)
 					if (!isset($context['SPortal']['block']['parameters'][$name]))
+					{
 						$context['SPortal']['block']['parameters'][$name] = array();
+					}
 					elseif (!empty($context['SPortal']['block']['parameters'][$name]) && is_array($context['SPortal']['block']['parameters'][$name]))
+					{
 						$context['SPortal']['block']['parameters'][$name] = implode('|', $context['SPortal']['block']['parameters'][$name]);
+					}
 
 					$context['SPortal']['block']['board_options'][$name] = array();
 					$config_variable = !empty($context['SPortal']['block']['parameters'][$name]) ? $context['SPortal']['block']['parameters'][$name] : array();
@@ -402,7 +437,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 					{
 						// Ignore the redirected boards :)
 						if (!empty($board['redirect']))
+						{
 							continue;
+						}
 
 						$context['SPortal']['block']['board_options'][$name][$board['id']] = array(
 							'value' => $board['id'],
@@ -433,8 +470,13 @@ class ManagePortalBlocks_Controller extends Action_Controller
 							{
 								// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
 								if ($i % 4 == 0)
-									$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', function($m) {return '[html]' . preg_replace('~<br\s?/?>~i', '&lt;br /&gt;<br />', $m[1]) . '[/html]';}, $parts[$i]);
+								{
+									$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', function ($m) {
+										return '[html]' . preg_replace('~<br\s?/?>~i', '&lt;br /&gt;<br />', $m[1]) . '[/html]';
+									}, $parts[$i]);
+								}
 							}
+
 							$form_message = implode('', $parts);
 						}
 						$form_message = preg_replace('~<br(?: /)?' . '>~i', "\n", $form_message);
@@ -457,7 +499,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 						$context['SPortal']['block']['parameters'][$name] = $form_message;
 					}
 					else
+					{
 						$context['SPortal']['block']['options'][$name] = 'textarea';
+					}
 				}
 			}
 
@@ -473,11 +517,15 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 			// Only the admin can do php here
 			if ($_POST['block_type'] === 'sp_php' && !allowedTo('admin_forum'))
+			{
 				fatal_lang_error('cannot_admin_forum', false);
+			}
 
 			// Make sure the block name is something safe
 			if (!isset($_POST['block_name']) || Util::htmltrim(Util::htmlspecialchars($_POST['block_name'], ENT_QUOTES)) === '')
+			{
 				fatal_lang_error('error_sp_name_empty', false);
+			}
 
 			if ($_POST['block_type'] === 'sp_php' && !empty($_POST['parameters']['content']) && empty($modSettings['sp_disable_php_validation']))
 			{
@@ -498,29 +546,45 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 			// If we have a block ID passed, we must be editing, so load the blocks current data
 			if (!empty($_REQUEST['block_id']))
+			{
 				$current_data = current(getBlockInfo(null, $_REQUEST['block_id']));
+			}
 
 			// Where are we going to place this new block, before, after, no change
 			if (!empty($_POST['placement']) && (($_POST['placement'] === 'before') || ($_POST['placement'] === 'after')))
 			{
 				if (!empty($current_data))
+				{
 					$current_row = $current_data['row'];
+				}
 				else
+				{
 					$current_row = null;
+				}
 
 				// Before or after the chosen block
 				if ($_POST['placement'] === 'before')
+				{
 					$row = (int) $_POST['block_row'];
+				}
 				else
+				{
 					$row = (int) $_POST['block_row'] + 1;
+				}
 
 				if (!empty($current_row) && ($row > $current_row))
+				{
 					sp_update_block_row($current_row, $row - 1, $_POST['block_column'], true);
+				}
 				else
+				{
 					sp_update_block_row($current_row, $row, $_POST['block_column'], false);
+				}
 			}
 			elseif (!empty($_POST['placement']) && $_POST['placement'] === 'nochange')
+			{
 				$row = 0;
+			}
 			else
 			{
 				$block_id = !empty($_REQUEST['block_id']) ? (int) $_REQUEST['block_id'] : 0;
@@ -536,11 +600,15 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				{
 					// Prepare BBC Content for ELK
 					if (isset($_POST['parameters'][$name]))
+					{
 						$this->_prepare_parameters($type, $name);
+					}
 				}
 			}
 			else
+			{
 				$_POST['parameters'] = array();
+			}
 
 			$blockInfo = array(
 				'id' => (int) $_POST['block_id'],
@@ -563,11 +631,15 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			}
 			// Update one that is there
 			else
+			{
 				sp_block_update($blockInfo);
+			}
 
 			// Save any parameters for the block
 			if (!empty($_POST['parameters']))
+			{
 				sp_block_insert_parameters($_POST['parameters'], $blockInfo['id']);
+			}
 
 			redirectexit('action=admin;area=portalblocks');
 		}
@@ -591,7 +663,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				foreach ($_GET['parameters'] as $param)
 				{
 					if (isset($_GET[$param]))
+					{
 						$start_parameters[$param] = $_GET[$param];
+					}
 				}
 			}
 		}
@@ -618,10 +692,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 				// We need to unhtml it now as it gets done shortly.
 				$_POST['parameters'][$_POST['bbc_name']] = un_htmlspecialchars($_POST['parameters'][$_POST['bbc_name']]);
-
-				// We need this for everything else.
-				// @todo what, thats what it is already?
-				$_POST['parameters'][$_POST['bbc_name']] = $_POST['parameters'][$_POST['bbc_name']];
 			}
 		}
 	}
@@ -649,13 +719,21 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$_POST['parameters'][$name] = $value;
 		}
 		elseif ($type === 'boards' || $type === 'board_select')
+		{
 			$_POST['parameters'][$name] = is_array($_POST['parameters'][$name]) ? implode('|', $_POST['parameters'][$name]) : $_POST['parameters'][$name];
+		}
 		elseif ($type === 'int' || $type === 'select')
+		{
 			$_POST['parameters'][$name] = (int) $_POST['parameters'][$name];
+		}
 		elseif ($type === 'text' || $type === 'textarea' || is_array($type))
+		{
 			$_POST['parameters'][$name] = Util::htmlspecialchars($_POST['parameters'][$name], ENT_QUOTES);
+		}
 		elseif ($type === 'check')
+		{
 			$_POST['parameters'][$name] = !empty($_POST['parameters'][$name]) ? 1 : 0;
+		}
 	}
 
 	/**
@@ -687,12 +765,14 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 				$target_side = (int) str_replace('side_', '', $_POST['received']);
 				$block_id = (int) str_replace('block_', '', $_POST['moved']);
-				list ($current_side, ) = sp_block_get_position($block_id);
+				list ($current_side,) = sp_block_get_position($block_id);
 
 				// The block ids arrive in 1-n view order ...
 				$blocks = array();
 				foreach ($_POST['block'] as $id)
+				{
 					$blocks[] = $id;
+				}
 
 				// Find where the moved block is in the block stack
 				$moved_key = array_search($block_id, $blocks);
@@ -703,47 +783,68 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 					// Find the details about the blocks above and below our moved one
 					if ($moved_key !== 0)
+					{
 						list ($check_above_side, $check_above_row) = sp_block_get_position($blocks[$moved_key - 1]);
+					}
+
 					if ($moved_key + 1 < count($blocks))
+					{
 						list ($check_below_side, $check_below_row) = sp_block_get_position($blocks[$moved_key + 1]);
+					}
 
 					// The block above is in the same side, so we place it after that block
 					if (isset($check_above_side) && $check_above_side == $target_side)
+					{
 						$target_row = $check_above_row + 1;
+					}
 					// The block above is not in the same side, but the block below is, move it above that one
 					elseif (isset($check_below_side) && $check_below_side == $target_side)
+					{
 						$target_row = $check_below_row;
+					}
 					// Perhaps the first in what was an empty side or "other"
 					else
+					{
 						$target_row = sp_block_nextrow($target_side);
+					}
 
 					// Is the block moving sides?
 					if ($current_side != $target_side)
+					{
 						sp_block_move_col($block_id, $target_side);
+					}
 
 					// Position it in right row in the side
 					sp_blocks_move_row($block_id, $target_side, $target_row);
 
 					// Update the sides that may have been affected
 					foreach (array_unique(array($current_side, $target_side)) as $side)
+					{
 						fixColumnRows($side);
+					}
 
 					$order[] = array(
 						'value' => $txt['sp-blocks_success_moving'],
 					);
 				}
 				else
+				{
 					$errors[] = array('value' => $txt['sp-blocks_fail_moving']);
+				}
 			}
 		}
 		// Failed validation, tough to be you
 		else
 		{
 			if (!empty($validation_session))
+			{
 				$errors[] = array('value' => $txt[$validation_session]);
+			}
 
 			if (empty($validation_token))
+			{
 				$errors[] = array('value' => $txt['token_verify_fail']);
+			}
 		}
 
 		// New generic token for use
@@ -792,37 +893,53 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 		// What block is being moved?
 		if (empty($_REQUEST['block_id']))
+		{
 			fatal_lang_error('error_sp_id_empty', false);
+		}
 		else
+		{
 			$block_id = (int) $_REQUEST['block_id'];
+		}
 
 		// Can't move outside our known columns 1-6
 		if (empty($_REQUEST['col']) || $_REQUEST['col'] < 1 || $_REQUEST['col'] > 6)
+		{
 			fatal_lang_error('error_sp_side_wrong', false);
+		}
 		else
+		{
 			$target_side = (int) $_REQUEST['col'];
+		}
 
 		// Specific row requested?
 		if (empty($_REQUEST['row']))
+		{
 			$target_row = sp_block_nextrow($target_side);
+		}
 		else
+		{
 			$target_row = (int) $_REQUEST['row'];
+		}
 
 		// Get the blocks current position in the portal
-		list ($current_side, $current_row)  = sp_block_get_position($block_id);
+		list ($current_side, $current_row) = sp_block_get_position($block_id);
 
 		// Is a move needed, new row, new column?
 		if ($current_side != $target_side || $current_row + 1 != $target_row)
 		{
 			// Shift the column
 			if ($current_side != $target_side)
+			{
 				sp_block_move_col($block_id, $target_side);
+			}
 
 			// Position it in the column
 			sp_blocks_move_row($block_id, $target_side, $target_row);
 
 			foreach (array_unique(array($current_side, $target_side)) as $side)
+			{
 				fixColumnRows($side);
+			}
 		}
 
 		redirectexit('action=admin;area=portalblocks');
@@ -843,7 +960,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 		// Do we have that?
 		if (empty($_REQUEST['block_id']))
+		{
 			fatal_lang_error('error_sp_id_empty', false);
+		}
 
 		// Make sure column ID is an integer too.
 		$_REQUEST['col'] = (int) $_REQUEST['col'];
@@ -853,7 +972,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		{
 			$context['SPortal']['block'] = current(getBlockInfo(null, $_REQUEST['block_id']));
 			if ($context['SPortal']['block']['type'] === 'sp_php' && !allowedTo('admin_forum'))
+			{
 				fatal_lang_error('cannot_admin_forum', false);
+			}
 		}
 
 		// We don't need it anymore.

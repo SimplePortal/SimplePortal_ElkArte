@@ -16,7 +16,8 @@ if (!defined('ELK'))
 
 /**
  * SimplePortal Category Administration controller class.
- * This class handles the adding/editing/listing of categories
+ *
+ * - This class handles the adding/editing/listing of categories
  */
 class ManagePortalCategories_Controller extends Action_Controller
 {

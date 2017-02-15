@@ -10,7 +10,9 @@
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * SimplePortal Article Administration controller class.
@@ -20,6 +22,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 {
 	/**
 	 * If we are adding a new article or editing an existing one
+	 *
 	 * @var bool
 	 */
 	protected $_is_new;
@@ -47,7 +50,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		// You need to be an admin or have manage article permissions
 		if (!allowedTo('sp_admin'))
+		{
 			isAllowedTo('sp_manage_articles');
+		}
 
 
 		loadTemplate('PortalAdminArticles');
@@ -70,10 +75,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 			'help' => 'sp_ArticlesArea',
 			'description' => $txt['sp_admin_articles_desc'],
 			'tabs' => array(
-				'list' => array(
-				),
-				'add' => array(
-				),
+				'list' => array(),
+				'add' => array(),
 			),
 		);
 
@@ -216,7 +219,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row)
+						'function' => function ($row)
 						{
 							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
 						},
@@ -256,7 +259,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 */
 	public function list_spCountArticles()
 	{
-	   return sp_count_articles();
+		return sp_count_articles();
 	}
 
 	/**
@@ -315,7 +318,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 			// Fix any bbc errors they have created
 			if ($context['article']['type'] === 'bbc')
+			{
 				preparsecode($context['article']['body']);
+			}
 
 			loadTemplate('PortalArticles');
 
@@ -329,7 +334,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 				);
 			}
 			else
+			{
 				$context['preview'] = true;
+			}
 		}
 		// Something new?
 		elseif ($this->_is_new)
@@ -354,7 +361,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 		}
 
 		if ($context['article']['type'] === 'bbc')
+		{
 			$context['article']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($context['article']['body']));
+		}
 
 		// On to the editor
 		if ($context['article']['type'] !== 'bbc')
@@ -377,7 +386,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		// Restore their settings
 		if (isset($temp_editor))
+		{
 			$options['wysiwyg_default'] = $temp_editor;
+		}
 
 		// Set the editor box to the right mode based on type (bbc, html, php)
 		addInlineJavascript('
@@ -389,15 +400,21 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// Final bits for the template, category's, styles and permission settings
 		$context['article']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		if (empty($context['article']['permission_profiles']))
+		{
 			fatal_lang_error('error_sp_no_permission_profiles', false);
+		}
 
 		$context['article']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
 		if (empty($context['article']['permission_profiles']))
+		{
 			fatal_lang_error('error_sp_no_style_profiles', false);
+		}
 
 		$context['article']['categories'] = sportal_get_categories();
 		if (empty($context['article']['categories']))
+		{
 			fatal_lang_error('error_sp_no_category', false);
+		}
 
 		// Page out values
 		$context['article']['style'] = sportal_select_style($context['article']['styles']);
@@ -426,7 +443,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// New ones we set defaults
 		else
 		{
-			$author = array('link' => '<a href="' . $scripturl .'?action=profile;u=' . $user_info['id'] . '">' . $user_info['name'] . '</a>');
+			$author = array('link' => '<a href="' . $scripturl . '?action=profile;u=' . $user_info['id'] . '">' . $user_info['name'] . '</a>');
 			$date = standardTime(time());
 			$views = 0;
 			$comments = 0;
@@ -449,7 +466,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 		);
 
 		if ($article['type'] === 'bbc')
+		{
 			preparsecode($article['body']);
+		}
 
 		return $article;
 	}
@@ -505,7 +524,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 		if (!$validator->validate($_POST))
 		{
 			foreach ($validator->validation_errors() as $id => $error)
+			{
 				$article_errors->addError($error);
+			}
 
 			$this->action_edit();
 		}
@@ -513,11 +534,15 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// Lets make sure this namespace (article id) is unique
 		$has_duplicate = sp_duplicate_articles($validator->article_id, $validator->namespace);
 		if (!empty($has_duplicate))
+		{
 			$article_errors->addError('sp_error_article_namespace_duplicate');
+		}
 
 		// And we can't have just a numeric namespace (article id)
 		if (preg_replace('~[0-9]+~', '', $validator->namespace) === '')
+		{
 			$article_errors->addError('sp_error_article_namespace_numeric');
+		}
 
 		// Posting some PHP code, and allowed? Then we need to validate it will run
 		if ($_POST['type'] === 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
@@ -527,12 +552,16 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 			// Bad PHP code
 			if (!$validator_php->validate(array('content' => $_POST['content'])))
+			{
 				$article_errors->addError($validator_php->validation_errors());
+			}
 		}
 
 		// None shall pass ... with errors
 		if ($article_errors->hasErrors())
+		{
 			$this->action_edit();
+		}
 
 		// No errors then, prepare the data for saving
 		$article_info = array(
@@ -548,13 +577,16 @@ class ManagePortalArticles_Controller extends Action_Controller
 		);
 
 		if ($article_info['type'] === 'bbc')
+		{
 			preparsecode($article_info['body']);
+		}
 
 		// Save away
 		checkSession();
 		sp_save_article($article_info, $this->_is_new);
 
 		redirectexit('action=admin;area=portalarticles');
+
 		return true;
 	}
 
@@ -584,7 +616,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 			checkSession();
 
 			foreach ($_POST['remove'] as $index => $article_id)
+			{
 				$article_ids[(int) $index] = (int) $article_id;
+			}
 		}
 		elseif (!empty($_REQUEST['article_id']))
 		{

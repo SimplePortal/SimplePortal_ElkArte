@@ -22,18 +22,21 @@ class ManagePortalConfig_Controller extends Action_Controller
 {
 	/**
 	 * General settings form
+	 *
 	 * @var Settings_Form
 	 */
 	protected $_generalSettingsForm;
 
 	/**
 	 * Block settings form
+	 *
 	 * @var Settings_Form
 	 */
 	protected $_blockSettingsForm;
 
 	/**
 	 * Article settings form
+	 *
 	 * @var Settings_Form
 	 */
 	protected $_articleSettingsForm;
@@ -247,9 +250,9 @@ class ManagePortalConfig_Controller extends Action_Controller
 			array('text', 'rightwidth'),
 			'',
 			array('multicheck',
-				'sp_IntegrationHide',
-				'subsettings' => array('sp_adminIntegrationHide' => $txt['admin'], 'sp_profileIntegrationHide' => $txt['profile'], 'sp_pmIntegrationHide' => $txt['personal_messages'], 'sp_mlistIntegrationHide' => $txt['members_title'], 'sp_searchIntegrationHide' => $txt['search'], 'sp_calendarIntegrationHide' => $txt['calendar'], 'sp_moderateIntegrationHide' => $txt['moderate']),
-				'subtext' => $txt['sp_IntegrationHide_desc']
+				  'sp_IntegrationHide',
+				  'subsettings' => array('sp_adminIntegrationHide' => $txt['admin'], 'sp_profileIntegrationHide' => $txt['profile'], 'sp_pmIntegrationHide' => $txt['personal_messages'], 'sp_mlistIntegrationHide' => $txt['members_title'], 'sp_searchIntegrationHide' => $txt['search'], 'sp_calendarIntegrationHide' => $txt['calendar'], 'sp_moderateIntegrationHide' => $txt['moderate']),
+				  'subtext' => $txt['sp_IntegrationHide_desc']
 			),
 		);
 

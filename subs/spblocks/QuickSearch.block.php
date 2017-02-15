@@ -46,9 +46,9 @@ function template_sp_quickSearch()
 	global $txt, $scripturl;
 
 	echo '
-		<form action="', $scripturl, '?action=search" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
 			<div class="centertext">
-				<input type="text" name="search" value="" class="sp_search" /><br />
+				<input type="text" name="search" value="" class="sp_search" placeholder="', $txt['search'], '" /><br />
 				<input type="submit" name="submit" value="', $txt['search'], '" class="button_submit" />
 				<input type="hidden" name="advanced" value="0" />
 			</div>

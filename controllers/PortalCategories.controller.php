@@ -16,7 +16,8 @@ if (!defined('ELK'))
 
 /**
  * Category controller.
- * This class handles requests for Category Functionality
+ *
+ * - This class handles requests for Category Functionality
  */
 class Categories_Controller extends Action_Controller
 {
