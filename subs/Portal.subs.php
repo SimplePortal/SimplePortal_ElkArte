@@ -519,6 +519,10 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 
 		if (!isset($return[$row['id_block']]))
 		{
+			// Allow custom blocks to load txt values.
+			if (empty($txt['sp_function_' . $row['type'] . '_label']))
+				sp_instantiate_block($row['type']);
+
 			$return[$row['id_block']] = array(
 				'id' => $row['id_block'],
 				'label' => $row['label'],
