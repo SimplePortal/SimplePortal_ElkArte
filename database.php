@@ -63,14 +63,10 @@ if (!$has_visibility_profiles)
 
 // Make any upgrade changes as required
 updateTableStructures();
-updateStyleProfiles();
-updateVisibiltyProfiles();
+updateStyleProfiles($has_style_profiles);
+updateVisibilityProfiles($has_visibility_profiles);
 
-$db_package_log = array();
-foreach ($sp_tables as $sp_table_name => $null)
-{
-	$db_package_log[] = array('remove_table', $db_prefix . $sp_table_name);
-}
+$db_package_log = $db_table->package_log();
 
 if (ELK === 'SSI')
 {
@@ -180,7 +176,7 @@ function updateTableStructures()
 /**
  * Update sp_blocks to use visibility profiles in place of display and mobile view values
  */
-function updateVisibiltyProfiles()
+function updateVisibilityProfiles($has_visibility_profiles)
 {
 	$db_table = db_table();
 	$db = database();
@@ -188,25 +184,27 @@ function updateVisibiltyProfiles()
 	$block_cols = $db_table->db_list_columns('{db_prefix}sp_blocks', true);
 	if (!isset($block_cols['visibility']))
 	{
-		// Add visibilty profile col to sp_blocks
+		// Add visibility profile col to sp_blocks
 		$db_table->db_add_column('{db_prefix}sp_blocks', array('name' => 'visibility', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true));
 
 		// Read in the "old" data
-		$updates = array();
-		$all_action = array('allaction' => 'allaction', 'allboard' => 'allboard', 'allpage' => 'allpages', 'all' => 'all');
 		$result = $db->query('', '
 			SELECT
-				id_block, mobile_view, display
+				id_block, mobile_view, display, display_custom
 			FROM {db_prefix}sp_blocks',
 			array()
 		);
+		$updates = array();
+		$all_action = array('allaction' => 'allaction', 'allboard' => 'allboard', 'allpage' => 'allpages', 'all' => 'all');
 		while ($row = $db->fetch_assoc($result))
 		{
 			$selections = array();
 			$query = array();
 
-			// Old Mobile to new is easy
-			$mobile_view = !empty($row['mobile_view']) ? 1 : '';
+			// Old Mobile and Custom to new is easy
+			$mobile_view = !empty($row['mobile_view']) ? 1 : 0;
+			if (!empty($row['display_custom']))
+				$query[] = $row['display_custom'];
 
 			// The rest depends on if its a selection or query
 			$rest = explode(',', $row['display']);
@@ -231,29 +229,35 @@ function updateVisibiltyProfiles()
 			}
 
 			// Build the visibility value that represents this row
-			$updates[$row['id_block']] = !empty($selections) ? implode(',', $selections) : '';
-			$updates[$row['id_block']] .= '|' . !empty($query) ? implode(',', $query) : '';
-			$updates[$row['id_block']] .= !empty($mobile_view) ? '|' . $mobile_view : '';
+			$updates[$row['id_block']] = (!empty($selections) ? implode(',', $selections) : '') . '|' . (!empty($query) ? implode(',', $query) : '') . (!empty($mobile_view) ? '|' . $mobile_view : '');
+			if (empty($updates[$row['id_block']]) || $updates[$row['id_block']] === '|')
+				$updates[$row['id_block']] = 'portal|';
 		}
+		$db->free_result($result);
 
 		// Now check if each update already exists as a profile, if not, then add it and then update the block that used it !
 		foreach ($updates as $id => $visibility)
 		{
 			// Find the old visibility value in the profile table
 			$result = $db->query('', '
-					SELECT
-						sp.id_profile
-					FROM {db_prefix}sp_profiles
-					WHERE sp.value = {string:value}
-						AND type = {int:type}
-					LIMIT 1',
+				SELECT
+					id_profile
+				FROM {db_prefix}sp_profiles
+				WHERE value = {string:value}
+					AND type = {int:type}
+				LIMIT 1',
 				array(
 					'value' => $visibility,
 					'type' => 3
 				)
 			);
-			list ($visibility_profile) = $db->fetch_row($result);
-			$db->free_result($result);
+			$visibility_profile = '';
+			if ($db->num_rows($result) !== 0)
+			{
+				list ($visibility_profile) = $db->fetch_row($result);
+				$db->free_result($result);
+			}
+
 			if (empty($visibility_profile))
 			{
 				// Not existing, so we add it and get the new id.
@@ -271,9 +275,9 @@ function updateVisibiltyProfiles()
 			// Update the block to use this visibility profile
 			{
 				$db->query('', '
-						UPDATE {db_prefix}sp_blocks
-						SET visibility = {string:visibility}
-						WHERE id_block = {int:id}',
+					UPDATE {db_prefix}sp_blocks
+					SET visibility = {string:visibility}
+					WHERE id_block = {int:id}',
 					array(
 						'visibility' => $visibility_profile,
 						'id' => $id
@@ -283,16 +287,16 @@ function updateVisibiltyProfiles()
 		}
 
 		// No need for the old columns now
-		$db_table->db_remove_column('{db_prefix}sp_blocks', 'display');
-		$db_table->db_remove_column('{db_prefix}sp_blocks', 'display_custom');
-		$db_table->db_remove_column('{db_prefix}sp_blocks', 'mobile_view');
+		//$db_table->db_remove_column('{db_prefix}sp_blocks', 'display');
+		//$db_table->db_remove_column('{db_prefix}sp_blocks', 'display_custom');
+		//$db_table->db_remove_column('{db_prefix}sp_blocks', 'mobile_view');
 	}
 }
 
 /**
  * Update tables to use styles profiles id's in place of old style text
  */
-function updateStyleProfiles()
+function updateStyleProfiles($has_style_profiles)
 {
 	$db_table = db_table();
 	$db = database();
@@ -311,20 +315,24 @@ function updateStyleProfiles()
 				SELECT
 					sp.id_profile, old.' . $key . '
 				FROM {db_prefix}sp_profiles AS sp
-					LEFT JOIN {db_prefix}' . $sp_table . ' AS old ON (sp.value = old.style)
+					INNER JOIN {db_prefix}' . $sp_table . ' AS old ON (sp.value = old.style)
 				WHERE sp.type = {int:type}',
 				array(
 					'type' => 2,
+					'db_error_skip' => true,
 				)
 			);
 			$updates = array();
-			while ($row = $db->fetch_assoc($result))
+			if ($result)
 			{
-				$updates[$row[$key]] = $row['id_profile'];
+				while ($row = $db->fetch_assoc($result))
+				{
+					$updates[$row[$key]] = $row['id_profile'];
+				}
+				$db->free_result($result);
 			}
-			$db->free_result($result);
 
-			// Add the styles profile id for any old style that matched
+			// Add the styles profile id for any old style that matched new ones
 			foreach ($updates as $id => $style)
 			{
 				$db->query('', '
@@ -338,8 +346,19 @@ function updateStyleProfiles()
 				);
 			}
 
+			// Set any blank ones to the default.
+			$db->query('', '
+				UPDATE {db_prefix}' . $sp_table . '
+				SET styles = {int:style}
+				WHERE styles = {int:id}',
+				array(
+					'style' => !empty($has_style_profiles) ? $has_style_profiles : 4,
+					'id' => 0
+				)
+			);
+
 			// No need for the old column now
-			$db_table->db_remove_column('{db_prefix}' . $sp_table, 'style');
+			//$db_table->db_remove_column('{db_prefix}' . $sp_table, 'style');
 		}
 	}
 }
@@ -365,8 +384,12 @@ function checkForVisibilityProfiles()
 			'limit' => 1,
 		)
 	);
-	list ($has_visibility_profiles) = $db->fetch_row($result);
-	$db->free_result($result);
+	$has_visibility_profiles = '';
+	if ($db->num_rows($result) !== 0)
+	{
+		list ($has_visibility_profiles) = $db->fetch_row($result);
+		$db->free_result($result);
+	}
 
 	return !empty($has_visibility_profiles);
 }
@@ -392,8 +415,12 @@ function checkForStyleProfiles()
 			'limit' => 1,
 		)
 	);
-	list ($has_style_profiles) = $db->fetch_row($result);
-	$db->free_result($result);
+	$has_style_profiles = '';
+	if ($db->num_rows($result) !== 0)
+	{
+		list ($has_style_profiles) = $db->fetch_row($result);
+		$db->free_result($result);
+	}
 
 	return !empty($has_style_profiles);
 }
@@ -418,8 +445,12 @@ function checkForPermissionProfiles()
 			'limit' => 1,
 		)
 	);
-	list ($has_permission_profiles) = $db->fetch_row($result);
-	$db->free_result($result);
+	$has_permission_profiles = '';
+	if ($db->num_rows($result) !== 0)
+	{
+		list ($has_permission_profiles) = $db->fetch_row($result);
+		$db->free_result($result);
+	}
 
 	return !empty($has_permission_profiles);
 }
@@ -440,8 +471,12 @@ function checkForBlocks()
 		LIMIT 1',
 		array()
 	);
-	list ($has_blocks) = $db->fetch_row($result);
-	$db->free_result($result);
+	$has_blocks = '';
+	if ($db->num_rows($result) !== 0)
+	{
+		list ($has_blocks) = $db->fetch_row($result);
+		$db->free_result($result);
+	}
 
 	return !empty($has_blocks);
 }
