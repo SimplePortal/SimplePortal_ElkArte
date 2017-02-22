@@ -169,7 +169,6 @@ $txt['error_sp_no_shoutbox_normaluser'] = 'Sorry, shoutbox blocks require a shou
 $txt['error_sp_cannot_shoutbox_moderate'] = 'You don\'t have permission to moderate this shoutbox.';
 $txt['error_sp_no_block'] = 'There aren\'t any blocks created yet.';
 $txt['error_sp_flood_spsbp'] = 'Your last shout was less than %1$d seconds ago. Please try again later.';
-$txt['error_sp_flood_spsbp'] = 'Your last shout was less than %1$d seconds ago. Please try again later.';
 $txt['error_sp_id_empty'] = 'Sorry, an invalid type was supplied.';
 
 // Portal arrangement

@@ -110,6 +110,8 @@ function getFunctionInfo($function = null)
 		$return[] = array(
 			'id' => $class,
 			'function' => str_replace('_Block', '', $class),
+			'custom_label' => $class::blockName(),
+			'custom_desc' => $class::blockDescription(),
 		);
 	}
 

@@ -60,6 +60,10 @@ abstract class SP_Abstract_Block
 	public function __construct($db = null)
 	{
 		$this->_db = $db;
+
+		// Allow custom blocks to set $txt values for name and description
+		$this->blockName();
+		$this->blockDescription();
 	}
 
 	/**
@@ -83,7 +87,8 @@ abstract class SP_Abstract_Block
 	}
 
 	/**
-	 * @todo
+	 * Called as part of the sportal_load_blocks process to initiate a block prior
+	 * to its being displayed.
 	 */
 	abstract public function setup($parameters, $id);
 
@@ -109,11 +114,33 @@ abstract class SP_Abstract_Block
 	}
 
 	/**
+	 * Sets the name of the block in $txt string for use with custom
+	 * blocks.  $txt['sp_function_Block_Name_label']
+	 *
+	 * @return string
+	 */
+	public static function blockName()
+	{
+		return '';
+	}
+
+	/**
+	 * Sets the description of the block in $txt for use with custom
+	 * blocks.  $txt['sp_function_Block_Name_desc']
+	 *
+	 * @return string
+	 */
+	public static function blockDescription()
+	{
+		return '';
+	}
+
+	/**
 	 * Adds javascript to make a block refresh call in the background
 	 */
 	public function auto_refresh()
 	{
-		// Lets be reasonable on the refresh, let not beat on the server
+		// Lets be reasonable on the refresh, lets not beat on the server
 		$refresh = ((int) $this->refresh['refresh_value'] < 30 ? 30 : (int) $this->refresh['refresh_value']) * 1000;
 
 		addInlineJavascript('

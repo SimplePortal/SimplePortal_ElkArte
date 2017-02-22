@@ -51,17 +51,19 @@
 
 	<file name="SOURCEDIR/Subs.php">
 		<operation error="ignore">
-			<search position="replace"><![CDATA[			if ($tag['type'] !== 'unparsed_equals')
+			<search position="replace"><![CDATA[			// For parsed content, we must recurse to avoid security problems.
+			if ($tag['type'] !== 'unparsed_equals')
 				$data = parse_bbc($data, !empty($tag['parsed_tags_allowed']) ? false : true, '', !empty($tag['parsed_tags_allowed']) ? $tag['parsed_tags_allowed'] : array());
 
 			$tag['after'] = strtr($tag['after'], array('$1' => $data));]]></search>
-			<add><![CDATA[			if ($tag['type'] !== 'unparsed_equals')
-	{
+			<add><![CDATA[			// For parsed content, we must recurse to avoid security problems.
+			if ($tag['type'] !== 'unparsed_equals')
+			{
 				$data = parse_bbc($data, !empty($tag['parsed_tags_allowed']) ? false : true, '', !empty($tag['parsed_tags_allowed']) ? $tag['parsed_tags_allowed'] : array());
 
 				// Unfortunately after we recurse, we must manually reset the static disabled tags to what they were
 				parse_bbc('dummy');
-		}
+			}
 
 			$tag['after'] = strtr($tag['after'], array('$1' => $data));]]></add>
 		</operation>
