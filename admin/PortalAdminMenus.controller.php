@@ -17,6 +17,8 @@ if (!defined('ELK'))
 /**
  * SimplePortal Menus Administration controller class.
  * This class handles the adding/editing of menus
+ *
+ * @todo not complete, do not use
  */
 class ManagePortalMenus_Controller extends Action_Controller
 {
