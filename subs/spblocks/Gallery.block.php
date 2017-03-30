@@ -149,7 +149,7 @@ function template_sp_gallery_aeva_media($item, $data)
 
 	echo '
 		<a href="', $scripturl, '?action=media;sa=item;in=', $item['id'], '">', $item['title'], '</a><br />' . ($data['fancybox_enabled'] ? '
-		<a href="' . $scripturl . '?action=media;sa=media;in=' . $item['id'] . '" rel="gallery" class="fancybox">' : '
+		<a href="' . $scripturl . '?action=media;sa=media;in=' . $item['id'] . '" rel="gallery" data-fancybox="1">' : '
 		<a href="' . $scripturl . '?action=media;sa=item;in=' . $item['id'] . '">') . '
 		<img src="', $scripturl, '?action=media;sa=media;in=', $item['id'], ';thumb" alt="" /></a><br />
 		', $txt['aeva_views'], ': ', $item['views'], '<br />

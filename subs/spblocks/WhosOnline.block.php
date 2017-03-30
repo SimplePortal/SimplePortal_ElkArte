@@ -29,7 +29,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 	public function __construct($db = null)
 	{
 		$this->block_parameters = array(
-			'online_today' => 'check',
+			'online_today' => 'select',
 			'avatars' => 'check',
 			'refresh_value' => 'int'
 		);
@@ -53,12 +53,14 @@ class Whos_Online_Block extends SP_Abstract_Block
 		global $modSettings, $context;
 
 		// Interface with the online today addon?
+		$this->data['online_today'] = '';
 		if (!empty($parameters['online_today']) && !empty($modSettings['onlinetoday']) && file_exists(SUBSDIR . '/OnlineToday.class.php'))
 		{
 			require_once(SUBSDIR . '/OnlineToday.class.php');
 
 			$context['info_center_callbacks'] = array();
 			Online_Today_Integrate::get();
+			$this->data['online_today'] = (int) $parameters['online_today'];
 		}
 
 		// Spiders
@@ -118,11 +120,11 @@ class Whos_Online_Block extends SP_Abstract_Block
 		{
 			// Load the member data
 			$avatars[$row['id_member']] = determineAvatar(array(
-				'avatar' => $row['avatar'],
-				'filename' => $row['filename'],
-				'id_attach' => $row['id_attach'],
-				'email_address' => $row['email_address'],
-				'attachment_type' => $row['attachment_type'])
+					'avatar' => $row['avatar'],
+					'filename' => $row['filename'],
+					'id_attach' => $row['id_attach'],
+					'email_address' => $row['email_address'],
+					'attachment_type' => $row['attachment_type'])
 			);
 		}
 		$this->_db->free_result($request);
@@ -155,14 +157,24 @@ function template_sp_whosOnline($data)
 	}
 
 	echo '
-				<li ', sp_embed_class('dot'), '> ', $txt['hidden'], ': ', $data['stats']['num_users_hidden'], '</li>
-				<li ', sp_embed_class('dot'), '> ', $txt['users'], ': ', $data['stats']['num_users_online'], '</li>';
+				<li ', sp_embed_class('dot'), '> ', $txt['hidden'], ': ', $data['stats']['num_users_hidden'], '</li>';
+
+	// Online today count only?
+	if ($data['online_today'] === 1)
+		echo '
+				<li ', sp_embed_class('dot'), '> ', $txt['sp-online_today'], ': ', $context['num_onlinetoday'], '</li>';
 
 	// Show the users online, if any
 	if (!empty($data['stats']['users_online']))
 	{
+		if (allowedTo('who_view') && !empty($modSettings['who_enabled']))
+			echo '
+				<li ', sp_embed_class('dot'), '><a href="' . $scripturl . '?action=who">', $txt['online_users'], '</a>: ', $data['stats']['num_users_online'], '</li>';
+		else
+			echo '
+				<li ', sp_embed_class('dot'), '> ', $txt['online_users'], ' : ', $data['stats']['num_users_online'], '</li>';
+
 		echo '
-				<li ', sp_embed_class('dot'), '> ', allowedTo('who_view') && !empty($modSettings['who_enabled']) ? '<a href="' . $scripturl . '?action=who">' : '', $txt['online_users'], allowedTo('who_view') && !empty($modSettings['who_enabled']) ? '</a>' : '', ':</li>
 			</ul>
 			<div class="sp_online_flow">
 				<ul class="sp_list">';
@@ -199,7 +211,7 @@ function template_sp_whosOnline($data)
 	}
 
 	// Does the online today addon exist
-	if (!empty($context['num_onlinetoday']))
+	if (!empty($context['num_onlinetoday']) && $data['online_today'] === 2)
 	{
 		echo '
 			<ul class="sp_list">

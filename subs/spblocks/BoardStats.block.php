@@ -49,7 +49,7 @@ class Board_Stats_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $modSettings;
+		global $modSettings, $user_info;
 
 		$this->data['averages'] = !empty($parameters['averages']);
 
@@ -82,7 +82,7 @@ class Board_Stats_Block extends SP_Abstract_Block
 		$this->setTemplate('template_sp_boardStats');
 
 		// Enabling auto refresh?
-		if (!empty($parameters['refresh_value']))
+		if (!empty($parameters['refresh_value']) && !$user_info['is_guest'])
 		{
 			$this->refresh = array('sa' => 'boardstats', 'class' => '.sp_board_stats', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
 			$this->auto_refresh();

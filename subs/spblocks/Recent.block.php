@@ -55,6 +55,8 @@ class Recent_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
+		global $user_info;
+
 		// Clean the parameters for this block
 		$boards = !empty($parameters['boards']) ? explode('|', $parameters['boards']) : null;
 		$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
@@ -75,7 +77,7 @@ class Recent_Block extends SP_Abstract_Block
 		$this->_colorids();
 
 		// Enabling auto refresh?
-		if (!empty($parameters['refresh_value']))
+		if (!empty($parameters['refresh_value']) && !$user_info['is_guest'])
 		{
 			$this->refresh = array('sa' => 'recent', 'class' => '.sp_recent', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
 			$this->auto_refresh();
