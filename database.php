@@ -287,9 +287,9 @@ function updateVisibilityProfiles($has_visibility_profiles)
 		}
 
 		// No need for the old columns now
-		//$db_table->db_remove_column('{db_prefix}sp_blocks', 'display');
-		//$db_table->db_remove_column('{db_prefix}sp_blocks', 'display_custom');
-		//$db_table->db_remove_column('{db_prefix}sp_blocks', 'mobile_view');
+		$db_table->db_remove_column('{db_prefix}sp_blocks', 'display');
+		$db_table->db_remove_column('{db_prefix}sp_blocks', 'display_custom');
+		$db_table->db_remove_column('{db_prefix}sp_blocks', 'mobile_view');
 	}
 }
 
@@ -358,7 +358,7 @@ function updateStyleProfiles($has_style_profiles)
 			);
 
 			// No need for the old column now
-			//$db_table->db_remove_column('{db_prefix}' . $sp_table, 'style');
+			$db_table->db_remove_column('{db_prefix}' . $sp_table, 'style');
 		}
 	}
 }
