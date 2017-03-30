@@ -253,7 +253,7 @@ $txt['sp_param_Shop_type_options'] = 'Total|Pocket|Bank';
 $txt['sp_param_Shop_sort_options'] = 'Recent|Random';
 $txt['sp_param_Blog_type_options'] = 'Articles|Blogs';
 $txt['sp_param_Blog_sort_options'] = 'Latest|Random';
-$txt['sp_param_Whos_Online_online_today_options'] = 'Count|List';
+$txt['sp_param_Whos_Online_online_today_options'] = '|Count|List';
 
 // Articles Area
 $txt['sp_admin_articles_title'] = 'Articles';
