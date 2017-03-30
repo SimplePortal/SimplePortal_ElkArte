@@ -138,6 +138,9 @@
 		<remove-file name="LANGUAGEDIR/french/SPortal.french.php" />
 		<remove-file name="LANGUAGEDIR/french/SPortalAdmin.french.php" />
 		<remove-file name="LANGUAGEDIR/french/SPortalHelp.french.php" />
+		<remove-file name="LANGUAGEDIR/german/SPortal.german.php" />
+		<remove-file name="LANGUAGEDIR/german/SPortalAdmin.german.php" />
+		<remove-file name="LANGUAGEDIR/german/SPortalHelp.german.php" />
 		<remove-dir name="IMAGESDIR/sp" />
 		<remove-file name="IMAGESDIR/admin/configuration.png" />
 		<remove-file name="IMAGESDIR/admin/articles.png" />
