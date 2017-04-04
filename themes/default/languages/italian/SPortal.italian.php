@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package SimplePortal
+ * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
  * @copyright 2014 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 2.4
+ * @version 1.0.0 Beta 2
  */
 
 // General strings
@@ -24,11 +23,15 @@ $txt['sp-remove_article'] = 'Rimouvi dagli Articoli';
 $txt['sp-dot'] = 'Punto';
 $txt['sp-arrow'] = 'Freccia';
 $txt['sp-star'] = 'Stella';
-$txt['sp_yes'] = 'sì';
+$txt['sp_yes'] = 'Sì';
 $txt['sp_no'] = 'No';
 $txt['sp_submit'] = 'Invia';
+$txt['sp_add'] = 'Aggiungi';
+$txt['sp_items'] = 'Items';
 $txt['sp_modify'] = 'Modifica';
 $txt['sp_move'] = 'Sposta';
+$txt['sp_likes_given'] = 'Dati';
+$txt['sp_likes_received'] = 'Ricevuti';
 $txt['sp_all'] = 'Tutti';
 $txt['sp_link'] = '[link]';
 $txt['sp_viewed_time'] = 'visualizzato %d volta';
@@ -38,7 +41,10 @@ $txt['sp_has_articles'] = '%d articoli';
 $txt['sp_commented_on_time'] = '%d commento';
 $txt['sp_commented_on_times'] = '%d commenti';
 $txt['sp_posted_on_by'] = 'pubblicato in data %1$s da %2$s';
+$txt['sp_posted_by'] = 'pubblicato %1$s da %2$s';
 $txt['sp_posted_in_on_by'] = 'pubblicato in %1$s in data %2$s da %3$s';
+$txt['sp_posted_on_in_by'] = 'pubblicato in data %2$s in %1$s da %3$s';
+
 $txt['sp_read_more'] = 'Leggi tutto';
 $txt['sp_write_comment'] = 'Commenta';
 $txt['sp_function_unknown_label'] = 'Tipo Blocco Sconosciuto';
@@ -80,20 +86,26 @@ $txt['sp_shoutbox_prune'] = 'Prune';
 $txt['sp_shoutbox_show_ignored'] = 'Visualizza Shout ignorati';
 $txt['sp_topstats_unknown_type'] = 'Tipi di statistiche non supportate o sconosciute.';
 $txt['sp_topstats_type_error'] = 'Tipo di setup incompleto.';
-$txt['sp_sashop_no_exist'] = 'Mi spiace, ma la mod SA Shop non è installata';
-$txt['sp_shop_no_exist'] = 'Mi spiace, ma la mod SMFShop non è installata.';
-$txt['sp_eliana_no_exist'] = 'Mi spiace, impossibile trovare il sistema di Karma, forse non è installato o è disabilitato.';
-$txt['sp_thankomatic_no_exist'] = 'Mi spiace, ma la mod Thank-O-Matic non è installata.';
-$txt['sp_reputation_no_exist'] = 'Mi spiace, impossibile trovare la gestione avanzata della Reputazione, forse non è installata o è disabilitata.';
 $txt['sp_karma_is_disabled'] = 'Il sistema di Karma è disabilitato.';
 $txt['sp_likes_is_disabled'] = 'Il sistema "Mi piace" è disabilitato.';
 $txt['sp_topStatsMember_total_time_logged_in'] = 'Tempo totale trascorso sul forum';
 $txt['sp_topStatsMember_Posts'] = 'Posts';
 $txt['sp_topStatsMember_Karma_Good'] = 'Karma Positivo';
 $txt['sp_topStatsMember_Karma_Bad'] = 'Karma Negativo';
-$txt['sp_topStatsMember_Karma_Total'] = 'Karma totale';
-$txt['sp_topStatsMember_Likes_Received'] = 'Mi piace Ricevuti';
-$txt['sp_topStatsMember_Likes_Given'] = 'Mi piace Inviati';
+$txt['sp_topStatsMember_Karma_Total'] = 'Karma Totale';
+$txt['sp_topStatsMember_Likes_Received'] = 'Mi Piace Ricevuti';
+$txt['sp_topStatsMember_Likes_Given'] = 'Mi Piace Inviati';
+$txt['sp_topStatsMember_Likes_Total'] = 'Mi Piace Totali';
+$txt['sp_admincount_approval'] = 'Richiede Approvazione';
+$txt['sp_admincount_attachments'] = 'Allegati';
+$txt['sp_admincount_emailmod'] = 'Email Postings';
+$txt['sp_admincount_topics'] = 'Topics';
+$txt['sp_admincount_posts'] = 'Posts';
+$txt['sp_admincount_groupreq'] = 'Richieste dai gruppi';
+$txt['sp_admincount_memberreq'] = 'Utenti';
+$txt['sp_admincount_reports'] = 'Messaggi segnalati';
+$txt['sp_admincount_errors'] = 'Error log entries';
+$txt['sp_admincount_awaiting_activation'] = 'In attesa di attivazione';
 
 // Who area strings
 $txt['sp_who_index'] = 'Sta visualizzando il <a href="%s">Portale</a>.';
@@ -135,12 +147,18 @@ $txt['error_sp_no_shop_found'] = 'Non ci sono funzionalità Shop installate..';
 $txt['error_sp_no_arcade_found'] = 'Non ci sono funzionalità Arcade installate.';
 $txt['error_sp_no_stats_found'] = 'Nessuna statistica trovata.';
 $txt['error_sp_no_permission_profiles'] = 'Non ci sono profili di permessi disponibili.';//There are no permission profiles available
+$txt['error_sp_no_style_profiles'] = 'Non ci sono profili di stili disponibili.';
+$txt['error_sp_no_visibility_profiles'] = 'Non ci sono profili di visibilità disponibili.';
 $txt['error_sp_no_pages'] = 'Non ci sono pagine disponibili.';
 $txt['error_sp_no_categories'] = 'Non ci sono categorie disponibili.';
 $txt['error_sp_no_articles'] = 'Non ci sono articoli disponibili.';
 $txt['error_sp_no_comments'] = 'Non ci sono ancora dei commenti su questo articolo. Puoi essere il primo a commentare!';
+$txt['error_sp_no_profiles'] = 'Non ci sono profili disponibili!'; //There are no profiles added yet!
+$txt['error_sp_no_custom_menus'] = 'Non ci sono menu personalizzati dispobibili!'; //There are no custom menus added yet!
+$txt['error_sp_no_menu_items'] = 'Non ci sono voci di menu disponibili!'; //There are no menu items added yet!
 $txt['error_sp_cannot_comment_modify'] = 'Non hai i permessi per modificare questo commento.';
 $txt['error_sp_cannot_comment_delete'] = 'Non hai i permessi per eimuovere questo commento.';
+$txt['error_sp_menu_not_found'] = 'Il menu richiesto non è stato trovato.';
 $txt['error_sp_page_not_found'] = 'La pagina richiesta non è stata trovata.';
 $txt['error_sp_article_not_found'] = 'L\'articolo richiesto non è stato trovato.';
 $txt['error_sp_category_not_found'] = 'La categoria richiesta non è stata trovata.';
