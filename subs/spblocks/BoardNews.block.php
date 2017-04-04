@@ -83,7 +83,7 @@ class Board_News_Block extends SP_Abstract_Block
 		$start = !empty($parameters['start']) ? (int) $parameters['start'] : 0;
 		$length = isset($parameters['length']) ? (int) $parameters['length'] : 250;
 		$avatars = !empty($parameters['avatar']);
-		$attachments = !empty($parameters['attachments']);
+		$attachments = !empty($parameters['attachment']);
 		$per_page = !empty($parameters['per_page']) ? (int) $parameters['per_page'] : 0;
 
 		$limit = max(0, $limit);
@@ -259,7 +259,7 @@ class Board_News_Block extends SP_Abstract_Block
 
 		if (!empty($per_page))
 		{
-			$context['sp_boardNews_page_index'] = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, false);
+			$context['sp_boardNews_page_index'] = constructPageIndex($current_url . 'news' . $id . '=%1$d', $start, $limit, $per_page, true);
 		}
 	}
 
