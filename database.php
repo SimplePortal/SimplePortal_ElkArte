@@ -186,11 +186,11 @@ function updateVisibilityProfiles($has_visibility_profiles)
 	{
 		// Add visibility profile col to sp_blocks
 		$db_table->db_add_column('{db_prefix}sp_blocks', array('name' => 'visibility', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true));
-
+		
 		// Read in the "old" data
 		$result = $db->query('', '
 			SELECT
-				id_block, mobile_view, display, display_custom
+				id_block, ' . isset($block_cols['mobile_view']) ? 'mobile_view, ' : '') . ' display, display_custom
 			FROM {db_prefix}sp_blocks',
 			array()
 		);
