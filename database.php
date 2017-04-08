@@ -190,7 +190,7 @@ function updateVisibilityProfiles($has_visibility_profiles)
 		// Read in the "old" data
 		$result = $db->query('', '
 			SELECT
-				id_block, ' . isset($block_cols['mobile_view']) ? 'mobile_view, ' : '') . ' display, display_custom
+				id_block, ' . (isset($block_cols['mobile_view']) ? 'mobile_view, ' : '') . ' display, display_custom
 			FROM {db_prefix}sp_blocks',
 			array()
 		);
