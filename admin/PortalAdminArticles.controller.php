@@ -316,12 +316,6 @@ class ManagePortalArticles_Controller extends Action_Controller
 		{
 			$context['article'] = $this->_sportal_admin_article_preview();
 
-			// Fix any bbc errors they have created
-			if ($context['article']['type'] === 'bbc')
-			{
-				preparsecode($context['article']['body']);
-			}
-
 			loadTemplate('PortalArticles');
 
 			// Showing errors or a preview?
