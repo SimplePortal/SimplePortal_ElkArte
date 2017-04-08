@@ -574,6 +574,7 @@ function sportal_process_visibility($query)
 
 	if (!empty($_GET['article']) && (empty($context['current_action']) || $context['current_action'] === 'portal'))
 	{
+		require_once(SUBSDIR . '/PortalArticle.subs.php');
 		$article_info = sportal_get_articles($_GET['article'], true, true);
 	}
 
