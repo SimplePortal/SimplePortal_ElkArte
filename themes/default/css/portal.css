@@ -308,6 +308,7 @@ table.sp_articles,
 #sp_main {
 	overflow: hidden;
 	width: 100%;
+	clear: both;
 }
 
 #sp_main:after {
@@ -317,26 +318,24 @@ table.sp_articles,
 	content: " ";
 }
 
-.sp_main_row {
-	clear: both;
-}
-
 .sp_main_cell {
 	overflow: hidden;
 }
 
-#sp_left, #sp_right, #sp_center {
+#sp_left, #sp_right, #sp_center_top, #sp_center_bottom {
 	vertical-align: top;
 }
 
 #sp_left {
 	float: left;
 	padding-right: .5em;
+	height: 100%;
 }
 
 #sp_right {
 	float: right;
 	padding-left: .5em;
+	height: 100%;
 }
 
 #sp_header, #sp_footer {
@@ -526,8 +525,7 @@ body {
 	display: block;
 	width: 18px;
 	height: 18px;
-	background-position: center center !important;
-	background-repeat: no-repeat !important;
+	background: no-repeat center center !important;
 }
 
 .shoutbox-button:hover {
@@ -921,8 +919,7 @@ dl.sp_form img,
 	margin-top: -30px;
 	margin-left: -58px;
 	padding: 47px 50px;
-	background-image: url(../images/_light/expcol.png);
-	background-repeat: no-repeat;
+	background: url(../images/_light/expcol.png) no-repeat;
 }
 
 .sp_category_header {
@@ -999,21 +996,44 @@ dl.sp_form img,
 	#sp_right {
 		float:left;
 		clear: both;
+		padding-left: 0 !important;
 	}
 
-    #sp_center {
-	    overflow: hidden;
-    }
+	#sp_left {
+		padding-right: 0 !important;
+	}
+
+	#sp_center_top, #sp_center_bottom {
+		overflow: hidden;
+	}
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
+	#sp_main {
+		display: flex;
+		flex-direction: column;
+	}
 
 	#sp_left, #sp_right {
 		float: none;
 		width: 100% !important;
 	}
 
-	#sp_center {
+	#sp_left {
+		order: 2;
+	}
+
+	#sp_right {
+		order: 3;
+	}
+
+	#sp_center_top {
+		order: 1;
+		width: 100%;
+	}
+
+	#sp_center_bottom {
+		order: 4;
 		width: 100%;
 	}
 
