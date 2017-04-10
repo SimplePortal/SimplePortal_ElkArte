@@ -48,7 +48,7 @@ function template_view_articles()
 					<h4>', $article['link'], '</h4>
 				</div>
 				<hr />
-				<p>', $article['preview'], '<a href="', $article['href'], '">...</a></p>
+				<p class="inner sp_inner">', $article['preview'], '<a href="', $article['href'], '">...</a></p>
 				<div class="sp_article_extra">
 					<a href="', $article['href'], '">', $txt['sp_read_more'], '</a> | <a href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
 				</div>
@@ -110,7 +110,7 @@ function template_view_article()
 					</span>
 				</div>
 				<hr />
-				<div>' ,
+				<div class="inner sp_inner">' ,
 					$context['article']['body'], '
 				</div>
 		</div>';

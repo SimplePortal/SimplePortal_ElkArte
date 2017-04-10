@@ -226,7 +226,7 @@ function template_sp_articles($data)
 										<span class="sp_articles_title">', $article['author']['link'], '</span><br />
 										', $article['link'], '
 									</td>
-									<td>',
+									<td class="inner sp_inner">',
 			$article['body'],
 			'</td>
 								</tr>

@@ -237,6 +237,10 @@ table.sp_articles,
 	vertical-align: middle;
 }
 
+.sp_inner {
+	border-top: 1px solid transparent;
+}
+
 .sp_article_icon {
 	margin: 5px 10px 0 0;
 }
@@ -916,8 +920,8 @@ dl.sp_form img,
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	margin-top: -30px;
-	margin-left: -58px;
+	margin-top: -150%;
+	margin-left: -150%;
 	padding: 47px 50px;
 	background: url(../images/_light/expcol.png) no-repeat;
 }

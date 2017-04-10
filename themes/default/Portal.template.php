@@ -48,13 +48,13 @@ function template_portal_index()
 					<span class="floatright">';
 
 		echo '
-						', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time']
-			: $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1
-			? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
+						', sprintf($article['view_count'] == 1
+							? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1
+							? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
 					</span>
 				</div>
 				<hr />
-				<p>', $article['preview'], '<a href="', $article['href'], '">&hellip;</a></p>
+				<div class="inner sp_inner">', $article['preview'], '<a href="', $article['href'], '">&hellip;</a></div>
 				<div class="sp_article_extra">
 					<a href="', $article['href'], '">', $txt['sp_read_more'], '</a> | <a href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
 				</div>
@@ -66,7 +66,7 @@ function template_portal_index()
 	if (!empty($context['article_page_index']))
 		echo '
 		<div class="sp_page_index">',
-		template_pagesection(), '
+			template_pagesection(), '
 		</div>';
 
 	echo '
