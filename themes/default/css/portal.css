@@ -185,8 +185,7 @@ hr {
 }
 
 table.sp_blog,
-table.sp_articles,
-.sp_shop_info {
+table.sp_articles {
 	line-height: 1.7em;
 }
 
@@ -327,6 +326,7 @@ table.sp_articles,
 
 #sp_left, #sp_right, #sp_center_top, #sp_center_bottom {
 	vertical-align: top;
+	margin-bottom: .5em;
 }
 
 #sp_left {

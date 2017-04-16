@@ -196,7 +196,7 @@ function template_portal_below()
 	// Output all the Bottom blocks
 	if (!empty($context['SPortal']['blocks'][3]))
 	{
-		if (empty($context['SPortal']['on_portal']) || !empty($modSettings['sp_articles_index']))
+		if (empty($context['SPortal']['on_portal']))
 			echo '
 					<br class="sp_side_clear" />';
 
