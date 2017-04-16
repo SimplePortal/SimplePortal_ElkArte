@@ -18,17 +18,24 @@ if (!defined('ELK'))
  * Article Block, show the list of articles in the system
  *
  * @param mixed[] $parameters
- *        'category' => list of categories to choose article from
- *        'limit' => number of articles to show
- *        'type' => 0 latest 1 random
- *        'length' => length for the body text preview
- *        'avatar' => whether to show the author avatar or not
+ * 		'category' => list of categories to choose article from
+ * 		'limit' => number of articles to show
+ * 		'type' => 0 latest 1 random
+ * 		'view' => 0 compact 1 full
+ * 		'length' => length for the body text preview
+ * 		'avatar' => whether to show the author avatar or not
+ * 		'attachment' => Show the first attachment as "blog" image
  *
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
 class Articles_Block extends SP_Abstract_Block
 {
+	/**
+	 * @var array
+	 */
+	protected $attachments = array();
+
 	/**
 	 * Constructor, used to define block parameters
 	 *
@@ -42,8 +49,10 @@ class Articles_Block extends SP_Abstract_Block
 			'category' => array(),
 			'limit' => 'int',
 			'type' => 'select',
+			'view' => 'select',
 			'length' => 'int',
 			'avatar' => 'check',
+			'attachment' => 'check',
 		);
 
 		parent::__construct($db);
@@ -90,8 +99,10 @@ class Articles_Block extends SP_Abstract_Block
 		$category = empty($parameters['category']) ? 0 : (int) $parameters['category'];
 		$limit = empty($parameters['limit']) ? 5 : (int) $parameters['limit'];
 		$type = empty($parameters['type']) ? 0 : 1;
+		$this->data['view'] = empty($parameters['view']) ? 0 : 1;
 		$this->data['length'] = isset($parameters['length']) ? (int) $parameters['length'] : 250;
 		$this->data['avatar'] = empty($parameters['avatar']) ? 0 : (int) $parameters['avatar'];
+		$attachments = !empty($parameters['attachment']);
 
 		// Fetch some articles
 		$this->data['articles'] = sportal_get_articles(null, true, true, $type ? 'RAND()' : 'spa.date DESC', $category, $limit);
@@ -105,11 +116,70 @@ class Articles_Block extends SP_Abstract_Block
 			return;
 		}
 
+		// Get the first attachment for each article for this group
+		if (!empty($attachments) && !empty($this->data['view']))
+		{
+			$this->loadAttachments();
+		}
+
 		// Doing the color thing
 		$this->_color_ids();
 
+		// And prepare the body text
+		if (!empty($this->data['view']))
+		{
+			$this->prepare_view();
+		}
+
 		// Set the template name
 		$this->setTemplate('template_sp_articles');
+	}
+
+	/**
+	 * Prepares the body text when using the full view
+	 */
+	private function prepare_view()
+	{
+		global $scripturl, $modSettings;
+
+		require_once(SUBSDIR . '/Post.subs.php');
+
+		foreach ($this->data['articles'] as $aid => $article)
+		{
+			// Using the cutoff tag?
+			$limited = false;
+			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
+			{
+				$article['body'] = Util::substr($article['body'], 0, $cutoff);
+				preparsecode($article['body']);
+				$limited = true;
+			}
+
+			// Good time to do this is ... now
+			censorText($article['subject']);
+			censorText($article['body']);
+
+			$article['body'] = sportal_parse_content($article['body'], $article['type'], 'return');
+
+			// Shorten the text, link the ellipsis, etc as needed
+			if ($limited || !empty($this->data['length']))
+			{
+				$ellip = '<a href="' . $scripturl . '?article=' . $article['article_id'] . '">&hellip;</a>';
+				$article['body'] = $limited ? $article['body'] . $ellip : Util::shorten_html($article['body'], $this->data['length'], $ellip, false);
+				$article['cut'] = true;
+			}
+
+			if ($modSettings['sp_resize_images'])
+			{
+				$article['body'] = str_ireplace('class="bbc_img', 'class="bbc_img sp_article', $article['body']);
+			}
+
+			// Account for embedded videos
+			$this->data['embed_videos'] = !empty($modSettings['enableVideoEmbeding']);
+
+			// Add / replace the data
+			$this->data['articles'][$aid] = array_merge($this->data['articles'][$aid], $article);
+		}
 	}
 
 	/**
@@ -139,6 +209,84 @@ class Articles_Block extends SP_Abstract_Block
 			}
 		}
 	}
+
+	/**
+	 * Load the first available attachments in an article (if any) for a group of articles0
+	 */
+	protected function loadAttachments()
+	{
+		global $modSettings;
+
+		require_once(SUBSDIR . '/Attachments.subs.php');
+
+		// We will show attachments in the block, regardless, so save and restore
+		$attachmentShowImages = $modSettings['attachmentShowImages'];
+		$modSettings['attachmentShowImages'] = 1;
+		$articles = array_keys($this->data['articles']);
+		$attachments = sportal_get_articles_attachments($articles);
+		$modSettings['attachmentShowImages'] = $attachmentShowImages;
+
+		// For each article, grab the first image attachment
+		foreach ($attachments as $id_article => $attach)
+		{
+			if (!isset($this->data['articles'][$id_article]['attachments']))
+			{
+				foreach ($attach as $key => $val)
+				{
+					$is_image = !empty($val['width']) && !empty($val['height']);
+					if ($is_image)
+					{
+						$this->data['articles'][$id_article]['attachments'] = $val;
+						break;
+					}
+				}
+			}
+		}
+
+		// Finalize the details for the template
+		$this->setArticleAttach($articles);
+	}
+
+	/**
+	 * Load the attachment details into context
+	 *
+	 * - If the article was found to have attachments (via loadAttachments) then
+	 * it will load that attachment data into context for use in the templae
+	 * - If the message did not have attachments, it is then searched for the first
+	 * bbc IMG tag, and that image is used.
+	 *
+	 * @param int[] $articles
+	 */
+	protected function setArticleAttach($articles)
+	{
+		global $scripturl;
+
+		foreach ($articles as $id_article)
+		{
+			if (!empty($this->data['articles'][$id_article]['attachments']))
+			{
+				$attachment = $this->data['articles'][$id_article]['attachments'];
+				$this->data['articles'][$id_article]['attachments'] += array(
+					'id' => $attachment['id_attach'],
+					'href' => $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'],
+					'link' => '<a href="' . $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'] . '">' . htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8') . '</a>',
+					'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8')),
+				);
+			}
+			// No attachments, perhaps an IMG tag then?
+			else
+			{
+				$body = $this->data['articles'][$id_article]['body'];
+				$pos = strpos($body, '[img');
+				if ($pos !== false)
+				{
+					$img_tag = substr($body, $pos, strpos($body, '[/img]', $pos) + 6);
+					$img_html = parse_bbc($img_tag);
+					$this->data['articles'][$id_article]['body'] = str_replace($img_tag, '<div class="sp_attachment_thumb">' . $img_html . '</div>', $body);
+				}
+			}
+		}
+	}
 }
 
 /**
@@ -158,10 +306,10 @@ function template_sp_articles_error($data)
  */
 function template_sp_articles($data)
 {
-	global $scripturl;
+	global $scripturl, $txt, $context;
 
 	// Not showing avatars, just use a compact link view
-	if (empty($data['avatar']))
+	if (empty($data['view']))
 	{
 		echo '
 			<ul class="sp_list">';
@@ -178,64 +326,78 @@ function template_sp_articles($data)
 	// Or the full monty!
 	else
 	{
-		require_once(SUBSDIR . '/Post.subs.php');
-
-		echo '
-							<table class="sp_fullwidth">';
-
-		foreach ($data['articles'] as $article)
+		// Auto video embedding enabled?
+		if ($data['embed_videos'])
 		{
-			// Using the cutoff tag?
-			$limited = false;
-			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
-			{
-				$article['body'] = Util::substr($article['body'], 0, $cutoff);
-				preparsecode($article['body']);
-				$limited = true;
-			}
-
-			// Good time to do this is ... now
-			censorText($article['subject']);
-			censorText($article['body']);
-
-			$article['body'] = sportal_parse_content($article['body'], $article['type'], 'return');
-
-			// Shorten the text, link the ellipsis, etc as needed
-			if ($limited || !empty($data['length']))
-			{
-				$ellip = '<a href="' . $scripturl . '?article=' . $article['article_id'] . '">&hellip;</a>';
-				$article['body'] = $limited ? $article['body'] . $ellip : Util::shorten_html($article['body'], $data['length'], $ellip, false);
-			}
-
-			echo '
-								<tr class="sp_articles_row">
-									<td class="sp_articles centertext">';
-
-			// If we have an avatar to show, show it
-			if ($data['avatar'] && !empty($article['author']['avatar']['href']))
-			{
-				echo '
-										<a href="', $scripturl, '?action=profile;u=', $article['author']['id'], '">
-											<img src="', $article['author']['avatar']['href'], '" alt="', $article['author']['name'], '" style="max-width:40px" />
-										</a>';
-			}
-
-			echo '
-									</td>
-									<td>
-										<span class="sp_articles_title">', $article['author']['link'], '</span><br />
-										', $article['link'], '
-									</td>
-									<td class="inner sp_inner">',
-			$article['body'],
-			'</td>
-								</tr>
-								<tr>
-									<td colspan="3" class="sp_articles_row"></td>
-								</tr>';
+			addInlineJavascript('
+			$(document).ready(function() {
+				$().linkifyvideo(oEmbedtext);
+			});', true);
 		}
 
-		echo '
-							</table>';
+		// Relative times?
+		if (!empty($context['using_relative_time']))
+		{
+			addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
+		}
+
+		// Show the articles.
+		foreach ($data['articles'] as $article)
+		{
+			echo '
+			<h3 class="secondary_header">',
+				$article['title'], '
+			</h3>
+			<div id="msg_', $article['article_id'], '" class="sp_article_content">
+				<div class="sp_content_padding">';
+
+			if (!empty($article['author']['avatar']['href']) && $data['avatar'])
+			{
+				echo '
+					<a href="', $scripturl, '?action=profile;u=', $article['author']['id'], '">
+						<img src="', $article['author']['avatar']['href'], '" alt="', $article['author']['name'], '" style="max-width:40px" class="floatright" />
+					</a>
+					<span class="middletext">
+						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], htmlTime($article['date']), $article['author']['link']), '
+						<br />
+						', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
+					</span>';
+			}
+			else
+			{
+				echo '
+					<span class="middletext">
+						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], htmlTime($article['date']), $article['author']['link']), '
+						<br />
+						', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
+					</span>';
+			}
+
+			echo '
+					<div class="post inner sp_inner">
+						<hr />';
+
+			if (!empty($article['attachments']))
+			{
+				echo '
+						<div class="sp_attachment_thumb">';
+
+				// If you want Fancybox to tag this, remove nfb_ from the id
+				echo '
+							<a href="', $article['href'], '" id="nfb_link_', $article['attachments']['id'], '">
+								<img src="', $article['attachments']['href'], '" alt="" title="', $article['attachments']['name'], '" id="thumb_', $article['attachments']['id'], '" />
+							</a>';
+
+				echo '
+						</div>';
+			}
+
+			echo
+						$article['body'], '
+					</div>
+				<div class="righttext"><a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a></div>
+			</div>
+		</div>';
+		}
 	}
 }
