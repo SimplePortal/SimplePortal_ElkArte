@@ -173,11 +173,8 @@ function sp_integrate_admin_areas(&$admin_areas)
 						'permission' => array('sp_admin', 'sp_manage_profiles'),
 						'subsections' => array(
 							'listpermission' => array($txt['sp_admin_permission_profiles_list']),
-							'addpermission' => array($txt['sp_admin_permission_profiles_add']),
 							'liststyle' => array($txt['sp_admin_style_profiles_list']),
-							'addstyle' => array($txt['sp_admin_style_profiles_add']),
 							'listvisibility' => array($txt['sp_admin_visibility_profiles_list']),
-							'addvisibility' => array($txt['sp_admin_visibility_profiles_add']),
 						),
 					),
 				),
@@ -451,7 +448,7 @@ function sp_integrate_frontpage(&$default_action)
 		{
 			// View a specific  article
 			$file = CONTROLLERDIR . '/PortalArticles.controller.php';
-			$controller = 'Article_Controller';
+			$controller = 'Articles_Controller';
 			$function = 'action_sportal_article';
 		}
 		elseif (!empty($_GET['category']))
