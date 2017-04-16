@@ -310,6 +310,8 @@ class ManagePortalConfig_Controller extends Action_Controller
 			'',
 			array('int', 'sp_articles_per_page'),
 			array('int', 'sp_articles_comments_per_page'),
+			'',
+			array('text', 'sp_articles_attachment_dir')
 		);
 
 		return $this->_articleSettingsForm->settings($config_vars);

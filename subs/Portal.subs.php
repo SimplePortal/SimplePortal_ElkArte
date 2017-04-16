@@ -409,6 +409,7 @@ function sportal_load_blocks()
  *
  * @param string $name The type of the block (without "_Block" at the end)
  * @param int $id The id of the block, to allow multiple same types on the page
+ * @return object
  */
 function sp_instantiate_block($name, $id = 0)
 {

@@ -20,12 +20,14 @@ if (!defined('ELK'))
  */
 class ManagePortalArticles_Controller extends Action_Controller
 {
-	/**
-	 * If we are adding a new article or editing an existing one
-	 *
-	 * @var bool
-	 */
-	protected $_is_new;
+	/** @var bool|int */
+	protected $_is_aid;
+	/** @var array */
+	protected $_attachments;
+	/** @var Error_Context */
+	protected $article_errors;
+	/** @var Attachment_Error_Context */
+	protected $attach_errors;
 
 	/**
 	 * This method is executed before any action handler.
@@ -53,7 +55,6 @@ class ManagePortalArticles_Controller extends Action_Controller
 		{
 			isAllowedTo('sp_manage_articles');
 		}
-
 
 		loadTemplate('PortalAdminArticles');
 
@@ -228,7 +229,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=admin;area=portalarticles;sa=remove',
+				'href' => $scripturl . '?action=admin;area=portalarticles;sa=delete',
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
@@ -278,62 +279,420 @@ class ManagePortalArticles_Controller extends Action_Controller
 	}
 
 	/**
-	 * Edits an existing or adds a new article to the system
-	 * Handles the previewing of an article
+	 * Edits an existing OR adds a new article to the system
+	 *
+	 * - Handles the previewing of an article
+	 * - Handles article attachments
 	 */
 	public function action_edit()
 	{
-		global $context, $options, $txt;
+		global $context, $txt;
 
-		$this->_is_new = empty($_REQUEST['article_id']);
+		// Load dependency's, prepare error checking
+		$this->editInit();
 
-		$article_errors = Error_Context::context('article', 0);
-
-		// Going to use editor and post functions
-		require_once(SUBSDIR . '/Post.subs.php');
-		require_once(SUBSDIR . '/Editor.subs.php');
-
-		// Convert this to BBC?
+		// Started with HTML editor and now converting to BBC?
 		if (!empty($_REQUEST['content_mode']) && $_POST['type'] === 'bbc')
 		{
-			$convert = $_REQUEST['content'];
 			require_once(SUBSDIR . '/Html2BBC.class.php');
+			$convert = $_REQUEST['content'];
 			$bbc_converter = new Html_2_BBC($convert);
 			$convert = $bbc_converter->get_bbc();
 			$convert = un_htmlspecialchars($convert);
 			$_POST['content'] = $convert;
 		}
 
-		// Saving the work?
-		if (!empty($_POST['submit']) && !$article_errors->hasErrors())
+		// Want to save the work?
+		if (!empty($_POST['submit']) && !$this->article_errors->hasErrors() && !$this->attach_errors->hasErrors())
 		{
-			checkSession();
+			// If the session has timed out, let the user re-submit their form.
+			if (checkSession('post', '', false) !== '')
+			{
+				$this->article_errors->addError('session_timeout');
+
+				// Disable the preview and the save
+				unset($_POST['preview'], $_POST['submit']);
+
+				return $this->action_edit();
+			}
+
+			// Check for errors and if none Save it
 			$this->_sportal_admin_article_edit_save();
 		}
 
-		// Just taking a look before you save?
-		if (!empty($_POST['preview']) || $article_errors->hasErrors())
+		// Prepare the form fields, preview, errors, etc
+		$this->prepareArticleForm();
+
+		// On to the editor
+		if ($context['article']['type'] === 'bbc')
+		{
+			$context['article']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($context['article']['body']));
+		}
+
+		$this->prepareEditor();
+
+		// Final bits for the template, category's, styles and permission profiles
+		$this->loadProfileContext();
+
+		// Attachments
+		if ($context['attachments']['can']['post'])
+		{
+			$this->article_attachment();
+			$this->article_attachment_dd();
+		}
+
+		// Set the editor to the right mode based on type (bbc, html, php)
+		addInlineJavascript('
+			$(window).load(function() {
+				diewithfire = window.setTimeout(function() {sp_update_editor("' . $context['article']['type'] . '", "");}, 200);
+			});
+		');
+
+		// Finally the main template
+		loadTemplate('PortalAdminArticles');
+		$context['sub_template'] = 'articles';
+
+		// The article above/below template
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->add('articles_edit');
+
+		// Page out values
+		$context[$context['admin_menu_name']]['current_subsection'] = 'add';
+		$context['article']['style'] = sportal_select_style($context['article']['styles']);
+		$context['is_new'] = $this->_is_aid;
+		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
+		$context['page_title'] = !$this->_is_aid ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'];
+
+		return true;
+	}
+
+	/**
+	 * Loads in dependency's for saving or editing an article
+	 */
+	private function editInit()
+	{
+		global $modSettings, $context;
+
+		$this->_is_aid = empty($_REQUEST['article_id']) ? false : (int) $_REQUEST['article_id'];
+
+		// Going to use editor, attachment and post functions
+		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Editor.subs.php');
+		require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
+		require_once(SUBSDIR . '/Attachments.subs.php');
+
+		loadLanguage('Post');
+		loadLanguage('Errors');
+
+		// Errors are likely
+		$this->article_errors = Error_Context::context('article', 0);
+		$this->attach_errors = Attachment_Error_Context::context();
+		$this->attach_errors->activate();
+
+		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment'));
+	}
+
+	/**
+	 * Does the actual saving of the article data
+	 *
+	 * - Validates the data is safe to save
+	 * - Updates existing articles or creates new ones
+	 */
+	private function _sportal_admin_article_edit_save()
+	{
+		global $context, $txt, $modSettings;
+
+		// Use our standard validation functions in a few spots
+		require_once(SUBSDIR . '/DataValidator.class.php');
+		$validator = new Data_Validator();
+
+		// If it exists, load the current data
+		if ($this->_is_aid)
+		{
+			$_POST['article_id'] = $this->_is_aid;
+			$context['article'] = sportal_get_articles($this->_is_aid);
+		}
+
+		// Clean and Review the post data for compliance
+		$validator->sanitation_rules(array(
+			'title' => 'trim|Util::htmlspecialchars',
+			'namespace' => 'trim|Util::htmlspecialchars',
+			'article_id' => 'intval',
+			'category_id' => 'intval',
+			'permissions' => 'intval',
+			'styles' => 'intval',
+			'type' => 'trim',
+			'content' => 'trim'
+		));
+		$validator->validation_rules(array(
+			'title' => 'required',
+			'namespace' => 'alpha_numeric|required',
+			'type' => 'required',
+			'content' => 'required'
+		));
+		$validator->text_replacements(array(
+			'title' => $txt['sp_admin_articles_col_title'],
+			'namespace' => $txt['sp_admin_articles_col_namespace'],
+			'content' => $txt['sp_admin_articles_col_body']
+		));
+
+		// If you messed this up, tell them why
+		if (!$validator->validate($_POST))
+		{
+			foreach ($validator->validation_errors() as $id => $error)
+			{
+				$this->article_errors->addError($error);
+			}
+		}
+
+		// Lets make sure this namespace (article id) is unique
+		$has_duplicate = sp_duplicate_articles($validator->article_id, $validator->namespace);
+		if (!empty($has_duplicate))
+		{
+			$this->article_errors->addError('sp_error_article_namespace_duplicate');
+		}
+
+		// And we can't have just a numeric namespace (article id)
+		if (preg_replace('~[0-9]+~', '', $validator->namespace) === '')
+		{
+			$this->article_errors->addError('sp_error_article_namespace_numeric');
+		}
+
+		// Posting some PHP code, and allowed? Then we need to validate it will run
+		if ($_POST['type'] === 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
+		{
+			$validator_php = new Data_Validator();
+			$validator_php->validation_rules(array('content' => 'php_syntax'));
+
+			// Bad PHP code
+			if (!$validator_php->validate(array('content' => $_POST['content'])))
+			{
+				$this->article_errors->addError($validator_php->validation_errors());
+			}
+		}
+
+		// Check / Save attachments
+		$this->saveArticleAttachments();
+
+		// None shall pass ... with errors
+		if ($this->article_errors->hasErrors() || $this->attach_errors->hasErrors())
+		{
+			unset($_POST['submit']);
+
+			return false;
+		}
+
+		// No errors then, prepare the data for saving
+		$article_info = array(
+			'id' => $validator->article_id,
+			'id_category' => $validator->category_id,
+			'namespace' => $validator->namespace,
+			'title' => $validator->title,
+			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
+			'type' => in_array($validator->type, array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
+			'permissions' => $validator->permissions,
+			'styles' => $validator->styles,
+			'status' => !empty($_POST['status']) ? 1 : 0,
+		);
+
+		if ($article_info['type'] === 'bbc')
+		{
+			preparsecode($article_info['body']);
+		}
+
+		// Save away
+		checkSession();
+		$this->_is_aid = sp_save_article($article_info, empty($this->_is_aid));
+
+		// Set attachments to the article, create any needed thumbnails
+		$this->finalizeArticleAttachments();
+
+		// And return to the listing
+		redirectexit('action=admin;area=portalarticles');
+
+		return true;
+	}
+
+	/**
+	 * Save attachments based on the form inputs
+	 *
+	 * - Remove existing ones that have been "unchecked" in the form
+	 * - Performs security, size, type, etc checks
+	 * - Moves files to the appropriate directory
+	 */
+	private function saveArticleAttachments()
+	{
+		global $user_info, $context, $modSettings;
+
+		// First see if they are trying to delete current attachments.
+		if (isset($_POST['attach_del']))
+		{
+			$keep_temp = array();
+			$keep_ids = array();
+			foreach ($_POST['attach_del'] as $dummy)
+			{
+				if (strpos($dummy, 'post_tmp_' . $user_info['id']) !== false)
+				{
+					$keep_temp[] = $dummy;
+				}
+				else
+				{
+					$keep_ids[] = (int) $dummy;
+				}
+			}
+
+			if (isset($_SESSION['temp_attachments']))
+			{
+				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+				{
+					if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name'])
+							&& in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files']))
+						|| in_array($attachID, $keep_temp)
+						|| strpos($attachID, 'post_tmp_' . $user_info['id']) === false
+					)
+					{
+						continue;
+					}
+
+					unset($_SESSION['temp_attachments'][$attachID]);
+					@unlink($attachment['tmp_name']);
+				}
+			}
+
+			if (!empty($this->_is_aid))
+			{
+				$attachmentQuery = array(
+					'id_article' => $this->_is_aid,
+					'not_id_attach' => $keep_ids,
+					'id_folder' => $modSettings['sp_articles_attachment_dir'],
+				);
+				removeArticleAttachments($attachmentQuery);
+			}
+		}
+
+		// Upload any new attachments.
+		if ($context['attachments']['can']['post'])
+		{
+			if ($this->_is_aid)
+			{
+				list($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForArticle($this->_is_aid);
+			}
+
+			processAttachments();
+		}
+	}
+
+	/**
+	 * Handle the final processing of attachments, including any thumbnail generation
+	 * and linking attachments to the specific article.  Saves the articles in the SP
+	 * attachment directory.
+	 */
+	private function finalizeArticleAttachments()
+	{
+		global $context, $user_info, $ignore_temp, $modSettings;
+
+		$attachIDs = array();
+
+		if (empty($ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']))
+		{
+			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+			{
+				if ($attachID !== 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
+				{
+					continue;
+				}
+
+				// If there was an initial error just show that message.
+				if ($attachID === 'initial_error')
+				{
+					unset($_SESSION['temp_attachments']);
+					break;
+				}
+
+				// No errors, then try to create the attachment
+				if (empty($attachment['errors']))
+				{
+					// Load the attachmentOptions array with the data needed to create an attachment
+					$attachmentOptions = array(
+						'article' => !empty($this->_is_aid) ? $this->_is_aid : 0,
+						'poster' => $user_info['id'],
+						'name' => $attachment['name'],
+						'tmp_name' => $attachment['tmp_name'],
+						'size' => isset($attachment['size']) ? $attachment['size'] : 0,
+						'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
+						'id_folder' => $modSettings['sp_articles_attachment_dir'],
+						'approved' => true,
+						'errors' => array(),
+					);
+
+					if (createArticleAttachment($attachmentOptions))
+					{
+						$attachIDs[] = $attachmentOptions['id'];
+						if (!empty($attachmentOptions['thumb']))
+						{
+							$attachIDs[] = $attachmentOptions['thumb'];
+						}
+					}
+				}
+				// We have errors on this file, build out the issues for display to the user
+				else
+				{
+					@unlink($attachment['tmp_name']);
+				}
+			}
+
+			unset($_SESSION['temp_attachments']);
+		}
+
+		return $attachIDs;
+	}
+
+	/**
+	 * Setup the add/edit article template values
+	 */
+	private function prepareArticleForm()
+	{
+		global $txt, $context;
+
+		$context['attachments']['current'] = array();
+
+		// Just taking a look before you save, or tried to save with errors?
+		if (!empty($_POST['preview']) || $this->article_errors->hasErrors() || $this->attach_errors->hasErrors())
 		{
 			$context['article'] = $this->_sportal_admin_article_preview();
 
-			loadTemplate('PortalArticles');
+			// If there are attachment errors. Let's show a list to the user.
+			if ($this->attach_errors->hasErrors())
+			{
+				loadTemplate('Errors');
+				$errors = $this->attach_errors->prepareErrors();
+				foreach ($errors as $key => $error)
+				{
+					$context['attachment_error_keys'][] = $key . '_error';
+					$context[$key . '_error'] = $error;
+				}
+			}
 
 			// Showing errors or a preview?
-			if ($article_errors->hasErrors())
+			if ($this->article_errors->hasErrors())
 			{
 				$context['article_errors'] = array(
-					'errors' => $article_errors->prepareErrors(),
-					'type' => $article_errors->getErrorType() == 0 ? 'minor' : 'serious',
+					'errors' => $this->article_errors->prepareErrors(),
+					'type' => $this->article_errors->getErrorType() == 0 ? 'minor' : 'serious',
 					'title' => $txt['sp_form_errors_detected'],
 				);
 			}
-			else
+
+			// Preview needs a flag
+			if (!empty($_POST['preview']))
 			{
+				// We reuse this template for the preview
+				loadTemplate('PortalArticles');
 				$context['preview'] = true;
 			}
 		}
 		// Something new?
-		elseif ($this->_is_new)
+		elseif (!$this->_is_aid)
 		{
 			$context['article'] = array(
 				'id' => 0,
@@ -350,72 +709,11 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// Something used
 		else
 		{
-			$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
-			$context['article'] = sportal_get_articles($_REQUEST['article_id']);
+			$_REQUEST['article_id'] = $this->_is_aid;
+			$context['article'] = sportal_get_articles($this->_is_aid);
+			$attach = sportal_get_articles_attachments($this->_is_aid, true);
+			$context['attachments']['current'] = $attach[$this->_is_aid];
 		}
-
-		if ($context['article']['type'] === 'bbc')
-		{
-			$context['article']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($context['article']['body']));
-		}
-
-		// On to the editor
-		if ($context['article']['type'] !== 'bbc')
-		{
-			// Override user prefs for wizzy mode if they don't need it
-			$temp_editor = !empty($options['wysiwyg_default']);
-			$options['wysiwyg_default'] = false;
-		}
-
-		// Fire up the editor with the values
-		$editor_options = array(
-			'id' => 'content',
-			'value' => $context['article']['body'],
-			'width' => '100%',
-			'height' => '225px',
-			'preview_type' => 2,
-		);
-		create_control_richedit($editor_options);
-		$context['post_box_name'] = $editor_options['id'];
-
-		// Restore their settings
-		if (isset($temp_editor))
-		{
-			$options['wysiwyg_default'] = $temp_editor;
-		}
-
-		// Set the editor box to the right mode based on type (bbc, html, php)
-		addInlineJavascript('
-			$(window).load(function() {
-				diewithfire = window.setTimeout(function() {sp_update_editor("' . $context['article']['type'] . '", "");}, 200);
-			});
-		');
-
-		// Final bits for the template, category's, styles and permission settings
-		$context['article']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
-		if (empty($context['article']['permission_profiles']))
-		{
-			fatal_lang_error('error_sp_no_permission_profiles', false);
-		}
-
-		$context['article']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
-		if (empty($context['article']['permission_profiles']))
-		{
-			fatal_lang_error('error_sp_no_style_profiles', false);
-		}
-
-		$context['article']['categories'] = sportal_get_categories();
-		if (empty($context['article']['categories']))
-		{
-			fatal_lang_error('error_sp_no_category', false);
-		}
-
-		// Page out values
-		$context['article']['style'] = sportal_select_style($context['article']['styles']);
-		$context['is_new'] = $this->_is_new;
-		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
-		$context['page_title'] = $this->_is_new ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'];
-		$context['sub_template'] = 'articles_edit';
 	}
 
 	/**
@@ -426,13 +724,13 @@ class ManagePortalArticles_Controller extends Action_Controller
 		global $scripturl, $user_info;
 
 		// Existing article will have some data
-		if (!$this->_is_new)
+		if ($this->_is_aid)
 		{
-			$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
-			$current = sportal_get_articles($_REQUEST['article_id']);
+			$_POST['article_id'] = $this->_is_aid;
+			$current = sportal_get_articles($this->_is_aid);
 			$author = $current['author'];
 			$date = standardTime($current['date']);
-			list($views, $comments) = sportal_get_article_views_comments($_REQUEST['article_id']);
+			list($views, $comments) = sportal_get_article_views_comments($this->_is_aid);
 		}
 		// New ones we set defaults
 		else
@@ -468,124 +766,217 @@ class ManagePortalArticles_Controller extends Action_Controller
 	}
 
 	/**
-	 * Does the actual saving of the article data
-	 *
-	 * - validates the data is safe to save
-	 * - updates existing articles or creates new ones
+	 * Sets up editor options as needed for SP, temporarily ignores any user options
+	 * so we can enable it in the proper mode bbc/php/html
 	 */
-	private function _sportal_admin_article_edit_save()
+	private function prepareEditor()
 	{
-		global $context, $txt, $modSettings;
+		global $context, $options;
 
-		// No errors, yet.
-		$article_errors = Error_Context::context('article', 0);
-
-		// Use our standard validation functions in a few spots
-		require_once(SUBSDIR . '/DataValidator.class.php');
-		$validator = new Data_Validator();
-
-		// If its not new, lets load the current data
-		if (!$this->_is_new)
+		if ($context['article']['type'] !== 'bbc')
 		{
-			$_REQUEST['article_id'] = (int) $_REQUEST['article_id'];
-			$context['article'] = sportal_get_articles($_REQUEST['article_id']);
+			// Override user preferences for wizzy mode if they don't need it
+			$temp_editor = !empty($options['wysiwyg_default']);
+			$options['wysiwyg_default'] = false;
 		}
 
-		// Clean and Review the post data for compliance
-		$validator->sanitation_rules(array(
-			'title' => 'trim|Util::htmlspecialchars',
-			'namespace' => 'trim|Util::htmlspecialchars',
-			'article_id' => 'intval',
-			'category_id' => 'intval',
-			'permissions' => 'intval',
-			'styles' => 'intval',
-			'type' => 'trim',
-			'content' => 'trim'
-		));
-		$validator->validation_rules(array(
-			'title' => 'required',
-			'namespace' => 'alpha_numeric|required',
-			'type' => 'required',
-			'content' => 'required'
-		));
-		$validator->text_replacements(array(
-			'title' => $txt['sp_admin_articles_col_title'],
-			'namespace' => $txt['sp_admin_articles_col_namespace'],
-			'content' => $txt['sp_admin_articles_col_body']
-		));
-
-		// If you messed this up, back you go
-		if (!$validator->validate($_POST))
-		{
-			foreach ($validator->validation_errors() as $id => $error)
-			{
-				$article_errors->addError($error);
-			}
-
-			$this->action_edit();
-		}
-
-		// Lets make sure this namespace (article id) is unique
-		$has_duplicate = sp_duplicate_articles($validator->article_id, $validator->namespace);
-		if (!empty($has_duplicate))
-		{
-			$article_errors->addError('sp_error_article_namespace_duplicate');
-		}
-
-		// And we can't have just a numeric namespace (article id)
-		if (preg_replace('~[0-9]+~', '', $validator->namespace) === '')
-		{
-			$article_errors->addError('sp_error_article_namespace_numeric');
-		}
-
-		// Posting some PHP code, and allowed? Then we need to validate it will run
-		if ($_POST['type'] === 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
-		{
-			$validator_php = new Data_Validator();
-			$validator_php->validation_rules(array('content' => 'php_syntax'));
-
-			// Bad PHP code
-			if (!$validator_php->validate(array('content' => $_POST['content'])))
-			{
-				$article_errors->addError($validator_php->validation_errors());
-			}
-		}
-
-		// None shall pass ... with errors
-		if ($article_errors->hasErrors())
-		{
-			$this->action_edit();
-		}
-
-		// No errors then, prepare the data for saving
-		$article_info = array(
-			'id' => $validator->article_id,
-			'id_category' => $validator->category_id,
-			'namespace' => $validator->namespace,
-			'title' => $validator->title,
-			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
-			'type' => in_array($validator->type, array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
-			'permissions' => $validator->permissions,
-			'styles' => $validator->styles,
-			'status' => !empty($_POST['status']) ? 1 : 0,
+		// Fire up the editor with the values
+		$editor_options = array(
+			'id' => 'content',
+			'value' => $context['article']['body'],
+			'width' => '100%',
+			'height' => '275px',
+			'preview_type' => 2,
 		);
+		create_control_richedit($editor_options);
+		$context['post_box_name'] = $editor_options['id'];
+		$context['attached'] = '';
 
-		if ($article_info['type'] === 'bbc')
+		// Restore their settings
+		if (isset($temp_editor))
 		{
-			preparsecode($article_info['body']);
+			$options['wysiwyg_default'] = $temp_editor;
 		}
-
-		// Save away
-		checkSession();
-		sp_save_article($article_info, $this->_is_new);
-
-		redirectexit('action=admin;area=portalarticles');
-
-		return true;
 	}
 
 	/**
-	 * Toggle an articles status
+	 * Loads in permission, visibility and style profiles for use in the template
+	 * If unable to load profiles, simply dies as "somethings broke"tm
+	 */
+	private function loadProfileContext()
+	{
+		global $context;
+
+		$context['article']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
+		if (empty($context['article']['permission_profiles']))
+		{
+			fatal_lang_error('error_sp_no_permission_profiles', false);
+		}
+
+		$context['article']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
+		if (empty($context['article']['permission_profiles']))
+		{
+			fatal_lang_error('error_sp_no_style_profiles', false);
+		}
+
+		$context['article']['categories'] = sportal_get_categories();
+		if (empty($context['article']['categories']))
+		{
+			fatal_lang_error('error_sp_no_category', false);
+		}
+	}
+
+	private function article_attachment()
+	{
+		global $context, $txt;
+
+		// If there are attachments, calculate the total size and how many.
+		$this->_attachments = array();
+		$this->_attachments['total_size'] = 0;
+		$this->_attachments['quantity'] = 0;
+
+		// If this isn't a new article, check the current attachments.
+		if ($this->_is_aid)
+		{
+			$this->_attachments['quantity'] = count($context['attachments']['current']);
+			foreach ($context['attachments']['current'] as $attachment)
+			{
+				$this->_attachments['total_size'] += $attachment['size'];
+			}
+		}
+
+		if (!empty($_SESSION['temp_attachments']) && empty($_POST['preview']) && empty($_POST['submit']) && !$this->_is_aid)
+		{
+			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+			{
+				unset($_SESSION['temp_attachments'][$attachID]);
+				@unlink($attachment['tmp_name']);
+			}
+
+		}
+		elseif (!empty($_SESSION['temp_attachments']))
+		{
+			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
+			{
+				if ($attachID === 'initial_error')
+				{
+					$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div class="attachmenterrors">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
+					$this->attach_errors->addError('attach_initial_error');
+					unset($_SESSION['temp_attachments']);
+					break;
+				}
+
+				// Show any errors which might have occurred.
+				if (!empty($attachment['errors']))
+				{
+					$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
+					$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
+					foreach ($attachment['errors'] as $error)
+					{
+						$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
+					}
+					$txt['error_attach_errors'] .= '</div>';
+
+					$this->attach_errors->addError('attach_errors');
+
+					// Take out the trash.
+					unset($_SESSION['temp_attachments'][$attachID]);
+					@unlink($attachment['tmp_name']);
+
+					continue;
+				}
+
+				// More house keeping.
+				if (!file_exists($attachment['tmp_name']))
+				{
+					unset($_SESSION['temp_attachments'][$attachID]);
+					continue;
+				}
+
+				$this->_attachments['quantity']++;
+				$this->_attachments['total_size'] += $this->_attachments['size'];
+
+				$context['attachments']['current'][] = array(
+					'name' => '<u>' . htmlspecialchars($this->_attachments['name'], ENT_COMPAT, 'UTF-8') . '</u>',
+					'size' => $this->_attachments['size'],
+					'id' => $attachID,
+					'unchecked' => false,
+					'approved' => 1,
+				);
+			}
+		}
+	}
+
+	/**
+	 * Prepares template values for the attachment area such as space left,
+	 * types allowed, etc.
+	 *
+	 * Prepares the D&D JS initialization values
+	 */
+	private function article_attachment_dd()
+	{
+		global $context, $modSettings, $txt;
+
+		// If they've unchecked an attachment, they may still want to attach that many more files, but don't allow more than num_allowed_attachments.
+		$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
+		$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
+		$context['attachments']['restrictions'] = array();
+
+		if (!empty($modSettings['attachmentCheckExtensions']))
+		{
+			$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
+		}
+		else
+		{
+			$context['attachments']['allowed_extensions'] = '';
+		}
+
+		$context['attachments']['templates'] = array(
+			'add_new' => 'template_article_new_attachments',
+			'existing' => 'template_article_existing_attachments',
+		);
+
+		$attachmentRestrictionTypes = array('attachmentNumPerPostLimit', 'attachmentPostLimit', 'attachmentSizeLimit');
+		foreach ($attachmentRestrictionTypes as $type)
+		{
+			if (!empty($modSettings[$type]))
+			{
+				$context['attachments']['restrictions'][] = sprintf($txt['attach_restrict_' . $type], comma_format($modSettings[$type], 0));
+
+				// Show some numbers. If they exist.
+				if ($type === 'attachmentNumPerPostLimit' && $this->_attachments['quantity'] > 0)
+				{
+					$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], $modSettings['attachmentNumPerPostLimit'] - $this->_attachments['quantity']);
+				}
+				elseif ($type === 'attachmentPostLimit' && $this->_attachments['total_size'] > 0)
+				{
+					$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], comma_format(round(max($modSettings['attachmentPostLimit'] - ($this->_attachments['total_size'] / 1028), 0)), 0));
+				}
+			}
+		}
+
+		// Load up the drag and drop attachment magic
+		addInlineJavascript('
+		var dropAttach = dragDropAttachment.prototype.init({
+			board: 0,
+			allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
+			totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
+			individualSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit']) . ',
+			numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
+			totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
+			numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+			oTxt: ({
+				allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
+				totalSizeAllowed : ' . JavaScriptEscape($txt['attach_max_total_file_size']) . ',
+				individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
+				numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
+				postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
+			}),
+		});', true);
+	}
+
+	/**
+	 * Toggle an articles status on/off
 	 */
 	public function action_status()
 	{
@@ -599,6 +990,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 	/**
 	 * Remove an article from the system
+	 *
+	 * - Removes the article
+	 * - Removes attachments associated with an article
+	 * - Updates category totals to reflect removed items
 	 */
 	public function action_delete()
 	{

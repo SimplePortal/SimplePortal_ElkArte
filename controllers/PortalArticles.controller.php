@@ -19,7 +19,7 @@ if (!defined('ELK'))
  *
  * - This class handles requests for Article Functionality
  */
-class Article_Controller extends Action_Controller
+class Articles_Controller extends Action_Controller
 {
 	/**
 	 * This method is executed before any action handler.
@@ -36,12 +36,25 @@ class Article_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// Where do you want to go today? :P
-		$this->action_sportal_articles();
+		require_once(SUBSDIR . '/Action.class.php');
+
+		// add an subaction array to act accordingly
+		$subActions = array(
+			'article' => array($this, 'action_sportal_article'),
+			'articles' => array($this, 'action_sportal_articles'),
+			'spattach' => array($this, 'action_sportal_attach'),
+		);
+
+		// Setup the action handler
+		$action = new Action();
+		$subAction = $action->initialize($subActions, 'article');
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**
-	 * Load all articles for selection
+	 * Load all articles for selection, not used just yet
 	 */
 	public function action_sportal_articles()
 	{
@@ -89,7 +102,7 @@ class Article_Controller extends Action_Controller
 	}
 
 	/**
-	 * Display a chosen article
+	 * Display a chosen article, called from frontpage hook
 	 *
 	 * - Update the stats, like #views etc
 	 */
@@ -117,6 +130,13 @@ class Article_Controller extends Action_Controller
 
 		$context['article']['style'] = sportal_select_style($context['article']['styles']);
 		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
+
+		// Fetch attachments.
+		if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
+		{
+			loadJavascriptFile('topic.js');
+			$context['article']['attachment'] = sportal_load_attachment_context($context['article']['id']);
+		}
 
 		// Set up for the comment pagination
 		$total_comments = sportal_get_article_comment_count($context['article']['id']);
@@ -226,5 +246,180 @@ class Article_Controller extends Action_Controller
 		// Off to the template we go
 		$context['page_title'] = $context['article']['title'];
 		$context['sub_template'] = 'view_article';
+	}
+
+	/**
+	 * Downloads / shows an article attachment
+	 *
+	 * It requires the view_attachments permission.
+	 * It disables the session parser, and clears any previous output.
+	 * It is accessed via the query string ?action=portal;sa=spattach.
+	 */
+	public function action_sportal_attach()
+	{
+		global $txt, $modSettings, $context;
+
+		// Some defaults that we need.
+		$context['no_last_modified'] = true;
+
+		// Make sure some attachment was requested and they can view them
+		if (!isset($_GET['article'], $_GET['attach']))
+		{
+			fatal_lang_error('no_access', false);
+		}
+		isAllowedTo('view_attachments');
+
+		// We need to do some work on attachments.
+		$id_article = (int) $_GET['article'];
+		$id_attach = (int) $_GET['attach'];
+		$attachment = sportal_get_attachment_from_article($id_article, $id_attach);
+		if (empty($attachment))
+		{
+			fatal_lang_error('no_access', false);
+		}
+
+		list ($real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $width, $height) = $attachment;
+		$filename = $modSettings['sp_articles_attachment_dir'] . '/' . $id_attach . '_' . $file_hash . '.elk';
+
+		// This is done to clear any output that was made before now.
+		while (ob_get_level() > 0)
+		{
+			@ob_end_clean();
+		}
+
+		ob_start();
+		header('Content-Encoding: none');
+
+		// No point in a nicer message, because this is supposed to be an attachment anyway...
+		if (!file_exists($filename))
+		{
+			loadLanguage('Errors');
+
+			header((preg_match('~HTTP/1\.[01]~i', $_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 404 Not Found');
+			header('Content-Type: text/plain; charset=UTF-8');
+
+			// We need to die like this *before* we send any anti-caching headers as below.
+			die('404 - ' . $txt['attachment_not_found']);
+		}
+
+		// If it hasn't been modified since the last time this attachment was retrieved,
+		// there's no need to display it again.
+		if (!empty($_SERVER['HTTP_IF_MODIFIED_SINCE']))
+		{
+			list ($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
+			if (strtotime($modified_since) >= filemtime($filename))
+			{
+				@ob_end_clean();
+
+				// Answer the question - no, it hasn't been modified ;).
+				header('HTTP/1.1 304 Not Modified');
+			}   exit(0);
+		}
+
+		// Check whether the ETag was sent back, and cache based on that...
+		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
+		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
+		{
+			@ob_end_clean();
+
+			header('HTTP/1.1 304 Not Modified');
+			exit(0);
+		}
+
+		// Send the attachment headers.
+		header('Content-Transfer-Encoding: binary');
+		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
+		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($filename)) . ' GMT');
+		header('Accept-Ranges: bytes');
+		header('Connection: close');
+		header('ETag: ' . $eTag);
+
+		// Make sure the mime type warrants an inline display.
+		if (isset($_GET['image']) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
+		{
+			unset($_GET['image']);
+		}
+		// Does this have a mime type?
+		elseif (!empty($mime_type) && (isset($_GET['image']) || !in_array($file_ext, array('jpg', 'gif', 'jpeg', 'x-ms-bmp', 'png', 'psd', 'tiff', 'iff'))))
+		{
+			header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
+		}
+		else
+		{
+			header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
+			unset($_GET['image']);
+		}
+
+		$disposition = !isset($_GET['image']) ? 'attachment' : 'inline';
+
+		// Different browsers like different standards...
+		if (isBrowser('firefox'))
+		{
+			header('Content-Disposition: ' . $disposition . '; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)));
+		}
+		elseif (isBrowser('opera'))
+		{
+			header('Content-Disposition: ' . $disposition . '; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename) . '"');
+		}
+		elseif (isBrowser('ie'))
+		{
+			header('Content-Disposition: ' . $disposition . '; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)) . '"');
+		}
+		else
+		{
+			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
+		}
+
+		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
+		if (!isset($_GET['image']) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')))
+		{
+			header('Pragma: no-cache');
+			header('Cache-Control: no-cache');
+		}
+		else
+		{
+			header('Cache-Control: max-age=' . (525600 * 60) . ', private');
+		}
+
+		if (empty($modSettings['enableCompressedOutput']) || filesize($filename) > 4194304)
+		{
+			header('Content-Length: ' . filesize($filename));
+		}
+
+		// Try to buy some time...
+		@set_time_limit(600);
+
+		// Since we don't do output compression for files this large...
+		if (filesize($filename) > 4194304)
+		{
+			// Forcibly end any output buffering going on.
+			while (ob_get_level() > 0)
+			{
+				@ob_end_clean();
+			}
+
+			$fp = fopen($filename, 'rb');
+			while (!feof($fp))
+			{
+				if (isset($callback))
+				{
+					echo $callback(fread($fp, 8192));
+				}
+				else
+				{
+					echo fread($fp, 8192);
+				}
+
+				flush();
+			}
+			fclose($fp);
+		}
+		// On some of the less-bright hosts, readfile() is disabled.  It's just a faster, more byte safe, version of what's in the if.
+		elseif (isset($callback) || @readfile($filename) === null)
+		{
+			echo isset($callback) ? $callback(file_get_contents($filename)) : file_get_contents($filename);
+		}
+
+		obExit(false);
 	}
 }

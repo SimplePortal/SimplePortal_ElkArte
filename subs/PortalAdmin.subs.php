@@ -744,6 +744,8 @@ function sp_load_articles($start, $items_per_page, $sort)
  */
 function sp_delete_articles($article_ids = array())
 {
+	global $modSettings;
+
 	$db = database();
 
 	if (!is_array($article_ids))
@@ -758,6 +760,17 @@ function sp_delete_articles($article_ids = array())
 			'id' => $article_ids,
 		)
 	);
+
+	// Remove attachments, thumbs, etc for these articles
+	foreach ($article_ids as $aid)
+	{
+		$attachmentQuery = array(
+			'id_article' => $aid,
+			'id_folder' => $modSettings['sp_articles_attachment_dir'],
+		);
+
+		removeArticleAttachments($attachmentQuery);
+	}
 }
 
 /**

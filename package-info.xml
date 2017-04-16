@@ -26,6 +26,7 @@
 		<require-dir name="subs" destination="SOURCEDIR" />
 		<require-dir name="controllers" destination="SOURCEDIR" />
 		<require-dir name="themes" destination="BOARDDIR" />
+		<require-dir name="sp_attach" destination="BOARDDIR" />
 		<database>database.php</database>
 		<code>settings.php</code>
 		<hook hook="integrate_current_action" function="sp_integrate_current_action" file="SOURCEDIR/PortalIntegration.subs.php" />

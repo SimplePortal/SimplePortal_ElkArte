@@ -34,6 +34,7 @@ class Sportal_Controller extends Action_Controller
 			'credits' => array($this, 'action_sportal_credits'),
 			'resetlayout' => array($this, 'action_sportal_resetLayout'),
 			'userorder' => array($this, 'action_userblockorder'),
+			'spattach' => array('controller' => 'Articles_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalArticles.controller.php', 'function' => 'action_index'),
 		);
 
 		// We like action, so lets get ready for some
@@ -81,7 +82,6 @@ class Sportal_Controller extends Action_Controller
 			require_once(SUBSDIR . '/PortalArticle.subs.php');
 
 			// Set up the pages
-
 			$total_articles = sportal_get_articles_count();
 			$total = min($total_articles, !empty($modSettings['sp_articles_index_total']) ? $modSettings['sp_articles_index_total'] : 20);
 			$per_page = min($total, !empty($modSettings['sp_articles_index_per_page']) ? $modSettings['sp_articles_index_per_page'] : 5);

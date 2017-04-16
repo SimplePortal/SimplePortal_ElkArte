@@ -46,6 +46,7 @@ $helptxt['sp_articles_index_total'] = 'This sets the total number of articles th
 $helptxt['sp_articles_length'] = 'This setting allows a limit to be set on the amount of characters an article can display on the portal page. If the article exceeds this limit it will be shortened and have an ellipsis (...) link on the end, which allows the user to view the entire article.';
 $helptxt['sp_articles_per_page'] = 'This sets the maximum amount of articles shown per page on the article listing';
 $helptxt['sp_articles_comments_per_page'] = 'This sets the maximum amount articles comments per page';
+$helptxt['sp_articles_attachment_dir'] = 'The directory to save attachments uploaded with articles.  The directory must exist and be writable.  Do not use the standard attachment directory and don\'t change this unless you know what you are doing.';
 
 // Blocks area
 $helptxt['sp_BlocksArea'] = 'Blocks are boxes which can be displayed on the portal or inside the forum. This section enables existing blocks to be modified, and new ones to be created.';
@@ -146,6 +147,7 @@ $helptxt['sp_param_sp_boardNews_limit'] = 'The maximum number of news items to b
 $helptxt['sp_param_sp_boardNews_start'] = 'The ID of a particular post to start with (otherwise the first result will be used).';
 $helptxt['sp_param_sp_boardNews_length'] = 'If specified, posts exceeding this limit will be shortened and have an ellipsis (...), or a "Read More" link placed on the end.';
 $helptxt['sp_param_sp_boardNews_avatar'] = 'Enables avatars to be displayed for the member who posted the board news.';
+$helptxt['sp_param_sp_boardNews_attachment'] = 'Enables the first attachment to be displayed as a leading left floated image, giving a blog look to the block';
 $helptxt['sp_param_sp_boardNews_per_page'] = 'How many posts to display per page. Leave empty to disable pagination.';
 $helptxt['sp_param_sp_attachmentImage_limit'] = 'How many recently attached images to display.';
 $helptxt['sp_param_sp_attachmentImage_direction'] = 'Attachment images can be aligned horizontally or vertically.';
@@ -168,8 +170,10 @@ $helptxt['sp_param_sp_staff_lmod'] = 'Disables Local Moderators from being liste
 $helptxt['sp_param_sp_articles_category'] = 'The category to display articles from.';
 $helptxt['sp_param_sp_articles_limit'] = 'How many articles to display.';
 $helptxt['sp_param_sp_articles_type'] = 'Displays random articles, or the latest articles.';
-$helptxt['sp_param_sp_articles_length'] = 'If specified, articles exceeding this limit will be shortened and have an ellipsis (...) link placed on the end.';
+$helptxt['sp_param_sp_articles_view'] = 'Compact will display a simple list of article titles, linked to the article.  Full will display the article full text, or up to the limit characters';
+$helptxt['sp_param_sp_articles_length'] = 'If specified, full articles exceeding this limit will be shortened and have an ellipsis (...) link placed on the end.';
 $helptxt['sp_param_sp_articles_avatar'] = 'Enables the author avatar to be displayed along with the article.';
+$helptxt['sp_param_sp_articles_attachment'] = 'Enables the first article attachment to be displayed as a leading left floated image, giving a blog look to the article block.';
 $helptxt['sp_param_sp_gallery_limit'] = 'How many items to display.';
 $helptxt['sp_param_sp_gallery_type'] = 'Displays random or the latest gallery items.';
 $helptxt['sp_param_sp_gallery_direction'] = 'Gallery images can be aligned horizontally or vertically.';

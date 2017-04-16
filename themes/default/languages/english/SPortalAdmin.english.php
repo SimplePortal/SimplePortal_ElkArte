@@ -50,6 +50,8 @@ $txt['sp_articles_index_per_page'] = 'Articles Per Page on Portal Page';
 $txt['sp_articles_per_page'] = 'Articles Per Page on Article List';
 $txt['sp_articles_comments_per_page'] = 'Articles Comments Per Page';
 $txt['sp_articles_length'] = 'Maximum Characters Before Article Cut-off';
+$txt['sp_articles_attachment_dir'] = 'Articles Attachment Directory';
+
 
 // Blocks area
 $txt['sp-adminBlockListName'] = 'Block List';
@@ -214,9 +216,11 @@ $txt['sp_param_Rss_Feed_limit'] = 'Character Limit';
 $txt['sp_param_Staff_lmod'] = 'Disable Local Moderators';
 $txt['sp_param_Articles_category'] = 'Category';
 $txt['sp_param_Articles_limit'] = 'Articles to Display';
-$txt['sp_param_Articles_type'] = 'Display Type';
+$txt['sp_param_Articles_type'] = 'Type';
 $txt['sp_param_Articles_avatar'] = 'Author Avatar';
 $txt['sp_param_Articles_length'] = 'Maximum Characters';
+$txt['sp_param_Articles_attachment'] = 'Display first attachment';
+$txt['sp_param_Articles_view'] = 'Display';
 $txt['sp_param_Shoutbox_shoutbox'] = 'Shoutbox to Display';
 $txt['sp_param_Gallery_limit'] = 'Items to Display';
 $txt['sp_param_Gallery_type'] = 'Display';
@@ -238,19 +242,16 @@ $txt['sp_param_Board_Stats_refresh_value'] = 'Refresh value in seconds, 0 or bla
 
 // Parameter options
 $txt['sp_param_Top_Poster_type_options'] = 'All Time|Today|This Week|This Month';
-$txt['sp_param_Top_Stats_Member_type_options'] = 'Total Time Logged In|Posts|Good Karma|Bad Karma|Total Karma';
+$txt['sp_param_Top_Stats_Member_type_options'] = 'Total Time Logged In|Posts|Good Karma|Bad Karma|Total Karma|Likes Given|Likes Received|Likes Total';
 $txt['sp_param_Recent_type_options'] = 'Posts|Topics';
 $txt['sp_param_Recent_display_options'] = 'Compact|Full';
 $txt['sp_param_Top_Topics_type_options'] = 'Replies|Views';
 $txt['sp_param_Show_Poll_type_options'] = 'Normal|Recent|Random';
 $txt['sp_param_Attachment_Image_direction_options'] = 'Vertical|Horizontal';
 $txt['sp_param_Articles_type_options'] = 'Latest|Random';
+$txt['sp_param_Articles_view_options'] = 'Compact|Full';
 $txt['sp_param_Gallery_type_options'] = 'Latest|Random';
 $txt['sp_param_Gallery_direction_options'] = 'Vertical|Horizontal';
-$txt['sp_param_Arcade_type_options'] = 'Most Played|Best Players|Longest Champ';
-$txt['sp_param_Shop_style_options'] = 'Members|Items';
-$txt['sp_param_Shop_type_options'] = 'Total|Pocket|Bank';
-$txt['sp_param_Shop_sort_options'] = 'Recent|Random';
 $txt['sp_param_Blog_type_options'] = 'Articles|Blogs';
 $txt['sp_param_Blog_sort_options'] = 'Latest|Random';
 $txt['sp_param_Whos_Online_online_today_options'] = '|Count|List';

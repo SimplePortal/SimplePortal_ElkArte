@@ -186,7 +186,7 @@ function updateVisibilityProfiles($has_visibility_profiles)
 	{
 		// Add visibility profile col to sp_blocks
 		$db_table->db_add_column('{db_prefix}sp_blocks', array('name' => 'visibility', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true));
-		
+
 		// Read in the "old" data
 		$result = $db->query('', '
 			SELECT
@@ -708,6 +708,29 @@ function defineTables()
 			),
 			'indexes' => array(
 				array('type' => 'primary', 'columns' => array('id_shout')),
+			),
+		),
+		'sp_attachments' => array(
+			'columns' => array(
+				array('name' => 'id_attach', 'type' => 'int', 'size' => 10, 'auto' => true, 'unsigned' => true),
+				array('name' => 'id_thumb', 'type' => 'int', 'size' => 10, 'auto' => true, 'unsigned' => true),
+				array('name' => 'id_article', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true),
+				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+				array('name' => 'attachment_type', 'type' => 'tinyint', 'size' => 3, 'default' => ''),
+				array('name' => 'filename', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+				array('name' => 'file_hash', 'type' => 'varchar', 'size' => 40, 'default' => ''),
+				array('name' => 'fileext', 'type' => 'varchar', 'size' => 8, 'default' => ''),
+				array('name' => 'size', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true),
+				array('name' => 'width', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+				array('name' => 'height', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
+				array('name' => 'mime_type', 'type' => 'varchar', 'size' => 20, 'default' => ''),
+			)
+			'indexes' => array(
+				array('type' => 'primary', 'columns' => array('id_attach')),
+				array('type' => 'index', 'columns' => array('id_member', 'id_attach')),
+				array('type' => 'key', 'columns' => array('id_attach')),
+				array('type' => 'key', 'columns' => array('attachment_type')),
+				array('type' => 'key', 'columns' => array('id_thumb')),
 			),
 		),
 	);

@@ -34,6 +34,7 @@ $defaults = array(
 	'sp_articles_index_total' => 20,
 	'sp_articles_per_page' => 10,
 	'sp_articles_comments_per_page' => 20,
+	'sp_articles_attachment_dir' => BOARDDIR . '/sp_attach';
 );
 
 $updates = array(

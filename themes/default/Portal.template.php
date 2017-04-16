@@ -54,9 +54,10 @@ function template_portal_index()
 					</span>
 				</div>
 				<hr />
-				<div class="inner sp_inner">', $article['preview'], '<a href="', $article['href'], '">&hellip;</a></div>
+				<div class="inner sp_inner">', $article['preview'], '</div>
 				<div class="sp_article_extra">
-					<a href="', $article['href'], '">', $txt['sp_read_more'], '</a> | <a href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
+					<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
+					<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
 				</div>
 			</div>
 		</div>';
