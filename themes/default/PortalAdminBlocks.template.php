@@ -121,13 +121,8 @@ function template_block_edit()
 				', $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'], '
 			</h3>
 				<div class="sp_content_padding">
-					<dl class="sp_form">
-						<dt>
-							', $txt['sp-adminColumnType'], ':
-						</dt>
-						<dd>
-							', $context['SPortal']['block']['type_text'], '
-						</dd>
+					<h3 class="secondary_header">',$context['SPortal']['block']['type_text'], '</h3>
+					<dl class="sp_form content">
 						<dt>
 							<label for="block_name">', $txt['sp-adminColumnName'], ':</label>
 						</dt>
@@ -172,7 +167,10 @@ function template_block_edit()
 
 	echo '
 							</select>
-						</dd>';
+						</dd>
+					</dl>
+					<h3 class="secondary_header">', $txt['sp-adminBlockSettingsName'], '</h3>
+					<dl class="sp_form content">';
 
 	// Display any options that are available for this block
 	foreach ($context['SPortal']['block']['options'] as $name => $type)
@@ -183,9 +181,11 @@ function template_block_edit()
 		echo '
 						<dt>';
 
-		if (!empty($helptxt['sp_param_' . $context['SPortal']['block']['type'] . '_' . $name]))
+		// Look for the help text using legacyNaming
+		$helpvar = 'sp_param_sp_' . str_replace('_', '', lcfirst(ucwords($context['SPortal']['block']['type'], '_'))) . '_' . $name;
+		if (!empty($helptxt[$helpvar]))
 			echo '
-							<a class="help" href="', $scripturl, '?action=quickhelp;help=sp_param_', $context['SPortal']['block']['type'] , '_' , $name, '" onclick="return reqOverlayDiv(this.href);">
+							<a class="help" href="', $scripturl, '?action=quickhelp;help=', $helpvar, '" onclick="return reqOverlayDiv(this.href);">
 								<img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" />
 							</a>';
 
