@@ -239,6 +239,7 @@ table.sp_articles,
 
 .sp_inner {
 	border-top: 1px solid transparent;
+	min-height: 3em;
 }
 
 .sp_article_icon {
@@ -261,7 +262,7 @@ table.sp_articles,
 	clear: both;
 }
 
-.action_home .post .sp_attachment_thumb img {
+.sp_attachment_thumb img {
 	max-width: 240px;
 }
 
@@ -310,7 +311,6 @@ table.sp_articles,
 }
 
 #sp_main {
-	overflow: hidden;
 	width: 100%;
 	clear: both;
 }
@@ -323,7 +323,6 @@ table.sp_articles,
 }
 
 .sp_main_cell {
-	overflow: hidden;
 }
 
 #sp_left, #sp_right, #sp_center_top, #sp_center_bottom {
@@ -389,7 +388,7 @@ h3.sp_secondary_header {
 
 .sp_article_block_container {
 	overflow: auto;
-	margin: 0 0 1.6em 0;
+	margin: 0 0 .1em 0;
 	padding: 0 0 .5em 0;
 	border: 1px solid #CCCCCC;
 	border-top: none;
@@ -611,6 +610,10 @@ body {
 #sp_live_info div.sp_content_padding,
 #sp_general_info div.sp_content_padding {
 	height: 18ex;
+}
+
+#sp_view_category div.sp_content_padding {
+	margin-bottom: .25em;
 }
 
 #sp_credits p {
