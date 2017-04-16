@@ -102,6 +102,7 @@ class Categories_Controller extends Action_Controller
 			// Cut me mick
 			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
 			{
+				$context['articles'][$article['id']]['cut'] = true;
 				$article['body'] = Util::substr($article['body'], 0, $cutoff);
 				if ($article['type'] === 'bbc')
 				{
