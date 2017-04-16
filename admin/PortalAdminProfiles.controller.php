@@ -59,11 +59,8 @@ class ManagePortalProfile_Controller extends Action_Controller
 			'description' => $txt['sp_admin_profiles_desc'],
 			'tabs' => array(
 				'listpermission' => array(),
-				'addpermission' => array(),
 				'liststyle' => array(),
-				'addstyle' => array(),
 				'listvisibility' => array(),
-				'addvisibility' => array(),
 			),
 		);
 
@@ -219,7 +216,10 @@ class ManagePortalProfile_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="remove_profiles" value="' . $txt['sp_admin_profiles_remove'] . '" class="right_submit" />',
+					'value' => '<div class="submitbutton">
+						<input class="right_submit" type="submit" name="remove_profiles" value="' . $txt['sp_admin_profiles_remove'] . '" />
+						<a class="linkbutton floatright" href="' . $scripturl . '?action=admin;area=portalprofiles;sa=addpermission">' . $txt['sp_admin_profiles_add'] . '</a>
+						</div>',
 				),
 			),
 		);
@@ -316,12 +316,12 @@ class ManagePortalProfile_Controller extends Action_Controller
 			$context['profile'] = sportal_get_profiles($_REQUEST['profile_id']);
 
 			// Set the add tab
-			$context[$context['admin_menu_name']]['current_subsection'] = 'addpermission';
+			$context[$context['admin_menu_name']]['current_subsection'] = 'listpermission';
 		}
 
 		// Sub template time
 		$context['profile']['groups'] = sp_load_membergroups();
-		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_profiles_add'] : $txt['sp_admin_profiles_edit'];
+		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_permission_profiles_add'] : $txt['sp_admin_profiles_edit'];
 		$context['sub_template'] = 'permission_profiles_edit';
 	}
 
@@ -483,7 +483,10 @@ class ManagePortalProfile_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="remove_profiles" value="' . $txt['sp_admin_profiles_remove'] . '" class="right_submit" />',
+					'value' => '<div class="submitbutton">
+						<input class="right_submit" type="submit" name="remove_profiles" value="' . $txt['sp_admin_profiles_remove'] . '" />
+						<a class="linkbutton floatright" href="' . $scripturl . '?action=admin;area=portalprofiles;sa=addstyle">' . $txt['sp_admin_profiles_add'] . '</a>
+						</div>',
 				),
 			),
 		);
@@ -556,10 +559,10 @@ class ManagePortalProfile_Controller extends Action_Controller
 		{
 			$profile_id = (int) $_GET['profile_id'];
 			$context['profile'] = sportal_get_profiles($profile_id);
-
-			// Set the add tab
-			$context[$context['admin_menu_name']]['current_subsection'] = 'addstyle';
 		}
+
+		// Set the style tab
+		$context[$context['admin_menu_name']]['current_subsection'] = 'liststyle';
 
 		// We may not have much style, but we have class
 		$context['profile']['classes'] = array(
@@ -567,7 +570,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			'body' => array('portalbg', 'portalbg2', 'information', 'roundframe', 'custom'),
 		);
 
-		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_profiles_add'] : $txt['sp_admin_profiles_edit'];
+		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_style_profiles_add'] : $txt['sp_admin_profiles_edit'];
 		$context['sub_template'] = 'style_profiles_edit';
 	}
 
@@ -670,7 +673,10 @@ class ManagePortalProfile_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="remove_profiles" value="' . $txt['sp_admin_profiles_remove'] . '" class="right_submit" />',
+					'value' => '<div class="submitbutton">
+						<input class="right_submit" type="submit" name="remove_profiles" value="' . $txt['sp_admin_profiles_remove'] . '" />
+						<a class="linkbutton floatright" href="' . $scripturl . '?action=admin;area=portalprofiles;sa=addvisibility">' . $txt['sp_admin_profiles_add'] . '</a>
+						</div>',
 				),
 			),
 		);
@@ -741,10 +747,10 @@ class ManagePortalProfile_Controller extends Action_Controller
 		{
 			$profile_id = (int) $_GET['profile_id'];
 			$context['profile'] = sportal_get_profiles($profile_id);
-
-			// Set the add tab
-			$context[$context['admin_menu_name']]['current_subsection'] = 'addvisibility';
 		}
+
+		// Set the visibility tab
+		$context[$context['admin_menu_name']]['current_subsection'] = 'listvisibility';
 
 		// All the places we can add portal visibility
 		$context['profile']['actions'] = array(
@@ -771,7 +777,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 		// Load board, cat, page and article values for the template
 		$context['profile'] = array_merge($context['profile'], sp_block_template_helpers());
 
-		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_profiles_add'] : $txt['sp_admin_profiles_edit'];
+		$context['page_title'] = $context['is_new'] ? $txt['sp_admin_visibility_profiles_add'] : $txt['sp_admin_profiles_edit'];
 		$context['sub_template'] = 'visibility_profiles_edit';
 	}
 
