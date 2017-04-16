@@ -34,7 +34,7 @@ $defaults = array(
 	'sp_articles_index_total' => 20,
 	'sp_articles_per_page' => 10,
 	'sp_articles_comments_per_page' => 20,
-	'sp_articles_attachment_dir' => BOARDDIR . '/sp_attach';
+	'sp_articles_attachment_dir' => BOARDDIR . '/sp_attach',
 );
 
 $updates = array(
@@ -44,7 +44,9 @@ $updates = array(
 foreach ($defaults as $index => $value)
 {
 	if (!isset($modSettings[$index]))
+	{
 		$updates[$index] = $value;
+	}
 }
 
 updateSettings($updates);
@@ -67,4 +69,6 @@ elseif (file_exists($standalone_file))
 }
 
 if (ELK == 'SSI')
+{
 	echo 'Settings changes were carried out successfully.';
+}
