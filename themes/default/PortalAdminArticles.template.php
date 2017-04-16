@@ -142,7 +142,7 @@ function template_articles()
 	if ($context['show_spellchecking'])
 	{
 		echo '
-						<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'admin_form_wrapper\', \'message\', \'true\')" tabindex="', $context['tabindex']++, '" class="button_submit" />';
+						<input type="button" value="', $txt['spell_check'], '" onclick="spellCheckStart()" tabindex="', $context['tabindex']++, '" class="button_submit" />';
 	}
 
 	echo '
