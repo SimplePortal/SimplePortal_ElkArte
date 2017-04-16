@@ -40,12 +40,12 @@ function template_information()
 				</div>
 			</div>
 		</div>
-		<script src="http://www.simpleportal.net/sp/current-version.js"></script>
-		<script src="http://www.simpleportal.net/sp/latest-news.js"></script>
-		<script><!-- // --><![CDATA[
+		<script src="//simpleportal.net/sp/current-version.js"></script>
+		<script src="//simpleportal.net/sp/latest-news.js"></script>
+		<script>
 			function spSetAnnouncements()
 			{
-				if (typeof(window.spAnnouncements) == "undefined" || typeof(window.spAnnouncements.length) == "undefined")
+				if (typeof(window.spAnnouncements) === "undefined" || typeof(window.spAnnouncements.length) === "undefined")
 					return;
 
 				var str = "<div style=\"margin: 4px; font-size: 0.85em;\">";
@@ -85,7 +85,7 @@ function template_information()
 				spCurrentVersion();
 			}
 			addLoadEvent(func);
-		// ]]></script>';
+		</script>';
 	}
 
 	echo '
