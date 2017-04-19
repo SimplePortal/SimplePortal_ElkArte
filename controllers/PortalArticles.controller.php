@@ -74,7 +74,6 @@ class Articles_Controller extends Action_Controller
 
 		// Fetch the article page
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
-
 		foreach ($context['articles'] as $article)
 		{
 			// Want to cut this one a bit short?
@@ -90,6 +89,16 @@ class Articles_Controller extends Action_Controller
 
 			$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
 			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
+		}
+
+		// Auto video embedding enabled?
+		if (!empty($modSettings['enableVideoEmbeding']))
+		{
+			addInlineJavascript('
+		$(document).ready(function() {
+			$().linkifyvideo(oEmbedtext);
+		});', true
+			);
 		}
 
 		$context['linktree'][] = array(
@@ -242,6 +251,16 @@ class Articles_Controller extends Action_Controller
 				'name' => $context['article']['title'],
 			)
 		));
+
+		// Auto video embedding enabled?
+		if (!empty($modSettings['enableVideoEmbeding']))
+		{
+			addInlineJavascript('
+		$(document).ready(function() {
+			$().linkifyvideo(oEmbedtext);
+		});', true
+			);
+		}
 
 		// Off to the template we go
 		$context['page_title'] = $context['article']['title'];
