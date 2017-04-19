@@ -709,7 +709,7 @@ function sp_load_articles($start, $items_per_page, $sort)
 				'id' => $row['id_category'],
 				'name' => $row['name'],
 				'href' => $scripturl . '?category=' . $row['category_namespace'],
-				'link' => '<a href="' . $scripturl . '?category=' . $row['category_namespace'] . '">' . $row['name'] . '</a>',
+				'link' => '<a class="sp_cat_link" href="' . $scripturl . '?category=' . $row['category_namespace'] . '">' . $row['name'] . '</a>',
 			),
 			'author' => array(
 				'id' => $row['id_author'],

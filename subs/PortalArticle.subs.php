@@ -149,7 +149,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 				'category_id' => $row['category_namespace'],
 				'name' => $row['name'],
 				'href' => $scripturl . '?category=' . $row['category_namespace'],
-				'link' => '<a href="' . $scripturl . '?category=' . $row['category_namespace'] . '">' . $row['name'] . '</a>',
+				'link' => '<a class="sp_cat_link" href="' . $scripturl . '?category=' . $row['category_namespace'] . '">' . $row['name'] . '</a>',
 				'permissions' => $row['category_permissions'],
 			),
 			'author' => array(
