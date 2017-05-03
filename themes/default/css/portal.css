@@ -575,8 +575,7 @@ body {
 .sp_cat_link:link, .sp_cat_link:visited {
 	padding: 0 6px;
 	display: inline-block;
-	font-size: 0.857em;
-	line-height: 1.929em;
+	line-height: 1.3em;
 	border-radius: 2px;
 	border: 1px solid #afafaf;
 	border-top: 1px solid #cfcfcf;
@@ -638,8 +637,13 @@ body {
 	height: 18ex;
 }
 
-#sp_view_category div.sp_content_padding {
+#sp_view_category article.sp_content_padding {
 	margin-bottom: .25em;
+}
+
+.forumposts > article {
+	border: 1px solid #CFCFCF;
+	background: #FFFFFD;
 }
 
 #sp_credits p {

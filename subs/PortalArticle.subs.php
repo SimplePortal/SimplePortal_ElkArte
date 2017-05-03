@@ -369,7 +369,7 @@ function sportal_get_comments($article_id = null, $limit = null, $start = null)
 
 		$return[$row['id_comment']] = array(
 			'id' => $row['id_comment'],
-			'body' => parse_bbc($row['body']),
+			'body' => censorText(parse_bbc($row['body'])),
 			'time' => htmlTime($row['log_time']),
 			'author' => array(
 				'id' => $row['id_author'],

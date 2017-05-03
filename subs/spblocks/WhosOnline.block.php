@@ -160,7 +160,7 @@ function template_sp_whosOnline($data)
 				<li ', sp_embed_class('dot'), '> ', $txt['hidden'], ': ', $data['stats']['num_users_hidden'], '</li>';
 
 	// Online today count only?
-	if ($data['online_today'] === 1)
+	if ($data['online_today'] === 1 && !empty($context['num_onlinetoday']))
 		echo '
 				<li ', sp_embed_class('dot'), '> ', $txt['sp-online_today'], ': ', $context['num_onlinetoday'], '</li>';
 
@@ -169,7 +169,9 @@ function template_sp_whosOnline($data)
 	{
 		if (allowedTo('who_view') && !empty($modSettings['who_enabled']))
 			echo '
-				<li ', sp_embed_class('dot'), '><a href="' . $scripturl . '?action=who">', $txt['online_users'], '</a>: ', $data['stats']['num_users_online'], '</li>';
+				<li ', sp_embed_class('dot'), '>
+					<a href="' . $scripturl . '?action=who">', $txt['online_users'], '</a>: ', $data['stats']['num_users_online'], '
+				</li>';
 		else
 			echo '
 				<li ', sp_embed_class('dot'), '> ', $txt['online_users'], ' : ', $data['stats']['num_users_online'], '</li>';

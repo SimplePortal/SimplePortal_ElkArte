@@ -44,6 +44,7 @@ $txt['sp_posted_on_by'] = 'posted on %1$s by %2$s';
 $txt['sp_posted_by'] = 'posted %1$s by %2$s';
 $txt['sp_posted_in_on_by'] = 'posted in %1$s on %2$s by %3$s';
 $txt['sp_posted_on_in_by'] = 'posted %2$s in %1$s by %3$s';
+$txt['sp_articles_in_category'] = 'Articles in Category "%s"';
 
 $txt['sp_read_more'] = 'Read More';
 $txt['sp_write_comment'] = 'Write Comment';
