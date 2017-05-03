@@ -712,7 +712,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			$_REQUEST['article_id'] = $this->_is_aid;
 			$context['article'] = sportal_get_articles($this->_is_aid);
 			$attach = sportal_get_articles_attachments($this->_is_aid, true);
-			$context['attachments']['current'] = $attach[$this->_is_aid];
+			$context['attachments']['current'] = !empty($attach[$this->_is_aid]) ? $attach[$this->_is_aid] : array();
 		}
 	}
 
@@ -826,6 +826,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 		}
 	}
 
+	/**
+	 * Handles the checking of uploaded attachments and loads valid ones
+	 * into context
+	 */
 	private function article_attachment()
 	{
 		global $context, $txt;
@@ -835,8 +839,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$this->_attachments['total_size'] = 0;
 		$this->_attachments['quantity'] = 0;
 
-		// If this isn't a new article, check the current attachments.
-		if ($this->_is_aid)
+		// If this isn't a new article, account for any current attachments.
+		if ($this->_is_aid && !empty($context['attachments']))
 		{
 			$this->_attachments['quantity'] = count($context['attachments']['current']);
 			foreach ($context['attachments']['current'] as $attachment)
@@ -845,6 +849,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			}
 		}
 
+		// Any failed/aborted attachments left in session that we should clear
 		if (!empty($_SESSION['temp_attachments']) && empty($_POST['preview']) && empty($_POST['submit']) && !$this->_is_aid)
 		{
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
@@ -852,12 +857,13 @@ class ManagePortalArticles_Controller extends Action_Controller
 				unset($_SESSION['temp_attachments'][$attachID]);
 				@unlink($attachment['tmp_name']);
 			}
-
 		}
+		// New attachments to add
 		elseif (!empty($_SESSION['temp_attachments']))
 		{
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
+				// PHP upload error means we drop the file
 				if ($attachID === 'initial_error')
 				{
 					$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div class="attachmenterrors">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
@@ -886,7 +892,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 					continue;
 				}
 
-				// More house keeping.
+				// In session but the file is missing, then some house cleaning
 				if (!file_exists($attachment['tmp_name']))
 				{
 					unset($_SESSION['temp_attachments'][$attachID]);
