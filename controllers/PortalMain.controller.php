@@ -98,24 +98,11 @@ class Sportal_Controller extends Action_Controller
 
 			foreach ($context['articles'] as $article)
 			{
-				if (empty($modSettings['sp_articles_length']) && ($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
-				{
-					$article['body'] = Util::substr($article['body'], 0, $cutoff);
-					if ($article['type'] === 'bbc')
-					{
-						require_once(SUBSDIR . '/Post.subs.php');
-						preparsecode($article['body']);
-					}
-				}
-
-				$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
+				$context['articles'][$article['id']]['preview'] = censorText($article['body']);
 				$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
 
-				// Just want a shorter look on the index page
-				if (!empty($modSettings['sp_articles_length']))
-				{
-					$context['articles'][$article['id']]['preview'] = Util::shorten_html($context['articles'][$article['id']]['preview'], $modSettings['sp_articles_length']);
-				}
+				// Parse / shorten as required
+				$context['articles'][$article['id']]['cut'] = sportal_parse_cutoff_content($context['articles'][$article['id']]['preview'], $article['type'], $modSettings['sp_articles_length'], $context['articles'][$article['id']]['article_id']);
 			}
 		}
 	}

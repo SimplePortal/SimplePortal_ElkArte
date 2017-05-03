@@ -62,7 +62,7 @@ class Categories_Controller extends Action_Controller
 	 */
 	public function action_sportal_category()
 	{
-		global $context, $scripturl, $modSettings;
+		global $context, $scripturl, $modSettings, $txt;
 
 		// Basic article support
 		require_once(SUBSDIR . '/PortalArticle.subs.php');
@@ -99,20 +99,21 @@ class Categories_Controller extends Action_Controller
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', $context['category']['id'], $per_page, $start);
 		foreach ($context['articles'] as $article)
 		{
-			// Cut me mick
-			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
-			{
-				$context['articles'][$article['id']]['cut'] = true;
-				$article['body'] = Util::substr($article['body'], 0, $cutoff);
-				if ($article['type'] === 'bbc')
-				{
-					require_once(SUBSDIR . '/Post.subs.php');
-					preparsecode($article['body']);
-				}
-			}
-
-			$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
+			$context['articles'][$article['id']]['preview'] = censorText($article['body']);
 			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
+
+			// Parse / shorten as required
+			$context['articles'][$article['id']]['cut'] = sportal_parse_cutoff_content($context['articles'][$article['id']]['preview'], $article['type'], $modSettings['sp_articles_length'], $context['articles'][$article['id']]['article_id']);
+		}
+
+		// Auto video embedding enabled?
+		if (!empty($modSettings['enableVideoEmbeding']))
+		{
+			addInlineJavascript('
+				$(document).ready(function() {
+					$().linkifyvideo(oEmbedtext);
+				});', true
+			);
 		}
 
 		$context['linktree'][] = array(
@@ -120,7 +121,7 @@ class Categories_Controller extends Action_Controller
 			'name' => $context['category']['name'],
 		);
 
-		$context['page_title'] = $context['category']['name'];
+		$context['page_title'] = sprintf($txt['sp_articles_in_category'], $context['category']['name']);
 		$context['sub_template'] = 'view_category';
 	}
 }

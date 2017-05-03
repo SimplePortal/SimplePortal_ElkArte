@@ -170,29 +170,17 @@ class Board_News_Block extends SP_Abstract_Block
 		$this->data['news'] = array();
 		while ($row = $this->_db->fetch_assoc($request))
 		{
-			// Using the cutoff tag?
-			$limited = false;
-			if (($cutoff = Util::strpos($row['body'], '[cutoff]')) !== false)
-			{
-				require_once(SUBSDIR . '/Post.subs.php');
-
-				$row['body'] = Util::substr($row['body'], 0, $cutoff);
-				preparsecode($row['body']);
-				$limited = true;
-			}
-
 			// Good time to do this is ... now
 			censorText($row['subject']);
 			censorText($row['body']);
 
 			$attach = !empty($attachments) ? $this->getMessageAttach($row['id_msg'], $row['id_topic'], $row['body']) : '';
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+			$limited = sportal_parse_cutoff_content($row['body'], 'bbc', $length);
 
-			// Shorten the text if needed, link the ellipsis if the body has been shortened.
-			if ($limited || !empty($length))
+			// Link the ellipsis if the body has been shortened.
+			if ($limited)
 			{
-				$ellip = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">&hellip;</a>';
-				$row['body'] = Util::shorten_html($row['body'], $length, $ellip, false);
+				$row['body'] .= '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">&hellip;</a>';
 			}
 
 			if (empty($modSettings['messageIconChecks_disable']) && !isset($this->icon_sources[$row['icon']]))

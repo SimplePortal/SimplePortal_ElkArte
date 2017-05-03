@@ -1469,6 +1469,73 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 }
 
 /**
+ * Shortens the lenght of a string.
+ *
+ * What it does:
+ * - If the string is pure html or bcc (parsed) it will properly shorten it to that many
+ * characters, accounting as best it can for presentational tags etc.
+ * - Will use [cutoff] tag if present as primary and passed lenght second
+ * - If no shortening is defined (cutoff or lenght), it returns the full parsed string
+ *
+ * @param string $body
+ * @param string $type
+ * @param int $length
+ * @param string|null $link_id
+ *
+ * @return bool
+ */
+function sportal_parse_cutoff_content(&$body, $type, $length = 0, $link_id = null)
+{
+	global $scripturl;
+
+	$cutoff = Util::strpos($body, '[cutoff]');
+	$cutoff = empty($cutoff) ? $length : $cutoff;
+
+	// Going to shorten this string?
+	if (!empty($cutoff))
+	{
+		switch ($type)
+		{
+			case 'bbc':
+				// Protect the cutoff tag so parse_bbc does not remove it
+				$body = str_replace('[cutoff]', '&#91;cutoff]', $body);
+				$body = sportal_parse_content($body, $type, 'return');
+
+				// With the bbc_parse done, determine character or marker length of plain text
+				$cutoff = Util::strpos(strip_tags($body), '&#91;cutoff]');
+				$cutoff = empty($cutoff) ? $length : $cutoff;
+
+				// Cut it at that many characters, well close anyway :D
+				$body = Util::shorten_html($body, $cutoff, '');
+				break;
+			case 'html':
+				// Strip tags and cut at the cutoff character count
+				$body = un_htmlspecialchars($body);
+				$body = preg_replace('~\x{00a0}~siu',' ',$body);
+				$cutoff = Util::strpos(strip_tags($body), '[cutoff]');
+				$cutoff = empty($cutoff) ? $length : $cutoff;
+				$body = Util::shorten_html($body, $cutoff, '');
+				break;
+			default:
+				$body = sportal_parse_content($body, $type, 'return');
+				$body = Util::substr($body, 0, $cutoff);
+		}
+
+		// Link the ellipsis if told
+		if (!empty($link_id))
+		{
+			$body .= '<a href="' . $scripturl . '?article=' . $link_id . '"><b>&hellip;</b></a>';
+		}
+	}
+	else
+	{
+		$body = sportal_parse_content($body, $type, 'return');
+	}
+
+	return !empty($cutoff);
+}
+
+/**
  * Prepare body text to be of type, html, bbc, php, etc
  *
  * @param string $body the string of text to treat as $type
@@ -1503,7 +1570,8 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 			}
 			else
 			{
-				return un_htmlspecialchars($body);
+				$body = un_htmlspecialchars($body);
+				return preg_replace('~\x{00a0}~su',' ',$body);
 			}
 			break;
 		case 'php':

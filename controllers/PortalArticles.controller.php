@@ -76,28 +76,20 @@ class Articles_Controller extends Action_Controller
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
 		foreach ($context['articles'] as $article)
 		{
-			// Want to cut this one a bit short?
-			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
-			{
-				$article['body'] = Util::substr($article['body'], 0, $cutoff);
-				if ($article['type'] === 'bbc')
-				{
-					require_once(SUBSDIR . '/Post.subs.php');
-					preparsecode($article['body']);
-				}
-			}
-
-			$context['articles'][$article['id']]['preview'] = sportal_parse_content($article['body'], $article['type'], 'return');
+			$context['articles'][$article['id']]['preview'] = censorText($article['body']);
 			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
+
+			// Parse and cut as needed
+			$context['articles'][$article['id']]['cut'] = sportal_parse_cutoff_content($context['articles'][$article['id']]['preview'], $article['type'], $modSettings['sp_articles_length'], $context['articles'][$article['id']]['article_id']);
 		}
 
 		// Auto video embedding enabled?
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
 			addInlineJavascript('
-		$(document).ready(function() {
-			$().linkifyvideo(oEmbedtext);
-		});', true
+				$(document).ready(function() {
+					$().linkifyvideo(oEmbedtext);
+				});', true
 			);
 		}
 
@@ -138,6 +130,7 @@ class Articles_Controller extends Action_Controller
 		}
 
 		$context['article']['style'] = sportal_select_style($context['article']['styles']);
+		$context['article']['body'] = censorText($context['article']['body']);
 		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
 
 		// Fetch attachments.
@@ -256,9 +249,9 @@ class Articles_Controller extends Action_Controller
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
 			addInlineJavascript('
-		$(document).ready(function() {
-			$().linkifyvideo(oEmbedtext);
-		});', true
+				$(document).ready(function() {
+					$().linkifyvideo(oEmbedtext);
+				});', true
 			);
 		}
 

@@ -146,28 +146,12 @@ class Articles_Block extends SP_Abstract_Block
 
 		foreach ($this->data['articles'] as $aid => $article)
 		{
-			// Using the cutoff tag?
-			$limited = false;
-			if (($cutoff = Util::strpos($article['body'], '[cutoff]')) !== false)
-			{
-				$article['body'] = Util::substr($article['body'], 0, $cutoff);
-				preparsecode($article['body']);
-				$limited = true;
-			}
-
 			// Good time to do this is ... now
 			censorText($article['subject']);
 			censorText($article['body']);
 
-			$article['body'] = sportal_parse_content($article['body'], $article['type'], 'return');
-
-			// Shorten the text, link the ellipsis, etc as needed
-			if ($limited || !empty($this->data['length']))
-			{
-				$ellip = '<a href="' . $scripturl . '?article=' . $article['article_id'] . '">&hellip;</a>';
-				$article['body'] = $limited ? $article['body'] . $ellip : Util::shorten_html($article['body'], $this->data['length'], $ellip, false);
-				$article['cut'] = true;
-			}
+			// Parse and optionally shorten the result
+			$article['cut'] = sportal_parse_cutoff_content($article['body'], $article['type'], $modSettings['sp_articles_length'], $article['article_id']);
 
 			if ($modSettings['sp_resize_images'])
 			{
