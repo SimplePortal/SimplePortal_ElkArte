@@ -30,7 +30,7 @@ function template_view_articles()
 		</div>';
 	}
 
-	foreach ($context['articles'] as $article)
+	foreach ($context['articles'] as $id => $article)
 	{
 		echo '
 			<div class="sp_content_padding">
@@ -52,7 +52,7 @@ function template_view_articles()
 					<h4>', $article['link'], '</h4>
 				</div>
 				<hr />
-				<p class="inner sp_inner">', $article['preview'], '<a href="', $article['href'], '">...</a></p>
+				<div id="msg_', $id, '" class="inner sp_inner">', $article['preview'], '<a href="', $article['href'], '">...</a></div>
 				<div class="sp_article_extra">
 					<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
 					<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
@@ -80,14 +80,14 @@ function template_view_article()
 	global $context, $txt;
 
 	echo '
-	<div id="sp_view_article">';
+	<article id="sp_view_article">';
 
 	if (empty($context['article']['style']['no_title']))
 	{
 		echo '
-		<h3', strpos($context['article']['style']['title']['class'], 'custom') === false ? ' class="' . $context['article']['style']['title']['class'] . '"' : '', !empty($context['article']['style']['title']['style']) ? ' style="' . $context['article']['style']['title']['style'] . '"' : '', '>
+		<h1', strpos($context['article']['style']['title']['class'], 'custom') === false ? ' class="' . $context['article']['style']['title']['class'] . '"' : '', !empty($context['article']['style']['title']['style']) ? ' style="' . $context['article']['style']['title']['style'] . '"' : '', '>
 			', $context['article']['title'], '
-		</h3>';
+		</h1>';
 	}
 
 	echo '
@@ -115,7 +115,7 @@ function template_view_article()
 					</span>
 				</div>
 				<hr />
-				<div class="inner sp_inner">' ,
+				<div id="msg_', $context['article']['id'], '" class="inner sp_inner">' ,
 					$context['article']['body'];
 
 	// Assuming there are attachments...
@@ -132,7 +132,7 @@ function template_view_article()
 	if (empty($context['preview']))
 	{
 		echo '
-		<div id="sp_view_comments">
+		<section id="sp_view_comments">
 			<h3 class="category_header">
 				', $txt['sp-comments'], '
 			</h3>';
@@ -182,7 +182,7 @@ function template_view_article()
 		if ($context['article']['can_comment'])
 		{
 			echo '
-			<div id="sp_comment" class="sp_content_padding">
+			<section id="sp_comment" class="sp_content_padding">
 					<form action="', $context['article']['href'], '" method="post" accept-charset="UTF-8">
 					<textarea name="body" rows="5" cols="50" style="width: 100%;padding: 0.1em 0.2em" tabindex="', $context['tabindex']++, '">', !empty($context['article']['comment']['body']) ? $context['article']['comment']['body'] : '', '</textarea>
 					<div class="submitbutton">
@@ -191,15 +191,15 @@ function template_view_article()
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 				</form>
-			</div>';
+			</section>';
 		}
 
 		echo '
-		</div>';
+		</section>';
 	}
 
 	echo '
-	</div>';
+	</article>';
 
 	if (!empty($context['using_relative_time']))
 		addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
@@ -219,7 +219,7 @@ function template_sp_display_attachments($article, $ignoring)
 	foreach ($article['attachment'] as $attachment)
 	{
 		echo '
-								<div class="attachment_block">';
+								<figure class="attachment_block">';
 
 		if ($attachment['is_image'])
 		{
@@ -234,10 +234,11 @@ function template_sp_display_attachments($article, $ignoring)
 		}
 
 		echo '
-										<a href="', $attachment['href'], '" class="attachment_name">', $attachment['name'], '</a>
-										<span class="attachment_details">', $attachment['size'], ($attachment['is_image'] ? ' / ' . $attachment['real_width'] . 'x' . $attachment['real_height'] : ''), '</span>';
+										<figcaption><a href="', $attachment['href'], '" class="attachment_name">', $attachment['name'], '</a>
+											<span class="attachment_details">', $attachment['size'], ($attachment['is_image'] ? ' / ' . $attachment['real_width'] . 'x' . $attachment['real_height'] : ''), '</span>
+										</figcaption>';
 		echo '
-								</div>';
+								</figure>';
 	}
 
 	echo '

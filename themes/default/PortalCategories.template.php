@@ -28,10 +28,10 @@ function template_view_categories()
 	foreach ($context['categories'] as $category)
 	{
 		echo '
-			<div class="sp_content_padding">
-				<h4>', $category['link'], '</h4>
-				<p>', $category['description'], '</p>
-				<span>', sprintf($category['articles'] == 1 ? $txt['sp_has_article'] : $txt['sp_has_articles'], $category['articles']) ,'</span>
+		<div class="sp_content_padding">
+			<h4>', $category['link'], '</h4>
+			<p>', $category['description'], '</p>
+			<span>', sprintf($category['articles'] == 1 ? $txt['sp_has_article'] : $txt['sp_has_articles'], $category['articles']) ,'</span>
 		</div>';
 	}
 
@@ -47,7 +47,7 @@ function template_view_category()
 	global $context, $txt;
 
 	echo '
-	<div id="sp_view_category" class="forumposts">
+	<section id="sp_view_category" class="forumposts">
 		<h3 class="category_header">
 			', $context['page_title'], '
 		</h3>';
@@ -61,7 +61,7 @@ function template_view_category()
 	foreach ($context['articles'] as $article)
 	{
 		echo '
-		<div class="sp_content_padding">
+		<article class="sp_content_padding">
 			<div class="sp_article_detail">';
 
 		if (!empty($article['author']['avatar']['image']))
@@ -78,18 +78,18 @@ function template_view_category()
 				<h4>', $article['link'], '</h4>
 			</div>
 			<hr />
-			<div class="inner sp_inner">', $article['preview'], (!empty($article['cut']) ? '<a href="' . $article['href'] . '">&hellip;</a>' : ''), '
+			<div id="msg_', $article['id'], '" class="inner sp_inner">', $article['preview'], '
 				<div class="sp_article_extra">',
 					(!empty($article['cut']) ? '<a class="linkbutton" href="' . $article['href'] . '">' . $txt['sp_read_more'] . '</a>' : ''),
-					(!empty($article['comment_count']) ? '<a class="linkbutton" href="' . $article['href'] . '">' . $txt['sp-articlesComments'] . '</a>' : ''),
-					'<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
+					(!empty($article['comment_count']) ? '<a class="linkbutton" href="' . $article['href'] . '#sp_view_comments">' . $txt['sp-articlesComments'] . '</a>' : ''),
+					'<a class="linkbutton" href="', $article['href'], '#sp_comment">', $txt['sp_write_comment'], '</a>
 				</div>
 			</div>
-		</div>';
+		</article>';
 	}
 
 	echo '
-	</div>';
+	</section>';
 
 	// Pages as well?
 	if (!empty($context['page_index']))
