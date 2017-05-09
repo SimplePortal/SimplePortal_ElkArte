@@ -844,7 +844,7 @@ function sportal_get_articles_attachments($articles, $template = false)
 	$request = $db->query('', '
 		SELECT
 			a.id_attach, a.id_article, a.filename, a.file_hash, IFNULL(a.size, 0) AS filesize, a.width, a.height,
-			IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width, thumb.height
+			IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height
 		FROM {db_prefix}sp_attachments AS a
 			LEFT JOIN {db_prefix}sp_attachments AS thumb ON (thumb.id_attach = a.id_thumb)
 		WHERE a.id_article IN ({array_int:article_list})
