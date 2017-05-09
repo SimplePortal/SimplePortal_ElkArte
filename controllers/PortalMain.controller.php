@@ -100,6 +100,7 @@ class Sportal_Controller extends Action_Controller
 			{
 				$context['articles'][$article['id']]['preview'] = censorText($article['body']);
 				$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
+				$context['articles'][$article['id']]['time'] = $article['date'];
 
 				// Parse / shorten as required
 				$context['articles'][$article['id']]['cut'] = sportal_parse_cutoff_content($context['articles'][$article['id']]['preview'], $article['type'], $modSettings['sp_articles_length'], $context['articles'][$article['id']]['article_id']);

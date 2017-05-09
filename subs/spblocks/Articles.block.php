@@ -235,7 +235,7 @@ class Articles_Block extends SP_Abstract_Block
 	 * Load the attachment details into context
 	 *
 	 * - If the article was found to have attachments (via loadAttachments) then
-	 * it will load that attachment data into context for use in the templae
+	 * it will load that attachment data into context for use in the template
 	 * - If the message did not have attachments, it is then searched for the first
 	 * bbc IMG tag, and that image is used.
 	 *

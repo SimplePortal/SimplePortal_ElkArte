@@ -78,6 +78,7 @@ class Articles_Controller extends Action_Controller
 		{
 			$context['articles'][$article['id']]['preview'] = censorText($article['body']);
 			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
+			$context['articles'][$article['id']]['time'] = $article['date'];
 
 			// Parse and cut as needed
 			$context['articles'][$article['id']]['cut'] = sportal_parse_cutoff_content($context['articles'][$article['id']]['preview'], $article['type'], $modSettings['sp_articles_length'], $context['articles'][$article['id']]['article_id']);
@@ -154,6 +155,7 @@ class Articles_Controller extends Action_Controller
 		$context['article']['comments'] = sportal_get_comments($context['article']['id'], $per_page, $start);
 
 		// Prepare the final template details
+		$context['article']['time'] = $context['article']['date'];
 		$context['article']['date'] = htmlTime($context['article']['date']);
 		$context['article']['can_comment'] = $context['user']['is_logged'];
 		$context['article']['can_moderate'] = allowedTo('sp_admin') || allowedTo('sp_manage_articles');
@@ -254,6 +256,9 @@ class Articles_Controller extends Action_Controller
 				});', true
 			);
 		}
+
+		$context['description'] = trim(preg_replace('~<[^>]+>~', ' ', $context['article']['body']));
+		$context['description'] = Util::shorten_text(preg_replace('~\s\s+|&nbsp;|&quot;|&#039;~', ' ', $context['description']), 384, true);
 
 		// Off to the template we go
 		$context['page_title'] = $context['article']['title'];
