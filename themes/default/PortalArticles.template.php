@@ -115,7 +115,7 @@ function template_view_article()
 					</span>
 				</div>
 				<hr />
-				<div id="msg_', $context['article']['id'], '" class="inner sp_inner">' ,
+				<div id="msg_', $context['article']['id'], '" class="messageContent inner sp_inner">' ,
 					$context['article']['body'];
 
 	// Assuming there are attachments...
@@ -201,8 +201,71 @@ function template_view_article()
 	echo '
 	</article>';
 
+	template_article_schema_script();
+
 	if (!empty($context['using_relative_time']))
 		addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
+}
+
+/**
+ * Output schema.org data as ld+json
+ */
+function template_article_schema_script()
+{
+	global $context, $boardurl;
+
+	$post = trim(preg_replace('~<[^>]+>~', ' ', $context['article']['body']));
+	$description = Util::shorten_text(preg_replace('~\s\s+~', ' ', $post));
+
+	$smd = array(
+		'@context' => 'http://schema.org',
+		'@type' => 'Article',
+		'headline' => $context['article']['title'],
+		'author' => array(
+			'@type' => 'Person',
+			'name' => $context['article']['author']['name'],
+		),
+		'url' => $context['article']['href'],
+		'commentCount' => $context['article']['comment_count'],
+		'datePublished' => standardTime($context['article']['time']),
+		'description' => $description,
+		'wordCount' => str_word_count($post),
+		'publisher' => array(
+			'@type' => 'Organization',
+			'name' => $context['forum_name'],
+			'logo' => array(
+				'@type' => 'ImageObject',
+				'url' => $context['header_logo_url_html_safe'],
+				'width' => 120,
+				'height' => 60,
+			),
+		),
+		'mainEntityOfPage' => array(
+			'@type' => 'WebPage',
+			'@id' => !empty($context['canonical_url']) ? $context['canonical_url'] : $boardurl,
+		),
+	);
+
+	// If there are attachments, use the first as the image
+	if (!empty($context['article']['attachment']))
+	{
+		foreach ($context['article']['attachment'] as $attachment)
+		{
+			$smd['image'] = array(
+				'@type' => 'ImageObject',
+				'url' => $attachment['href'],
+				'width' => $attachment['real_width'],
+				'height' => $attachment['real_height']
+			);
+
+			break;
+		}
+	}
+
+	echo '
+	<script type="application/ld+json">
+    ', json_encode($smd, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), '
+    </script>';
 }
 
 /**
