@@ -360,13 +360,13 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			if (strpos($context['widths'][1], '%') !== false)
 			{
 				$val = substr($context['widths'][1], 0, strpos($context['widths'][1], '%'));
-				$context['widths'][2] = $context['widths'][3] = 100 - ($val + $context['widths'][4]) . '%';
+				$context['widths'][2] = $context['widths'][3] = 100 - ($val + (int) $context['widths'][4]) . '%';
 				$context['widths'][5] = $context['widths'][6] = '100%';
 			}
 			elseif (strpos($context['widths'][1], 'px') !== false)
 			{
 				$val = substr($context['widths'][1], 0, strpos($context['widths'][1], 'px'));
-				$context['widths'][2] = $context['widths'][3] = 960 - ($val + $context['widths'][4]) . 'px';
+				$context['widths'][2] = $context['widths'][3] = 960 - ($val + (int) $context['widths'][4]) . 'px';
 				$context['widths'][5] = $context['widths'][6] = '960px';
 			}
 

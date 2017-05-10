@@ -511,11 +511,23 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 		ORDER BY spb.col, spb.row', $parameters
 	);
 	$return = array();
+	$show_it = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		if (!empty($show) && !sportal_check_visibility($row['visibility']))
+		if (!empty($show))
 		{
-			continue;
+			if (isset($show_it[$row['visibility']]) && $show_it[$row['visibility']] === false)
+			{
+				continue;
+			}
+			elseif (!isset($show_it[$row['visibility']]))
+			{
+				$show_it[$row['visibility']] = sportal_check_visibility($row['visibility']);
+				if ($show_it[$row['visibility']] === false)
+				{
+					continue;
+				}
+			}
 		}
 
 		if (!isset($return[$row['id_block']]))
@@ -561,19 +573,20 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 function sportal_process_visibility($query)
 {
 	global $context, $modSettings;
+	static $page_info, $category_info, $article_info;
 
 	// Fetch any page, category or article as needed
-	if (!empty($_GET['page']) && (empty($context['current_action']) || $context['current_action'] === 'portal'))
+	if (!empty($_GET['page']) && empty($page_info) && (empty($context['current_action']) || $context['current_action'] === 'portal'))
 	{
 		$page_info = sportal_get_pages($_GET['page'], true, true);
 	}
 
-	if (!empty($_GET['category']) && (empty($context['current_action']) || $context['current_action'] === 'portal'))
+	if (!empty($_GET['category']) && empty($category_info) && (empty($context['current_action']) || $context['current_action'] === 'portal'))
 	{
 		$category_info = sportal_get_categories($_GET['category'], true, true);
 	}
 
-	if (!empty($_GET['article']) && (empty($context['current_action']) || $context['current_action'] === 'portal'))
+	if (!empty($_GET['article']) && empty($article_info) && (empty($context['current_action']) || $context['current_action'] === 'portal'))
 	{
 		require_once(SUBSDIR . '/PortalArticle.subs.php');
 		$article_info = sportal_get_articles($_GET['article'], true, true);
