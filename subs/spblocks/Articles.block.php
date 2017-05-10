@@ -116,8 +116,8 @@ class Articles_Block extends SP_Abstract_Block
 			return;
 		}
 
-		// Get the first attachment for each article for this group
-		if (!empty($attachments) && !empty($this->data['view']))
+		// Get the first image attachment for each article for this group
+		if (!empty($attachments) && !empty($this->data['view']) && !empty($this->data['articles']['has_attachments']))
 		{
 			$this->loadAttachments();
 		}
@@ -140,7 +140,7 @@ class Articles_Block extends SP_Abstract_Block
 	 */
 	private function prepare_view()
 	{
-		global $scripturl, $modSettings;
+		global $modSettings;
 
 		require_once(SUBSDIR . '/Post.subs.php');
 
@@ -195,7 +195,9 @@ class Articles_Block extends SP_Abstract_Block
 	}
 
 	/**
-	 * Load the first available attachments in an article (if any) for a group of articles0
+	 * Load the first available attachment in an article (if any) for a group of articles
+	 *
+	 * - Does not check permission, assumes article access has been vetted
 	 */
 	protected function loadAttachments()
 	{
@@ -210,7 +212,7 @@ class Articles_Block extends SP_Abstract_Block
 		$attachments = sportal_get_articles_attachments($articles);
 		$modSettings['attachmentShowImages'] = $attachmentShowImages;
 
-		// For each article, grab the first image attachment
+		// For each article, grab the first *image* attachment
 		foreach ($attachments as $id_article => $attach)
 		{
 			if (!isset($this->data['articles'][$id_article]['attachments']))

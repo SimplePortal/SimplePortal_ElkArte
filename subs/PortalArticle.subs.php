@@ -124,11 +124,12 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 			spa.type, spa.date, spa.status, spa.permissions AS article_permissions, spa.views, spa.comments, spa.styles,
 			spc.permissions AS category_permissions, spc.name, spc.namespace AS category_namespace,
 			m.avatar, IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name, m.email_address,
-			a.id_attach, a.attachment_type, a.filename
+			a.id_attach, a.attachment_type, a.filename, COUNT(att.id_article) AS attachment_count
 		FROM {db_prefix}sp_articles AS spa
 			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spa.id_member)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)' . (!empty($query) ? '
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
+			LEFT JOIN {db_prefix}sp_attachments AS att ON (att.id_article = spa.id_article)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}' . (!empty($limit) ? '
 		LIMIT {int:start}, {int:limit}' : ''), $parameters
@@ -179,6 +180,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 			'view_count' => $row['views'],
 			'comment_count' => $row['comments'],
 			'status' => $row['status'],
+			'has_attachments' => $row['attachment_count']
 		);
 	}
 	$db->free_result($request);
@@ -231,6 +233,51 @@ function sportal_get_articles_in_cat_count($catid)
 	$db->free_result($request);
 
 	return $total_articles;
+}
+
+/**
+ * Checks if a member has access to an article
+ *
+ * Checks permissions and that the article and category are active
+ *
+ * @param int $id_article article to check access
+ * @return bool
+ */
+function sportal_article_access($id_article)
+{
+	global $context;
+
+	if (empty($id_article))
+	{
+		return false;
+	}
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT 
+			spa.id_article
+		FROM {db_prefix}sp_articles AS spa
+			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
+		WHERE spa.id_article = {int:id_article}
+		 	AND spa.status = {int:article_status}
+			AND spc.status = {int:category_status}
+			AND {raw:article_permissions}
+			AND {raw:category_permissions}
+		LIMIT {int:limit}',
+		array(
+			'id_article' => $id_article,
+			'article_status' => 1,
+			'category_status' => 1,
+			'article_permissions' => sprintf($context['SPortal']['permissions']['query'], 'spa.permissions'),
+			'category_permissions' => sprintf($context['SPortal']['permissions']['query'], 'spc.permissions'),
+			'limit' => 1,
+		)
+	);
+	list ($total_articles) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return !empty($total_articles);
 }
 
 /**
@@ -823,7 +870,7 @@ function createArticleAttachment(&$attachmentOptions)
  * Get all attachments associated with an article or set of articles.
  *
  * What it does:
- *  - This does not check permissions.
+ *  - This does *not* check permissions.
  *
  * @param int|int[] $articles array of article ids
  * @param bool $template if to load some data into context

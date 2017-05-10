@@ -134,8 +134,8 @@ class Articles_Controller extends Action_Controller
 		$context['article']['body'] = censorText($context['article']['body']);
 		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
 
-		// Fetch attachments.
-		if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
+		// Fetch attachments, if there are any
+		if (!empty($modSettings['attachmentEnable']) && !empty($context['article']['has_attachments']))
 		{
 			loadJavascriptFile('topic.js');
 			$context['article']['attachment'] = sportal_load_attachment_context($context['article']['id']);
@@ -284,7 +284,12 @@ class Articles_Controller extends Action_Controller
 		{
 			fatal_lang_error('no_access', false);
 		}
-		isAllowedTo('view_attachments');
+
+		// No funny business, you need to have access to the article to see its attachments
+		if (sportal_article_access($_GET['article']) === false)
+		{
+			fatal_lang_error('no_access', false);
+		}
 
 		// We need to do some work on attachments.
 		$id_article = (int) $_GET['article'];
