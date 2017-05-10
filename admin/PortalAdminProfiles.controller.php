@@ -182,7 +182,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '<a href="?action=admin;area=portalprofiles;sa=editpermission;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
-								<a href="?action=admin;area=portalprofiles;sa=deletepermission;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_articles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+								<a href="?action=admin;area=portalprofiles;sa=deletepermission;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_profiles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
 								'id' => true,
 							),
@@ -449,7 +449,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'sprintf' => array(
 							'format' => '
 								<a href="?action=admin;area=portalprofiles;sa=editstyle;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
-								<a href="?action=admin;area=portalprofiles;sa=deletestyle;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_articles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+								<a href="?action=admin;area=portalprofiles;sa=deletestyle;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_profiles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
 								'id' => true,
 							),
@@ -639,7 +639,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 						'sprintf' => array(
 							'format' => '
 								<a href="?action=admin;area=portalprofiles;sa=editvisibility;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
-								<a href="?action=admin;area=portalprofiles;sa=deletevisibility;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_articles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+								<a href="?action=admin;area=portalprofiles;sa=deletevisibility;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_profiles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
 							'params' => array(
 								'id' => true,
 							),
