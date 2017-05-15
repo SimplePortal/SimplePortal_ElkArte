@@ -124,12 +124,11 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 			spa.type, spa.date, spa.status, spa.permissions AS article_permissions, spa.views, spa.comments, spa.styles,
 			spc.permissions AS category_permissions, spc.name, spc.namespace AS category_namespace,
 			m.avatar, IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name, m.email_address,
-			a.id_attach, a.attachment_type, a.filename, COUNT(att.id_article) AS attachment_count
+			a.id_attach, a.attachment_type, a.filename
 		FROM {db_prefix}sp_articles AS spa
 			INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spa.id_member)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
-			LEFT JOIN {db_prefix}sp_attachments AS att ON (att.id_article = spa.id_article)' . (!empty($query) ? '
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}' . (!empty($limit) ? '
 		LIMIT {int:start}, {int:limit}' : ''), $parameters
@@ -180,10 +179,24 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 			'view_count' => $row['views'],
 			'comment_count' => $row['comments'],
 			'status' => $row['status'],
-			'has_attachments' => $row['attachment_count']
+			'has_attachments' => false
 		);
 	}
 	$db->free_result($request);
+
+	// No results, nothing else to do
+	if (empty($return))
+	{
+		return array();
+	}
+
+	// Flag which ones have attachments
+	$id_articles = array_keys($return);
+	$has_attachments = sportal_article_has_attachments($id_articles);
+	foreach ($has_attachments as $id_article => $article)
+	{
+		$return[$id_article]['has_attachments'] = $has_attachments[$id_article];
+	}
 
 	// Use color profiles?
 	if (!empty($member_ids) && sp_loadColors($member_ids) !== false)
@@ -882,6 +895,11 @@ function sportal_get_articles_attachments($articles, $template = false)
 
 	$db = database();
 
+	if (empty($articles))
+	{
+		return array();
+	}
+
 	if (!is_array($articles))
 	{
 		$articles = array($articles);
@@ -1066,4 +1084,45 @@ function sportal_get_attachment_from_article($article, $attach)
 	$db->free_result($request);
 
 	return $attachmentData;
+}
+
+/**
+ * Get attachment count for a article or group of articles
+ *
+ * @param int|int[] $articles the article id
+ * @return array
+ */
+function sportal_article_has_attachments($articles)
+{
+	$db = database();
+
+	if (empty($articles))
+	{
+		return array();
+	}
+
+	if (!is_array($articles))
+	{
+		$articles = (array) $articles;
+	}
+
+	// Make sure this attachment is part of this article
+	$request = $db->query('', '
+		SELECT 
+			id_article, COUNT(id_attach) AS number
+		FROM {db_prefix}sp_attachments
+		WHERE id_article IN ({array_int:articles})
+		GROUP BY id_article',
+		array(
+			'articles' => $articles,
+		)
+	);
+	$attachments = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$attachments[$row['id_article']] = $row['number'];
+	}
+	$db->free_result($request);
+
+	return $attachments;
 }

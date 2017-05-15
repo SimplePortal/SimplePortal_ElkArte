@@ -117,7 +117,7 @@ class Articles_Block extends SP_Abstract_Block
 		}
 
 		// Get the first image attachment for each article for this group
-		if (!empty($attachments) && !empty($this->data['view']) && !empty($this->data['articles']['has_attachments']))
+		if (!empty($attachments) && !empty($this->data['view']))
 		{
 			$this->loadAttachments();
 		}
@@ -208,7 +208,17 @@ class Articles_Block extends SP_Abstract_Block
 		// We will show attachments in the block, regardless, so save and restore
 		$attachmentShowImages = $modSettings['attachmentShowImages'];
 		$modSettings['attachmentShowImages'] = 1;
-		$articles = array_keys($this->data['articles']);
+		$articles = array();
+
+		// Just ones with attachments
+		foreach ($this->data['articles'] as $id_article => $article)
+		{
+			if (!empty($article['has_attachments']))
+			{
+				$articles[] = $id_article;
+			}
+		}
+
 		$attachments = sportal_get_articles_attachments($articles);
 		$modSettings['attachmentShowImages'] = $attachmentShowImages;
 
@@ -332,7 +342,7 @@ function template_sp_articles($data)
 		{
 			echo '
 			<h3 class="secondary_header">',
-				$article['title'], '
+			$article['title'], '
 			</h3>
 			<div id="msg_', $article['article_id'], '" class="sp_article_content">
 				<div class="sp_content_padding">';
@@ -378,10 +388,14 @@ function template_sp_articles($data)
 						</div>';
 			}
 
-			echo
-						$article['body'], '
+			echo '
+					<div class="sp_article_block">',
+			$article['body'], '
 					</div>
-				<div class="righttext"><a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a></div>
+				</div>
+				<div class="righttext">
+					<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
+				</div>
 			</div>
 		</div>';
 		}
