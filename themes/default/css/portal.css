@@ -143,27 +143,32 @@ hr {
 
 .sp_image {
 	padding: 5px;
-	min-width: 150px;
-	min-height: 225px;
+	min-width: 175px;
+	max-width: 200px;
+	min-height: 200px;
 	border: 1px solid #CCCCCC;
 	text-align: center;
-	white-space: nowrap;
+	word-wrap: break-word;
 	line-height: 1.4em;
+	overflow: hidden;
 }
 
 .sp_image_topic {
 	overflow: hidden;
-	max-width: 150px;
+	max-width: 200px;
 	text-overflow: ellipsis;
-	white-space: pre;
 	font-style: italic;
+}
+
+.sp_image .sp_attach_title {
+	white-space: nowrap;
 }
 
 .sp_image a img {
 	display: block;
 	margin: auto;
-	max-width: 125px;
-	max-height: 125px;
+	max-width: 145px;
+	max-height: 145px;
 }
 
 .sp_search {
@@ -395,6 +400,10 @@ h3.sp_secondary_header {
 	border-radius: 5px;
 	background: transparent;
 	box-shadow: 4px 6px 3px -5px rgba(0, 0, 0, 0.4);
+}
+
+.sp_article_block .bbc_list {
+	overflow: hidden;
 }
 
 .portalbg {

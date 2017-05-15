@@ -152,11 +152,14 @@ function template_sp_attachmentImage($data)
 					<div class="sp_image smalltext">',
 						($data['showLink'] ? '<a href="' . $item['file']['href'] . '">' . str_replace(array('_', '-'), ' ', $item['file']['filename']) . '</a><br />' : '') . '
 						<a id="link_' . $id . '" href="' . $scripturl . '?action=dlattach;topic=' . $item['topic']['id'] . '.0;attach=' . $id . ';image">
-						<img id="thumb_' . $id . '" src="' . $scripturl . '?action=dlattach;topic=' . $item['topic']['id'] . '.0;attach=' . $item['file']['image']['id'] . ';image" alt="' . $item['file']['filename'] . '" /></a>
-						<br />' .
-						($data['showLink'] ? '<div class="sp_image_topic">' . $item['topic']['link'] . '</div>' : '') .
+							<img id="thumb_' . $id . '" src="' . $scripturl . '?action=dlattach;topic=' . $item['topic']['id'] . '.0;attach=' . $item['file']['image']['id'] . ';image" alt="' . $item['file']['filename'] . '" />
+						</a>
+						<br />
+						<div class="sp_image_topic">' .
+						($data['showLink'] ? $item['topic']['link'] . '<br />': '') .
 						($data['showDownloads'] ? $txt['downloads'] . ': ' . $item['file']['downloads'] . '<br />' : ''),
 						($data['showPoster'] ? $txt['posted_by'] . ': ' . $item['member']['link'] : ''), '
+						</div>
 					</div>
 				</td>', $after;
 	}

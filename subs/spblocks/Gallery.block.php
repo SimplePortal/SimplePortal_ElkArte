@@ -148,13 +148,18 @@ function template_sp_gallery_aeva_media($item, $data)
 	global $scripturl, $txt;
 
 	echo '
-		<a href="', $scripturl, '?action=media;sa=item;in=', $item['id'], '">', $item['title'], '</a><br />' . ($data['fancybox_enabled'] ? '
-		<a href="' . $scripturl . '?action=media;sa=media;in=' . $item['id'] . '" rel="gallery" data-fancybox="1">' : '
-		<a href="' . $scripturl . '?action=media;sa=item;in=' . $item['id'] . '">') . '
-		<img src="', $scripturl, '?action=media;sa=media;in=', $item['id'], ';thumb" alt="" /></a><br />
+		<a class="sp_attach_title" href="', $scripturl, '?action=media;sa=item;in=', $item['id'], '">', $item['title'], '</a>
+		<br />' . ($data['fancybox_enabled']
+		? '<a href="' . $scripturl . '?action=media;sa=media;in=' . $item['id'] . '" rel="gallery" data-fancybox="1">'
+		: '<a href="' . $scripturl . '?action=media;sa=item;in=' . $item['id'] . '">') . '
+			<img src="', $scripturl, '?action=media;sa=media;in=', $item['id'], ';thumb" alt="" />
+		</a>
+		<br />
+		<div class="sp_image_topic">
 		', $txt['aeva_views'], ': ', $item['views'], '<br />
 		', $txt['aeva_posted_by'], ': <a href="', $scripturl, '?action=profile;u=', $item['poster_id'], '">', $item['poster_name'], '</a><br />
-		', $txt['aeva_in_album'], ': <a href="', $scripturl, '?action=media;sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>';
+		', $txt['aeva_in_album'], ': <a href="', $scripturl, '?action=media;sa=album;in=', $item['id_album'], '">', $item['album_name'], '</a>
+		</div>';
 }
 
 /**
