@@ -288,7 +288,7 @@ function template_block_edit()
 					<dl class="sp_form">';
 		}
 
-		if ($type != 'bbc')
+		if ($type != 'bbc' && $type != 'textarea')
 			echo '
 						</dd>';
 	}

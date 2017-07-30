@@ -282,7 +282,7 @@ function template_shoutbox_xml()
 	{
 		echo '
 	<updated>1</updated>
-	<error>', empty($context['SPortal']['shouts']) ? $txt['sp_shoutbox_no_shout'] : 0, '</error>
+	<error>', empty($context['SPortal']['shouts']) ? Util::htmlspecialchars($txt['sp_shoutbox_no_shout'], ENT_COMPAT, 'UTF-8', true) : 0, '</error>
 	<warning>', !empty($context['SPortal']['shoutbox']['warning']) 	? Util::htmlspecialchars($context['SPortal']['shoutbox']['warning'], ENT_COMPAT, 'UTF-8', true) : 0, '</warning>
 	<reverse>', !empty($context['SPortal']['shoutbox']['reverse']) ? 1 : 0, '</reverse>';
 

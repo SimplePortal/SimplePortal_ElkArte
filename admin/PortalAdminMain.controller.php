@@ -343,15 +343,21 @@ class ManagePortalConfig_Controller extends Action_Controller
 					array(
 						'title' => $txt['sp-info_groups_dev'],
 						'members' => array(
-							'<span onclick="if (getInnerHTML(this).indexOf(\'Sinan\') == -1) setInnerHTML(this, \'Sinan &quot;[SiNaN]&quot; &Ccedil;evik\'); return false;">Selman &quot;[SiNaN]&quot; Eser</span>',
-							'&#12487;&#12451;&#12531;1031',
+							'<span onclick="if (getInnerHTML(this).indexOf(\'Sinan\') === -1) setInnerHTML(this, \'Sinan &quot;[SiNaN]&quot; &Ccedil;evik\'); return false;">Selman &quot;[SiNaN]&quot; Eser</span>',
 							'Nathaniel Baxter',
+							'&#12487;&#12451;&#12531;1031',
+							'spuds',
+							'emanuele',
 						),
 					),
 					array(
 						'title' => $txt['sp-info_groups_support'],
 						'members' => array(
-							'<span onclick="if (getInnerHTML(this).indexOf(\'Queen\') == -1) setInnerHTML(this, \'Angelina &quot;Queen of Support&quot; Belle\'); return false;">AngelinaBelle</span>',
+							'<span onclick="if (getInnerHTML(this).indexOf(\'Queen\') === -1) setInnerHTML(this, \'Angelina &quot;Queen of Support&quot; Belle\'); return false;">AngelinaBelle</span>',
+							'Chen Zhen',
+							'andy',
+							'Ninja ZX-10RR',
+							'phantomm',
 						),
 					),
 					array(
@@ -365,26 +371,28 @@ class ManagePortalConfig_Controller extends Action_Controller
 					array(
 						'title' => $txt['sp-info_groups_language'],
 						'members' => array(
+							'Kryzen',
 							'Jade &quot;Alundra&quot; Elizabeth',
-							'<span onclick="if (getInnerHTML(this).indexOf(\'King\') == -1) setInnerHTML(this, \'130 &quot;King of Pirates&quot; 860\'); return false;">130860</span>',
+							'<span onclick="if (getInnerHTML(this).indexOf(\'King\') === -1) setInnerHTML(this, \'130 &quot;King of Pirates&quot; 860\'); return false;">130860</span>',
 						),
 					),
 					array(
 						'title' => $txt['sp-info_groups_marketing'],
 						'members' => array(
-							'Runic',
+							'BryanD',
 						),
 					),
 					array(
 						'title' => $txt['sp-info_groups_beta'],
 						'members' => array(
-							'&#214;zg&#252;r',
-							'Willerby',
+							'BurkeKnight',
+							'ARG',
+							'Old Fossil',
 							'David',
-							'Dr. Deejay',
-							'Brack1',
+							'sharks',
+							'Willerby',
+							'&#214;zg&#252;r',
 							'c23_Mike',
-							'Underdog',
 						),
 					),
 				),

@@ -56,7 +56,7 @@ function sp_integrate_admin_areas(&$admin_areas)
 		$admin_areas[$area] = $data;
 
 		// Add in our admin menu option after layout aka forum
-		if ($area == 'layout')
+		if ($area === 'layout')
 		{
 			$admin_areas['portal'] = array(
 				'title' => $txt['sp-adminCatTitle'],
@@ -498,9 +498,9 @@ function sp_integrate_buffer($tourniquet)
 {
 	global $sportal_version, $context, $modSettings, $forum_version;
 
-	$fix = str_replace('{version}', $sportal_version, '<a href="http://www.simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-2017</a>');
+	$fix = str_replace('{version}', $sportal_version, '<a href="https://simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . strftime('%Y') . '</a>');
 
-	if ((ELK == 'SSI' && empty($context['standalone'])) || !Template_Layers::getInstance()->hasLayers() || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
+	if ((ELK === 'SSI' && empty($context['standalone'])) || !Template_Layers::getInstance()->hasLayers() || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
 	{
 		return $tourniquet;
 	}
@@ -616,11 +616,17 @@ function sp_integrate_redirect(&$setLocation)
  */
 function sp_integrate_boardindex()
 {
-	global $context;
+	global $context, $modSettings, $scripturl;
 
 	if (!empty($_GET) && $_GET !== array('action' => 'forum'))
 	{
 		$context['robot_no_index'] = true;
+	}
+
+	// Set the board index canonical URL correctly when portal mode is set to front page
+	if (!empty($modSettings['sp_portal_mode']) && $modSettings['sp_portal_mode'] == 1 && empty($context['disable_sp']))
+	{
+		$context['canonical_url'] = $scripturl . '?action=forum';
 	}
 }
 
@@ -634,7 +640,7 @@ function sp_integrate_current_action(&$current_action)
 	global $modSettings, $context;
 
 	// If it is home, it may be something else
-	if ($current_action == 'home')
+	if ($current_action === 'home')
 	{
 		$current_action = $modSettings['sp_portal_mode'] == 3 && empty($context['standalone']) && empty($context['disable_sp'])
 			? 'forum' : 'home';
