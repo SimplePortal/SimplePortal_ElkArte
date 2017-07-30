@@ -228,7 +228,7 @@ function template_visibility_profiles_edit()
 						<select id="query_list">';
 
 	// Select list used to populate the profile_query input field
-	$options = array($txt['sp-adminother'] => '', 'all' => 'all', 'allaction' => 'allaction', 'allboard' => 'allboard',	'allpage' => 'allpage', 'allcategory' => 'allcategory', 'allarticle' => 'allarticle');
+	$options = array($txt['sp-adminother'] => $context['profile']['query'], 'all' => 'all', 'allaction' => 'allaction', 'allboard' => 'allboard',	'allpage' => 'allpage', 'allcategory' => 'allcategory', 'allarticle' => 'allarticle');
 	foreach ($options as $option => $value)
 	{
 		echo '
