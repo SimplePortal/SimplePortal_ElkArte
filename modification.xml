@@ -84,7 +84,7 @@
 	<file name="SUBSDIR/BoardsList.class.php">
 		<operation>
 			<search position="replace"><![CDATA[					'href' => $this->_scripturl . '#c' . $row_board['id_cat'],]]></search>
-			<add><![CDATA[					'href' => $this->_scripturl . '#forumc' . $row_board['id_cat'],]]></add>
+			<add><![CDATA[					'href' => $this->_scripturl . '?action=forum#c' . $row_board['id_cat'],]]></add>
 		</operation>
 	</file>
 
