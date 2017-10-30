@@ -29,26 +29,6 @@
 		</operation>
 	</file>
 
-	<file name="SUBSDIR/Recent.subs.php">
-		<operation>
-			<search position="replace"><![CDATA[				'href' => $scripturl . '#c' . $row['id_cat'],
-				'link' => '<a href="' . $scripturl . '#c' . $row['id_cat'] . '">' . $row['cname'] . '</a>']]></search>
-			<add><![CDATA[				'href' => $scripturl . '?action=forum#c' . $row['id_cat'],
-				'link' => '<a href="' . $scripturl . '?action=forum#c' . $row['id_cat'] . '">' . $row['cname'] . '</a>']]></add>
-		</operation>
-	</file>
-
-	<file name="CONTROLLERDIR/Recent.controller.php">
-		<operation>
-			<search position="replace"><![CDATA[					'url' => $scripturl . '#c' . $categories[0],]]></search>
-			<add><![CDATA[					'url' => $scripturl . '?action=forum#c' . $categories[0],]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[				'url' => $scripturl . '#c' . (int) $_REQUEST['c'][0],]]></search>
-			<add><![CDATA[				'url' => $scripturl . '?action=forum#c' . (int) $_REQUEST['c'][0],]]></add>
-		</operation>
-	</file>
-
 	<file name="SOURCEDIR/Subs.php">
 		<operation error="ignore">
 			<search position="replace"><![CDATA[			// For parsed content, we must recurse to avoid security problems.
@@ -67,6 +47,9 @@
 
 			$tag['after'] = strtr($tag['after'], array('$1' => $data));]]></add>
 		</operation>
+	</file>
+
+	<file name="THEMEDIR/Theme.php">
 		<operation>
 			<search position="replace"><![CDATA['admin_forum', 'manage_boards']]></search>
 			<add><![CDATA['admin_forum', 'manage_boards', 'sp_admin', 'sp_manage_settings', 'sp_manage_blocks', 'sp_manage_articles', 'sp_manage_pages', 'sp_manage_shoutbox']]></add>
@@ -81,30 +64,10 @@
 		</operation>
 	</file>
 
-	<file name="SUBSDIR/BoardsList.class.php">
-		<operation>
-			<search position="replace"><![CDATA[					'href' => $this->_scripturl . '#c' . $row_board['id_cat'],]]></search>
-			<add><![CDATA[					'href' => $this->_scripturl . '?action=forum#c' . $row_board['id_cat'],]]></add>
-		</operation>
-	</file>
-
-	<file name="CONTROLLERDIR/Markasread.controller.php">
-		<operation>
-			<search position="replace"><![CDATA[		if (isset($_SESSION['topicseen_cache']))
-			$_SESSION['topicseen_cache'] = array();
-
-		return '';]]></search>
-			<add><![CDATA[		if (isset($_SESSION['topicseen_cache']))
-			$_SESSION['topicseen_cache'] = array();
-
-		return 'action=forum';]]></add>
-		</operation>
-	</file>
-
 	<file name="THEMEDIR/scripts/script.js">
 		<operation>
 			<search position="replace"><![CDATA['#c']]></search>
-			<add><![CDATA['?action=forum#c']]></add>
+			<add><![CDATA[elk_forum_action . '#c']]></add>
 		</operation>
 	</file>
 

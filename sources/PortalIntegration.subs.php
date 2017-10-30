@@ -500,7 +500,7 @@ function sp_integrate_buffer($tourniquet)
 
 	$fix = str_replace('{version}', $sportal_version, '<a href="https://simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . strftime('%Y') . '</a>');
 
-	if ((ELK === 'SSI' && empty($context['standalone'])) || !Template_Layers::getInstance()->hasLayers() || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
+	if ((ELK === 'SSI' && empty($context['standalone'])) || !Template_Layers::instance()->hasLayers() || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
 	{
 		return $tourniquet;
 	}

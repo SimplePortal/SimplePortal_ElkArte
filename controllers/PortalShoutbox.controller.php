@@ -134,7 +134,7 @@ class Shoutbox_Controller extends Action_Controller
 			$context['SPortal']['shouts'] = sportal_get_shouts($shoutbox_id, $shout_parameters);
 
 			// Return a clean xml response
-			Template_Layers::getInstance()->removeAll();
+			Template_Layers::instance()->removeAll();
 			$context['sub_template'] = 'shoutbox_xml';
 			$context['SPortal']['updated'] = empty($context['SPortal']['shoutbox']['last_update']) || $context['SPortal']['shoutbox']['last_update'] > $request_time;
 
