@@ -161,9 +161,9 @@ function sportal_init($standalone = false)
 	$context['SPortal']['on_portal'] = sportal_process_visibility('portal');
 
 	// Add the portal template
-	if (!Template_Layers::getInstance()->hasLayers(true) && !in_array('portal', Template_Layers::getInstance()->getLayers()))
+	if (!Template_Layers::instance()->hasLayers(true) && !in_array('portal', Template_Layers::instance()->getLayers()))
 	{
-		Template_Layers::getInstance()->add('portal');
+		Template_Layers::instance()->add('portal');
 	}
 }
 

@@ -353,7 +353,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$context['sub_template'] = 'articles';
 
 		// The article above/below template
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = Template_Layers::instance();
 		$template_layers->add('articles_edit');
 
 		// Page out values
