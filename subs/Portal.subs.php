@@ -4,15 +4,11 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2017 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0 RC1
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
 
 /**
  * Initializes the portal, outputs all the blocks as needed
@@ -23,7 +19,7 @@ function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings, $maintenance, $sportal_version;
 
-	$sportal_version = '1.0.0 Beta 2';
+	$sportal_version = '1.0.0 RC1';
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 	{

@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2017 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0 RC1
  */
 
 if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
@@ -38,7 +38,7 @@ $defaults = array(
 );
 
 $updates = array(
-	'sp_version' => '1.0 Beta 2',
+	'sp_version' => '1.0 RC1',
 );
 
 foreach ($defaults as $index => $value)
