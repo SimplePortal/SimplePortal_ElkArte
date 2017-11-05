@@ -41,6 +41,10 @@ $data = substr(file_get_contents($forum_dir . '/index.php'), 0, 4096);
 if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $data, $match))
 {
 	$forum_version = 'ElkArte ' . $match[1];
+	if (!defined('FORUM_VERSION'))
+	{
+		define('FORUM_VERSION', $forum_version);
+	}
 }
 
 // Load the SSI magic.

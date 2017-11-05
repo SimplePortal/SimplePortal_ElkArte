@@ -90,7 +90,7 @@ function sportal_init($standalone = false)
 		require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');
 
 		// Not running via ssi then we need to get SSI for its functions
-		if (ELK !== 'SSI')
+		if (ELK !== 'ELKBOOT')
 		{
 			require_once(BOARDDIR . '/SSI.php');
 		}

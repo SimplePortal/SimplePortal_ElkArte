@@ -14,6 +14,13 @@ if (!defined('ELK'))
 	die('No access...');
 }
 
+function sp_integrate_actions_allow()
+{
+	global $context;
+
+	$context['allow_admin'] = $context['allow_admin'] && allowedTo(array('admin_forum', 'manage_boards', 'sp_admin', 'sp_manage_settings', 'sp_manage_blocks', 'sp_manage_articles', 'sp_manage_pages', 'sp_manage_shoutbox'));
+}
+
 /**
  * integration hook integrate_actions
  * Called from dispatcher.class, used to add in custom actions
@@ -496,7 +503,7 @@ function sp_integrate_quickhelp()
  */
 function sp_integrate_buffer($tourniquet)
 {
-	global $sportal_version, $context, $modSettings, $forum_version;
+	global $sportal_version, $context, $modSettings;
 
 	$fix = str_replace('{version}', $sportal_version, '<a href="https://simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . strftime('%Y') . '</a>');
 
@@ -506,17 +513,17 @@ function sp_integrate_buffer($tourniquet)
 	}
 
 	// Don't display copyright for things like SSI.
-	if (!isset($forum_version))
+	if (!defined('FORUM_VERSION'))
 	{
-		return '';
+		return $tourniquet;
 	}
 
 	// Append our cp notice at the end of the line
 	$finds = array(
-		sprintf('powered by %1$s</a> | ', $forum_version),
+		sprintf('powered by %1$s</a> | ', FORUM_VERSION),
 	);
 	$replaces = array(
-		sprintf('powered by %1$s</a> | ', $forum_version) . $fix . ' | ',
+		sprintf('powered by %1$s</a> | ', FORUM_VERSION) . $fix . ' | ',
 	);
 
 	$tourniquet = str_replace($finds, $replaces, $tourniquet);

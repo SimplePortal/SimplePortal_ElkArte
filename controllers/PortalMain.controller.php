@@ -9,6 +9,8 @@
  * @version 1.0.0 Beta 2
  */
 
+use ElkArte\sources\Frontpage_Interface;
+
 if (!defined('ELK'))
 {
 	die('No access...');
@@ -19,7 +21,7 @@ if (!defined('ELK'))
  *
  * - This class handles requests that allow viewing the main portal or the portal credits
  */
-class Sportal_Controller extends Action_Controller
+class Sportal_Controller extends Action_Controller implements Frontpage_Interface
 {
 	/**
 	 * Default method, just forwards
@@ -45,6 +47,100 @@ class Sportal_Controller extends Action_Controller
 
 		// Finally go to where we want to go
 		$action->dispatch($subAction);
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function frontPageHook(&$default_action)
+	{
+		global $modSettings, $context;
+
+		// Need to run init to determine if we are even active
+		require_once(SUBSDIR . '/Portal.subs.php');
+		sportal_init();
+
+		// Portal is active
+		if (empty($context['disable_sp']))
+		{
+			$file = null;
+			$function = null;
+
+			// Any actions we need to handle with the portal, set up the action here.
+			if (empty($_GET['page']) && empty($_GET['article']) && empty($_GET['category']) && $modSettings['sp_portal_mode'] == 1)
+			{
+				// View the portal front page
+				$file = CONTROLLERDIR . '/PortalMain.controller.php';
+				$controller = 'Sportal_Controller';
+				$function = 'action_sportal_index';
+			}
+			elseif (!empty($_GET['page']))
+			{
+				// View a specific page
+				$file = CONTROLLERDIR . '/PortalPages.controller.php';
+				$controller = 'Pages_Controller';
+				$function = 'action_sportal_page';
+			}
+			elseif (!empty($_GET['article']))
+			{
+				// View a specific  article
+				$file = CONTROLLERDIR . '/PortalArticles.controller.php';
+				$controller = 'Articles_Controller';
+				$function = 'action_sportal_article';
+			}
+			elseif (!empty($_GET['category']))
+			{
+				// View a specific category
+				$file = CONTROLLERDIR . '/PortalCategories.controller.php';
+				$controller = 'Categories_Controller';
+				$function = 'action_sportal_category';
+			}
+
+			// Something portal-ish, then set the new action
+			if (isset($file, $function))
+			{
+				$default_action = array(
+					'file' => $file,
+					'controller' => isset($controller) ? $controller : null,
+					'function' => $function
+				);
+			}
+		}
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function canFrontPage()
+	{
+		return true;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function frontPageOptions()
+	{
+		global $txt;
+		parent::frontPageOptions();
+
+		loadLanguage('SPortalAdmin');
+		addInlineJavascript('
+			$(\'#front_page\').on(\'change\', function() {
+				var $base = $(\'#sp_portal_mode\').parent();
+				if ($(this).val() == \'PortalMain_Controller\')
+				{
+					$base.fadeIn();
+					$base.prev().fadeIn();
+				}
+				else
+				{
+					$base.fadeOut();
+					$base.prev().fadeOut();
+				}
+			}).change();', true);
+
+		return array(array('select', 'sp_portal_mode', explode('|', $txt['sp_portal_mode_options'])));
 	}
 
 	/**
@@ -75,6 +171,7 @@ class Sportal_Controller extends Action_Controller
 		global $context, $modSettings;
 
 		$context['sub_template'] = 'portal_index';
+		loadTemplate('Portal');
 
 		// Showing articles on the index page?
 		if (!empty($modSettings['sp_articles_index']))
@@ -230,4 +327,8 @@ class Sportal_Controller extends Action_Controller
 			),
 		);
 	}
+}
+
+class PortalMain_Controller extends Sportal_Controller
+{
 }

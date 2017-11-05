@@ -16,6 +16,7 @@ $txt['sp-adminGeneralSettingsName'] = 'General Settings';
 $txt['sp-adminBlockSettingsName'] = 'Block Settings';
 $txt['sp-adminArticleSettingsName'] = 'Article Settings';
 $txt['sp-adminother'] = 'Other';
+$txt['PortalMain_Controller'] = 'Portal';
 
 // General settings
 $txt['portalactive'] = 'Enable SimplePortal';

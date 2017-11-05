@@ -109,6 +109,14 @@ class ManagePortalConfig_Controller extends Action_Controller
 		if (isset($_GET['save']))
 		{
 			checkSession();
+			if (!empty($_POST['sp_portal_mode']))
+			{
+				updateSettings(array('front_page' => 'MainPortal_Controller'));
+			}
+			else
+			{
+				updateSettings(array('front_page' => 0));
+			}
 
 			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=portalconfig;sa=generalsettings');
