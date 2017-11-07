@@ -63,10 +63,13 @@ class Recent_Block extends SP_Abstract_Block
 		$this->data['items'] = $type($limit, null, $boards, 'array');
 		$this->data['class_type'] = empty($parameters['type']) ? 'post' : 'topic';
 
-		// Nothing recent
+		// Something recent
 		if (!empty($this->data['items']))
 		{
-			$this->data['items'][count($this->data['items']) - 1]['is_last'] = true;
+			end($this->data['items']);
+			$num = key($this->data['items']);
+			$this->data['items'][$num]['is_last'] = true;
+			reset($this->data['items']);
 		}
 
 		// Color id's
@@ -93,7 +96,8 @@ class Recent_Block extends SP_Abstract_Block
 		$color_ids = array();
 		foreach ($this->data['items'] as $item)
 		{
-			$color_ids[] = $item['poster']['id'];
+			if (!empty($item['poster']['id']))
+				$color_ids[] = $item['poster']['id'];
 		}
 
 		if (!empty($color_ids) && sp_loadColors($color_ids) !== false)
@@ -148,11 +152,14 @@ function template_sp_recent($data)
 		$embed_class = sp_embed_class($data['class_type'], '', 'sp_recent_icon centertext');
 		foreach ($data['items'] as $item)
 		{
+			if (!empty($item['is_last']))
+				continue;
+
 			echo '
 				<tr>
 					<td ', $embed_class, '></td>
 					<td class="sp_recent_subject">',
-						$item['new'] ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
+						empty($item['new']) ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
 						<a href="', $item['href'], '">', $item['subject'], '</a>
 						<br />[', $item['board']['link'], ']
 					</td>
