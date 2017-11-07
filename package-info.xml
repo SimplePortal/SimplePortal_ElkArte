@@ -29,6 +29,7 @@
 		<require-dir name="sp_attach" destination="BOARDDIR" />
 		<database>database.php</database>
 		<code>settings.php</code>
+		<hook hook="integrate_init_theme" function="sp_integrate_init_theme" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_current_action" function="sp_integrate_current_action" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_action_boardindex_after" function="sp_integrate_boardindex" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_actions" function="sp_integrate_actions" file="SOURCEDIR/PortalIntegration.subs.php" />
@@ -44,13 +45,14 @@
 		<hook hook="integrate_pre_log_stats" function="sp_integrate_pre_log_stats" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_load_illegal_guest_permissions" function="sp_integrate_load_illegal_guest_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_pre_parsebbc" function="sp_integrate_pre_parsebbc" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_setup_allow" function="sp_integrate_actions_allow" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_setup_allow" function="sp_integrate_setup_allow" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<credits url="www.simpleportal.net" license="BSD 3" copyright="Simple Portal Team">SimplePortal</credits>
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
 
 	<uninstall for="1.0 - 1.1.99">
 		<readme type="inline">This will uninstall SimplePortal for Elkarte.</readme>
+		<hook reverse="true" hook="integrate_init_theme" function="sp_integrate_init_theme" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_current_action" function="sp_integrate_current_action" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_action_boardindex_after" function="sp_integrate_boardindex" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_actions" function="sp_integrate_actions" file="SOURCEDIR/PortalIntegration.subs.php" />
