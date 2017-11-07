@@ -11,6 +11,31 @@
 
 
 /**
+ * Return if the portal is active, or active in a given area.
+ *
+ * @return bool
+ */
+function sp_is_active()
+{
+	global $modSettings, $context;
+
+	$context['disable_sp'] = false;
+
+	// Need to determine if we are even active
+	if (!empty($modSettings['sp_disableMobile']) && empty($_GET['page']) && empty($_GET['article'])
+		|| !empty($settings['disable_sp'])
+		|| empty($modSettings['sp_portal_mode'])
+		|| ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum'))
+		|| isset($_GET['debug'])
+		|| (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
+	{
+		$context['disable_sp'] = true;
+	}
+
+	return $context['disable_sp'];
+}
+
+/**
  * Initializes the portal, outputs all the blocks as needed
  *
  * @param boolean $standalone
@@ -86,7 +111,7 @@ function sportal_init($standalone = false)
 		require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');
 
 		// Not running via ssi then we need to get SSI for its functions
-		if (ELK !== 'ELKBOOT')
+		if (ELK !== 'SSI')
 		{
 			require_once(BOARDDIR . '/SSI.php');
 		}
@@ -194,7 +219,7 @@ function sportal_init_headers()
 	addJavascriptVar(array('sp_script_url' => '\'' . $safe_scripturl . '\''));
 
 	// Load up some javascript!
-	loadJavascriptFile('portal.js?sp110');
+	loadJavascriptFile('portal.js?sp100rc1');
 
 	// We use drag and sort blocks for the front page
 	$javascript = '';
@@ -1563,13 +1588,14 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 	switch ($type)
 	{
 		case 'bbc':
+			$parser = \BBC\ParserWrapper::instance();
 			if ($output_method === 'echo')
 			{
-				echo parse_bbc($body);
+				echo $parser->parseMessage($body, true);
 			}
 			else
 			{
-				return parse_bbc($body);
+				return $parser->parseMessage($body, true);
 			}
 			break;
 		case 'html':
@@ -1863,7 +1889,7 @@ function sp_prevent_flood($type, $fatal = true)
 	{
 		if ($fatal)
 		{
-			fatal_lang_error('error_sp_flood_' . $type, false, array($time_limit));
+			throw new Elk_Exception('error_sp_flood_' . $type, false, array($time_limit));
 		}
 		else
 		{
