@@ -100,11 +100,11 @@ class ManagePortalConfig_Controller extends Action_Controller
 
 		// Initialize the form
 		$this->_initGeneralSettingsForm();
-		$config_vars = $this->_generalSettingsForm->settings();
 
 		if (isset($_GET['save']))
 		{
 			checkSession();
+
 			if (!empty($_POST['sp_portal_mode']))
 			{
 				updateSettings(array('front_page' => 'MainPortal_Controller'));
@@ -114,7 +114,8 @@ class ManagePortalConfig_Controller extends Action_Controller
 				updateSettings(array('front_page' => 0));
 			}
 
-			Settings_Form::save_db($config_vars);
+			$this->_generalSettingsForm->setConfigValues($_POST);
+			$this->_generalSettingsForm->save();
 			redirectexit('action=admin;area=portalconfig;sa=generalsettings');
 		}
 
@@ -123,7 +124,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		$context['page_title'] = $txt['sp-adminGeneralSettingsName'];
 		$context['sub_template'] = 'show_settings';
 
-		Settings_Form::prepare_db($config_vars);
+		$this->_generalSettingsForm->prepare();
 	}
 
 	/**
@@ -135,7 +136,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		global $txt, $context;
 
 		// Instantiate the form
-		$this->_generalSettingsForm = new Settings_Form();
+		$this->_generalSettingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		$config_vars = array(
 			array('select', 'sp_portal_mode', explode('|', $txt['sp_portal_mode_options'])),
@@ -152,7 +153,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 			array('check', 'sp_disableMobile'),
 		);
 
-		return $this->_generalSettingsForm->settings($config_vars);
+		$this->_generalSettingsForm->setConfigVars($config_vars);
 	}
 
 	/**
@@ -169,7 +170,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 
 		// Initialize the form
 		$this->_initBlockSettingsForm();
-		$config_vars = $this->_blockSettingsForm->settings();
+		$config_vars = $this->_blockSettingsForm->getConfigVars();
 
 		if (isset($_GET['save']))
 		{
@@ -224,7 +225,9 @@ class ManagePortalConfig_Controller extends Action_Controller
 				)
 			);
 
-			Settings_Form::save_db($config_vars);
+			$this->_blockSettingsForm->setConfigVars($config_vars);
+			$this->_blockSettingsForm->setConfigValues($_POST);
+			$this->_blockSettingsForm->save();
 			redirectexit('action=admin;area=portalconfig;sa=blocksettings');
 		}
 
@@ -233,7 +236,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		$context['page_title'] = $txt['sp-adminBlockSettingsName'];
 		$context['sub_template'] = 'show_settings';
 
-		Settings_Form::prepare_db($config_vars);
+		$this->_blockSettingsForm->prepare();
 	}
 
 	/**
@@ -245,7 +248,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		global $txt;
 
 		// instantiate the block form
-		$this->_blockSettingsForm = new Settings_Form();
+		$this->_blockSettingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		$config_vars = array(
 			array('check', 'showleft'),
@@ -260,7 +263,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 			),
 		);
 
-		return $this->_blockSettingsForm->settings($config_vars);
+		$this->_blockSettingsForm->setConfigVars($config_vars);
 	}
 
 	/**
@@ -277,14 +280,14 @@ class ManagePortalConfig_Controller extends Action_Controller
 
 		// Initialize the form
 		$this->_initArticleSettingsForm();
-		$config_vars = $this->_articleSettingsForm->settings();
 
 		// Save away
 		if (isset($_GET['save']))
 		{
 			checkSession();
 
-			Settings_Form::save_db($config_vars);
+			$this->_articleSettingsForm->setConfigValues($_POST);
+			$this->_articleSettingsForm->save();
 			redirectexit('action=admin;area=portalconfig;sa=articlesettings');
 		}
 
@@ -294,7 +297,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		$context['page_title'] = $txt['sp-adminArticleSettingsName'];
 		$context['sub_template'] = 'show_settings';
 
-		Settings_Form::prepare_db($config_vars);
+		$this->_articleSettingsForm->prepare();
 	}
 
 	/**
@@ -304,7 +307,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 	private function _initArticleSettingsForm()
 	{
 		// instantiate the article form
-		$this->_articleSettingsForm = new Settings_Form();
+		$this->_articleSettingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		$config_vars = array(
 			array('check', 'sp_articles_index'),
@@ -318,13 +321,14 @@ class ManagePortalConfig_Controller extends Action_Controller
 			array('text', 'sp_articles_attachment_dir')
 		);
 
-		return $this->_articleSettingsForm->settings($config_vars);
+		$this->_articleSettingsForm->setConfigVars($config_vars);
 	}
 
 	/**
 	 * Our about page etc.
 	 *
 	 * @param boolean $in_admin
+	 * @throws Elk_Exception
 	 */
 	public function action_information($in_admin = true)
 	{
