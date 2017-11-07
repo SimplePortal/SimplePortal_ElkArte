@@ -23,7 +23,7 @@ function sportal_admin_state_change($type, $id)
 {
 	if (!in_array($type, array('block', 'category', 'article')))
 	{
-		fatal_lang_error('error_sp_id_empty', false);
+		throw new Elk_Exception('error_sp_id_empty', false);
 	}
 
 	// Toggle the current state

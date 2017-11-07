@@ -62,7 +62,7 @@ writeLog();
 
 // Articles
 require_once(CONTROLLERDIR . '/PortalMain.controller.php');
-$controller = new Sportal_Controller();
+$controller = new PortalMain_Controller();
 $controller->pre_dispatch();
 $controller->action_index();
 

@@ -72,6 +72,7 @@ class Theme_Select_Block extends SP_Abstract_Block
 			}
 
 			$settings['images_url'] = &$theme_data['images_url'];
+			$txt['theme_thumbnail_href'] = '';
 
 			// Set the description in their language if available
 			if (file_exists($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php'))
