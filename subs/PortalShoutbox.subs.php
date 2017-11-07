@@ -11,7 +11,7 @@
 
 
 /**
- * Load a shoutboxs parameters by ID
+ * Load a shout box's parameters by ID
  *
  * @param int|null $shoutbox_id
  * @param boolean $active
@@ -103,6 +103,10 @@ function sportal_get_shouts($shoutbox, $parameters)
 	$cache = !empty($parameters['cache']);
 	$can_delete = !empty($parameters['can_moderate']);
 
+	// BBC Parser
+	$parser = \BBC\ParserWrapper::instance();
+	$parser->getCodes()->setParsedTags($bbc);
+
 	// Cached, use it first
 	if (!empty($start) || !$cache || ($shouts = cache_get_data('shoutbox_shouts-' . $shoutbox, 240)) === null)
 	{
@@ -144,7 +148,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 					'color' => $online_color,
 				),
 				'time' => $row['log_time'],
-				'text' => parse_bbc($row['body'], true, '', $bbc),
+				'text' => $parser->parseMessage($row['body'], true)
 			);
 		}
 		$db->free_result($request);
@@ -157,7 +161,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 
 	foreach ($shouts as $shout)
 	{
-		// Private shouts @username: only get shown to the shouter and shoutee, and the admin
+		// Private shouts @username: only get shown to the shouter and shoutee, and the admin ;)
 		if (preg_match('~^@(.+?): ~u', $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
 		{
 			unset($shouts[$shout['id']]);
@@ -176,7 +180,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 		$shouts[$shout['id']]['time'] = standardTime($shouts[$shout['id']]['time']);
 		$shouts[$shout['id']]['text'] = preg_replace('~(</?)div([^<]*>)~', '$1span$2', $shouts[$shout['id']]['text']);
 		$shouts[$shout['id']]['text'] = preg_replace('~<a([^>]+>)([^<]+)</a>~', '<a$1' . $txt['sp_link'] . '</a>', $shouts[$shout['id']]['text']);
-		$shouts[$shout['id']]['text'] = censorText($shouts[$shout['id']]['text']);
+		$shouts[$shout['id']]['text'] = censor($shouts[$shout['id']]['text']);
 
 		// Ignored user, hide the shout with option to show it
 		if (!empty($modSettings['enable_buddylist']) && in_array($shout['author']['id'], $context['user']['ignoreusers']))
@@ -205,7 +209,8 @@ function sportal_get_shoutbox_count($shoutbox_id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}sp_shouts
 		WHERE id_shoutbox = {int:current}',
 		array(
@@ -234,6 +239,7 @@ function sportal_create_shout($shoutbox, $shout)
 	global $user_info;
 
 	$db = database();
+	$parser = \BBC\ParserWrapper::instance();
 
 	// If a guest shouts in the woods, and no one is there to hear them
 	if ($user_info['is_guest'])
@@ -247,7 +253,7 @@ function sportal_create_shout($shoutbox, $shout)
 		return false;
 	}
 
-	if (trim(strip_tags(parse_bbc($shout, false), '<img>')) === '')
+	if (trim(strip_tags($parser->parseMessage($shout, false), '<img>')) === '')
 	{
 		return false;
 	}
@@ -320,6 +326,8 @@ function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
 
 	// Update the view
 	sportal_update_shoutbox($shoutbox_id, $prune ? count($shouts) - 1 : count($shouts));
+
+	return;
 }
 
 /**
@@ -350,4 +358,6 @@ function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
 	);
 
 	cache_put_data('shoutbox_shouts-' . $shoutbox_id, null, 240);
+
+	return;
 }

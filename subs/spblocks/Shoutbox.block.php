@@ -40,6 +40,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 	 * Returns optional block parameters
 	 *
 	 * @return mixed[]
+	 * @throws \Elk_Exception
 	 */
 	public function parameters()
 	{
@@ -77,7 +78,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 
 		if (empty($this->block_parameters['shoutbox']))
 		{
-			fatal_error(allowedTo(array('sp_admin', 'sp_manage_shoutbox')) ? $txt['error_sp_no_shoutbox'] . '<br />' . sprintf($txt['error_sp_no_shoutbox_sp_moderator'], $scripturl . '?action=admin;area=portalshoutbox;sa=add') : $txt['error_sp_no_shoutbox_normaluser'], false);
+			throw new Elk_Exception(allowedTo(array('sp_admin', 'sp_manage_shoutbox')) ? $txt['error_sp_no_shoutbox'] . '<br />' . sprintf($txt['error_sp_no_shoutbox_sp_moderator'], $scripturl . '?action=admin;area=portalshoutbox;sa=add') : $txt['error_sp_no_shoutbox_normaluser'], false);
 		}
 
 		return $this->block_parameters;
@@ -90,10 +91,11 @@ class Shoutbox_Block extends SP_Abstract_Block
 	 *
 	 * @param mixed[] $parameters
 	 * @param int $id
+	 * @throws \Elk_Exception
 	 */
 	public function setup($parameters, $id)
 	{
-		global $context, $modSettings, $user_info, $settings, $txt, $editortxt;
+		global $context, $modSettings, $user_info, $settings, $txt;
 
 		loadTemplate('PortalShoutbox');
 		loadLanguage('Editor');
@@ -151,14 +153,17 @@ class Shoutbox_Block extends SP_Abstract_Block
 		);
 		$this->data['shouts'] = sportal_get_shouts($this->data['id'], $shout_parameters);
 
-		$this->data['warning'] = parse_bbc($this->data['warning']);
+		$parser = \BBC\ParserWrapper::instance();
+		$this->data['warning'] = $parser->parseMessage($this->data['warning'], true);
 		$context['can_shout'] = $context['user']['is_logged'];
 
 		if ($context['can_shout'])
 		{
 			// Set up the smiley tags for the shoutbox
-			$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'];
 			$this->data['smileys'] = array('normal' => array(), 'popup' => array());
+			$settings['smileys_url'] = determineSmileySet($user_info['smiley_set'], $modSettings['smiley_sets_known']);
+			$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $settings['smileys_url'] . '/';
+
 			if (empty($modSettings['smiley_enable']))
 			{
 				$this->data['smileys']['normal'] = $this->_smileys();
@@ -216,6 +221,11 @@ class Shoutbox_Block extends SP_Abstract_Block
 		$this->setTemplate('template_shoutbox_embed');
 	}
 
+	/**
+	 * Load in the avaialbe BBC codes that a shoutbox can use
+	 *
+	 * @return array
+	 */
 	private function _bbc()
 	{
 		global $editortxt;
