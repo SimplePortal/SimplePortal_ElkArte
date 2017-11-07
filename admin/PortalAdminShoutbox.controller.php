@@ -254,14 +254,14 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			{
-				fatal_lang_error('sp_error_shoutbox_name_empty', false);
+				throw new Elk_Exception('sp_error_shoutbox_name_empty', false);
 			}
 
 			// No two the same
 			$has_duplicate = sp_check_duplicate_shoutbox($_POST['name'], $_POST['shoutbox_id']);
 			if (!empty($has_duplicate))
 			{
-				fatal_lang_error('sp_error_shoutbox_name_duplicate', false);
+				throw new Elk_Exception('sp_error_shoutbox_name_duplicate', false);
 			}
 
 			if (isset($_POST['moderator_groups']) && is_array($_POST['moderator_groups']) && count($_POST['moderator_groups']) > 0)
@@ -354,7 +354,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 		if (empty($context['SPortal']['shoutbox']['permission_profiles']))
 		{
-			fatal_lang_error('error_sp_no_permission_profiles', false);
+			throw new Elk_Exception('error_sp_no_permission_profiles', false);
 		}
 
 		// We only allow some BBC in the shoutbox
@@ -417,7 +417,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 		if (empty($context['shoutbox']))
 		{
-			fatal_lang_error('error_sp_shoutbox_not_exist', false);
+			throw new Elk_Exception('error_sp_shoutbox_not_exist', false);
 		}
 
 		// Time to remove some chitta-chatta

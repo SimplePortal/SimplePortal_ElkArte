@@ -9,6 +9,8 @@
  * @version 1.0.0 RC1
  */
 
+use ElkArte\Errors\AttachmentErrorContext;
+use ElkArte\Errors\ErrorContext;
 
 /**
  * SimplePortal Article Administration controller class.
@@ -20,9 +22,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 	protected $_is_aid;
 	/** @var array */
 	protected $_attachments;
-	/** @var Error_Context */
+	/** @var ErrorContext */
 	protected $article_errors;
-	/** @var Attachment_Error_Context */
+	/** @var AttachmentErrorContext */
 	protected $attach_errors;
 
 	/**
@@ -374,15 +376,14 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// Going to use editor, attachment and post functions
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Editor.subs.php');
-		require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		loadLanguage('Post');
 		loadLanguage('Errors');
 
 		// Errors are likely
-		$this->article_errors = Error_Context::context('article', 0);
-		$this->attach_errors = Attachment_Error_Context::context();
+		$this->article_errors = ErrorContext::context('article', 0);
+		$this->attach_errors = AttachmentErrorContext::context();
 		$this->attach_errors->activate();
 
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment'));
@@ -806,19 +807,19 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$context['article']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		if (empty($context['article']['permission_profiles']))
 		{
-			fatal_lang_error('error_sp_no_permission_profiles', false);
+			throw new Elk_Exception('error_sp_no_permission_profiles', false);
 		}
 
 		$context['article']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
 		if (empty($context['article']['permission_profiles']))
 		{
-			fatal_lang_error('error_sp_no_style_profiles', false);
+			throw new Elk_Exception('error_sp_no_style_profiles', false);
 		}
 
 		$context['article']['categories'] = sportal_get_categories();
 		if (empty($context['article']['categories']))
 		{
-			fatal_lang_error('error_sp_no_category', false);
+			throw new Elk_Exception('error_sp_no_category', false);
 		}
 	}
 

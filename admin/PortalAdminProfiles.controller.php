@@ -276,7 +276,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			// Always clean the name
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			{
-				fatal_lang_error('sp_error_profile_name_empty', false);
+				throw new Elk_Exception('sp_error_profile_name_empty', false);
 			}
 
 			list($groups_allowed, $groups_denied) = $this->_group_permissions();
@@ -516,7 +516,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			// Always clean the profile name
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			{
-				fatal_lang_error('sp_error_profile_name_empty', false);
+				throw new Elk_Exception('sp_error_profile_name_empty', false);
 			}
 
 			// Add the data to place in the fields
@@ -706,7 +706,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			// Always clean the profile name
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			{
-				fatal_lang_error('sp_error_profile_name_empty', false);
+				throw new Elk_Exception('sp_error_profile_name_empty', false);
 			}
 
 			// Get the form values

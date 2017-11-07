@@ -9,6 +9,7 @@
  * @version 1.0.0 RC1
  */
 
+use ElkArte\Errors\ErrorContext;
 
 /**
  * SimplePortal Page Administration controller class.
@@ -249,7 +250,7 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		$context['SPortal']['is_new'] = empty($_REQUEST['page_id']);
 
-		$pages_errors = Error_Context::context('pages', 0);
+		$pages_errors = ErrorContext::context('pages', 0);
 
 		// Some help will be needed
 		require_once(SUBSDIR . '/Editor.subs.php');
@@ -369,14 +370,14 @@ class ManagePortalPages_Controller extends Action_Controller
 		$context['SPortal']['page']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		if (empty($context['SPortal']['page']['permission_profiles']))
 		{
-			fatal_lang_error('error_sp_no_permission_profiles', false);
+			throw new Elk_Exception('error_sp_no_permission_profiles', false);
 		}
 
 		// Styles
 		$context['SPortal']['page']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
 		if (empty($context['SPortal']['page']['style_profiles']))
 		{
-			fatal_lang_error('error_sp_no_style_profiles', false);
+			throw new Elk_Exception('error_sp_no_style_profiles', false);
 		}
 
 		// And for the template
@@ -397,7 +398,7 @@ class ManagePortalPages_Controller extends Action_Controller
 		global $txt, $context, $modSettings;
 
 		// No errors, yet.
-		$pages_errors = Error_Context::context('pages', 0);
+		$pages_errors = ErrorContext::context('pages', 0);
 
 		// Use our standard validation functions in a few spots
 		require_once(SUBSDIR . '/DataValidator.class.php');
@@ -449,7 +450,7 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		if ($_POST['type'] === 'php' && !allowedTo('admin_forum'))
 		{
-			fatal_lang_error('cannot_admin_forum', false);
+			throw new Elk_Exception('cannot_admin_forum', false);
 		}
 
 		// Running some php code, then we need to validate its legit code

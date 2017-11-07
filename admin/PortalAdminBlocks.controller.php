@@ -372,7 +372,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			// Only the admin can use PHP blocks
 			if ($context['SPortal']['block']['type'] === 'sp_php' && !allowedTo('admin_forum'))
 			{
-				fatal_lang_error('cannot_admin_forum', false);
+				throw new Elk_Exception('cannot_admin_forum', false);
 			}
 
 			loadLanguage('SPortalHelp');
@@ -381,21 +381,21 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$context['SPortal']['block']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 			if (empty($context['SPortal']['block']['permission_profiles']))
 			{
-				fatal_lang_error('error_sp_no_permission_profiles', false);
+				throw new Elk_Exception('error_sp_no_permission_profiles', false);
 			}
 
 			// Load in the style profiles
 			$context['SPortal']['block']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
 			if (empty($context['SPortal']['block']['style_profiles']))
 			{
-				fatal_lang_error('error_sp_no_style_profiles', false);
+				throw new Elk_Exception('error_sp_no_style_profiles', false);
 			}
 
 			// Load in the display profiles
 			$context['SPortal']['block']['visibility_profiles'] = sportal_get_profiles(null, 3, 'name');
 			if (empty($context['SPortal']['block']['visibility_profiles']))
 			{
-				fatal_lang_error('error_sp_no_visibility_profiles', false);
+				throw new Elk_Exception('error_sp_no_visibility_profiles', false);
 			}
 
 			$context['SPortal']['block']['style'] = sportal_select_style($context['SPortal']['block']['styles']);
@@ -501,7 +501,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				}
 			}
 
-			loadJavascriptFile('portal.js?sp100');
+			loadJavascriptFile('portal.js?sp100rc1');
 			$context['sub_template'] = 'block_edit';
 			$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'];
 		}
@@ -514,13 +514,13 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			// Only the admin can do php here
 			if ($_POST['block_type'] === 'sp_php' && !allowedTo('admin_forum'))
 			{
-				fatal_lang_error('cannot_admin_forum', false);
+				throw new Elk_Exception('cannot_admin_forum', false);
 			}
 
 			// Make sure the block name is something safe
 			if (!isset($_POST['block_name']) || Util::htmltrim(Util::htmlspecialchars($_POST['block_name'], ENT_QUOTES)) === '')
 			{
-				fatal_lang_error('error_sp_name_empty', false);
+				throw new Elk_Exception('error_sp_name_empty', false);
 			}
 
 			if ($_POST['block_type'] === 'sp_php' && !empty($_POST['parameters']['content']) && empty($modSettings['sp_disable_php_validation']))
@@ -890,7 +890,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// What block is being moved?
 		if (empty($_REQUEST['block_id']))
 		{
-			fatal_lang_error('error_sp_id_empty', false);
+			throw new Elk_Exception('error_sp_id_empty', false);
 		}
 		else
 		{
@@ -900,7 +900,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// Can't move outside our known columns 1-6
 		if (empty($_REQUEST['col']) || $_REQUEST['col'] < 1 || $_REQUEST['col'] > 6)
 		{
-			fatal_lang_error('error_sp_side_wrong', false);
+			throw new Elk_Exception('error_sp_side_wrong', false);
 		}
 		else
 		{
@@ -957,7 +957,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// Do we have that?
 		if (empty($_REQUEST['block_id']))
 		{
-			fatal_lang_error('error_sp_id_empty', false);
+			throw new Elk_Exception('error_sp_id_empty', false);
 		}
 
 		// Make sure column ID is an integer too.
@@ -969,7 +969,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$context['SPortal']['block'] = current(getBlockInfo(null, $_REQUEST['block_id']));
 			if ($context['SPortal']['block']['type'] === 'sp_php' && !allowedTo('admin_forum'))
 			{
-				fatal_lang_error('cannot_admin_forum', false);
+				throw new Elk_Exception('cannot_admin_forum', false);
 			}
 		}
 

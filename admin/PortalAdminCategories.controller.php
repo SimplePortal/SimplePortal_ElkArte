@@ -252,27 +252,27 @@ class ManagePortalCategories_Controller extends Action_Controller
 
 			if (empty($name))
 			{
-				fatal_lang_error('sp_error_category_name_empty', false);
+				throw new Elk_Exception('sp_error_category_name_empty', false);
 			}
 
 			if (empty($namespace))
 			{
-				fatal_lang_error('sp_error_category_namespace_empty', false);
+				throw new Elk_Exception('sp_error_category_namespace_empty', false);
 			}
 
 			if (sp_check_duplicate_category($current, $namespace))
 			{
-				fatal_lang_error('sp_error_category_namespace_duplicate', false);
+				throw new Elk_Exception('sp_error_category_namespace_duplicate', false);
 			}
 
 			if (preg_match('~[^A-Za-z0-9_]+~', $namespace) != 0)
 			{
-				fatal_lang_error('sp_error_category_namespace_invalid_chars', false);
+				throw new Elk_Exception('sp_error_category_namespace_invalid_chars', false);
 			}
 
 			if (preg_replace('~[0-9]+~', '', $namespace) === '')
 			{
-				fatal_lang_error('sp_error_category_namespace_numeric', false);
+				throw new Elk_Exception('sp_error_category_namespace_numeric', false);
 			}
 
 			$category_info = array(
