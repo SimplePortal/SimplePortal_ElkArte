@@ -15,7 +15,7 @@
  *
  * - This class handles requests for Page Functionality
  */
-class Pages_Controller extends Action_Controller
+class PortalPages_Controller extends Action_Controller
 {
 	/**
 	 * Default method
@@ -67,7 +67,7 @@ class Pages_Controller extends Action_Controller
 		$context['SPortal']['page'] = sportal_get_pages($page_id, true, true);
 		if (empty($context['SPortal']['page']['id']))
 		{
-			fatal_lang_error('error_sp_page_not_found', false);
+			throw new Elk_Exception('error_sp_page_not_found', false);
 		}
 
 		// Fetch any style associated with the page

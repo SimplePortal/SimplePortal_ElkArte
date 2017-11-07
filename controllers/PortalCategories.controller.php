@@ -15,7 +15,7 @@
  *
  * - This class handles requests for Category Functionality
  */
-class Categories_Controller extends Action_Controller
+class PortalCategories_Controller extends Action_Controller
 {
 	/**
 	 * Default method
@@ -78,7 +78,7 @@ class Categories_Controller extends Action_Controller
 
 		if (empty($context['category']['id']))
 		{
-			fatal_lang_error('error_sp_category_not_found', false);
+			throw new Elk_Exception('error_sp_category_not_found', false);
 		}
 
 		// Set up the pages
@@ -95,7 +95,7 @@ class Categories_Controller extends Action_Controller
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', $context['category']['id'], $per_page, $start);
 		foreach ($context['articles'] as $article)
 		{
-			$context['articles'][$article['id']]['preview'] = censorText($article['body']);
+			$context['articles'][$article['id']]['preview'] = censor($article['body']);
 			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
 			$context['articles'][$article['id']]['time'] = $article['date'];
 

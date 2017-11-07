@@ -4,24 +4,19 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2017 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0 RC1
  */
 
 use ElkArte\sources\Frontpage_Interface;
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
 /**
- * Portal controller.
+ * PortalMain_Controller controller.
  *
  * - This class handles requests that allow viewing the main portal or the portal credits
  */
-class Sportal_Controller extends Action_Controller implements Frontpage_Interface
+class PortalMain_Controller extends Action_Controller implements Frontpage_Interface
 {
 	/**
 	 * Default method, just forwards
@@ -36,7 +31,7 @@ class Sportal_Controller extends Action_Controller implements Frontpage_Interfac
 			'credits' => array($this, 'action_sportal_credits'),
 			'resetlayout' => array($this, 'action_sportal_resetLayout'),
 			'userorder' => array($this, 'action_userblockorder'),
-			'spattach' => array('controller' => 'Articles_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalArticles.controller.php', 'function' => 'action_index'),
+			'spattach' => array('controller' => 'PortalArticles_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalArticles.controller.php', 'function' => 'action_index'),
 		);
 
 		// We like action, so lets get ready for some
@@ -56,9 +51,9 @@ class Sportal_Controller extends Action_Controller implements Frontpage_Interfac
 	{
 		global $modSettings, $context;
 
-		// Need to run init to determine if we are even active
+		// Need to determine if the portal is active
 		require_once(SUBSDIR . '/Portal.subs.php');
-		sportal_init();
+		sp_is_active();
 
 		// Portal is active
 		if (empty($context['disable_sp']))
@@ -71,28 +66,28 @@ class Sportal_Controller extends Action_Controller implements Frontpage_Interfac
 			{
 				// View the portal front page
 				$file = CONTROLLERDIR . '/PortalMain.controller.php';
-				$controller = 'Sportal_Controller';
+				$controller = 'PortalMain_Controller';
 				$function = 'action_sportal_index';
 			}
 			elseif (!empty($_GET['page']))
 			{
 				// View a specific page
 				$file = CONTROLLERDIR . '/PortalPages.controller.php';
-				$controller = 'Pages_Controller';
+				$controller = 'PortalPages_Controller';
 				$function = 'action_sportal_page';
 			}
 			elseif (!empty($_GET['article']))
 			{
 				// View a specific  article
 				$file = CONTROLLERDIR . '/PortalArticles.controller.php';
-				$controller = 'Articles_Controller';
+				$controller = 'PortalArticles_Controller';
 				$function = 'action_sportal_article';
 			}
 			elseif (!empty($_GET['category']))
 			{
 				// View a specific category
 				$file = CONTROLLERDIR . '/PortalCategories.controller.php';
-				$controller = 'Categories_Controller';
+				$controller = 'PortalCategories_Controller';
 				$function = 'action_sportal_category';
 			}
 
@@ -195,7 +190,7 @@ class Sportal_Controller extends Action_Controller implements Frontpage_Interfac
 
 			foreach ($context['articles'] as $article)
 			{
-				$context['articles'][$article['id']]['preview'] = censorText($article['body']);
+				$context['articles'][$article['id']]['preview'] = censor($article['body']);
 				$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
 				$context['articles'][$article['id']]['time'] = $article['date'];
 
@@ -327,8 +322,4 @@ class Sportal_Controller extends Action_Controller implements Frontpage_Interfac
 			),
 		);
 	}
-}
-
-class PortalMain_Controller extends Sportal_Controller
-{
 }

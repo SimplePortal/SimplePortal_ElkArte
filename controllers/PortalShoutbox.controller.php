@@ -58,12 +58,13 @@ class Shoutbox_Controller extends Action_Controller
 			}
 			else
 			{
-				fatal_lang_error('error_sp_shoutbox_not_exist', false);
+				throw new Elk_Exception('error_sp_shoutbox_not_exist', false);
 			}
 		}
 
 		// Any warning title for the shoutbox, like Not For Support ;P
-		$context['SPortal']['shoutbox']['warning'] = parse_bbc($context['SPortal']['shoutbox']['warning']);
+		$parser = \BBC\ParserWrapper::instance();
+		$context['SPortal']['shoutbox']['warning'] = $parser->parseMessage($context['SPortal']['shoutbox']['warning'], true);
 
 		$can_moderate = allowedTo('sp_admin') || allowedTo('sp_manage_shoutbox');
 		if (!$can_moderate && !empty($context['SPortal']['shoutbox']['moderator_groups']))
@@ -104,7 +105,7 @@ class Shoutbox_Controller extends Action_Controller
 
 			if (!$can_moderate)
 			{
-				fatal_lang_error('error_sp_cannot_shoutbox_moderate', false);
+				throw new Elk_Exception('error_sp_cannot_shoutbox_moderate', false);
 			}
 
 			$delete = (int) $_REQUEST['delete'];

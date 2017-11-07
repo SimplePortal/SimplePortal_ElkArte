@@ -9,13 +9,12 @@
  * @version 1.0.0 RC1
  */
 
-
 /**
  * Article controller.
  *
  * - This class handles requests for Article Functionality
  */
-class Articles_Controller extends Action_Controller
+class PortalArticles_Controller extends Action_Controller
 {
 	/**
 	 * This method is executed before any action handler.
@@ -72,7 +71,7 @@ class Articles_Controller extends Action_Controller
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
 		foreach ($context['articles'] as $article)
 		{
-			$context['articles'][$article['id']]['preview'] = censorText($article['body']);
+			$context['articles'][$article['id']]['preview'] = censor($article['body']);
 			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
 			$context['articles'][$article['id']]['time'] = $article['date'];
 
@@ -123,11 +122,11 @@ class Articles_Controller extends Action_Controller
 		$context['article'] = sportal_get_articles($article_id, true, true);
 		if (empty($context['article']['id']))
 		{
-			fatal_lang_error('error_sp_article_not_found', false);
+			throw new Elk_Exception('error_sp_article_not_found', false);
 		}
 
 		$context['article']['style'] = sportal_select_style($context['article']['styles']);
-		$context['article']['body'] = censorText($context['article']['body']);
+		$context['article']['body'] = censor($context['article']['body']);
 		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
 
 		// Fetch attachments, if there are any
@@ -169,14 +168,15 @@ class Articles_Controller extends Action_Controller
 			preparsecode($body);
 
 			// Update or add a new comment
-			if (!empty($body) && trim(strip_tags(parse_bbc($body, false), '<img>')) !== '')
+			$parser = \BBC\ParserWrapper::instance();
+			if (!empty($body) && trim(strip_tags($parser->parseMessage($body, false), '<img>')) !== '')
 			{
 				if (!empty($_POST['comment']))
 				{
 					list ($comment_id, $author_id,) = sportal_fetch_article_comment((int) $_POST['comment']);
 					if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
 					{
-						fatal_lang_error('error_sp_cannot_comment_modify', false);
+						throw new Elk_Exception('error_sp_cannot_comment_modify', false);
 					}
 
 					sportal_modify_article_comment($comment_id, $body);
@@ -200,7 +200,7 @@ class Articles_Controller extends Action_Controller
 			list ($comment_id, $author_id, $body) = sportal_fetch_article_comment((int) $_GET['modify']);
 			if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
 			{
-				fatal_lang_error('error_sp_cannot_comment_modify', false);
+				throw new Elk_Exception('error_sp_cannot_comment_modify', false);
 			}
 
 			require_once(SUBSDIR . '/Post.subs.php');
@@ -218,7 +218,7 @@ class Articles_Controller extends Action_Controller
 
 			if (sportal_delete_article_comment((int) $_GET['delete']) === false)
 			{
-				fatal_lang_error('error_sp_cannot_comment_delete', false);
+				throw new Elk_Exception('error_sp_cannot_comment_delete', false);
 			}
 
 			redirectexit('article=' . $context['article']['article_id']);
@@ -278,13 +278,13 @@ class Articles_Controller extends Action_Controller
 		// Make sure some attachment was requested and they can view them
 		if (!isset($_GET['article'], $_GET['attach']))
 		{
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		// No funny business, you need to have access to the article to see its attachments
 		if (sportal_article_access($_GET['article']) === false)
 		{
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		// We need to do some work on attachments.
@@ -293,7 +293,7 @@ class Articles_Controller extends Action_Controller
 		$attachment = sportal_get_attachment_from_article($id_article, $id_attach);
 		if (empty($attachment))
 		{
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		list ($real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $width, $height) = $attachment;
