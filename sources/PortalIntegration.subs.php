@@ -9,8 +9,11 @@
  * @version 1.0.0 RC1
  */
 
-
-function sp_integrate_actions_allow()
+/**
+ * Integration hook integrate_setup_allow
+ * Called from Theme.php setupMenuContext(), used to modify menu privileges
+ */
+function sp_integrate_setup_allow()
 {
 	global $context;
 
@@ -33,7 +36,7 @@ function sp_integrate_actions(&$actions)
 	}
 
 	$actions['forum'] = array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_boardindex');
-	$actions['portal'] = array('PortalMain.controller.php', 'Sportal_Controller', 'action_index');
+	$actions['portal'] = array('PortalMain.controller.php', 'PortalMain_Controller', 'action_index');
 	$actions['shoutbox'] = array('PortalShoutbox.controller.php', 'Shoutbox_Controller', 'action_sportal_shoutbox');
 }
 
@@ -198,7 +201,6 @@ function sp_integrate_admin_areas(&$admin_areas)
  */
 function sp_integrate_load_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
 {
-
 	$permissionList['membergroup'] = array_merge($permissionList['membergroup'], array(
 		'sp_admin' => array(false, 'sp', 'sp'),
 		'sp_manage_settings' => array(false, 'sp', 'sp'),
@@ -421,12 +423,12 @@ function sp_whos_online_article($article_id)
 function sp_integrate_frontpage(&$default_action)
 {
 	global $modSettings, $context;
-
-	// Need to run init to determine if we are even active
+return;
+	// Need to see if sp is active
 	require_once(SUBSDIR . '/Portal.subs.php');
-	sportal_init();
+	sp_is_active();
 
-	// Portal is active
+	// If portal is active
 	if (empty($context['disable_sp']))
 	{
 		$file = null;
@@ -437,7 +439,7 @@ function sp_integrate_frontpage(&$default_action)
 		{
 			// View the portal front page
 			$file = CONTROLLERDIR . '/PortalMain.controller.php';
-			$controller = 'Sportal_Controller';
+			$controller = 'PortalMain_Controller';
 			$function = 'action_sportal_index';
 		}
 		elseif (!empty($_GET['page']))
@@ -474,6 +476,17 @@ function sp_integrate_frontpage(&$default_action)
 	}
 
 	return;
+}
+
+/**
+ * Theme hook, integrate_init_theme, called from load.php
+ * Used to initialize main portal functions as soon as the theme is started
+ */
+function sp_integrate_init_theme()
+{
+	// Need to run init to determine if we are even active
+	require_once(SUBSDIR . '/Portal.subs.php');
+	sportal_init();
 }
 
 /**
@@ -664,7 +677,7 @@ function sp_integrate_current_action(&$current_action)
 function sp_integrate_xmlhttp(&$subActions)
 {
 	$subActions['blockorder'] = array('controller' => 'ManagePortalBlocks_Controller', 'file' => 'PortalAdminBlocks.controller.php', 'function' => 'action_blockorder', 'permission' => 'admin_forum');
-	$subActions['userblockorder'] = array('controller' => 'Sportal_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalMain.controller.php', 'function' => 'action_userblockorder');
+	$subActions['userblockorder'] = array('controller' => 'PortalMain_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalMain.controller.php', 'function' => 'action_userblockorder');
 }
 
 /**
