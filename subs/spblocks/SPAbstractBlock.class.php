@@ -25,6 +25,12 @@ abstract class SP_Abstract_Block
 	protected $_db = null;
 
 	/**
+	 * The modSettings
+	 * @var object
+	 */
+	protected $_modSettings = array();
+
+	/**
 	 * Block parameters
 	 * @var array
 	 */
@@ -55,7 +61,11 @@ abstract class SP_Abstract_Block
 	 */
 	public function __construct($db = null)
 	{
+		global $modSettings;
+
 		$this->_db = $db;
+
+		$this->_modSettings = new \ElkArte\ValuesContainer($modSettings ?: array());
 
 		// Allow custom blocks to set $txt values for name and description
 		$this->blockName();

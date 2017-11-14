@@ -247,7 +247,7 @@ table.sp_articles {
 }
 
 .sp_article_icon {
-	margin: 5px 10px 0 0;
+	margin: -2px .5em 0 0;
 }
 
 .sp_article_content {
@@ -537,7 +537,8 @@ body {
 	display: block;
 	width: 18px;
 	height: 18px;
-	background: no-repeat center center !important;
+	background-position: center center !important;
+	background-repeat: no-repeat !important;
 }
 
 .shoutbox-button:hover {

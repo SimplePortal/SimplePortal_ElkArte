@@ -48,7 +48,7 @@ class Calendar_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $modSettings, $options, $scripturl, $txt;
+		global $options, $scripturl, $txt;
 
 		require_once(SUBSDIR . '/Calendar.subs.php');
 
@@ -78,7 +78,7 @@ class Calendar_Block extends SP_Abstract_Block
 
 		$title_text = $txt['months_titles'][$this->data['calendar']['current_month']] . ' ' . $this->data['calendar']['current_year'];
 
-		if (!empty($modSettings['cal_enabled']))
+		if (!empty($this->_modSettings['cal_enabled']))
 		{
 			$this->data['calendar_title'] = '<a href="' . $scripturl . '?action=calendar;year=' . $this->data['calendar']['current_year'] . ';month=' . $this->data['calendar']['current_month'] . '">' . $title_text . '</a>';
 		}

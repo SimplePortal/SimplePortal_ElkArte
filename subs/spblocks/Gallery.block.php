@@ -50,7 +50,7 @@ class Gallery_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id = 0)
 	{
-		global  $txt, $modSettings;
+		global $txt;
 
 		$limit = empty($parameters['limit']) ? 1 : (int) $parameters['limit'];
 		$type = empty($parameters['type']) ? 0 : 1;
@@ -71,7 +71,7 @@ class Gallery_Block extends SP_Abstract_Block
 		// Set the appropriate template for the gallery in use
 		$this->data['gallery_template'] = 'template_sp_gallery_' . $this->data['mod'];
 		$this->data['items'] = $this->_getItems($limit, $type);
-		$this->data['fancybox_enabled'] = !empty($modSettings['fancybox_enabled']);
+		$this->data['fancybox_enabled'] = !empty($this->_modSettings['fancybox_enabled']);
 
 		// No items in the gallery?
 		if (empty($this->data['items']))

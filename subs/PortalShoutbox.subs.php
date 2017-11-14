@@ -105,7 +105,18 @@ function sportal_get_shouts($shoutbox, $parameters)
 
 	// BBC Parser
 	$parser = \BBC\ParserWrapper::instance();
-	$parser->getCodes()->setParsedTags($bbc);
+	$codes = $parser->getCodes()->getTags();
+
+	// We only allow a few codes in the shoutbox, so turn off others for now
+	$restore = array();
+	foreach ($codes as $key => $code)
+	{
+		if (!in_array($key, $bbc))
+		{
+			$parser->getCodes()->disable($key);
+			$restore[$key] = $code;
+		}
+	}
 
 	// Cached, use it first
 	if (!empty($start) || !$cache || ($shouts = cache_get_data('shoutbox_shouts-' . $shoutbox, 240)) === null)
@@ -156,6 +167,12 @@ function sportal_get_shouts($shoutbox, $parameters)
 		if (empty($start) && $cache)
 		{
 			cache_put_data('shoutbox_shouts-' . $shoutbox, $shouts, 240);
+		}
+
+		// Restore BBC codes
+		foreach ($restore as $key => $code)
+		{
+			$parser->getCodes()->restore($key);
 		}
 	}
 

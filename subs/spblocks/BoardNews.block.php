@@ -71,7 +71,7 @@ class Board_News_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $scripturl, $txt, $settings, $modSettings, $context;
+		global $scripturl, $txt, $settings, $context;
 
 		// Break out / sanitize all the parameters
 		$board = !empty($parameters['board']) ? explode('|', $parameters['board']) : null;
@@ -98,14 +98,14 @@ class Board_News_Block extends SP_Abstract_Block
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 			WHERE {query_see_board}
-				AND ' . (empty($board) ? 't.id_first_msg >= {int:min_msg_id}' : 't.id_board IN ({array_int:current_board})') . ($modSettings['postmod_active'] ? '
+				AND ' . (empty($board) ? 't.id_first_msg >= {int:min_msg_id}' : 't.id_board IN ({array_int:current_board})') . ($this->_modSettings['postmod_active'] ? '
 				AND t.approved = {int:is_approved}' : '') . '
 				AND (t.locked != {int:locked} OR m.icon != {string:icon})
 			ORDER BY t.id_first_msg DESC
 			LIMIT {int:limit}',
 			array(
 				'current_board' => $board,
-				'min_msg_id' => $modSettings['maxMsgID'] - 45 * min($limit, 5),
+				'min_msg_id' => $this->_modSettings['maxMsgID'] - 45 * min($limit, 5),
 				'is_approved' => 1,
 				'locked' => 1,
 				'icon' => 'moved',
@@ -164,11 +164,12 @@ class Board_News_Block extends SP_Abstract_Block
 		}
 
 		$this->data['news'] = array();
+
 		while ($row = $this->_db->fetch_assoc($request))
 		{
 			// Good time to do this is ... now
-			censorText($row['subject']);
-			censorText($row['body']);
+			censor($row['subject']);
+			censor($row['body']);
 
 			$attach = !empty($attachments) ? $this->getMessageAttach($row['id_msg'], $row['id_topic'], $row['body']) : '';
 			$limited = sportal_parse_cutoff_content($row['body'], 'bbc', $length);
@@ -179,12 +180,12 @@ class Board_News_Block extends SP_Abstract_Block
 				$row['body'] .= '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">&hellip;</a>';
 			}
 
-			if (empty($modSettings['messageIconChecks_disable']) && !isset($this->icon_sources[$row['icon']]))
+			if (empty($this->_modSettings['messageIconChecks_disable']) && !isset($this->icon_sources[$row['icon']]))
 			{
 				$this->icon_sources[$row['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['icon'] . '.png') ? 'images_url' : 'default_images_url';
 			}
 
-			if ($modSettings['sp_resize_images'])
+			if ($this->_modSettings['sp_resize_images'])
 			{
 				$row['body'] = str_ireplace('class="bbc_img', 'class="bbc_img sp_article', $row['body']);
 			}
@@ -239,7 +240,7 @@ class Board_News_Block extends SP_Abstract_Block
 		$this->_color_ids();
 
 		// Account for embedded videos
-		$this->data['embed_videos'] = !empty($modSettings['enableVideoEmbeding']);
+		$this->data['embed_videos'] = !empty($this->_modSettings['enableVideoEmbeding']);
 
 		if (!empty($per_page))
 		{
@@ -254,15 +255,15 @@ class Board_News_Block extends SP_Abstract_Block
 	 */
 	protected function loadAttachments($posts)
 	{
-		global $modSettings, $attachments;
+		global $attachments;
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// We will show attachments in the block, regardless, so save and restore
-		$attachmentShowImages = $modSettings['attachmentShowImages'];
-		$modSettings['attachmentShowImages'] = 1;
+		$attachmentShowImages = $this->_modSettings['attachmentShowImages'];
+		$this->_modSettings['attachmentShowImages'] = 1;
 		$this->attachments = getAttachments($posts, false);
-		$modSettings['attachmentShowImages'] = $attachmentShowImages;
+		$this->_modSettings['attachmentShowImages'] = $attachmentShowImages;
 
 		if (!isset($attachments))
 		{

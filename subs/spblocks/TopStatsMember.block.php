@@ -36,7 +36,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 	 */
 	public function __construct($db = null)
 	{
-		global $txt, $modSettings;
+		global $txt;
 
 		$this->block_parameters = array(
 			'type' => array(
@@ -55,6 +55,14 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 			'enable_label' => 'check',
 			'list_label' => 'text',
 		);
+
+		parent::__construct($db);
+		$this->setupSystemArray();
+	}
+
+	private function setupSystemArray()
+	{
+		global $txt;
 
 		/*
 		* The system setup array, the order depends on the $txt array of the select name
@@ -111,8 +119,8 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'output_function' => create_function('&$row', '
 					$row["karma_total"] = $row["karma_good"] - $row["karma_bad"];
 				'),
-				'output_text' => $modSettings['karmaLabel'] . ($modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
-				'enabled' => !empty($modSettings['karmaMode']),
+				'output_text' => (!empty($this->_modSettings['karmaLabel']) ? $this->_modSettings['karmaLabel'] : '') . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
+				'enabled' => !empty($this->_modSettings['karmaMode']),
 				'error_msg' => $txt['sp_karma_is_disabled'],
 			),
 			'3' => array(
@@ -122,8 +130,8 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'output_function' => create_function('&$row', '
 					$row["karma_total"] = $row["karma_good"] - $row["karma_bad"];
 				'),
-				'output_text' => $modSettings['karmaLabel'] . ($modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
-				'enabled' => !empty($modSettings['karmaMode']),
+				'output_text' => (!empty($this->_modSettings['karmaLabel']) ? $this->_modSettings['karmaLabel'] : '') . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
+				'enabled' => !empty($this->_modSettings['karmaMode']),
 				'error_msg' => $txt['sp_karma_is_disabled'],
 			),
 			'4' => array(
@@ -133,8 +141,8 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'output_function' => create_function('&$row', '
 					$row["karma_total"] = $row["karma_good"] - $row["karma_bad"];
 				'),
-				'output_text' => $modSettings['karmaLabel'] . ($modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
-				'enabled' => !empty($modSettings['karmaMode']),
+				'output_text' => $this->_modSettings['karmaLabel'] . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
+				'enabled' => !empty($this->_modSettings['karmaMode']),
 				'error_msg' => $txt['sp_karma_is_disabled'],
 			),
 			'5' => array(
@@ -142,7 +150,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'field' => 'mem.likes_received',
 				'order' => 'mem.likes_received',
 				'output_text' => '%likes_received% ' . $txt['sp_topStatsMember_Likes_Received'],
-				'enabled' => !empty($modSettings['likes_enabled']),
+				'enabled' => !empty($this->_modSettings['likes_enabled']),
 				'error_msg' => $txt['sp_likes_is_disabled'],
 			),
 			'6' => array(
@@ -150,7 +158,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'field' => 'mem.likes_given',
 				'order' => 'mem.likes_given',
 				'output_text' => '%likes_given% ' . $txt['sp_topStatsMember_Likes_Given'],
-				'enabled' => !empty($modSettings['likes_enabled']),
+				'enabled' => !empty($this->_modSettings['likes_enabled']),
 				'error_msg' => $txt['sp_likes_is_disabled'],
 			),
 			'7' => array(
@@ -158,12 +166,10 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'field' => 'mem.likes_received, mem.likes_given',
 				'order' => 'mem.likes_received',
 				'output_text' => $txt['sp_topStatsMember_Likes_Received'] . ':&nbsp;%likes_received% / ' . $txt['sp_topStatsMember_Likes_Given'] . ':&nbsp;%likes_given%',
-				'enabled' => !empty($modSettings['likes_enabled']),
+				'enabled' => !empty($this->_modSettings['likes_enabled']),
 				'error_msg' => $txt['sp_likes_is_disabled'],
 			),
 		);
-
-		parent::__construct($db);
 	}
 
 	/**
@@ -176,7 +182,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $context, $scripturl, $modSettings;
+		global $context, $scripturl;
 
 		// Standard Variables
 		$type = !empty($parameters['type']) ? $parameters['type'] : 0;
@@ -211,9 +217,9 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 
 		// If this is already cached, use it
 		$chache_id = 'sp_chache_' . $id . '_topStatsMember';
-		if (empty($modSettings['sp_disableChache']) && !empty($modSettings[$chache_id]))
+		if (empty($this->_modSettings['sp_disableChache']) && !empty($this->_modSettings[$chache_id]))
 		{
-			$data = explode(';', $modSettings[$chache_id]);
+			$data = explode(';', $this->_modSettings[$chache_id]);
 
 			if ($data[0] == $type && $data[1] == $limit && !empty($data[2]) == $sort_asc && $data[3] > time() - 300) // 5 Minute cache
 			{
@@ -221,7 +227,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 			}
 			else
 			{
-				unset($modSettings[$chache_id]);
+				unset($this->_modSettings[$chache_id]);
 			}
 		}
 
@@ -318,13 +324,13 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 		$this->_db->free_result($request);
 
 		// Update the cache, at least around 100 members are needed for a good working version
-		if (empty($modSettings['sp_disableChache']) && isset($context['common_stats']['total_members']) && $context['common_stats']['total_members'] > 0 && !empty($chache_member_ids) && count($chache_member_ids) > $limit && empty($modSettings[$chache_id]))
+		if (empty($this->_modSettings['sp_disableChache']) && isset($context['common_stats']['total_members']) && $context['common_stats']['total_members'] > 0 && !empty($chache_member_ids) && count($chache_member_ids) > $limit && empty($this->_modSettings[$chache_id]))
 		{
 			$toCache = array($type, $limit, ($sort_asc ? 1 : 0), time(), implode(',', $chache_member_ids));
 			updateSettings(array($chache_id => implode(';', $toCache)));
 		}
 		// One time error, if this happens the cache needs an update
-		elseif (!empty($modSettings[$chache_id]))
+		elseif (!empty($this->_modSettings[$chache_id]))
 		{
 			updateSettings(array($chache_id => '0;0;0;1000;0'));
 		}
