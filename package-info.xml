@@ -7,7 +7,7 @@
  * @author SimplePortal Team
  * @copyright 2015 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0 RC1
  *
  * This version of SimplePortal ElkArte is based on SimplePortal core 2.4
  */
@@ -15,9 +15,9 @@
 <package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
 	<name>SimplePortal</name>
-	<version>1.0.0 Beta 2</version>
+	<version>1.0.0 RC1</version>
 	<type>modification</type>
-	<install for="1.0.3 - 1.1.99">
+	<install for="1.1.1 - 1.1.99">
 		<readme type="inline">This will install SimplePortal for Elkarte.</readme>
 		<modification>modification.xml</modification>
 		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
@@ -50,7 +50,7 @@
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
 
-	<uninstall for="1.0 - 1.1.99">
+	<uninstall for="1.1 - 1.1.99">
 		<readme type="inline">This will uninstall SimplePortal for Elkarte.</readme>
 		<hook reverse="true" hook="integrate_init_theme" function="sp_integrate_init_theme" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_current_action" function="sp_integrate_current_action" file="SOURCEDIR/PortalIntegration.subs.php" />
