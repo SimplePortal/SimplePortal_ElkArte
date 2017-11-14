@@ -39,6 +39,7 @@ function sp_is_active()
  * Initializes the portal, outputs all the blocks as needed
  *
  * @param boolean $standalone
+ * @throws \Elk_Exception
  */
 function sportal_init($standalone = false)
 {

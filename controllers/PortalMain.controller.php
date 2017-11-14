@@ -15,6 +15,7 @@ use ElkArte\sources\Frontpage_Interface;
  * PortalMain_Controller controller.
  *
  * - This class handles requests that allow viewing the main portal or the portal credits
+ * - Handles the front page block arrangement, including resetting
  */
 class PortalMain_Controller extends Action_Controller implements Frontpage_Interface
 {
@@ -45,23 +46,26 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * Used to change the default action with a new one.
+	 *
+	 * Called statically from the Dispatcher to the controller listed in $modSettings['front_page']
+	 * Can be used to call add_integration_function() for added functions (non permanent)
+	 *
+	 * @param string[] $default_action
 	 */
 	public static function frontPageHook(&$default_action)
 	{
-		global $modSettings, $context;
+		global $modSettings;
 
 		// Need to determine if the portal is active
 		require_once(SUBSDIR . '/Portal.subs.php');
-		sp_is_active();
 
-		// Portal is active
-		if (empty($context['disable_sp']))
+		// Any actions we need to handle with the portal, set up the action here.
+		if (sp_is_active())
 		{
 			$file = null;
 			$function = null;
 
-			// Any actions we need to handle with the portal, set up the action here.
 			if (empty($_GET['page']) && empty($_GET['article']) && empty($_GET['category']) && $modSettings['sp_portal_mode'] == 1)
 			{
 				// View the portal front page
@@ -78,7 +82,7 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 			}
 			elseif (!empty($_GET['article']))
 			{
-				// View a specific  article
+				// View a specific article
 				$file = CONTROLLERDIR . '/PortalArticles.controller.php';
 				$controller = 'PortalArticles_Controller';
 				$function = 'action_sportal_article';
@@ -104,7 +108,10 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * If this controller is capable of being the front page.
+	 *
+	 * - damn right it can!
+	 * - Used by system to "find" front page controllers
 	 */
 	public static function canFrontPage()
 	{
@@ -112,18 +119,24 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * Add the portal action to allowable ones for the front page
+	 *
+	 * Used by Configuration -> Layout
 	 */
 	public static function frontPageOptions()
 	{
 		global $txt;
+
 		parent::frontPageOptions();
 
 		loadLanguage('SPortalAdmin');
+
+		// Used to show/hide the portal front page options
 		addInlineJavascript('
 			$(\'#front_page\').on(\'change\', function() {
 				var $base = $(\'#sp_portal_mode\').parent();
-				if ($(this).val() == \'PortalMain_Controller\')
+				
+				if ($(this).val() === \'PortalMain_Controller\')
 				{
 					$base.fadeIn();
 					$base.prev().fadeIn();
@@ -135,6 +148,7 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 				}
 			}).change();', true);
 
+		// Adds Frontpage, Integrate and Standalone portal mode options.
 		return array(array('select', 'sp_portal_mode', explode('|', $txt['sp_portal_mode_options'])));
 	}
 

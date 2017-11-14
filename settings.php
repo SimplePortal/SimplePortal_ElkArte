@@ -68,7 +68,7 @@ elseif (file_exists($standalone_file))
 	}
 }
 
-if (ELK == 'SSI')
+if (ELK === 'SSI')
 {
 	echo 'Settings changes were carried out successfully.';
 }
