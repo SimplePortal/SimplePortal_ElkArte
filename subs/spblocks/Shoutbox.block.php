@@ -95,7 +95,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $context, $modSettings, $user_info, $settings, $txt;
+		global $context, $user_info, $settings, $txt;
 
 		loadTemplate('PortalShoutbox');
 		loadLanguage('Editor');
@@ -161,10 +161,10 @@ class Shoutbox_Block extends SP_Abstract_Block
 		{
 			// Set up the smiley tags for the shoutbox
 			$this->data['smileys'] = array('normal' => array(), 'popup' => array());
-			$settings['smileys_url'] = determineSmileySet($user_info['smiley_set'], $modSettings['smiley_sets_known']);
-			$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $settings['smileys_url'] . '/';
+			$settings['smileys_url'] = determineSmileySet($user_info['smiley_set'], $this->_modSettings['smiley_sets_known']);
+			$settings['smileys_url'] = $this->_modSettings['smileys_url'] . '/' . $settings['smileys_url'] . '/';
 
-			if (empty($modSettings['smiley_enable']))
+			if (empty($this->_modSettings['smiley_enable']))
 			{
 				$this->data['smileys']['normal'] = $this->_smileys();
 			}
