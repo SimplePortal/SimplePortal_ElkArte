@@ -29,7 +29,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $user_info, $modSettings;
+		global $user_info;
 
 		$this->data['admin'] = array();
 		$this->data['moderation'] = array();
@@ -39,7 +39,6 @@ class Admin_Info_Block extends SP_Abstract_Block
 		{
 			// Function to get the stats
 			require_once(SUBSDIR . '/Moderation.subs.php');
-			require_once(SUBSDIR . '/Error.subs.php');
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// Moderation totals
@@ -48,7 +47,8 @@ class Admin_Info_Block extends SP_Abstract_Block
 			// The admin may want to know about errors and users waiting activation
 			if ($user_info['is_admin'])
 			{
-				$this->data['admin']['errors'] = numErrors(null);
+				$errorLog = new ElkArte\Errors\Log(database());
+				$this->data['admin']['errors'] = $errorLog->numErrors(array());
 
 				$activation_numbers = countInactiveMembers();
 				$this->data['admin']['awaiting_activation'] = 0;
@@ -65,7 +65,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 			$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 			// Any posts / topics / attachments awaiting approval
-			if ($modSettings['postmod_active'] && !empty($approve_boards))
+			if ($this->_modSettings['postmod_active'] && !empty($approve_boards))
 			{
 				$this->data['moderation']['topics'] = $totals['topics'];
 				$this->data['moderation']['posts'] = $totals['posts'];
@@ -79,7 +79,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 			}
 
 			// Failed emails
-			if (!empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'))
+			if (!empty($this->_modSettings['maillist_enabled']) && allowedTo('approve_emails'))
 			{
 				$this->data['moderation']['emailmod'] = $totals['emailmod'];
 			}
@@ -91,7 +91,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 			}
 
 			// Members waiting approval (3,4,5 codes)
-			if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])))
+			if (allowedTo('moderate_forum') && ((!empty($this->_modSettings['registration_method']) && $this->_modSettings['registration_method'] == 2) || !empty($this->_modSettings['approveAccountDeletion'])))
 			{
 				$this->data['moderation']['memberreq'] = $totals['memberreq'];
 			}

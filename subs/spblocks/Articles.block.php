@@ -136,8 +136,6 @@ class Articles_Block extends SP_Abstract_Block
 	 */
 	private function prepare_view()
 	{
-		global $modSettings;
-
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		foreach ($this->data['articles'] as $aid => $article)
@@ -147,15 +145,15 @@ class Articles_Block extends SP_Abstract_Block
 			censorText($article['body']);
 
 			// Parse and optionally shorten the result
-			$article['cut'] = sportal_parse_cutoff_content($article['body'], $article['type'], $modSettings['sp_articles_length'], $article['article_id']);
+			$article['cut'] = sportal_parse_cutoff_content($article['body'], $article['type'], $this->_modSettings['sp_articles_length'], $article['article_id']);
 
-			if ($modSettings['sp_resize_images'])
+			if ($this->_modSettings['sp_resize_images'])
 			{
 				$article['body'] = str_ireplace('class="bbc_img', 'class="bbc_img sp_article', $article['body']);
 			}
 
 			// Account for embedded videos
-			$this->data['embed_videos'] = !empty($modSettings['enableVideoEmbeding']);
+			$this->data['embed_videos'] = !empty($this->_modSettings['enableVideoEmbeding']);
 
 			// Add / replace the data
 			$this->data['articles'][$aid] = array_merge($this->data['articles'][$aid], $article);
@@ -197,13 +195,11 @@ class Articles_Block extends SP_Abstract_Block
 	 */
 	protected function loadAttachments()
 	{
-		global $modSettings;
-
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// We will show attachments in the block, regardless, so save and restore
-		$attachmentShowImages = $modSettings['attachmentShowImages'];
-		$modSettings['attachmentShowImages'] = 1;
+		$attachmentShowImages = $this->_modSettings['attachmentShowImages'];
+		$this->_modSettings['attachmentShowImages'] = 1;
 		$articles = array();
 
 		// Just ones with attachments
@@ -216,7 +212,7 @@ class Articles_Block extends SP_Abstract_Block
 		}
 
 		$attachments = sportal_get_articles_attachments($articles);
-		$modSettings['attachmentShowImages'] = $attachmentShowImages;
+		$this->_modSettings['attachmentShowImages'] = $attachmentShowImages;
 
 		// For each article, grab the first *image* attachment
 		foreach ($attachments as $id_article => $attach)

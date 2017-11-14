@@ -20,6 +20,16 @@
 class Theme_Select_Block extends SP_Abstract_Block
 {
 	/**
+	 * Constructor, used to define block parameters
+	 *
+	 * @param Database|null $db
+	 */
+	public function __construct($db = null)
+	{
+		parent::__construct($db);
+	}
+
+	/**
 	 * Initializes a block for use.
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
@@ -29,14 +39,14 @@ class Theme_Select_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $modSettings, $user_info, $settings, $language, $txt;
+		global $user_info, $settings, $language, $txt;
 
 		// Going to need some help to pick themes
 		loadLanguage('Profile');
 		loadLanguage('ManageThemes');
 		require_once(SUBSDIR . '/Themes.subs.php');
 
-		if (!empty($_SESSION['id_theme']) && (!empty($modSettings['theme_allow']) || allowedTo('admin_forum')))
+		if (!empty($_SESSION['id_theme']) && (!empty($this->_modSettings['theme_allow']) || allowedTo('admin_forum')))
 		{
 			$current_theme = (int) $_SESSION['id_theme'];
 		}
@@ -50,7 +60,7 @@ class Theme_Select_Block extends SP_Abstract_Block
 		$available_themes = installedThemes();
 
 		// Set the guest theme
-		if (!isset($available_themes[$modSettings['theme_guests']]))
+		if (!isset($available_themes[$this->_modSettings['theme_guests']]))
 		{
 			$available_themes[0] = array(
 				'num_users' => 0
@@ -59,7 +69,7 @@ class Theme_Select_Block extends SP_Abstract_Block
 		}
 		else
 		{
-			$guest_theme = $modSettings['theme_guests'];
+			$guest_theme = $this->_modSettings['theme_guests'];
 		}
 
 		$current_images_url = $settings['images_url'];
@@ -121,7 +131,7 @@ class Theme_Select_Block extends SP_Abstract_Block
 			$available_themes[-1]['selected'] = true;
 		}
 
-		if (!empty($_POST['sp_ts_submit']) && !empty($_POST['sp_ts_permanent']) && !empty($_POST['theme']) && isset($available_themes[$_POST['theme']]) && (!empty($modSettings['theme_allow']) || allowedTo('admin_forum')))
+		if (!empty($_POST['sp_ts_submit']) && !empty($_POST['sp_ts_permanent']) && !empty($_POST['theme']) && isset($available_themes[$_POST['theme']]) && (!empty($this->_modSettings['theme_allow']) || allowedTo('admin_forum')))
 		{
 			updateMemberData($user_info['id'], array('id_theme' => $_POST['theme'] == -1 ? 0 : (int) $_POST['theme']));
 		}

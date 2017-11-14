@@ -47,7 +47,7 @@ class Show_Poll_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $modSettings, $txt;
+		global $txt;
 
 		// Basic block parameters
 		$topic = !empty($parameters['topic']) ? $parameters['topic'] : null;
@@ -71,11 +71,11 @@ class Show_Poll_Block extends SP_Abstract_Block
 				SELECT
 					t.id_topic
 				FROM {db_prefix}polls AS p
-					INNER JOIN {db_prefix}topics AS t ON (t.id_poll = p.id_poll' . ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') . ')
+					INNER JOIN {db_prefix}topics AS t ON (t.id_poll = p.id_poll' . ($this->_modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') . ')
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 				WHERE {query_wanna_see_board}
 					AND p.voting_locked = {int:not_locked}' . (!in_array(0, $boardsAllowed) ? '
-					AND b.id_board IN ({array_int:boards_allowed_list})' : '') . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+					AND b.id_board IN ({array_int:boards_allowed_list})' : '') . (!empty($this->_modSettings['recycle_enable']) && $this->_modSettings['recycle_board'] > 0 ? '
 					AND b.id_board != {int:recycle_enable}' : '') . '
 				ORDER BY {raw:type}
 				LIMIT 1',
@@ -83,7 +83,7 @@ class Show_Poll_Block extends SP_Abstract_Block
 					'boards_allowed_list' => $boardsAllowed,
 					'not_locked' => 0,
 					'is_approved' => 1,
-					'recycle_enable' => $modSettings['recycle_board'],
+					'recycle_enable' => $this->_modSettings['recycle_board'],
 					'type' => $type == 1 ? 'p.id_poll DESC' : 'RAND()',
 				)
 			);

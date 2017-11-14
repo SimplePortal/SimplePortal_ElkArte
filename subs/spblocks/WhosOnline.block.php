@@ -46,11 +46,11 @@ class Whos_Online_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $modSettings, $context;
+		global $context;
 
 		// Interface with the online today addon?
 		$this->data['online_today'] = '';
-		if (!empty($parameters['online_today']) && !empty($modSettings['onlinetoday']) && file_exists(SUBSDIR . '/OnlineToday.class.php'))
+		if (!empty($parameters['online_today']) && !empty($this->_modSettings['onlinetoday']) && file_exists(SUBSDIR . '/OnlineToday.class.php'))
 		{
 			require_once(SUBSDIR . '/OnlineToday.class.php');
 
@@ -60,7 +60,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 		}
 
 		// Spiders
-		$this->data['show_spiders'] = !empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] < 3 || allowedTo('admin_forum'));
+		$this->data['show_spiders'] = !empty($this->_modSettings['show_spider_online']) && ($this->_modSettings['show_spider_online'] < 3 || allowedTo('admin_forum'));
 
 		loadLanguage('index', '', false, true);
 
@@ -139,7 +139,7 @@ class Whos_Online_Block extends SP_Abstract_Block
  */
 function template_sp_whosOnline($data)
 {
-	global $scripturl, $modSettings, $txt, $context;
+	global $scripturl, $txt, $context, $modSettings;
 
 	echo '
 			<ul class="sp_list">
