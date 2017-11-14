@@ -107,11 +107,11 @@ class ManagePortalConfig_Controller extends Action_Controller
 
 			if (!empty($_POST['sp_portal_mode']))
 			{
-				updateSettings(array('front_page' => 'MainPortal_Controller'));
+				updateSettings(array('front_page' => 'PortalMain_Controller'));
 			}
 			else
 			{
-				updateSettings(array('front_page' => 0));
+				updateSettings(array('front_page' => ''));
 			}
 
 			$this->_generalSettingsForm->setConfigValues($_POST);
