@@ -27,12 +27,13 @@ function sp_is_active()
 		|| empty($modSettings['sp_portal_mode'])
 		|| ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum'))
 		|| isset($_GET['debug'])
-		|| (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
+		|| (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest'])
+		|| (!empty($modSettings['front_page']) && $modSettings['front_page'] !== 'PortalMain_Controller'))
 	{
 		$context['disable_sp'] = true;
 	}
 
-	return $context['disable_sp'];
+	return !$context['disable_sp'];
 }
 
 /**
@@ -88,10 +89,8 @@ function sportal_init($standalone = false)
 	}
 
 	// Portal not enabled, or mobile, or debug, or maintenance, or .... then bow out now
-	if (!empty($modSettings['sp_disableMobile']) && empty($_GET['page']) && empty($_GET['article']) || !empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')) || isset($_GET['debug']) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
+	if (!sp_is_active())
 	{
-		$context['disable_sp'] = true;
-
 		if ($standalone)
 		{
 			$get_string = '';
