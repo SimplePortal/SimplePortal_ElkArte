@@ -23,7 +23,9 @@
 
 	// Maybe we have a portal specific theme?
 	if (!isset($_GET['action']) && !isset($_GET['board']) && !isset($_GET['topic']) && ($modSettings['sp_portal_mode'] == 1 || !empty($sp_standalone)) && !empty($modSettings['portaltheme']))
+	{
 		$id_theme = (int) $modSettings['portaltheme'];
+	}
 
 	// Verify the id_theme... no foul play.]]></add>
 		</operation>

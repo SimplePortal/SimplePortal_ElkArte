@@ -231,7 +231,9 @@ function updateVisibilityProfiles($has_visibility_profiles)
 			// Build the visibility value that represents this row
 			$updates[$row['id_block']] = (!empty($selections) ? implode(',', $selections) : '') . '|' . (!empty($query) ? implode(',', $query) : '') . (!empty($mobile_view) ? '|' . $mobile_view : '');
 			if (empty($updates[$row['id_block']]) || $updates[$row['id_block']] === '|')
+			{
 				$updates[$row['id_block']] = 'portal|';
+			}
 		}
 		$db->free_result($result);
 
