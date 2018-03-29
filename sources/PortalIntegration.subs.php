@@ -511,11 +511,16 @@ function sp_integrate_menu_buttons(&$buttons)
 		return;
 	}
 
+	theme()->addCSSRules("
+	.i-spgroup::before {
+		content: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23555555' viewBox='0 0 36 32'%3E%3Cpath d='M24 24v-1.6a9 9 0 0 0 4-7.4c0-5 0-9-6-9s-6 4-6 9a9 9 0 0 0 4 7.4v1.7C13.2 24.6 8 28 8 32h28c0-4-5.2-7.4-12-8z'/%3E%3Cpath d='M10.2 24.9a19 19 0 0 1 6.3-2.6 11.3 11.3 0 0 1-2.8-7.3c0-2.7 0-5.2 1-7.3 1-2 2.6-3.3 5-3.7-.5-2.4-2-4-5.7-4-6 0-6 4-6 9a9 9 0 0 0 4 7.4v1.7C5.2 18.6 0 22 0 26h8.7l1.5-1.1z'/%3E%3C/svg%3E\");
+	}");
+
 	// Define the new menu item(s), show it for modes 1 and 3 only
 	$buttons = elk_array_insert($buttons, 'home', array(
 		'forum' => array(
 			'title' => empty($txt['sp-forum']) ? 'Forum' : $txt['sp-forum'],
-			'data-icon' => '&#xf0c0;',
+			'data-icon' => 'i-spgroup',
 			'href' => $sportal_url,
 			'show' => in_array($modSettings['sp_portal_mode'], array(1, 3)) && empty($context['disable_sp']),
 			'sub_buttons' => array(),
@@ -664,11 +669,9 @@ function sp_integrate_load_illegal_guest_permissions()
  * - Prevents parseBBC from working on these tags at all
  *
  * @param string $message
- * @param mixed[] $smileys
- * @param string $cache_id
- * @param string[]|null $parse_tags
+ * @param string[]|null $bbc_tags
  */
-function sp_integrate_pre_parsebbc(&$message, &$smileys, &$cache_id, &$parse_tags)
+function sp_integrate_pre_parsebbc(&$message, &$bbc_tags)
 {
 	if (strpos($message, '[cutoff]') !== false)
 	{
