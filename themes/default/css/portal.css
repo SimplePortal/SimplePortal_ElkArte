@@ -636,6 +636,20 @@ body {
 	padding: 0 4px;
 }
 
+#spAnnouncements dt {
+	border-top-color: #377828;
+	font-weight: 600;
+}
+
+#spAnnouncements dt a {
+	color: #377828;
+}
+
+#spAnnouncements dd {
+	border-top-color: #DDDDDD;
+	padding-bottom: 1em;
+}
+
 #admin_main_section .content {
 	overflow: auto;
 	padding: 6px 0;
