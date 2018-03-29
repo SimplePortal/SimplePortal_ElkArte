@@ -44,7 +44,7 @@
 		<hook hook="integrate_sa_xmlhttp" function="sp_integrate_xmlhttp" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_pre_log_stats" function="sp_integrate_pre_log_stats" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_load_illegal_guest_permissions" function="sp_integrate_load_illegal_guest_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_pre_parsebbc" function="sp_integrate_pre_parsebbc" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook hook="integrate_pre_bbc_parser" function="sp_integrate_pre_parsebbc" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_setup_allow" function="sp_integrate_setup_allow" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<credits url="www.simpleportal.net" license="BSD 3" copyright="Simple Portal Team">SimplePortal</credits>
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
@@ -67,7 +67,7 @@
 		<hook reverse="true" hook="integrate_sa_xmlhttp" function="sp_integrate_xmlhttp" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_pre_log_stats" function="sp_integrate_pre_log_stats" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_load_illegal_guest_permissions" function="sp_integrate_load_illegal_guest_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_pre_parsebbc" function="sp_integrate_pre_parsebbc" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<hook reverse="true" hook="integrate_pre_bbc_parser" function="sp_integrate_pre_parsebbc" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<modification reverse="true">modification.xml</modification>
 		<remove-file name="BOARDDIR/PortalStandalone.php" />
 		<remove-file name="CONTROLLERDIR/PortalArticles.controller.php" />
