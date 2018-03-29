@@ -95,8 +95,12 @@ class Theme_Select_Block extends SP_Abstract_Block
 			}
 			else
 			{
-				$txt['theme_thumbnail_href'] = $theme_data['images_url'] . '/thumbnail.png';
 				$txt['theme_description'] = '';
+			}
+
+			if (empty($txt['theme_thumbnail_href']))
+			{
+				$txt['theme_thumbnail_href'] = $theme_data['images_url'] . '/thumbnail.png';
 			}
 
 			$available_themes[$id_theme]['thumbnail_href'] = str_replace('{images_url}', $settings['images_url'], $txt['theme_thumbnail_href']);
