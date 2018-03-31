@@ -40,7 +40,7 @@ function template_block_list()
 
 		foreach ($context['columns'] as $column)
 			echo '
-					<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' width="' . $column['width'] . '"' : '', '>', $column['label'], '</th>';
+					<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' style="width:' . $column['width'] . ';"' : '', '>', $column['label'], '</th>';
 
 		echo '
 				</tr>
@@ -51,7 +51,7 @@ function template_block_list()
 		{
 			echo '
 				<tr class="content">
-					<td class="centertext noticebox" colspan="4"></td>
+					<td class="centertext noticebox" colspan="3"></td>
 				</tr>';
 		}
 
@@ -182,7 +182,10 @@ function template_block_edit()
 						<dt>';
 
 		// Look for the help text using legacyNaming
-		$helpvar = 'sp_param_sp_' . str_replace('_', '', lcfirst(ucwords($context['SPortal']['block']['type'], '_'))) . '_' . $name;
+		$helpvar = lcfirst(ucwords(str_replace('_', ' ', $context['SPortal']['block']['type'])));
+		$helpvar = str_replace(' ', '', $helpvar);
+		$helpvar = 'sp_param_sp_' . $helpvar . '_' . $name;
+
 		if (!empty($helptxt[$helpvar]))
 			echo '
 							<a class="help" href="', $scripturl, '?action=quickhelp;help=', $helpvar, '" onclick="return reqOverlayDiv(this.href);">
