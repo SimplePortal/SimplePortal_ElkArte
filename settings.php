@@ -50,6 +50,7 @@ foreach ($defaults as $index => $value)
 }
 
 updateSettings($updates);
+updateSettings(array('front_page' => 'PortalMain_Controller'));
 
 $standalone_file = BOARDDIR . '/PortalStandalone.php';
 

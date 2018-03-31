@@ -44,7 +44,7 @@ function sp_is_active()
  */
 function sportal_init($standalone = false)
 {
-	global $context, $scripturl, $modSettings, $settings, $maintenance, $sportal_version;
+	global $context, $scripturl, $modSettings, $settings, $sportal_version;
 
 	$sportal_version = '1.0.0 RC1';
 
@@ -1893,8 +1893,7 @@ function sp_prevent_flood($type, $fatal = true)
 		}
 		else
 		{
-			return isset($txt['error_sp_flood_' . $type]) ? sprintf($txt['error_sp_flood_' . $type], $time_limit)
-				: true;
+			return isset($txt['error_sp_flood_' . $type]) ? sprintf($txt['error_sp_flood_' . $type], $time_limit) : true;
 		}
 	}
 

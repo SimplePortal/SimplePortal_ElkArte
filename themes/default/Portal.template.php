@@ -132,7 +132,7 @@ function template_portal_above()
 	if (!empty($modSettings['showleft']) && !empty($context['SPortal']['blocks'][1]))
 	{
 		echo '
-		<div id="sp_left" class="sp_main_cell"', !empty($modSettings['leftwidth']) ? ' style="width:' . $modSettings['leftwidth'] . 'px"'
+		<div id="sp_left" class="sp_main_cell"', !empty($modSettings['leftwidth']) ? ' style="width:' . $modSettings['leftwidth'] . '"'
 			: '', $context['SPortal']['sides'][1]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
 			? ' style="display: none;"' : '', '>
 			<div id="sp_left_div" class="sp_column">';
@@ -145,26 +145,10 @@ function template_portal_above()
 		</div>';
 	}
 
-	// Then the right blocks (due to float)
-	if (!empty($modSettings['showright']) && !empty($context['SPortal']['blocks'][4]))
-	{
-		echo '
-			<div id="sp_right" class="sp_main_cell"', !empty($modSettings['rightwidth'])
-				? ' style="width:' . $modSettings['rightwidth'] . 'px"' : '',
-				$context['SPortal']['sides'][4]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
-				? ' style="display: none;"' : '', '>
-				<div id="sp_right_div" class="sp_column">';
-
-		foreach ($context['SPortal']['blocks'][4] as $block)
-			template_block($block, 4);
-
-		echo '
-				</div>
-			</div>';
-	}
 
 	// Followed by all the Top Blocks
 	echo '
+			<div id="sp_center">
 			<div id="sp_center_top" class="sp_main_cell">
 				<div id="sp_top_div" class="sp_column">';
 
@@ -207,7 +191,26 @@ function template_portal_below()
 	echo '
 			</div>
 		</div>
-	</div>';
+		</div>';
+
+	// Then the right blocks
+	if (!empty($modSettings['showright']) && !empty($context['SPortal']['blocks'][4]))
+	{
+		echo '
+			<div id="sp_right" class="sp_main_cell"', !empty($modSettings['rightwidth'])
+			? ' style="width:' . $modSettings['rightwidth'] . '"' : '',
+		$context['SPortal']['sides'][4]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
+			? ' style="display: none;"' : '', '>
+				<div id="sp_right_div" class="sp_column">';
+
+		foreach ($context['SPortal']['blocks'][4] as $block)
+			template_block($block, 4);
+
+		echo '
+				</div>
+			</div>
+		</div>';
+	}
 
 	// Footer Blocks
 	if (!empty($context['SPortal']['blocks'][6]))

@@ -63,6 +63,7 @@ class User_Info_Block extends SP_Abstract_Block
 		else
 		{
 			$this->data['is_guest'] = false;
+			$context['admin_features'] = isset($context['admin_features']) ? $context['admin_features'] : array();
 
 			// load up the members details
 			loadMemberData($user_info['id']);

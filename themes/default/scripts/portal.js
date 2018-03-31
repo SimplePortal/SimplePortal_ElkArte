@@ -493,3 +493,48 @@ function sp_surroundText(text1, text2, oTextHandle)
 		oTextHandle.focus(oTextHandle.value.length - 1);
 	}
 }
+
+// Updates the current version container with the current version found in the repository
+function sp_currentVersion()
+{
+	var oSPVersionContainer = document.getElementById("spCurrentVersion"),
+		oinstalledVersionContainer = document.getElementById("spYourVersion"),
+		sCurrentVersion = oinstalledVersionContainer.innerHTML;
+
+	$.getJSON('https://api.github.com/repos/SimplePortal/SimplePortal_ElkArte/releases', {format: "json"},
+		function(data, textStatus, jqXHR) {
+			var mostRecent = {},
+				init_news = false;
+
+			$.each(data, function(idx, elem) {
+				// No drafts, thank you
+				if (elem.draft)
+					return;
+
+				mostRecent = elem;
+
+				// Load announcements for this release
+				sp_setAnnouncement(init_news, elem);
+				init_news = true;
+			});
+
+			var spVersion = mostRecent.tag_name.replace(/simpleportal/i, '').trim();
+
+			oSPVersionContainer.innerHTML = spVersion;
+			if (sCurrentVersion !== spVersion)
+				oinstalledVersionContainer.innerHTML = '<span class="alert">' + sCurrentVersion + '</span>';
+		});
+}
+
+// Load in any announcements
+function sp_setAnnouncement(init_news, announcement)
+{
+	var oElem = document.getElementById('spAnnouncements'),
+		sMessages = init_news ? oElem.innerHTML : '',
+		sAnnouncementTemplate = '<dl>%content%</dl>',
+		sAnnouncementMessageTemplate = '<dt><a href="%href%">%subject%</a> :: %time%</dt><dd>%message%</dd>';
+
+	var sMessage = sAnnouncementMessageTemplate.replace('%href%', announcement.html_url).replace('%subject%', announcement.name).replace('%time%', announcement.published_at.replace(/[TZ]/g, ' ')).replace('%message%', announcement.body).replace(/\n/g, '<br />').replace(/\r/g, '');
+
+	oElem.innerHTML = sMessages + sAnnouncementTemplate.replace('%content%', sMessage);
+}

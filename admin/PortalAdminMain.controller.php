@@ -191,7 +191,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 					}
 					else
 					{
-						$suffix = '';
+						$suffix = 'px';
 					}
 
 					preg_match_all('/(?:([0-9]+)|.)/i', $_POST[$pos . 'width'], $matches);
@@ -335,6 +335,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		global $context, $scripturl, $txt, $sportal_version, $user_profile;
 
 		loadTemplate('PortalAdmin');
+		loadJavascriptFile('portal.js?sp100rc1');
 
 		$context['sp_credits'] = array(
 			array(
