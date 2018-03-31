@@ -191,7 +191,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 					}
 					else
 					{
-						$suffix = '';
+						$suffix = 'px';
 					}
 
 					preg_match_all('/(?:([0-9]+)|.)/i', $_POST[$pos . 'width'], $matches);
