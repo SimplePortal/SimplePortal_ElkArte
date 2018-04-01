@@ -148,7 +148,7 @@ function template_portal_above()
 
 	// Followed by all the Top Blocks
 	echo '
-			<div id="sp_center">
+		<div id="sp_center">
 			<div id="sp_center_top" class="sp_main_cell">
 				<div id="sp_top_div" class="sp_column">';
 
@@ -189,28 +189,31 @@ function template_portal_below()
 	}
 
 	echo '
+				</div>
 			</div>
-		</div>
 		</div>';
 
 	// Then the right blocks
 	if (!empty($modSettings['showright']) && !empty($context['SPortal']['blocks'][4]))
 	{
 		echo '
-			<div id="sp_right" class="sp_main_cell"', !empty($modSettings['rightwidth'])
+		<div id="sp_right" class="sp_main_cell"', !empty($modSettings['rightwidth'])
 			? ' style="width:' . $modSettings['rightwidth'] . '"' : '',
 		$context['SPortal']['sides'][4]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
 			? ' style="display: none;"' : '', '>
-				<div id="sp_right_div" class="sp_column">';
+			<div id="sp_right_div" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][4] as $block)
 			template_block($block, 4);
 
 		echo '
-				</div>
 			</div>
 		</div>';
 	}
+
+	// Close the main portal div
+	echo '	
+	</div>';
 
 	// Footer Blocks
 	if (!empty($context['SPortal']['blocks'][6]))

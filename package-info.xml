@@ -52,6 +52,7 @@
 
 	<uninstall for="1.1 - 1.1.99">
 		<readme type="inline">This will uninstall SimplePortal for Elkarte.</readme>
+		<code>remove.php</code>
 		<hook reverse="true" hook="integrate_init_theme" function="sp_integrate_init_theme" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_current_action" function="sp_integrate_current_action" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook reverse="true" hook="integrate_action_boardindex_after" function="sp_integrate_boardindex" file="SOURCEDIR/PortalIntegration.subs.php" />

@@ -11,7 +11,6 @@
 
 if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
 {
-	$_GET['debug'] = 'Blue Dream!';
 	require_once(dirname(__FILE__) . '/SSI.php');
 }
 elseif (!defined('ELK'))
