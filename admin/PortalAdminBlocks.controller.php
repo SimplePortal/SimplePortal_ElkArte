@@ -751,7 +751,8 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// You have to be allowed to do this
 		$validation_token = validateToken('admin-sort', 'post', true, false);
 		$validation_session = validateSession();
-		if (empty($validation_session) && $validation_token === true)
+
+		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering the blocks
 			if (isset($_POST['order'], $_POST['received'], $_POST['moved']))
@@ -832,9 +833,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// Failed validation, tough to be you
 		else
 		{
-			if (!empty($validation_session))
+			if (!empty($validation_session) && $validation_session !== true)
 			{
-				$errors[] = array('value' => $txt[$validation_session]);
+				$errors[] = array('value' => $txt['session_verify_fail'] . ' (' . $validation_session . ')');
 			}
 
 			if (empty($validation_token))
