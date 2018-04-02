@@ -1232,12 +1232,12 @@ dl.sp_form img,
 
 	#sp_center {
 		flex: 0 0 75%;
+		max-width: 100%;
 	}
 
 	#sp_left, #sp_right {
 		flex: 0 0 24%;
 	}
-
 }
 
 /* This one does 800 screens at default font size. */
@@ -1281,13 +1281,14 @@ dl.sp_form img,
 
 	#sp_center_top {
 		order: 1;
-		width: 100%;
+		min-width: 100%;
 	}
 
 	#sp_center_bottom {
 		order: 4;
-		width: 100%;
+		min-width: 100%;
 	}
+
 
 	#sp_collapse_side1, #sp_collapse_side2, #sp_collapse_side3, #sp_collapse_side4 {
 		padding: 6px;
