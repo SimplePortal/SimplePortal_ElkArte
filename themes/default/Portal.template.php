@@ -85,7 +85,7 @@ function template_portal_above()
 	if (empty($modSettings['sp_disable_side_collapse']) && ($context['SPortal']['sides'][1]['active'] || $context['SPortal']['sides'][4]['active']))
 	{
 		echo '
-	<div class="righttext sp_fullwidth" style="margin-bottom: 2.5em;">';
+	<div class="righttext sp_fullwidth" style="margin-bottom: 3.5em;">';
 
 		if ($context['SPortal']['sides'][1]['active'])
 			echo '
@@ -124,7 +124,7 @@ function template_portal_above()
 	</div>';
 	}
 
-	// The main portal div
+	// The flex main portal div
 	echo '
 	<div id="sp_main">';
 
@@ -147,8 +147,15 @@ function template_portal_above()
 
 
 	// Followed by all the Top Blocks
+	$flex = '';
+	if ((empty($modSettings['showleft']) || empty($context['SPortal']['blocks'][1]))
+		&& (empty($modSettings['showright']) || empty($context['SPortal']['blocks'][4])))
+	{
+		$flex = 'flex: 0 0 100%;';
+	}
+
 	echo '
-		<div id="sp_center">
+		<div id="sp_center" style="' . $flex . '">
 			<div id="sp_center_top" class="sp_main_cell">
 				<div id="sp_top_div" class="sp_column">';
 

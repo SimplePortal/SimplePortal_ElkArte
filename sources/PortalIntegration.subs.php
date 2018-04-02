@@ -448,11 +448,14 @@ function sp_integrate_quickhelp()
  */
 function sp_integrate_buffer($tourniquet)
 {
-	global $sportal_version, $context, $modSettings;
+	global $sportal_version, $context, $modSettings, $forum_copyright;
 
 	$fix = str_replace('{version}', $sportal_version, '<a href="https://simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . strftime('%Y') . '</a>');
 
-	if ((ELK === 'SSI' && empty($context['standalone'])) || !Template_Layers::instance()->hasLayers() || empty($modSettings['sp_portal_mode']) || strpos($tourniquet, $fix) !== false)
+	if ((ELK === 'SSI' && empty($context['standalone']))
+		|| !Template_Layers::instance()->hasLayers()
+		|| empty($modSettings['sp_portal_mode'])
+		|| strpos($tourniquet, $fix) !== false)
 	{
 		return $tourniquet;
 	}
@@ -465,10 +468,10 @@ function sp_integrate_buffer($tourniquet)
 
 	// Append our cp notice at the end of the line
 	$finds = array(
-		sprintf('powered by %1$s</a> | ', FORUM_VERSION),
+		$forum_copyright,
 	);
 	$replaces = array(
-		sprintf('powered by %1$s</a> | ', FORUM_VERSION) . $fix . ' | ',
+		sprintf($forum_copyright, FORUM_VERSION) . ' | ' . $fix,
 	);
 
 	$tourniquet = str_replace($finds, $replaces, $tourniquet);
