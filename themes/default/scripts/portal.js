@@ -453,7 +453,7 @@ function sp_collapseCalendar(id)
 function sp_collapseObject(id)
 {
 	var mode = document.getElementById("sp_object_" + id).style.display;
-	mode = (mode === "" | mode === "block") ? false : true;
+	mode = (!(mode === "" || mode === "block"));
 
 	// Make it close smoothly
 	$("#sp_object_" + id).slideToggle(300);
