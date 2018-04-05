@@ -331,7 +331,8 @@ class PortalArticles_Controller extends Action_Controller
 
 				// Answer the question - no, it hasn't been modified ;).
 				header('HTTP/1.1 304 Not Modified');
-			}   exit(0);
+			}
+			exit(0);
 		}
 
 		// Check whether the ETag was sent back, and cache based on that...
@@ -419,14 +420,7 @@ class PortalArticles_Controller extends Action_Controller
 			$fp = fopen($filename, 'rb');
 			while (!feof($fp))
 			{
-				if (isset($callback))
-				{
-					echo $callback(fread($fp, 8192));
-				}
-				else
-				{
-					echo fread($fp, 8192);
-				}
+				echo fread($fp, 8192);
 
 				flush();
 			}
