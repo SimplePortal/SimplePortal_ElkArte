@@ -83,7 +83,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'name' => 'Total time logged in',
 				'field' => 'mem.total_time_logged_in',
 				'order' => 'mem.total_time_logged_in',
-				'output_function' => create_function('&$row', '
+				'output_function' => function(&$row) {
 					global $txt;
 
 					// Figure out the days, hours and minutes.
@@ -93,14 +93,18 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 					// Figure out which things to show... (days, hours, minutes, etc.)
 					$timelogged = "";
 					if ($timeDays > 0)
+					{
 						$timelogged .= $timeDays . $txt["totalTimeLogged5"];
+					}
 
 					if ($timeHours > 0)
+					{
 						$timelogged .= $timeHours . $txt["totalTimeLogged6"];
+					}
 
 					$timelogged .= floor(($row["total_time_logged_in"] % 3600) / 60) . $txt["totalTimeLogged7"];
 					$row["timelogged"] = $timelogged;
-				'),
+				},
 				'output_text' => ' %timelogged%',
 				'reverse_sort_asc' => false,
 				'enabled' => true,
@@ -116,9 +120,9 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'name' => 'Karma Good',
 				'field' => 'mem.karma_good, mem.karma_bad',
 				'order' => 'mem.karma_good',
-				'output_function' => create_function('&$row', '
+				'output_function' => function(&$row) {
 					$row["karma_total"] = $row["karma_good"] - $row["karma_bad"];
-				'),
+				},
 				'output_text' => (!empty($this->_modSettings['karmaLabel']) ? $this->_modSettings['karmaLabel'] : '') . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
 				'enabled' => !empty($this->_modSettings['karmaMode']),
 				'error_msg' => $txt['sp_karma_is_disabled'],
@@ -127,9 +131,9 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'name' => 'Karma Bad',
 				'field' => 'mem.karma_good, mem.karma_bad',
 				'order' => 'mem.karma_bad',
-				'output_function' => create_function('&$row', '
+				'output_function' => function(&$row) {
 					$row["karma_total"] = $row["karma_good"] - $row["karma_bad"];
-				'),
+				},
 				'output_text' => (!empty($this->_modSettings['karmaLabel']) ? $this->_modSettings['karmaLabel'] : '') . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
 				'enabled' => !empty($this->_modSettings['karmaMode']),
 				'error_msg' => $txt['sp_karma_is_disabled'],
@@ -138,9 +142,9 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'name' => 'Karma Total',
 				'field' => 'mem.karma_good, mem.karma_bad',
 				'order' => 'FLOOR(1000000+karma_good-karma_bad)',
-				'output_function' => create_function('&$row', '
+				'output_function' => function(&$row) {
 					$row["karma_total"] = $row["karma_good"] - $row["karma_bad"];
-				'),
+				},
 				'output_text' => $this->_modSettings['karmaLabel'] . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
 				'enabled' => !empty($this->_modSettings['karmaMode']),
 				'error_msg' => $txt['sp_karma_is_disabled'],
@@ -414,7 +418,7 @@ function template_sp_topStatsMember($data)
 						</a>' : '', '
 					</td>
 					<td>
-						', $member['link'], '<br /><span class="smalltext">', $member['output'], '</span>
+						', $member['link'], ' : <span class="smalltext">', $member['output'], '</span>
 					</td>
 				</tr>';
 	}
