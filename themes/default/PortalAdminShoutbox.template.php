@@ -58,10 +58,10 @@ function template_shoutbox_edit()
 								</ul>
 							</fieldset>
 							<a href="javascript:void(0);" onclick="document.getElementById(\'moderators\').style.display = \'block\'; document.getElementById(\'moderators_groups_link\').style.display = \'none\'; return false;" id="moderators_groups_link" style="display: none;">[ ', $txt['avatar_select_permission'], ' ]</a>
-							<script"><!-- // --><![CDATA[
+							<script>
 								document.getElementById("moderators").style.display = "none";
 								document.getElementById("moderators_groups_link").style.display = "";
-							// ]]></script>
+							</script>
 						</dd>
 						<dt>
 							<a href="', $scripturl, '?action=quickhelp;help=sp-shoutboxesWarning" onclick="return reqOverlayDiv(this.href);" class="help">
