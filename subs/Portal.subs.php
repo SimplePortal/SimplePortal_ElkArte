@@ -17,7 +17,7 @@
  */
 function sp_is_active()
 {
-	global $modSettings, $context;
+	global $modSettings, $context, $settings, $maintenance;
 
 	$context['disable_sp'] = false;
 
