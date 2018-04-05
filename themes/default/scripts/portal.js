@@ -113,7 +113,7 @@ function sp_image_resize()
 		}
 	}
 
-	if (typeof(window_oldSPImageOnload) !== "undefined" && window_oldSPImageOnload)
+	if (typeof window_oldSPImageOnload !== "undefined" && window_oldSPImageOnload)
 	{
 		window_oldSPImageOnload();
 		window_oldSPImageOnload = null;

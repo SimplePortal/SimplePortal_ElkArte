@@ -173,5 +173,3 @@ $helptxt['sp_param_sp_gallery_direction'] = 'La galerie d\'images sera alignée 
 $helptxt['sp_param_sp_html_content'] = 'Saisiez le contenu HTML personnalisé dans cette boîte.';
 $helptxt['sp_param_sp_bbc_content'] = 'Saisiez le contenu BBC personnalisé dans cette boîte.';
 $helptxt['sp_param_sp_php_content'] = 'Saisiez le contenu PHP personnalisé dans cette boîte.';
-
-?>
