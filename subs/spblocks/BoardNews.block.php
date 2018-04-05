@@ -120,6 +120,7 @@ class Board_News_Block extends SP_Abstract_Block
 		$this->_db->free_result($request);
 
 		// No posts, basic error message it is
+		$current_url = '';
 		if (empty($posts))
 		{
 			$this->setTemplate('template_sp_boardNews_error');

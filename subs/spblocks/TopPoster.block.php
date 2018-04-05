@@ -59,6 +59,8 @@ class Top_Poster_Block extends SP_Abstract_Block
 		// If not top poster of all time we need to set a start time
 		if (!empty($type))
 		{
+			$start_time = time();
+
 			// Today
 			if ($type == 1)
 			{

@@ -525,7 +525,7 @@ function sportal_modify_article_comment($comment_id, $body)
  *
  * @param int $comment_id comment it
  *
- * @return null
+ * @return boolean
  */
 function sportal_delete_article_comment($comment_id)
 {
@@ -634,6 +634,7 @@ function removeArticleAttachments($attachmentQuery)
 			'restriction' => $restriction,
 		)
 	);
+	$attach = array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		$filename = $attachmentQuery['id_folder'] . '/' . $row['id_attach'] . '_' . $row['file_hash'] . '.elk';

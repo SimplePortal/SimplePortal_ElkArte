@@ -150,9 +150,7 @@ function template_portal_above()
 	$flex = '';
 	if ((empty($modSettings['showleft']) || empty($context['SPortal']['blocks'][1]))
 		&& (empty($modSettings['showright']) || empty($context['SPortal']['blocks'][4])))
-	{
 		$flex = 'flex: 0 0 100%;';
-	}
 
 	echo '
 		<div id="sp_center" style="' . $flex . '">

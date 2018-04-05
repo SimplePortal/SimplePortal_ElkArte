@@ -175,6 +175,8 @@ function updateTableStructures()
 
 /**
  * Update sp_blocks to use visibility profiles in place of display and mobile view values
+ *
+ * @param bool $has_visibility_profiles;
  */
 function updateVisibilityProfiles($has_visibility_profiles)
 {
@@ -297,6 +299,8 @@ function updateVisibilityProfiles($has_visibility_profiles)
 
 /**
  * Update tables to use styles profiles id's in place of old style text
+ *
+ * @param bool $has_style_profiles
  */
 function updateStyleProfiles($has_style_profiles)
 {

@@ -14,17 +14,24 @@
  */
 function sp_collapseBlock(id)
 {
-	$("#sp_block_" + id).slideToggle(300).promise().done(function() {
+	$("#sp_block_" + id).slideToggle(300).promise().done(function ()
+	{
 		var mode = false;
 
 		if ($("#sp_block_" + id).is(":visible"))
+		{
 			mode = true;
+		}
 
 		// Save the choice, one way for guest, or theme options for members
 		if (elk_member_id === 0)
+		{
 			document.cookie = "sp_block_" + id + "=" + (mode ? 0 : 1);
+		}
 		else
+		{
 			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null, null);
+		}
 
 		// Swap the class to change the icon
 		$("#sp_collapse_" + id).attr("class", mode ? "collapse" : "expand");
@@ -47,9 +54,13 @@ function sp_collapseSide(id)
 
 	// Guests use a cookie, members a theme option to remember the choice
 	if (elk_member_id === 0)
+	{
 		document.cookie = sp_sides[id] + "=" + (mode ? 0 : 1);
+	}
 	else
+	{
 		elk_setThemeOption(sp_sides[id], mode ? 0 : 1, null, null);
+	}
 
 	// Update the side expand/collapse image
 	document.getElementById("sp_collapse_side" + id).className = (mode ? "dot collapse" : "dot expand");
@@ -71,7 +82,9 @@ function sp_collapse_object(id, has_image)
 	$("#sp_object_" + id).toggle(300);
 
 	if (typeof(has_image) === "undefined" || has_image === true)
+	{
 		document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? '/collapse.png' : '/expand.png');
+	}
 }
 
 function sp_image_resize()
@@ -81,7 +94,9 @@ function sp_image_resize()
 	for (var i = 0; i < possible_images.length; i++)
 	{
 		if (possible_images[i].className !== "bbc_img sp_article")
+		{
 			continue;
+		}
 
 		var temp_image = new Image();
 		temp_image.src = possible_images[i].src;
@@ -123,9 +138,9 @@ function sp_submit_shout(shoutbox_id, sSessionVar, sSessionId)
 		sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;xml', 'shoutbox_id=' + shoutbox_id + '&shout=' + shout_body + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
 
 		document.getElementById('new_shout_' + shoutbox_id).value = '';
-
-		return false;
 	}
+
+	return false;
 }
 
 /**
@@ -143,9 +158,9 @@ function sp_delete_shout(shoutbox_id, shout_id, sSessionVar, sSessionId)
 		shoutbox_indicator(shoutbox_id, true);
 
 		sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;xml', 'shoutbox_id=' + shoutbox_id + '&delete=' + shout_id + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
-
-		return false;
 	}
+
+	return false;
 }
 
 /**
@@ -161,9 +176,9 @@ function sp_refresh_shout(shoutbox_id, last_refresh)
 		shoutbox_indicator(shoutbox_id, true);
 
 		getXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;shoutbox_id=' + shoutbox_id + ';time=' + last_refresh + ';xml', onShoutReceived);
-
-		return false;
 	}
+
+	return false;
 }
 
 /**
@@ -173,7 +188,8 @@ function sp_refresh_shout(shoutbox_id, last_refresh)
  */
 function onShoutReceived(XMLDoc)
 {
-	var shout, shoutbox_id, updated, error, warning, reverse, id, author, time, timeclean, delete_link, content, is_me, new_body = '';
+	var shout, shoutbox_id, updated, error, warning, reverse, id, author, time,
+		timeclean, delete_link, content, is_me, new_body = '';
 
 	// All valid response will have these
 	shoutbox_id = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("shoutbox")[0].childNodes[0].nodeValue;
@@ -189,10 +205,14 @@ function onShoutReceived(XMLDoc)
 
 		// SHow the "warning" box at the top of the shoutbox
 		if (warning !== "0")
+		{
 			new_body += '<li class="shoutbox_warning smalltext">' + warning + '</li>';
+		}
 
 		if (error !== "0")
+		{
 			document.getElementById('shouts_' + shoutbox_id).innerHTML = new_body + '<li class="smalltext">' + error + '</li>';
+		}
 		else
 		{
 			// Display all the shouts
@@ -215,9 +235,13 @@ function onShoutReceived(XMLDoc)
 
 			// Set the display direction
 			if (reverse !== "0")
+			{
 				document.getElementById('shouts_' + shoutbox_id).scrollTop = document.getElementById('shouts_' + shoutbox_id).scrollHeight;
+			}
 			else
+			{
 				document.getElementById('shouts_' + shoutbox_id).scrollTop = 0;
+			}
 		}
 	}
 
@@ -243,12 +267,18 @@ function sp_catch_enter(key)
 	var keycode;
 
 	if (window.event)
+	{
 		keycode = window.event.keyCode;
+	}
 	else if (key)
+	{
 		keycode = key.which;
+	}
 
 	if (keycode === 13)
+	{
 		return true;
+	}
 }
 
 function sp_show_ignored_shout(shout_id)
@@ -311,15 +341,19 @@ function sp_update_editor(new_state, original)
 	{
 		// Get the current textbox contents, treat as if html
 		if (original === 'html')
-			val =  $_textarea.html().php_unhtmlspecialchars();
+		{
+			val = $_textarea.html().php_unhtmlspecialchars();
+		}
 		else
-			val = '[code]' +  $_textarea.val().replace(/\n/g, '<br \>') + '[/code]';
+		{
+			val = '[code]' + $_textarea.val().replace(/\n/g, '<br \>') + '[/code]';
+		}
 
 		// Start the editor again
 		elk_editor();
 
 		// load the editor with the html contents, toggle back to bbc so the editor converts it
-		instance =  $_textarea.sceditor("instance");
+		instance = $_textarea.sceditor("instance");
 		instance.sourceMode(false);
 		instance.setWysiwygEditorValue(val);
 		instance.sourceMode(true);
@@ -353,7 +387,9 @@ function sp_update_editor(new_state, original)
 	{
 		// Update the the original text area with current editor contents and stop the editor
 		if (new_state === 'html')
+		{
 			instance.updateOriginal();
+		}
 
 		instance.destroy();
 	}
@@ -364,19 +400,22 @@ function sp_update_editor(new_state, original)
  *
  * @param {string} element ID of element to attach change/focus events
  */
-function sp_editor_change_type(element) {
-    var previous;
+function sp_editor_change_type(element)
+{
+	var previous;
 
-    $('#' + element).on('focus', function () {
-        // Store the current value on focus and on change
-        previous = this.value;
-    }).change(function() {
-        // Handle the editor change
+	$('#' + element).on('focus', function ()
+	{
+		// Store the current value on focus and on change
+		previous = this.value;
+	}).change(function ()
+	{
+		// Handle the editor change
 		sp_update_editor(this.value, previous);
 
-        // Make sure the previous value is updated
-        previous = this.value;
-    });
+		// Make sure the previous value is updated
+		previous = this.value;
+	});
 }
 
 /**
@@ -398,7 +437,9 @@ function sp_collapseCalendar(id)
 	new_day = "sp_calendar_" + id;
 
 	if (new_day === current_day)
+	{
 		return false;
+	}
 
 	document.getElementById(current_day).style.display = "none";
 	document.getElementById(new_day).style.display = "";
@@ -425,7 +466,7 @@ function sp_collapseObject(id)
  */
 function check_style_options()
 {
-	var	noTitle = document.getElementById("no_title").checked,
+	var noTitle = document.getElementById("no_title").checked,
 		noBody = document.getElementById("no_body").checked;
 
 	document.getElementById("title_default_class").disabled = noTitle;
@@ -461,7 +502,9 @@ function sp_surroundText(text1, text2, oTextHandle)
 			caretPos.select();
 		}
 		else
+		{
 			oTextHandle.focus(caretPos);
+		}
 	}
 	// Compliant text range wrap.
 	else if ('selectionStart' in oTextHandle)
@@ -477,9 +520,13 @@ function sp_surroundText(text1, text2, oTextHandle)
 		if (oTextHandle.setSelectionRange)
 		{
 			if (selection.length === 0)
+			{
 				oTextHandle.setSelectionRange(newCursorPos + text1.length, newCursorPos + text1.length);
+			}
 			else
+			{
 				oTextHandle.setSelectionRange(newCursorPos, newCursorPos + text1.length + selection.length + text2.length);
+			}
 
 			oTextHandle.focus();
 		}
@@ -502,14 +549,18 @@ function sp_currentVersion()
 		sCurrentVersion = oinstalledVersionContainer.innerHTML;
 
 	$.getJSON('https://api.github.com/repos/SimplePortal/SimplePortal_ElkArte/releases', {format: "json"},
-		function(data, textStatus, jqXHR) {
+		function (data, textStatus, jqXHR)
+		{
 			var mostRecent = {},
 				init_news = false;
 
-			$.each(data, function(idx, elem) {
+			$.each(data, function (idx, elem)
+			{
 				// No drafts, thank you
 				if (elem.draft)
+				{
 					return;
+				}
 
 				mostRecent = elem;
 
@@ -522,7 +573,9 @@ function sp_currentVersion()
 
 			oSPVersionContainer.innerHTML = spVersion;
 			if (sCurrentVersion !== spVersion)
+			{
 				oinstalledVersionContainer.innerHTML = '<span class="alert">' + sCurrentVersion + '</span>';
+			}
 		});
 }
 
