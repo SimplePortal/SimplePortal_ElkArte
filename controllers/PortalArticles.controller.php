@@ -429,7 +429,7 @@ class PortalArticles_Controller extends Action_Controller
 		// On some of the less-bright hosts, readfile() is disabled.  It's just a faster, more byte safe, version of what's in the if.
 		elseif (@readfile($filename) === null)
 		{
-			echo isset($callback) ? $callback(file_get_contents($filename)) : file_get_contents($filename);
+			echo file_get_contents($filename);
 		}
 
 		obExit(false);

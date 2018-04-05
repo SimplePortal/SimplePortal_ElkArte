@@ -857,7 +857,7 @@ function sportal_process_visibility($query)
  *
  * @param int $visibility_id
  *
- * @return bool if to show the block or not
+ * @return mixed if to show the block or not
  */
 function sportal_check_visibility($visibility_id)
 {
