@@ -354,6 +354,7 @@ table.sp_articles {
 
 #sp_center {
 	flex: 1 1 auto;
+	overflow: auto;
 }
 
 #sp_center_top, #sp_center_bottom {
