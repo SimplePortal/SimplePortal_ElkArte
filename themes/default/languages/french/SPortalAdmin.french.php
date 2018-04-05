@@ -523,4 +523,3 @@ $txt['sp-adminCatDesc'] = 'Ici vous pouvez gérer SimplePortal.';
 
 // Errors
 $txt['sp_form_errors_detected'] = 'La ou les erreurs suivantes sont survenues durant la sauvegarde ou l\'édition :';
-?>

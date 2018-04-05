@@ -112,7 +112,7 @@ function template_menus_custom_item_edit()
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
 	</div>
-	<script><!-- // --><![CDATA[
+	<script>
 		var sp_link_items = {';
 
 	$sets = array();
@@ -153,5 +153,5 @@ function template_menus_custom_item_edit()
 			document.getElementById("item_link_dt").style.display = document.getElementById("item_link_dd").style.display = new_value == "custom" ? "none" : "block";
 			document.getElementById("item_url_dt").style.display = document.getElementById("item_url_dd").style.display = new_value != "custom" ? "none" : "block";
 		}
-	// ]]></script>';
+	</script>';
 }

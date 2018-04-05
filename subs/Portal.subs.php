@@ -17,7 +17,7 @@
  */
 function sp_is_active()
 {
-	global $modSettings, $context;
+	global $modSettings, $context, $settings, $maintenance;
 
 	$context['disable_sp'] = false;
 
@@ -589,7 +589,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
  *
  * @param string[]|string|null $query
  *
- * @return array
+ * @return boolean|array
  */
 function sportal_process_visibility($query)
 {
@@ -717,7 +717,6 @@ function sportal_process_visibility($query)
 			continue;
 		}
 
-		$name = '';
 		$item = '';
 
 		// Is this a weird action?
@@ -858,7 +857,7 @@ function sportal_process_visibility($query)
  *
  * @param int $visibility_id
  *
- * @return bool if to show the block or not
+ * @return mixed if to show the block or not
  */
 function sportal_check_visibility($visibility_id)
 {

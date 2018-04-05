@@ -95,6 +95,9 @@ abstract class SP_Abstract_Block
 	/**
 	 * Called as part of the sportal_load_blocks process to initiate a block prior
 	 * to its being displayed.
+	 *
+	 * @param array $parameters
+	 * @param int $id
 	 */
 	abstract public function setup($parameters, $id);
 

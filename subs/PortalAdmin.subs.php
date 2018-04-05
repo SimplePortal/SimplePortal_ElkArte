@@ -275,8 +275,6 @@ function sp_general_load_themes()
  *                       'master' => will load only not postbased groups
  * @param string $contextName - where the data should stored in the $context
  * @param string $subContext
- *
- * @return null
  */
 function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $contextName = 'member_groups', $subContext = 'SPortal')
 {

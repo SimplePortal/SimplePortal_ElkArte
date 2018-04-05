@@ -115,7 +115,9 @@ class Rss_Feed_Block extends SP_Abstract_Block
 		}
 
 		$data = str_replace(array("\n", "\r", "\t"), '', $data);
-		$data = preg_replace_callback('~<\!\[CDATA\[(.+?)\]\]>~u', create_function('$m', 'return "#cdata_escape_encode#" . Util::htmlspecialchars($m[1]);'), $data);
+		$data = preg_replace_callback('~<\!\[CDATA\[(.+?)\]\]>~u', function($m) {
+			return "#cdata_escape_encode#" . Util::htmlspecialchars($m[1]);
+		}, $data);
 
 		// Find all the feed items
 		preg_match_all('~<item>(.+?)</item>~', $data, $items);

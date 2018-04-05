@@ -191,7 +191,7 @@ function template_shoutbox_embed($shoutbox)
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 	</form>
 
-	<script><!-- // --><![CDATA[
+	<script>
 		var last_refresh_', $shoutbox['id'], ' = ', time(), ';';
 
 	if ($shoutbox['reverse'])
@@ -264,7 +264,7 @@ function template_shoutbox_embed($shoutbox)
 	}
 
 	echo '
-	// ]]></script>';
+	</script>';
 }
 
 /**

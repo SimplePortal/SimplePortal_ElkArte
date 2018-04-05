@@ -223,7 +223,7 @@ function sp_integrate_load_permissions(&$permissionGroups, &$permissionList, &$l
  *
  * @param string $actions
  *
- * @return array
+ * @return string|array
  */
 function sp_integrate_whos_online($actions)
 {
