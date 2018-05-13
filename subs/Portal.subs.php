@@ -395,7 +395,7 @@ function sportal_load_blocks()
 		$context['SPortal']['blocks'] = array();
 	}
 
-	// For each active block, determine it style and get an instance of it for use
+	// For each active block, determine the style and get an instance of it for use
 	foreach ($blocks as $block)
 	{
 		if (!$context['SPortal']['sides'][$block['column']]['active'] || empty($block['type']))
@@ -499,6 +499,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 
 	$query = array();
 	$parameters = array();
+
 	if (!empty($column_id))
 	{
 		$query[] = 'spb.col = {int:col}';
@@ -544,6 +545,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 			elseif (!isset($show_it[$row['visibility']]))
 			{
 				$show_it[$row['visibility']] = sportal_check_visibility($row['visibility']);
+
 				if ($show_it[$row['visibility']] === false)
 				{
 					continue;
@@ -1726,6 +1728,7 @@ function sportal_get_menu_items($item_id = null, $sort = 'id_item')
  * What is does:
  * - If no profile id is supplied, all profiles are returned
  * - If type = 1 (generally the case), the profile group permissions are returned
+ * - Type 2 are Style and Type 3 are Visibility profiles
  *
  * @param int|null $profile_id
  * @param int|null $type

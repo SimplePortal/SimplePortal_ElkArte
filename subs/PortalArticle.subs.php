@@ -467,6 +467,8 @@ function sportal_get_comments($article_id = null, $limit = null, $start = null)
  *
  * @param int $article_id id of the article commented on
  * @param string $body text of the comment
+ *
+ * @return null
  */
 function sportal_create_article_comment($article_id, $body)
 {
