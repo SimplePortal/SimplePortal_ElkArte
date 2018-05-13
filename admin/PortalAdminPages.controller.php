@@ -361,7 +361,7 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		// Set the editor box as needed (editor or textbox, etc)
 		addInlineJavascript('
-			$(window).load(function() {
+			$(function() {
 				diewithfire = window.setTimeout(function() {sp_update_editor("' . $context['SPortal']['page']['type'] . '", "");}, 200);
 			});
 		');

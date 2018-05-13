@@ -416,6 +416,7 @@ function sportal_get_comments($article_id = null, $limit = null, $start = null)
 	);
 	$return = array();
 	$member_ids = array();
+	$parser = \BBC\ParserWrapper::instance();
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row['id_author']))
@@ -425,7 +426,7 @@ function sportal_get_comments($article_id = null, $limit = null, $start = null)
 
 		$return[$row['id_comment']] = array(
 			'id' => $row['id_comment'],
-			'body' => censor(parse_bbc($row['body'])),
+			'body' => censor($parser->parseMessage($row['body'], true)),
 			'time' => htmlTime($row['log_time']),
 			'author' => array(
 				'id' => $row['id_author'],
@@ -727,21 +728,8 @@ function createArticleAttachment(&$attachmentOptions)
 
 	require_once(SUBSDIR . '/Graphics.subs.php');
 
-	// These are the only valid image types.
-	$validImageTypes = array(
-		1 => 'gif',
-		2 => 'jpeg',
-		3 => 'png',
-		5 => 'psd',
-		6 => 'bmp',
-		7 => 'tiff',
-		8 => 'tiff',
-		9 => 'jpeg',
-		14 => 'iff'
-	);
-
 	// If this is an image we need to set a few additional parameters.
-	$size = @getimagesize($attachmentOptions['tmp_name']);
+	$size = elk_getimagesize($attachmentOptions['tmp_name']);
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
 
 	// If it's an image get the mime type right.
@@ -753,9 +741,9 @@ function createArticleAttachment(&$attachmentOptions)
 			$attachmentOptions['mime_type'] = $size['mime'];
 		}
 		// Otherwise a valid one?
-		elseif (isset($validImageTypes[$size[2]]))
+		else
 		{
-			$attachmentOptions['mime_type'] = 'image/' . $validImageTypes[$size[2]];
+			$attachmentOptions['mime_type'] = getValidMimeImageType($size[2]);
 		}
 	}
 
@@ -769,7 +757,7 @@ function createArticleAttachment(&$attachmentOptions)
 	// Get the hash if no hash has been given yet.
 	if (empty($attachmentOptions['file_hash']))
 	{
-		$attachmentOptions['file_hash'] = sha1(md5($attachmentOptions['name'] . time()) . mt_rand());
+		$attachmentOptions['file_hash'] = getAttachmentFilename($attachmentOptions['name'], 0, null, true);
 	}
 
 	// Assuming no-one set the extension let's take a look at it.
@@ -785,13 +773,12 @@ function createArticleAttachment(&$attachmentOptions)
 	$db->insert('',
 		'{db_prefix}sp_attachments',
 		array(
-			'id_article' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
-			'size' => 'int', 'width' => 'int', 'height' => 'int',
-			'mime_type' => 'string-20',
+			'id_article' => 'int', 'id_member' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40',
+			'fileext' => 'string-8', 'size' => 'int', 'width' => 'int', 'height' => 'int', 	'mime_type' => 'string-20'
 		),
 		array(
-			(int) $attachmentOptions['article'], $attachmentOptions['name'], $attachmentOptions['file_hash'], $attachmentOptions['fileext'],
-			(int) $attachmentOptions['size'], (empty($attachmentOptions['width']) ? 0 : (int) $attachmentOptions['width']), (empty($attachmentOptions['height']) ? '0' : (int) $attachmentOptions['height']),
+			(int) $attachmentOptions['article'], (int) $attachmentOptions['poster'], $attachmentOptions['name'], $attachmentOptions['file_hash'],
+			$attachmentOptions['fileext'], (int) $attachmentOptions['size'], (empty($attachmentOptions['width']) ? 0 : (int) $attachmentOptions['width']), (empty($attachmentOptions['height']) ? '0' : (int) $attachmentOptions['height']),
 			(!empty($attachmentOptions['mime_type']) ? $attachmentOptions['mime_type'] : ''),
 		),
 		array('id_attach')
@@ -819,21 +806,16 @@ function createArticleAttachment(&$attachmentOptions)
 		if (createThumbnail($attachmentOptions['destination'], $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
 		{
 			// Figure out how big we actually made it.
-			$size = @getimagesize($attachmentOptions['destination'] . '_thumb');
+			$size = elk_getimagesize($attachmentOptions['destination'] . '_thumb');
 			list ($thumb_width, $thumb_height) = $size;
 
 			if (!empty($size['mime']))
 			{
 				$thumb_mime = $size['mime'];
 			}
-			elseif (isset($validImageTypes[$size[2]]))
-			{
-				$thumb_mime = 'image/' . $validImageTypes[$size[2]];
-			}
-			// Lord only knows how this happened...
 			else
 			{
-				$thumb_mime = '';
+				$thumb_mime = getValidMimeImageType($size[2]);
 			}
 
 			$thumb_filename = $attachmentOptions['name'] . '_thumb';
@@ -845,11 +827,11 @@ function createArticleAttachment(&$attachmentOptions)
 			$db->insert('',
 				'{db_prefix}sp_attachments',
 				array(
-					'id_article' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
+					'id_article' => 'int', 'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
 					'size' => 'int', 'width' => 'int', 'height' => 'int', 'mime_type' => 'string-20',
 				),
 				array(
-					(int) $attachmentOptions['article'], 3, $thumb_filename, $thumb_file_hash, $attachmentOptions['fileext'],
+					(int) $attachmentOptions['article'], (int) $attachmentOptions['poster'], 3, $thumb_filename, $thumb_file_hash, $attachmentOptions['fileext'],
 					$thumb_size, $thumb_width, $thumb_height, $thumb_mime,
 				),
 				array('id_attach')
@@ -1040,6 +1022,9 @@ function sportal_load_attachment_context($id_article)
 			}
 			elseif ($attachmentData[$i]['thumbnail']['has_thumb'])
 			{
+				// Data attributes for use in expandThumb
+				$attachmentData[$i]['thumbnail']['lightbox'] = 'data-lightboxmessage="' . $id_article . '" data-lightboximage="' . $attachment['id_attach'] . '"';
+
 				// If the image is too large to show inline, make it a popup.
 				$attachmentData[$i]['thumbnail']['javascript'] = 'return expandThumb(' . $attachment['id_attach'] . ');';
 			}
