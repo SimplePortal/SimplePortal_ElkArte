@@ -141,8 +141,8 @@ class Articles_Block extends SP_Abstract_Block
 		foreach ($this->data['articles'] as $aid => $article)
 		{
 			// Good time to do this is ... now
-			censorText($article['subject']);
-			censorText($article['body']);
+			censor($article['title']);
+			censor($article['body']);
 
 			// Parse and optionally shorten the result
 			$article['cut'] = sportal_parse_cutoff_content($article['body'], $article['type'], $this->_modSettings['sp_articles_length'], $article['article_id']);
@@ -269,7 +269,8 @@ class Articles_Block extends SP_Abstract_Block
 				if ($pos !== false)
 				{
 					$img_tag = substr($body, $pos, strpos($body, '[/img]', $pos) + 6);
-					$img_html = parse_bbc($img_tag);
+					$parser = \BBC\ParserWrapper::instance();
+					$img_html = $parser->parseMessage($img_tag, true);
 					$this->data['articles'][$id_article]['body'] = str_replace($img_tag, '<div class="sp_attachment_thumb">' . $img_html . '</div>', $body);
 				}
 			}
@@ -334,7 +335,7 @@ function template_sp_articles($data)
 		{
 			echo '
 			<h3 class="secondary_header">',
-			$article['title'], '
+				$article['title'], '
 			</h3>
 			<div id="msg_', $article['article_id'], '" class="sp_article_content">
 				<div class="sp_content_padding">';

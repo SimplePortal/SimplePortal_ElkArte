@@ -324,12 +324,12 @@ function sp_whos_online_page($page_id)
 	{
 		if (isset($page_data['id']))
 		{
-			$data = sprintf($txt['sp_who_page'], $page_data['id'], censorText($page_data['title']), $scripturl);
+			$data = sprintf($txt['sp_who_page'], $page_data['id'], censor($page_data['title']), $scripturl);
 		}
 
 		if (isset($page_data['namespace']))
 		{
-			$data = sprintf($txt['sp_who_page'], $page_data['namespace'], censorText($page_data['title']), $scripturl);
+			$data = sprintf($txt['sp_who_page'], $page_data['namespace'], censor($page_data['title']), $scripturl);
 		}
 	}
 
@@ -402,12 +402,12 @@ function sp_whos_online_article($article_id)
 	{
 		if (isset($article_data['id']))
 		{
-			$data = sprintf($txt['sp_who_article'], $article_data['id'], censorText($article_data['title']), $scripturl);
+			$data = sprintf($txt['sp_who_article'], $article_data['id'], censor($article_data['title']), $scripturl);
 		}
 
 		if (isset($article_data['namespace']))
 		{
-			$data = sprintf($txt['sp_who_article'], $article_data['namespace'], censorText($article_data['title']), $scripturl);
+			$data = sprintf($txt['sp_who_article'], $article_data['namespace'], censor($article_data['title']), $scripturl);
 		}
 	}
 

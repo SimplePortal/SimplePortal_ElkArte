@@ -288,19 +288,21 @@ function template_sp_display_attachments($article, $ignoring)
 		{
 			if ($attachment['thumbnail']['has_thumb'])
 				echo '
-										<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" onclick="', $attachment['thumbnail']['javascript'], '">
+										<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" ', $attachment['thumbnail']['lightbox'], '">
 											<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" />
 										</a>';
 			else
 				echo '
-										<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="width:', $attachment['width'], 'px; height:', $attachment['height'], 'px;" />';
+										<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;" />';
 		}
 
 		echo '
-										<figcaption><a href="', $attachment['href'], '" class="attachment_name">', $attachment['name'], '</a>
+										<figcaption>
+											<a href="', $attachment['href'], '" class="attachment_name">',
+												$attachment['name'], '
+											</a>
 											<span class="attachment_details">', $attachment['size'], ($attachment['is_image'] ? ' / ' . $attachment['real_width'] . 'x' . $attachment['real_height'] : ''), '</span>
-										</figcaption>';
-		echo '
+										</figcaption>
 								</figure>';
 	}
 

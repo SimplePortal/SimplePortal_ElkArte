@@ -414,7 +414,7 @@ function template_sp_topStatsMember($data)
 				<tr>
 					<td class="sp_top_poster centertext">', !empty($member['avatar']['href']) ? '
 						<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '">
-							<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" style="max-width:40px" />
+							<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" />
 						</a>' : '', '
 					</td>
 					<td>

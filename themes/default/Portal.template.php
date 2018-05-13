@@ -85,7 +85,7 @@ function template_portal_above()
 	if (empty($modSettings['sp_disable_side_collapse']) && ($context['SPortal']['sides'][1]['active'] || $context['SPortal']['sides'][4]['active']))
 	{
 		echo '
-	<div class="righttext sp_fullwidth" style="margin-bottom: 3.5em;">';
+	<div class="righttext sp_fullwidth">';
 
 		if ($context['SPortal']['sides'][1]['active'])
 			echo '

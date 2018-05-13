@@ -184,7 +184,7 @@ function template_sp_staff($data)
 			<tr>
 				<td class="sp_staff centertext">', !empty($staff['avatar']['href']) ? '
 					<a href="' . $scripturl . '?action=profile;u=' . $staff['id'] . '">
-						<img src="' . $staff['avatar']['href'] . '" alt="' . $staff['name'] . '" style="max-width:40px" />
+						<img src="' . $staff['avatar']['href'] . '" alt="' . $staff['name'] . '" />
 					</a>' : '', '
 				</td>
 				<td ', sp_embed_class($data['icons'][$staff['type']], '', 'sp_staff_info' . $data['staff_count'] != ++$count ? ' sp_staff_divider' : ''), '>',

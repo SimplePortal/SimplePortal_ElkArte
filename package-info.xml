@@ -17,7 +17,7 @@
 	<name>SimplePortal</name>
 	<version>1.0.0 RC1</version>
 	<type>modification</type>
-	<install for="1.1.1 - 1.1.99">
+	<install for="1.1.3 - 1.1.99">
 		<readme type="inline">This will install SimplePortal for Elkarte.</readme>
 		<modification>modification.xml</modification>
 		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
@@ -36,7 +36,6 @@
 		<hook hook="integrate_admin_areas" function="sp_integrate_admin_areas" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_load_permissions" function="sp_integrate_load_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_whos_online" function="sp_integrate_whos_online" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_action_frontpage" function="sp_integrate_frontpage" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_quickhelp" function="sp_integrate_quickhelp" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_buffer" function="sp_integrate_buffer" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SOURCEDIR/PortalIntegration.subs.php" />

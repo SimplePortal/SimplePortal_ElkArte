@@ -45,7 +45,8 @@ class Bbc_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		$this->data['content'] = !empty($parameters['content']) ? parse_bbc($parameters['content']) : '';
+		$parser = \BBC\ParserWrapper::instance();
+		$this->data['content'] = !empty($parameters['content']) ? $parser->parseMessage($parameters['content'], true) : '';
 
 		$this->setTemplate('template_sp_bbc');
 	}

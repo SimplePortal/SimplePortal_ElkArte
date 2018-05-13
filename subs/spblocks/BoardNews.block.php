@@ -335,7 +335,8 @@ class Board_News_Block extends SP_Abstract_Block
 			}
 
 			$img_tag = substr($body, $pos, strpos($body, '[/img]', $pos) + 6);
-			$img_html = parse_bbc($img_tag);
+			$parser = \BBC\ParserWrapper::instance();
+			$img_html = $parser->parseMessage($img_tag, true);
 			$body = str_replace($img_tag, '<div class="sp_attachment_thumb">' . $img_html . '</div>', $body);
 
 			return array();

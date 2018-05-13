@@ -112,9 +112,7 @@ $helptxt['sp-shoutboxesBBC'] = 'This setting allows you to choose the BBC that c
 $helptxt['sp_MenusArea'] = 'The main menu of the forum can be modified in this area. Additional custom menus can also be created and modified here.';
 
 // Profiles area
-$helptxt['sp_ProfilesArea'] = 'Permission, style and visibility profiles can be managed in this area. The profiles are used for blocks, pages, categories, articles and shoutboxes.';
-
-$helptxt['sp_permissions'] = 'This option enables permissions to be used on blocks. The first three options are the simplest to use and understand.
+$helptxt['sp_ProfilesArea'] = 'This option enables permissions to be used on blocks. The first three options are the simplest to use and understand.
 <ul>
 	<li><strong>Guests:</strong> Any user who is not registered or logged in <em>will</em> see this block. Logged-in users (including Administrators) <em>will not</em> see this block.</li>
 	<li><strong>Members:</strong> Any user who is logged in (including Administrators) <em>will</em> see this block.</li>

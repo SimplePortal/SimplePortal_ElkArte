@@ -275,6 +275,8 @@ function sp_general_load_themes()
  *                       'master' => will load only not postbased groups
  * @param string $contextName - where the data should stored in the $context
  * @param string $subContext
+ *
+ * @return null
  */
 function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $contextName = 'member_groups', $subContext = 'SPortal')
 {
@@ -1386,7 +1388,7 @@ function sp_count_profiles($type = 1)
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
- * @param int $type (1 = permissions, 2 = styles)
+ * @param int $type (1 = permissions, 2 = styles, 3 = display)
  *
  * @return array
  */

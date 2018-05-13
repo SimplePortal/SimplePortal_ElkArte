@@ -236,8 +236,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="remove_articles" value="' . $txt['sp_admin_articles_remove'] . '" class="right_submit" />',
+					'value' => '<a class="linkbutton" href="?action=admin;area=portalarticles;sa=add;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="a">' . $txt['sp_admin_articles_add'] . '</a>
+						<input type="submit" name="remove_articles" value="' . $txt['sp_admin_articles_remove'] . '" />',
 				),
 			),
 		);
@@ -341,7 +343,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		// Set the editor to the right mode based on type (bbc, html, php)
 		addInlineJavascript('
-			$(window).load(function() {
+			$(function() {
 				diewithfire = window.setTimeout(function() {sp_update_editor("' . $context['article']['type'] . '", "");}, 200);
 			});
 		');
@@ -528,13 +530,15 @@ class ManagePortalArticles_Controller extends Action_Controller
 			$keep_ids = array();
 			foreach ($_POST['attach_del'] as $dummy)
 			{
-				if (strpos($dummy, 'post_tmp_' . $user_info['id']) !== false)
+				$attachID = getAttachmentIdFromPublic($dummy);
+
+				if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
 				{
-					$keep_temp[] = $dummy;
+					$keep_temp[] = $attachID;
 				}
 				else
 				{
-					$keep_ids[] = (int) $dummy;
+					$keep_ids[] = (int) $attachID;
 				}
 			}
 
@@ -568,13 +572,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 		}
 
 		// Upload any new attachments.
+		$context['attachments']['can']['post'] = (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		if ($context['attachments']['can']['post'])
 		{
-			if ($this->_is_aid)
-			{
-				list($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForArticle($this->_is_aid);
-			}
-
+			list($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForArticle($this->_is_aid);
 			processAttachments();
 		}
 	}
@@ -589,7 +590,6 @@ class ManagePortalArticles_Controller extends Action_Controller
 		global $context, $user_info, $ignore_temp, $modSettings;
 
 		$attachIDs = array();
-
 		if (empty($ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']))
 		{
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
@@ -890,12 +890,14 @@ class ManagePortalArticles_Controller extends Action_Controller
 				}
 
 				// In session but the file is missing, then some house cleaning
-				if (!file_exists($attachment['tmp_name']))
+				if (isset($attachment['tmp_name']) && !file_exists($attachment['tmp_name']))
 				{
 					unset($_SESSION['temp_attachments'][$attachID]);
 					continue;
 				}
 
+				$this->_attachments['name'] = !empty($this->_attachments['name']) ? $this->_attachments['name'] : '';
+				$this->_attachments['size'] = !empty($this->_attachments['size']) ? $this->_attachments['size'] : 0;
 				$this->_attachments['quantity']++;
 				$this->_attachments['total_size'] += $this->_attachments['size'];
 
@@ -960,7 +962,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		// Load up the drag and drop attachment magic
 		addInlineJavascript('
-		var dropAttach = dragDropAttachment.prototype.init({
+		var dropAttach = dragDropAttachment({
 			board: 0,
 			allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
 			totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
@@ -968,13 +970,16 @@ class ManagePortalArticles_Controller extends Action_Controller
 			numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
 			totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
 			numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+			fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>\',
 			oTxt: ({
 				allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
 				totalSizeAllowed : ' . JavaScriptEscape($txt['attach_max_total_file_size']) . ',
 				individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
 				numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
 				postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
+				areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . ',
 			}),
+			existingSelector: ".inline_insert",
 		});', true);
 	}
 

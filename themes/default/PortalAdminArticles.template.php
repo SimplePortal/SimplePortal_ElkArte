@@ -133,7 +133,7 @@ function template_articles()
 	echo '
 					<div>', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message'), '</div>
 					<div class="submitbutton">
-						<input type="submit" name="submit" value="', $context['page_title'], '" accesskey="s" tabindex="', $context['tabindex']++, '" class="button_submit" />
+						<input type="submit" name="submit" value="', $txt['save'], '" accesskey="s" tabindex="', $context['tabindex']++, '" class="button_submit" />
 						<input type="submit" name="preview" value="', $txt['sp_admin_articles_preview'], '" accesskey="p" tabindex="', $context['tabindex']++, '" class="button_submit" />
 						<input type="hidden" name="article_id" value="', $context['article']['id'], '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
