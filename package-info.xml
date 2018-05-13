@@ -36,7 +36,6 @@
 		<hook hook="integrate_admin_areas" function="sp_integrate_admin_areas" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_load_permissions" function="sp_integrate_load_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_whos_online" function="sp_integrate_whos_online" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_action_frontpage" function="sp_integrate_frontpage" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_quickhelp" function="sp_integrate_quickhelp" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_buffer" function="sp_integrate_buffer" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<hook hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SOURCEDIR/PortalIntegration.subs.php" />
