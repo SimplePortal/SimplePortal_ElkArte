@@ -21,8 +21,12 @@ function sp_is_active()
 
 	$context['disable_sp'] = false;
 
+	// This to ensure BrowserDetector has run, Elkarte 1.1.4 will return this value properly, until then
+	// we need to make the call and then check browser_body_id below.
+	isBrowser('mobile');
+
 	// Need to determine if we are even active
-	if (!empty($modSettings['sp_disableMobile']) && empty($_GET['page']) && empty($_GET['article'])
+	if ((!empty($modSettings['sp_disableMobile']) && $context['browser_body_id'] === 'mobile') && empty($_GET['page']) && empty($_GET['article'])
 		|| !empty($settings['disable_sp'])
 		|| empty($modSettings['sp_portal_mode'])
 		|| ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum'))

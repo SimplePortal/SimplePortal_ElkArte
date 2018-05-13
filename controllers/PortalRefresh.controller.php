@@ -107,7 +107,11 @@ class PortalRefresh_Controller extends Action_Controller
 		}
 
 		// And not if the site or portal is disabled / maintenance / etc
-		if (!empty($modSettings['sp_disableMobile']) || !empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest'])))
+		if (!empty($modSettings['sp_disableMobile'])
+			|| !empty($settings['disable_sp'])
+			|| empty($modSettings['sp_portal_mode'])
+			|| ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum'))
+			|| (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
 		{
 			$this->_request = false;
 		}
