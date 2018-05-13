@@ -267,7 +267,11 @@ table.sp_articles {
 }
 
 .sp_attachment_thumb img {
-	max-width: 240px;
+	max-width: 175px;
+}
+
+#sp_view_article span.attachment_details {
+	font-size: 1em;
 }
 
 .sp_article_detail h4 {
