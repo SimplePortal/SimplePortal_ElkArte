@@ -187,8 +187,10 @@ class ManagePortalCategories_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="remove_categories" value="' . $txt['sp_admin_categories_remove'] . '" class="right_submit" />',
+					'value' => '<a class="linkbutton" href="?action=admin;area=portalcategories;sa=add;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="a">' . $txt['sp_admin_categories_add'] . '</a>
+						<input type="submit" name="remove_categories" value="' . $txt['sp_admin_categories_remove'] . '" />',
 				),
 			),
 		);
@@ -320,10 +322,27 @@ class ManagePortalCategories_Controller extends Action_Controller
 	 */
 	public function action_status()
 	{
-		checkSession('get');
+		global $context;
+
+		checkSession(isset($_REQUEST['xml']) ? '' : 'get');
 
 		$category_id = !empty($_REQUEST['category_id']) ? (int) $_REQUEST['category_id'] : 0;
-		sp_changeState('category', $category_id);
+		$state = sp_changeState('category', $category_id);
+
+		// Doing this the ajax way?
+		if (isset($_REQUEST['xml']))
+		{
+			$context['item_id'] = $category_id;
+			$context['status'] = !empty($state) ? 'active' : 'deactive';
+
+			// Clear out any template layers, add the xml response
+			loadTemplate('PortalAdmin');
+			$template_layers = Template_Layers::instance();
+			$template_layers->removeAll();
+			$context['sub_template'] = 'change_status';
+
+			obExit();
+		}
 
 		redirectexit('action=admin;area=portalcategories');
 	}

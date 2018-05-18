@@ -591,3 +591,56 @@ function sp_setAnnouncement(init_news, announcement)
 
 	oElem.innerHTML = sMessages + sAnnouncementTemplate.replace('%content%', sMessage);
 }
+
+/**
+ * Sends and xml request to enable / disable pages, categories, articles, etc.
+ *
+ * @param {int} id
+ * @param {string} type
+ * @param {string} session_var
+ * @param {string} session_id
+ * @returns {boolean}
+ */
+function sp_change_status(id, type, session_var, session_id)
+{
+	if (type === 'articles')
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalarticles;sa=status;xml', 'article_id=' + id + '&' + session_var + '=' + session_id, sp_on_status_received);
+	else if (type === 'category')
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalcategories;sa=status;xml', 'category_id=' + id + '&' + session_var + '=' + session_id, sp_on_status_received);
+	else if (type === 'page')
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalpages;sa=status;xml', 'page_id=' + id + '&' + session_var + '=' + session_id, sp_on_status_received);
+	else if (type === 'block')
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalblocks;sa=statechange;xml', 'block_id=' + id + '&' + session_var + '=' + session_id, sp_on_status_received);
+
+	return false;
+}
+
+/**
+ * Callback function for XML enable ... updates the UI enabled/disabled image as needed.
+ *
+ * @param XMLDoc
+ * @returns {boolean}
+ */
+function sp_on_status_received(XMLDoc)
+{
+	// If it is not valid then clean up
+	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk'))
+	{
+		return false;
+	}
+
+	var xml = XMLDoc.getElementsByTagName('elk')[0],
+		id = xml.getElementsByTagName('id')[0].childNodes[0].nodeValue,
+		status = xml.getElementsByTagName('status')[0].childNodes[0].nodeValue,
+		label = xml.getElementsByTagName('label')[0].childNodes[0].nodeValue,
+		old = status === 'active' ? 'deactive.png' : 'active.png';
+
+	if (id !== 0)
+	{
+		status_image = document.getElementById('status_image_' + id);
+		status_image.src = status_image.src.replace(old, status + '.png');
+		status_image.alt = status_image.title = label;
+	}
+
+	return false;
+}
