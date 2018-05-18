@@ -185,7 +185,9 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			{
 				$context['sides'][$side_id]['last'] = $block_id;
 				$context['blocks'][$side['name']][$block_id]['actions'] = array(
-					'state_icon' => empty($block['state']) ? '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';type=block;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('deactive', $txt['sp-blocksActivate']) . '</a>' : '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';type=block;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('active', $txt['sp-blocksDeactivate']) . '</a>',
+					'state_icon' => '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
+						onclick="sp_change_status(\'' . $block['id']  . '\', \'block\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');return false;">' .
+						sp_embed_image(empty($block['state']) ? 'deactive' : 'active', (!empty($block['state']) ? $txt['sp-blocksDeactivate'] : $txt['sp-blocksActivate']), null, null, true, 'status_image_' . $block['id']) . '</a>',
 					'edit' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=edit;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 					'delete' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=delete;block_id=' . $block['id'] . ';col=' . $block['column'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp-deleteblock'] . '\');">' . sp_embed_image('delete') . '</a>',
 				);
@@ -989,9 +991,30 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	 */
 	public function action_state_change()
 	{
-		$id = (int) $_REQUEST['block_id'];
-		$type = $_REQUEST['type'];
+		global $context;
 
-		sportal_admin_state_change($type, $id);
+		checkSession(isset($_REQUEST['xml']) ? '' : 'get');
+
+		$id = (int) $_REQUEST['block_id'];
+		$state = sp_changeState('block', $id);
+		$sides = array(1 => 'left', 2 => 'top', 3 => 'bottom', 4 => 'right');
+		$list = !empty($_GET['redirect']) && isset($sides[$_GET['redirect']]) ? $sides[$_GET['redirect']] : 'list';
+
+		// Doing this the ajax way?
+		if (isset($_REQUEST['xml']))
+		{
+			$context['item_id'] = $id;
+			$context['status'] = !empty($state) ? 'active' : 'deactive';
+
+			// Clear out any template layers, add the xml response
+			loadTemplate('PortalAdmin');
+			$template_layers = Template_Layers::instance();
+			$template_layers->removeAll();
+			$context['sub_template'] = 'change_status';
+
+			obExit();
+		}
+
+		redirectexit('action=admin;area=portalblocks;sa=' . $list);
 	}
 }

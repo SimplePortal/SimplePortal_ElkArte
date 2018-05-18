@@ -86,3 +86,18 @@ function template_information()
 		</div>
 	</div>';
 }
+
+/**
+ * Provide an xml response to an active on/off toggle
+ */
+function template_change_status()
+{
+	global $context, $txt;
+
+	echo '<', '?xml version="1.0" encoding="UTF-8" ?', '>
+	<elk>
+		<id>', $context['item_id'], '</id>
+		<status>', $context['status'], '</status>
+		<label>', $txt['sp-blocks' . ($context['status'] === 'active' ? 'Deactivate' : 'Activate')] . '</label>
+	</elk>';
+}

@@ -11,47 +11,6 @@
 
 
 /**
- * Toggles the current state of a block / control
- *
- * - Calls sp_changeState to toggle the on/off status
- * - Directs back based on type passed
- *
- * @param string $type type of control
- * @param int $id id of the control
- */
-function sportal_admin_state_change($type, $id)
-{
-	if (!in_array($type, array('block', 'category', 'article')))
-	{
-		throw new Elk_Exception('error_sp_id_empty', false);
-	}
-
-	// Toggle the current state
-	sp_changeState($type, $id);
-
-	// Based on the type, find our way back
-	if ($type === 'block')
-	{
-		$sides = array(1 => 'left', 2 => 'top', 3 => 'bottom', 4 => 'right');
-		$list = !empty($_GET['redirect']) && isset($sides[$_GET['redirect']]) ? $sides[$_GET['redirect']] : 'list';
-
-		redirectexit('action=admin;area=portalblocks;sa=' . $list);
-	}
-	elseif ($type === 'category')
-	{
-		redirectexit('action=admin;area=portalarticles;sa=categories');
-	}
-	elseif ($type === 'article')
-	{
-		redirectexit('action=admin;area=portalarticles;sa=articles');
-	}
-	else
-	{
-		redirectexit('action=admin;area=portalconfig');
-	}
-}
-
-/**
  * Fetches all the classes (blocks) in the system
  *
  * - If supplied a name gets just that functions id
@@ -65,6 +24,8 @@ function sportal_admin_state_change($type, $id)
  */
 function getFunctionInfo($function = null)
 {
+	global $txt;
+
 	$return = array();
 
 	// Looking for a specific block or all of them
@@ -108,7 +69,18 @@ function getFunctionInfo($function = null)
 			'function' => str_replace('_Block', '', $class),
 			'custom_label' => $class::blockName(),
 			'custom_desc' => $class::blockDescription(),
+			'standard_label' => isset($txt['sp_function_' . str_replace('_Block', '', $class) . '_label']) ? $txt['sp_function_' . str_replace('_Block', '', $class) . '_label'] : str_replace('_Block', '', $class)
 		);
+	}
+
+	// Show the block list in alpha order
+	if ($function === null)
+	{
+		usort($return, function ($a, $b) {
+			$a_string = !empty($a['custom_label']) ? $a['custom_label'] : $a['standard_label'];
+			$b_string = !empty($b['custom_label']) ? $b['custom_label'] : $b['standard_label'];
+			return strcmp($a_string, $b_string);
+		});
 	}
 
 	return $function === null ? $return : current($return);
@@ -161,7 +133,7 @@ function fixColumnRows($column_id = null)
  * @param string|null $type type of control
  * @param int|null $id specific id of the control
  *
- * @return bool
+ * @return int|bool
  */
 function sp_changeState($type = null, $id = null)
 {
@@ -231,7 +203,22 @@ function sp_changeState($type = null, $id = null)
 		)
 	);
 
-	return true;
+	// Get the new state
+	$request = $db->query('', '
+		SELECT {raw:column}
+		FROM {db_prefix}{raw:table}
+		WHERE {raw:query_id} = {int:id}',
+		array(
+			'table' => $query['table'],
+			'column' => $query['column'],
+			'query_id' => $query['query_id'],
+			'id' => $id,
+		)
+	);
+	list ($state) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $state;
 }
 
 /**
@@ -492,9 +479,9 @@ function sp_load_categories($start = null, $items_per_page = null, $sort = null)
 			'link' => '<a href="' . $scripturl . '?category=' . $row['namespace'] . '">' . $row['name'] . '</a>',
 			'articles' => $row['articles'],
 			'status' => $row['status'],
-			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalcategories;sa=status;category_id=' . $row['id_category'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status'])
-				? 'deactive' : 'active', $txt['sp_admin_categories_' . (!empty($row['status']) ? 'de'
-				: '') . 'activate']) . '</a>',
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalcategories;sa=status;category_id=' . $row['id_category'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
+				onclick="sp_change_status(\'' . $row['id_category'] . '\', \'category\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');return false;">' .
+				sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_categories_' . (!empty($row['status']) ? 'de' : '') . 'activate'], null, null, true, 'status_image_' . $row['id_category']) . '</a>',
 		);
 	}
 	$db->free_result($request);
@@ -719,9 +706,9 @@ function sp_load_articles($start, $items_per_page, $sort)
 			'type_text' => $txt['sp_articles_type_' . $row['type']],
 			'date' => standardTime($row['date']),
 			'status' => $row['status'],
-			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status'])
-				? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de'
-				: '') . 'activate']) . '</a>',
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" 
+				onclick="sp_change_status(\'' . $row['id_article'] . '\', \'articles\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');return false;">' .
+				sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de' : '') . 'activate'], null, null, true, 'status_image_' . $row['id_article']) . '</a>',
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=edit;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=delete;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_articles_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
@@ -970,9 +957,9 @@ function sp_load_pages($start, $items_per_page, $sort)
 			'type_text' => $txt['sp_pages_type_' . $row['type']],
 			'views' => $row['views'],
 			'status' => $row['status'],
-			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=status;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status'])
-				? 'deactive' : 'active', $txt['sp_admin_pages_' . (!empty($row['status']) ? 'de'
-				: '') . 'activate']) . '</a>',
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=status;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
+				onclick="sp_change_status(\'' . $row['id_page'] . '\', \'page\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');return false;">' .
+				sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_pages_' . (!empty($row['status']) ? 'de' : '') . 'activate'], null, null, true, 'status_image_' . $row['id_page']) . '</a>',
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=edit;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=delete;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_pages_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',

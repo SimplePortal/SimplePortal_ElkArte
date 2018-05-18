@@ -984,14 +984,31 @@ class ManagePortalArticles_Controller extends Action_Controller
 	}
 
 	/**
-	 * Toggle an articles status on/off
+	 * Toggle an articles active status on/off
 	 */
 	public function action_status()
 	{
-		checkSession('get');
+		global $context;
+
+		checkSession(isset($_REQUEST['xml']) ? '' : 'get');
 
 		$article_id = !empty($_REQUEST['article_id']) ? (int) $_REQUEST['article_id'] : 0;
-		sp_changeState('article', $article_id);
+		$state = sp_changeState('article', $article_id);
+
+		// Doing this the ajax way?
+		if (isset($_REQUEST['xml']))
+		{
+			$context['item_id'] = $article_id;
+			$context['status'] = !empty($state) ? 'active' : 'deactive';
+
+			// Clear out any template layers, add the xml response
+			loadTemplate('PortalAdmin');
+			$template_layers = Template_Layers::instance();
+			$template_layers->removeAll();
+			$context['sub_template'] = 'change_status';
+
+			obExit();
+		}
 
 		redirectexit('action=admin;area=portalarticles');
 	}
