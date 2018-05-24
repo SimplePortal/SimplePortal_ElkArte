@@ -26,7 +26,7 @@ function sp_is_active()
 	isBrowser('mobile');
 
 	// Frontpage hooks are called early in the flow
-	if (empty($user_info['is_guest']))
+	if (!isset($user_info['is_guest']))
 	{
 		loadUserSettings();
 	}
