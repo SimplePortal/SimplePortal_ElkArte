@@ -17,7 +17,7 @@
  */
 function sp_is_active()
 {
-	global $modSettings, $context, $settings, $maintenance;
+	global $modSettings, $context, $settings, $maintenance, $user_info;
 
 	$context['disable_sp'] = false;
 
@@ -25,13 +25,19 @@ function sp_is_active()
 	// we need to make the call and then check browser_body_id below.
 	isBrowser('mobile');
 
+	// Frontpage hooks are called early in the flow
+	if (empty($user_info['is_guest']))
+	{
+		loadUserSettings();
+	}
+
 	// Need to determine if we are even active
 	if ((!empty($modSettings['sp_disableMobile']) && $context['browser_body_id'] === 'mobile') && empty($_GET['page']) && empty($_GET['article'])
 		|| !empty($settings['disable_sp'])
 		|| empty($modSettings['sp_portal_mode'])
 		|| ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum'))
 		|| isset($_GET['debug'])
-		|| (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest'])
+		|| (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'])
 		|| (!empty($modSettings['front_page']) && $modSettings['front_page'] !== 'PortalMain_Controller'))
 	{
 		$context['disable_sp'] = true;
@@ -1801,6 +1807,7 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 		elseif ($row['type'] == 3)
 		{
 			list ($selections, $query, $mobile_view) = array_pad(explode('|', $row['value']), 3, '');
+			$query = str_replace('&vert;', '|', $query);
 
 			$return[$row['id_profile']] = array_merge($return[$row['id_profile']], array(
 				'selections' => explode(',', $selections),
