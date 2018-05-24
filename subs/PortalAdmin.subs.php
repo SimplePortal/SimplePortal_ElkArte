@@ -1348,7 +1348,7 @@ function sp_prune_shoutbox($shoutbox_id, $where, $parameters, $all = false)
 /**
  * Returns the total count of profiles in the system
  *
- * @param int $type (1 = permissions, 2 = styles)
+ * @param int $type (1 = permissions, 2 = styles, 3 = visability)
  */
 function sp_count_profiles($type = 1)
 {

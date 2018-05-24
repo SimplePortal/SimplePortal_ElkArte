@@ -804,6 +804,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			foreach ($items as $item)
 			{
 				$item = Util::htmltrim(Util::htmlspecialchars($item, ENT_QUOTES));
+				$item = str_replace('|', '&vert;', $item);
 
 				if ($item !== '')
 				{
