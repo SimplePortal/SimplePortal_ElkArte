@@ -34,6 +34,7 @@ class Menu_Block extends SP_Abstract_Block
 
 		if (empty($context['menu_buttons']))
 		{
+			setupThemeContext();
 			setupMenuContext();
 		}
 
