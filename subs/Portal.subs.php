@@ -38,7 +38,7 @@ function sp_is_active()
 		|| ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum'))
 		|| isset($_GET['debug'])
 		|| (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'])
-		|| (!empty($modSettings['front_page']) && $modSettings['front_page'] !== 'PortalMain_Controller'))
+		|| (empty($modSettings['front_page']) || $modSettings['front_page'] !== 'PortalMain_Controller'))
 	{
 		$context['disable_sp'] = true;
 	}
