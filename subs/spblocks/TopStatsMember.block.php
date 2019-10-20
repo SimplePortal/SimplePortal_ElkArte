@@ -145,7 +145,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'output_function' => function(&$row) {
 					$row["karma_total"] = $row["karma_good"] - $row["karma_bad"];
 				},
-				'output_text' => $this->_modSettings['karmaLabel'] . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
+				'output_text' => $this->_modSettings['karmaLabel'] . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' &plusmn;%karma_good%\%karma_bad%'),
 				'enabled' => !empty($this->_modSettings['karmaMode']),
 				'error_msg' => $txt['sp_karma_is_disabled'],
 			),
@@ -313,7 +313,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'id' => $row['id_member'],
 				'name' => $row['real_name'],
 				'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
-				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
+				'link' => '<a style="font-size: 90%" href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 				'avatar' => determineAvatar(array(
 					'avatar' => $row['avatar'],
 					'filename' => $row['filename'],

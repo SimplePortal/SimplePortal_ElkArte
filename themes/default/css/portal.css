@@ -215,10 +215,10 @@ table.sp_articles {
 
 #sp_menu li ul {
 	position: absolute;
-	top: 5px;
-	left: 75px;
+	top: 1.5em;
+	left: 25px;
 	z-index: 90;
-	width: 18.4em;
+	width: 13em;
 	border: 1px solid #AAAAAA;
 	background: #FFFFFF;
 }
@@ -233,6 +233,8 @@ table.sp_articles {
 
 #sp_menu a .pm_indicator {
 	font-size: 0.643em;
+	top: -0.6em;
+	right: 2em;
 }
 
 #sp_menu a .avatar {
@@ -440,11 +442,11 @@ body {
 }
 
 .sp_top_poster {
-	width: 50px;
+	width: 45px;
 }
 
 .sp_top_poster > a > img, .sp_staff > a > img {
-	max-width: 40px;
+	max-width: 35px;
 }
 
 #new_shout {
