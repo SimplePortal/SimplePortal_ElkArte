@@ -97,13 +97,13 @@ hr {
 
 .sp_online_flow {
 	overflow: auto;
-	max-height: 150px;;
+	max-height: 150px;
 	height: auto !important;
 }
 
 .sp_rss_flow {
 	overflow: auto;
-	max-height: 300px;;
+	max-height: 300px;
 	height: 300px !important;
 }
 
@@ -359,8 +359,13 @@ table.sp_articles {
 
 #sp_center {
 	flex: 1 1 auto;
-	overflow: auto;
 	padding: 2px;
+}
+
+#sp_center::after{
+	display: block;
+	clear: both;
+	content: "";
 }
 
 #sp_center_top, #sp_center_bottom {
@@ -1228,7 +1233,7 @@ dl.sp_form img,
 /* This one does 1280 screens at default font size. */
 @media screen and (max-width: 80em) {
 	.wrapper {
-		min-width: 95%;
+		min-width: 98%;
 	}
 }
 
@@ -1254,6 +1259,7 @@ dl.sp_form img,
 	#sp_left, #sp_right {
 		flex: 0 0 24%;
 		padding-right: 0;
+		padding-left: 0;
 	}
 }
 
