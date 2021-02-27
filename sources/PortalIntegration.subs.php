@@ -9,6 +9,7 @@
  * @version 1.0.0 RC1
  */
 
+
 /**
  * Integration hook integrate_setup_allow
  * Called from Theme.php setupMenuContext(), used to modify menu privileges

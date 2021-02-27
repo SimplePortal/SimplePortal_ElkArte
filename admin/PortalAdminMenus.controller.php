@@ -526,7 +526,6 @@ class ManagePortalMenus_Controller extends Action_Controller
 			// Adjust the url for the link type
 			$link_type = !empty($_POST['link_type']) ? $_POST['link_type'] : '';
 			$link_item = !empty($_POST['link_item']) ? $_POST['link_item'] : '';
-			$link_item_id = 0;
 			if ($link_type !== 'custom')
 			{
 				if (preg_match('~^\d+|[A-Za-z0-9_\-]+$~', $link_item, $match))

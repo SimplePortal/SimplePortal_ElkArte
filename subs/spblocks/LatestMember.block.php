@@ -46,7 +46,7 @@ class Latest_Member_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $scripturl, $color_profile;
+		global $scripturl;
 
 		// Load in the latest members
 		require_once(SUBSDIR . '/Members.subs.php');

@@ -18,12 +18,15 @@ use ElkArte\Errors\ErrorContext;
  */
 class ManagePortalArticles_Controller extends Action_Controller
 {
-	/** @var bool|int */
+	/** @var bool|int hold the article id if existing */
 	protected $_is_aid;
+
 	/** @var array */
 	protected $_attachments;
+
 	/** @var ErrorContext */
 	protected $article_errors;
+
 	/** @var AttachmentErrorContext */
 	protected $attach_errors;
 
@@ -572,7 +575,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 		}
 
 		// Upload any new attachments.
-		$context['attachments']['can']['post'] = (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+		$context['attachments']['can']['post'] = (allowedTo('post_attachment')
+			|| ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		if ($context['attachments']['can']['post'])
 		{
 			list($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForArticle($this->_is_aid);
