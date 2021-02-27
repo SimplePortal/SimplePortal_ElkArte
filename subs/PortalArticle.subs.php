@@ -9,6 +9,8 @@
  * @version 1.0.0 Beta 1
  */
 
+use BBC\ParserWrapper;
+
 
 /**
  * Returns the number of views and comments for a given article
@@ -416,7 +418,7 @@ function sportal_get_comments($article_id = null, $limit = null, $start = null)
 	);
 	$return = array();
 	$member_ids = array();
-	$parser = \BBC\ParserWrapper::instance();
+	$parser = ParserWrapper::instance();
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row['id_author']))
@@ -674,6 +676,11 @@ function removeArticleAttachments($attachmentQuery)
 function attachmentsSizeForArticle($id_article, $include_count = true)
 {
 	$db = database();
+
+	if (empty($id_article))
+	{
+		return $include_count ? array(0, 0) : array(0);
+	}
 
 	if ($include_count)
 	{
