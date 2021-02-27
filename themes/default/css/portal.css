@@ -97,13 +97,13 @@ hr {
 
 .sp_online_flow {
 	overflow: auto;
-	max-height: 150px;;
+	max-height: 150px;
 	height: auto !important;
 }
 
 .sp_rss_flow {
 	overflow: auto;
-	max-height: 300px;;
+	max-height: 300px;
 	height: 300px !important;
 }
 
@@ -215,10 +215,10 @@ table.sp_articles {
 
 #sp_menu li ul {
 	position: absolute;
-	top: 5px;
-	left: 75px;
+	top: 1.5em;
+	left: 25px;
 	z-index: 90;
-	width: 18.4em;
+	width: 13em;
 	border: 1px solid #AAAAAA;
 	background: #FFFFFF;
 }
@@ -233,6 +233,8 @@ table.sp_articles {
 
 #sp_menu a .pm_indicator {
 	font-size: 0.643em;
+	top: -0.6em;
+	right: 2em;
 }
 
 #sp_menu a .avatar {
@@ -357,8 +359,13 @@ table.sp_articles {
 
 #sp_center {
 	flex: 1 1 auto;
-	overflow: auto;
 	padding: 2px;
+}
+
+#sp_center::after{
+	display: block;
+	clear: both;
+	content: "";
 }
 
 #sp_center_top, #sp_center_bottom {
@@ -440,11 +447,11 @@ body {
 }
 
 .sp_top_poster {
-	width: 50px;
+	width: 45px;
 }
 
 .sp_top_poster > a > img, .sp_staff > a > img {
-	max-width: 40px;
+	max-width: 35px;
 }
 
 #new_shout {
@@ -1226,7 +1233,7 @@ dl.sp_form img,
 /* This one does 1280 screens at default font size. */
 @media screen and (max-width: 80em) {
 	.wrapper {
-		min-width: 95%;
+		min-width: 98%;
 	}
 }
 
@@ -1252,6 +1259,7 @@ dl.sp_form img,
 	#sp_left, #sp_right {
 		flex: 0 0 24%;
 		padding-right: 0;
+		padding-left: 0;
 	}
 }
 

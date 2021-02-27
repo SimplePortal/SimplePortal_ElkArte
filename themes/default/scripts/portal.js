@@ -50,7 +50,7 @@ function sp_collapseSide(id)
 	sp_sides[1] = "sp_left";
 	sp_sides[4] = "sp_right";
 
-	mode = document.getElementById(sp_sides[id]).style.display === "" ? 0 : 1;
+	var mode = document.getElementById(sp_sides[id]).style.display === "" ? 0 : 1;
 
 	// Guests use a cookie, members a theme option to remember the choice
 	if (elk_member_id === 0)
@@ -188,7 +188,7 @@ function sp_refresh_shout(shoutbox_id, last_refresh)
  */
 function onShoutReceived(XMLDoc)
 {
-	var shout, shoutbox_id, updated, error, warning, reverse, id, author, time,
+	var shout, shouts, shoutbox_id, updated, error, warning, reverse, id, author, time,
 		timeclean, delete_link, content, is_me, new_body = '';
 
 	// All valid response will have these
@@ -262,25 +262,6 @@ function shoutbox_indicator(shoutbox_id, turn_on)
 	document.getElementById('shoutbox_load_' + shoutbox_id).style.display = turn_on ? '' : 'none';
 }
 
-function sp_catch_enter(key)
-{
-	var keycode;
-
-	if (window.event)
-	{
-		keycode = window.event.keyCode;
-	}
-	else if (key)
-	{
-		keycode = key.which;
-	}
-
-	if (keycode === 13)
-	{
-		return true;
-	}
-}
-
 function sp_show_ignored_shout(shout_id)
 {
 	document.getElementById('ignored_shout_' + shout_id).style.display = '';
@@ -305,7 +286,7 @@ function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_them
 	{
 		var sp_smileyRowsContent = '';
 
-		for (i = 0; i < sp_smileys.length; i++)
+		for (let i = 0; i < sp_smileys.length; i++)
 		{
 			sp_smileys[i][2] = sp_smileys[i][2].replace(/"/g, '&quot;');
 			sp_smileys[i][0] = sp_smileys[i][0].replace(/"/g, '&quot;');
@@ -434,7 +415,7 @@ function sp_theme_select(obj)
  */
 function sp_collapseCalendar(id)
 {
-	new_day = "sp_calendar_" + id;
+	let new_day = "sp_calendar_" + id;
 
 	if (new_day === current_day)
 	{

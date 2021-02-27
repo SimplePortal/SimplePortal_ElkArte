@@ -2,7 +2,7 @@
 
 ### This is SimplePortal for the ElkArte Forum platform.
 
-The version is based on SimplePortal 2.4 (under development) and attempts to retain all functionality of that version.  It also adds some **unique functionality** that is available only under the ElkArte platform.
+The version is based on SimplePortal 2.4 and attempts to retain all functionality of that version.  It also adds some **unique functionality** that is available only under the ElkArte platform.
 
 [![Open Issues](http://img.shields.io/github/issues/SimplePortal/SimplePortal_ElkArte.svg?style=flat)](https://github.com/SimplePortal/SimplePortal_ElkArte/issues)
 [![Current Release](https://img.shields.io/github/release/SimplePortal/SimplePortal_ElkArte.svg?style=flat)](https://github.com/SimplePortal/SimplePortal_ElkArte/releases)

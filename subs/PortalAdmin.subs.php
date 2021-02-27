@@ -495,12 +495,13 @@ function sp_load_categories($start = null, $items_per_page = null, $sort = null)
  * @param int $id
  * @param string $namespace
  */
-function sp_check_duplicate_category($id, $namespace)
+function sp_check_duplicate_category($id, $namespace = '')
 {
 	$db = database();
 
 	$result = $db->query('', '
-		SELECT id_category
+		SELECT 
+			id_category
 		FROM {db_prefix}sp_categories
 		WHERE namespace = {string:namespace}
 			AND id_category != {int:current}
@@ -508,7 +509,7 @@ function sp_check_duplicate_category($id, $namespace)
 		array(
 			'limit' => 1,
 			'namespace' => $namespace,
-			'current' => $id,
+			'current' => (int) $id,
 		)
 	);
 	list ($has_duplicate) = $db->fetch_row($result);
@@ -635,7 +636,8 @@ function sp_count_articles()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+		    COUNT(*)
 		FROM {db_prefix}sp_articles'
 	);
 	list ($total_articles) = $db->fetch_row($request);
@@ -907,7 +909,8 @@ function sp_count_pages()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+		    COUNT(*)
 		FROM {db_prefix}sp_pages'
 	);
 	list ($total_pages) = $db->fetch_row($request);
@@ -1086,7 +1089,8 @@ function sp_count_shoutbox()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+		    COUNT(*)
 		FROM {db_prefix}sp_shoutboxes'
 	);
 	list ($total_shoutbox) = $db->fetch_row($request);

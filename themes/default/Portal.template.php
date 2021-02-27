@@ -145,7 +145,6 @@ function template_portal_above()
 		</div>';
 	}
 
-
 	// Followed by all the Top Blocks
 	$flex = '';
 	if ((empty($modSettings['showleft']) || empty($context['SPortal']['blocks'][1]))

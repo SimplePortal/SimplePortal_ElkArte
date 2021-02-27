@@ -9,6 +9,9 @@
  * @version 1.0.0 RC1
  */
 
+use BBC\ParserWrapper;
+
+
 /**
  * Article controller.
  *
@@ -168,7 +171,7 @@ class PortalArticles_Controller extends Action_Controller
 			preparsecode($body);
 
 			// Update or add a new comment
-			$parser = \BBC\ParserWrapper::instance();
+			$parser = ParserWrapper::instance();
 			if (!empty($body) && trim(strip_tags($parser->parseMessage($body, false), '<img>')) !== '')
 			{
 				if (!empty($_POST['comment']))

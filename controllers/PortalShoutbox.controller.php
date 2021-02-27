@@ -9,6 +9,8 @@
  * @version 1.0.0 RC1
  */
 
+use BBC\ParserWrapper;
+
 
 /**
  * Shoutbox controller.
@@ -63,7 +65,7 @@ class Shoutbox_Controller extends Action_Controller
 		}
 
 		// Any warning title for the shoutbox, like Not For Support ;P
-		$parser = \BBC\ParserWrapper::instance();
+		$parser = ParserWrapper::instance();
 		$context['SPortal']['shoutbox']['warning'] = $parser->parseMessage($context['SPortal']['shoutbox']['warning'], true);
 
 		$can_moderate = allowedTo('sp_admin') || allowedTo('sp_manage_shoutbox');

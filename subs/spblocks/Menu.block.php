@@ -69,8 +69,9 @@ function template_sp_menu($data)
 			{
 				echo '
 					<li ', sp_embed_class('dot', '', 'sp_list_indent'), '>
-						<a title="', $sub_button['title'], '" href="', $sub_button['href'], '">', $sub_button['title'], '</a></li>';
-}
+						<a title="', $sub_button['title'], '" href="', $sub_button['href'], '">', $sub_button['title'], '</a>
+					</li>';
+			}
 
 			echo '
 				</ul>';

@@ -9,6 +9,8 @@
  * @version 1.0.0 Beta 1
  */
 
+use BBC\ParserWrapper;
+
 
 /**
  * Load a shout box's parameters by ID
@@ -104,7 +106,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 	$can_delete = !empty($parameters['can_moderate']);
 
 	// BBC Parser
-	$parser = \BBC\ParserWrapper::instance();
+	$parser = ParserWrapper::instance();
 	$codes = $parser->getCodes()->getTags();
 
 	// We only allow a few codes in the shoutbox, so turn off others for now
@@ -256,7 +258,7 @@ function sportal_create_shout($shoutbox, $shout)
 	global $user_info;
 
 	$db = database();
-	$parser = \BBC\ParserWrapper::instance();
+	$parser = ParserWrapper::instance();
 
 	// If a guest shouts in the woods, and no one is there to hear them
 	if ($user_info['is_guest'])

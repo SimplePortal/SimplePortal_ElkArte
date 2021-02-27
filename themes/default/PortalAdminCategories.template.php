@@ -9,9 +9,12 @@
  * @version 1.0.0 RC1
  */
 
+
 function template_categories_edit()
 {
 	global $context, $scripturl, $txt;
+
+	template_show_error('category_errors');
 
 	echo '
 	<div id="sp_edit_category">

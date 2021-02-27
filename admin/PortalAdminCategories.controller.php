@@ -9,6 +9,7 @@
  * @version 1.0.0 RC1
  */
 
+use ElkArte\Errors\ErrorContext;
 
 /**
  * SimplePortal Category Administration controller class.
@@ -17,12 +18,11 @@
  */
 class ManagePortalCategories_Controller extends Action_Controller
 {
-	/**
-	 * If we are adding a new category
-	 *
-	 * @var bool
-	 */
+	/** @var bool If we are adding a new category*/
 	protected $_is_new;
+
+	/** @var ErrorContext */
+	protected $category_errors;
 
 	/**
 	 * Main dispatcher.
@@ -237,7 +237,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 		global $context, $txt;
 
 		loadTemplate('PortalAdminCategories');
-
+		$this->category_errors = ErrorContext::context('category', 0);
 		$this->_is_new = empty($_REQUEST['category_id']);
 
 		// Saving the category form
@@ -245,53 +245,78 @@ class ManagePortalCategories_Controller extends Action_Controller
 		{
 			checkSession();
 
-			// Clean what was sent
-			// @todo move all this to validator?
-			$name = isset($_POST['name']) ? Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) : '';
-			$namespace = isset($_POST['namespace']) ? Util::htmltrim(Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES)) : '';
-			$current = isset($_POST['category_id']) ? (int) $_POST['category_id'] : 0;
-			$description = isset($_POST['description']) ? Util::htmlspecialchars($_POST['description'], ENT_QUOTES) : '';
+			// Clean and Review the post data for compliance
+			require_once(SUBSDIR . '/DataValidator.class.php');
+			$validator = new Data_Validator();
+			$validator->sanitation_rules(array(
+				'name' => 'Util::htmltrim|Util::htmlspecialchars',
+				'namespace' => 'trim|Util::htmlspecialchars',
+				'current' => 'intval',
+				'description' => 'trim|Util::htmlspecialchars',
+				'permissions' => 'intval',
+				'category_id' => 'intval'
+			));
+			$validator->validation_rules(array(
+				'name' => 'required',
+				'namespace' => 'alpha_numeric|required',
+				'description' => 'required'
+			));
+			$validator->text_replacements(array(
+				'name' => $txt['sp_admin_categories_col_name'],
+				'namespace' => $txt['sp_admin_categories_col_namespace'],
+				'description' => $txt['sp_admin_categories_col_description']
+			));
 
-			if (empty($name))
+			// If you messed this up, tell them why
+			if (!$validator->validate($_POST))
 			{
-				throw new Elk_Exception('sp_error_category_name_empty', false);
+				foreach ($validator->validation_errors() as $id => $error)
+				{
+					$this->category_errors->addError($error);
+				}
 			}
 
-			if (empty($namespace))
+			if (sp_check_duplicate_category($validator->current, $validator->namespace))
 			{
-				throw new Elk_Exception('sp_error_category_namespace_empty', false);
+				$this->category_errors->addError('sp_error_category_namespace_duplicate');
 			}
 
-			if (sp_check_duplicate_category($current, $namespace))
+			if ($validator->namespace !== '' && preg_replace('~[0-9]+~', '', $_POST['namespace']) === '')
 			{
-				throw new Elk_Exception('sp_error_category_namespace_duplicate', false);
-			}
-
-			if (preg_match('~[^A-Za-z0-9_]+~', $namespace) != 0)
-			{
-				throw new Elk_Exception('sp_error_category_namespace_invalid_chars', false);
-			}
-
-			if (preg_replace('~[0-9]+~', '', $namespace) === '')
-			{
-				throw new Elk_Exception('sp_error_category_namespace_numeric', false);
+				$this->category_errors->addError('sp_error_category_namespace_numeric');
 			}
 
 			$category_info = array(
-				'id' => (int) $_POST['category_id'],
-				'namespace' => $namespace,
-				'name' => $name,
-				'description' => $description,
-				'permissions' => (int) $_POST['permissions'],
+				'id' => $validator->category_id,
+				'category_id' => $validator->namespace,
+				'namespace' => $validator->namespace,
+				'name' => $validator->name,
+				'description' => $validator->description,
+				'permissions' => $validator->permissions,
 				'status' => !empty($_POST['status']) ? 1 : 0,
 			);
 
-			$category_info['id'] = sp_update_category($category_info, $this->_is_new);
-			redirectexit('action=admin;area=portalcategories');
+			// None shall pass ... with errors
+			if ($this->category_errors->hasErrors())
+			{
+				// Return what we have to the form, show them the issues
+				$context['category'] = $category_info;
+				$context['category_errors'] = array(
+					'errors' => $this->category_errors->prepareErrors(),
+					'type' => 'minor',
+					'title' => $txt['sp_form_errors_detected'],
+				);
+				unset($_POST['submit']);
+			}
+			else
+			{
+				// Clear to save
+				$category_info['id'] = sp_update_category($category_info, $this->_is_new);
+				redirectexit('action=admin;area=portalcategories');
+			}
 		}
-
 		// Creating a new category, lets set up some defaults for the form
-		if ($this->_is_new)
+		elseif ($this->_is_new)
 		{
 			$context['category'] = array(
 				'id' => 0,

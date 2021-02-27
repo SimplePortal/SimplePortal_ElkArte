@@ -21,7 +21,7 @@ function template_information()
 				<h3 class="category_header hdicon cat_img_talk">
 					', $txt['sp-info_live'], '
 				</h3>
-				<div class="content windowbg">
+				<div class="content">
 					<div id="spAnnouncements">', $txt['sp-info_no_live'], '</div>
 				</div>
 			</div>
@@ -29,7 +29,7 @@ function template_information()
 				<h3 class="category_header hdicon cat_img_config">
 					', $txt['sp-info_general'], '
 				</h3>
-				<div class="content windowbg">
+				<div class="content">
 					<strong>', $txt['sp-info_versions'], ':</strong><br />
 					', $txt['sp-info_your_version'], ':
 					<em id="spYourVersion" style="white-space: nowrap;">', $context['sp_version'], '</em><br />

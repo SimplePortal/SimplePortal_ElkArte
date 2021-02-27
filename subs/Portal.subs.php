@@ -9,6 +9,8 @@
  * @version 1.0.0 RC1
  */
 
+use BBC\ParserWrapper;
+
 
 /**
  * Return if the portal is active, or active in a given area.
@@ -459,9 +461,7 @@ function sp_instantiate_block($name, $id = 0)
 		$instances[$name. '_' . $id] = new $class($db);
 	}
 
-	$instance = $instances[$name. '_' . $id];
-
-	return $instance;
+	return $instances[$name. '_' . $id];
 }
 
 /**
@@ -633,7 +633,7 @@ function sportal_process_visibility($query)
 	$page = !empty($page_info['id']) ? 'p' . $page_info['id'] : '';
 	$category = !empty($category_info['id']) ? 'c' . $category_info['id'] : '';
 	$article = !empty($article_info['id']) ? 'a' . $article_info['id'] : '';
-	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] == 1) || $action === 'portal' || !empty($context['standalone']) ? true : false;
+	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] == 1) || $action === 'portal' || !empty($context['standalone']);
 	$forum = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] != 1) || $action === 'forum';
 
 	// Will hopefully get larger in the future.
@@ -1118,11 +1118,9 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 	}
 
 	// Build the image tag
-	$image = '<img src="' . $settings['sp_images_url'] . '/' . $name . '.png" alt="' . $alt . '"' . (!empty($title)
+	return '<img src="' . $settings['sp_images_url'] . '/' . $name . '.png" alt="' . $alt . '"' . (!empty($title)
 		? ' title="' . $title . '"' : '') . (!empty($width) ? ' width="' . $width . '"' : '') . (!empty($height)
 		? ' height="' . $height . '"' : '') . (!empty($id) ? ' id="' . $id . '"' : '') . ' />';
-
-	return $image;
 }
 
 /**
@@ -1599,7 +1597,7 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 	switch ($type)
 	{
 		case 'bbc':
-			$parser = \BBC\ParserWrapper::instance();
+			$parser = ParserWrapper::instance();
 			if ($output_method === 'echo')
 			{
 				echo $parser->parseMessage($body, true);
