@@ -9,11 +9,13 @@
  * @version 1.0.0 RC1
  */
 
+use ElkArte\Errors\Log;
+
 
 /**
  * Admin info block
  *
- * @param mixed[] $parameters not used in this block
+ * @param array $parameters not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -47,7 +49,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 			// The admin may want to know about errors and users waiting activation
 			if ($user_info['is_admin'])
 			{
-				$errorLog = new ElkArte\Errors\Log(database());
+				$errorLog = new Log(database());
 				$this->data['admin']['errors'] = $errorLog->numErrors(array());
 
 				$activation_numbers = countInactiveMembers();
@@ -98,6 +100,14 @@ class Admin_Info_Block extends SP_Abstract_Block
 		}
 
 		$this->setTemplate('template_sp_admininfo');
+	}
+
+	/**
+	 * Permissions check fo access to this one
+	 */
+	public static function permissionsRequired()
+	{
+		return array('admin_forum');
 	}
 }
 

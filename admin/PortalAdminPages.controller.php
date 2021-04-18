@@ -317,7 +317,7 @@ class ManagePortalPages_Controller extends Action_Controller
 		{
 			$context['SPortal']['page'] = array(
 				'id' => 0,
-				'page_id' => 'page' . mt_rand(1, 5000),
+				'page_id' => 'page' . random_int(1, 5000),
 				'title' => $txt['sp_pages_default_title'],
 				'body' => '',
 				'type' => 'bbc',

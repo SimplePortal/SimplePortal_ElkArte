@@ -125,7 +125,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 		}
 		$this->_db->free_result($request);
 
-		foreach ($this->data['stats']['users_online'] as $key => $user)
+		foreach (array_keys($this->data['stats']['users_online']) as $key)
 		{
 			$this->data['stats']['users_online'][$key]['avatar'] = $avatars[$this->data['stats']['users_online'][$key]['id']];
 		}

@@ -11,7 +11,6 @@
 
 use BBC\ParserWrapper;
 
-
 /**
  * Article controller.
  *
@@ -112,11 +111,7 @@ class PortalArticles_Controller extends Action_Controller
 
 		$article_id = !empty($_REQUEST['article']) ? $_REQUEST['article'] : 0;
 
-		if (is_int($article_id))
-		{
-			$article_id = (int) $article_id;
-		}
-		else
+		if (!is_int($article_id))
 		{
 			$article_id = Util::htmlspecialchars($article_id, ENT_QUOTES);
 		}
@@ -130,7 +125,7 @@ class PortalArticles_Controller extends Action_Controller
 
 		$context['article']['style'] = sportal_select_style($context['article']['styles']);
 		$context['article']['body'] = censor($context['article']['body']);
-		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
+		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return', $article_id);
 
 		// Fetch attachments, if there are any
 		if (!empty($modSettings['attachmentEnable']) && !empty($context['article']['has_attachments']))
@@ -256,6 +251,9 @@ class PortalArticles_Controller extends Action_Controller
 			);
 		}
 
+		// Needed for basic Lightbox functionality
+		loadJavascriptFile('topic.js', ['defer' => true]);
+
 		$context['description'] = trim(preg_replace('~<[^>]+>~', ' ', $context['article']['body']));
 		$context['description'] = Util::shorten_text(preg_replace('~\s\s+|&nbsp;|&quot;|&#039;~', ' ', $context['description']), 384, true);
 
@@ -293,7 +291,12 @@ class PortalArticles_Controller extends Action_Controller
 		// We need to do some work on attachments.
 		$id_article = (int) $_GET['article'];
 		$id_attach = (int) $_GET['attach'];
-		$attachment = sportal_get_attachment_from_article($id_article, $id_attach);
+
+		if (isset($_GET['thumb']))
+			$attachment = sportal_get_attachment_thumb_from_article($id_article, $id_attach);
+		else
+			$attachment = sportal_get_attachment_from_article($id_article, $id_attach);
+
 		if (empty($attachment))
 		{
 			throw new Elk_Exception('no_access', false);
@@ -368,29 +371,19 @@ class PortalArticles_Controller extends Action_Controller
 		}
 		else
 		{
-			header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
-			unset($_GET['image']);
+			header('Content-Type: application/octet-stream');
 		}
 
 		$disposition = !isset($_GET['image']) ? 'attachment' : 'inline';
+		$fileName = str_replace('"', '',  $filename);
 
-		// Different browsers like different standards...
-		if (isBrowser('firefox'))
+		// Send as UTF-8 if the name requires that
+		$altName = '';
+		if (preg_match('~[\x80-\xFF]~', $fileName))
 		{
-			header('Content-Disposition: ' . $disposition . '; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)));
+			$altName = "; filename*=UTF-8''" . rawurlencode($fileName);
 		}
-		elseif (isBrowser('opera'))
-		{
-			header('Content-Disposition: ' . $disposition . '; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename) . '"');
-		}
-		elseif (isBrowser('ie'))
-		{
-			header('Content-Disposition: ' . $disposition . '; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)) . '"');
-		}
-		else
-		{
-			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
-		}
+		header('Content-Disposition: ' . $disposition . '; filename="' . $fileName . '"' . $altName);
 
 		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
 		if (!isset($_GET['image']) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')))

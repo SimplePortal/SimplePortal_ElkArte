@@ -220,7 +220,6 @@ $txt['sp_param_Articles_limit'] = 'Articles to Display';
 $txt['sp_param_Articles_type'] = 'Type';
 $txt['sp_param_Articles_avatar'] = 'Author Avatar';
 $txt['sp_param_Articles_length'] = 'Maximum Characters';
-$txt['sp_param_Articles_attachment'] = 'Display first attachment';
 $txt['sp_param_Articles_view'] = 'Display';
 $txt['sp_param_Shoutbox_shoutbox'] = 'Shoutbox to Display';
 $txt['sp_param_Gallery_limit'] = 'Items to Display';
@@ -610,3 +609,8 @@ $txt['sp-adminCatDesc'] = 'Here you can manage and configure SimplePortal.';
 
 // Errors
 $txt['sp_form_errors_detected'] = 'The following error or errors occurred while saving or editing:';
+
+// Portal CoreFeature
+$txt['core_settings_item_pt'] = 'SimplePortal';
+$txt['core_settings_item_pt_desc'] = 'Enabling this feature will enable the SimplePortal addon.';
+

@@ -34,7 +34,7 @@ function sp_collapseBlock(id)
 		}
 
 		// Swap the class to change the icon
-		$("#sp_collapse_" + id).attr("class", mode ? "collapse" : "expand");
+		$("#sp_collapse_" + id).attr("class", mode ? "chevricon i-chevron-up" : "chevricon i-chevron-down");
 	});
 }
 

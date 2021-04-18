@@ -9,6 +9,8 @@
  * @version 1.0.0 RC1
  */
 
+use BBC\ParserWrapper;
+
 
 /**
  * Shoutbox Block, show the shoutbox thoughts box
@@ -113,7 +115,10 @@ class Shoutbox_Block extends SP_Abstract_Block
 		}
 
 		// Going to add to the shoutbox \
-		if (!empty($_POST['new_shout']) && !empty($_POST['submit_shout']) && !empty($_POST['shoutbox_id']) && $_POST['shoutbox_id'] == $this->data['id'])
+		if (!empty($_POST['new_shout'])
+			&& !empty($_POST['submit_shout'])
+			&& !empty($_POST['shoutbox_id'])
+			&& $_POST['shoutbox_id'] == $this->data['id'])
 		{
 			// Make sure things are in order
 			checkSession();
@@ -153,7 +158,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 		);
 		$this->data['shouts'] = sportal_get_shouts($this->data['id'], $shout_parameters);
 
-		$parser = \BBC\ParserWrapper::instance();
+		$parser = ParserWrapper::instance();
 		$this->data['warning'] = $parser->parseMessage($this->data['warning'], true);
 		$context['can_shout'] = $context['user']['is_logged'];
 

@@ -31,6 +31,7 @@ foreach ($defaults as $index => $value)
 }
 
 updateSettings($updates);
+Hooks::instance()->disableIntegration('Portal_Integrate');
 
 if (ELK === 'SSI')
 {

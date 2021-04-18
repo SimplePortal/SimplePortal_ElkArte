@@ -11,7 +11,6 @@
 
 use BBC\ParserWrapper;
 
-
 /**
  * Return if the portal is active, or active in a given area.
  *
@@ -129,7 +128,7 @@ function sportal_init($standalone = false)
 		}
 
 		// Portal specific templates and language
-		loadTemplate('Portal');
+		Templates::instance()->load('Portal');
 		loadLanguage('SPortal');
 
 		if (!empty($modSettings['sp_maintenance']) && !allowedTo('sp_admin'))
@@ -275,9 +274,7 @@ function sportal_init_headers()
 	}
 
 	// Mark it as done so we don't do it again
-	$initialized = true;
-
-	return $initialized;
+	return true;
 }
 
 /**
@@ -513,13 +510,13 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 	if (!empty($column_id))
 	{
 		$query[] = 'spb.col = {int:col}';
-		$parameters['col'] = !empty($column_id) ? $column_id : 0;
+		$parameters['col'] = $column_id;
 	}
 
 	if (!empty($block_id))
 	{
 		$query[] = 'spb.id_block = {int:id_block}';
-		$parameters['id_block'] = !empty($block_id) ? $block_id : 0;
+		$parameters['id_block'] = $block_id;
 	}
 
 	if (!empty($permission))
@@ -992,7 +989,7 @@ function sp_loadColors($users = array())
 	{
 		$color_profile = array();
 	}
-	// Otherwise, we will need to do some reformating of the old data.
+	// Otherwise, we will need to do some reformatting of the old data.
 	else
 	{
 		foreach ($users as $k => $u)
@@ -1441,6 +1438,8 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 
 	$db = database();
 
+	$page_id = is_int($page_id) || is_string($page_id) ? $page_id : 0;
+
 	// If we already have the information, just return it
 	$cache_name = implode(':', array($page_id, $active, $allowed));
 	if (isset($cache[$cache_name]))
@@ -1779,9 +1778,7 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 		$return[$row['id_profile']] = array(
 			'id' => $row['id_profile'],
 			'name' => $row['name'],
-			'label' => isset($txt['sp_admin_profiles' . substr($row['name'], 1)])
-				? $txt['sp_admin_profiles' . substr($row['name'], 1)]
-				: $row['name'],
+			'label' => $txt['sp_admin_profiles' . substr($row['name'], 1)] ?? $row['name'],
 			'type' => $row['type'],
 			'value' => $row['value'],
 		);
@@ -1869,7 +1866,7 @@ function sp_prevent_flood($type, $fatal = true)
 
 	if (!allowedTo('admin_forum'))
 	{
-		$time_limit = isset($limits[$type]) ? $limits[$type] : $modSettings['spamWaitTime'];
+		$time_limit = $limits[$type] ?? $modSettings['spamWaitTime'];
 	}
 	else
 	{

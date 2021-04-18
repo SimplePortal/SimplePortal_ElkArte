@@ -54,7 +54,7 @@ class PortalCategories_Controller extends Action_Controller
 	}
 
 	/**
-	 * View a specific category, showing all articles it contains
+	 * View a specific category, showing all the articles it contains
 	 */
 	public function action_sportal_category()
 	{
@@ -65,11 +65,7 @@ class PortalCategories_Controller extends Action_Controller
 
 		$category_id = !empty($_REQUEST['category']) ? $_REQUEST['category'] : 0;
 
-		if (is_int($category_id))
-		{
-			$category_id = (int) $category_id;
-		}
-		else
+		if (!is_int($category_id))
 		{
 			$category_id = Util::htmlspecialchars($category_id, ENT_QUOTES);
 		}
@@ -100,6 +96,7 @@ class PortalCategories_Controller extends Action_Controller
 			$context['articles'][$article['id']]['time'] = $article['date'];
 
 			// Parse / shorten as required
+			$context['article']['id'] = $article['id'];
 			$context['articles'][$article['id']]['cut'] = sportal_parse_cutoff_content($context['articles'][$article['id']]['preview'], $article['type'], $modSettings['sp_articles_length'], $context['articles'][$article['id']]['article_id']);
 		}
 
@@ -112,6 +109,9 @@ class PortalCategories_Controller extends Action_Controller
 				});', true
 			);
 		}
+
+		// Needed for basic Lightbox functionality
+		loadJavascriptFile('topic.js', ['defer' => true]);
 
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?category=' . $context['category']['category_id'],

@@ -195,7 +195,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		}
 
 		// Call the sub template.
-		createToken('admin-sort', 'post');
+		createToken('admin-sort');
 		$context['sub_template'] = 'block_list';
 		$context['page_title'] = $txt['sp-adminBlockListName'];
 	}
@@ -572,7 +572,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 				if (!empty($current_row) && ($row > $current_row))
 				{
-					sp_update_block_row($current_row, $row - 1, $_POST['block_column'], true);
+					sp_update_block_row($current_row, $row - 1, $_POST['block_column']);
 				}
 				else
 				{
@@ -646,7 +646,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	/**
 	 * Moves get var to post for compatibility and get parameters to start params
 	 *
-	 * @return mixed[]
+	 * @return array
 	 */
 	private function _getStartParameters()
 	{
@@ -767,11 +767,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				list ($current_side,) = sp_block_get_position($block_id);
 
 				// The block ids arrive in 1-n view order ...
-				$blocks = array();
-				foreach ($_POST['block'] as $id)
-				{
-					$blocks[] = $id;
-				}
+				$blocks = $_POST['block'];
 
 				// Find where the moved block is in the block stack
 				$moved_key = array_search($block_id, $blocks);
@@ -847,7 +843,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		}
 
 		// New generic token for use
-		createToken('admin-sort', 'post');
+		createToken('admin-sort');
 		$tokens = array(
 			array(
 				'value' => $context['admin-sort_token'],
@@ -885,10 +881,6 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	public function action_move()
 	{
 		checkSession('get');
-
-		// Not moving yet
-		$target_side = null;
-		$block_id = null;
 
 		// What block is being moved?
 		if (empty($_REQUEST['block_id']))

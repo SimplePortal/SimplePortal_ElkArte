@@ -473,8 +473,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 			}
 		}
 
-		// Check / Save attachments
-		$this->saveArticleAttachments();
+		// Check / Prep attachments
+		$this->processArticleAttachments();
 
 		// None shall pass ... with errors
 		if ($this->article_errors->hasErrors() || $this->attach_errors->hasErrors())
@@ -502,17 +502,15 @@ class ManagePortalArticles_Controller extends Action_Controller
 			preparsecode($article_info['body']);
 		}
 
+		// Bind attachments to the article, create any needed thumbnails, move to sp attachment directory
+		$this->finalizeArticleAttachments($article_info);
+
 		// Save away
 		checkSession();
 		$this->_is_aid = sp_save_article($article_info, empty($this->_is_aid));
 
-		// Set attachments to the article, create any needed thumbnails
-		$this->finalizeArticleAttachments();
-
 		// And return to the listing
 		redirectexit('action=admin;area=portalarticles');
-
-		return true;
 	}
 
 	/**
@@ -520,9 +518,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 *
 	 * - Remove existing ones that have been "unchecked" in the form
 	 * - Performs security, size, type, etc checks
-	 * - Moves files to the appropriate directory
+	 * - Moves files to the current attachment directory, we will move it again to sp attachment in
+	 * the following steps.
 	 */
-	private function saveArticleAttachments()
+	private function processArticleAttachments()
 	{
 		global $user_info, $context, $modSettings;
 
@@ -531,9 +530,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 		{
 			$keep_temp = array();
 			$keep_ids = array();
-			foreach ($_POST['attach_del'] as $dummy)
+			foreach ($_POST['attach_del'] as $idRemove)
 			{
-				$attachID = getAttachmentIdFromPublic($dummy);
+				$attachID = getAttachmentIdFromPublic($idRemove);
 
 				if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
 				{
@@ -589,9 +588,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 * and linking attachments to the specific article.  Saves the articles in the SP
 	 * attachment directory.
 	 */
-	private function finalizeArticleAttachments()
+	private function finalizeArticleAttachments(&$article_info)
 	{
-		global $context, $user_info, $ignore_temp, $modSettings;
+		global $context, $user_info, $modSettings, $ignore_temp;
 
 		$attachIDs = array();
 		if (empty($ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']))
@@ -619,8 +618,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 						'poster' => $user_info['id'],
 						'name' => $attachment['name'],
 						'tmp_name' => $attachment['tmp_name'],
-						'size' => isset($attachment['size']) ? $attachment['size'] : 0,
-						'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
+						'size' => $attachment['size'] ?? 0,
+						'mime_type' => $attachment['type'] ?? '',
 						'id_folder' => $modSettings['sp_articles_attachment_dir'],
 						'approved' => true,
 						'errors' => array(),
@@ -633,6 +632,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 						{
 							$attachIDs[] = $attachmentOptions['thumb'];
 						}
+
+						// Replace ila attach tags with the new valid attachment id and [spattach] tag
+						$article_info['body'] = preg_replace('~\[attach(.*?)\]' . $attachment['public_attachid'] . '\[\/attach\]~', '[spattach$1]' . $attachmentOptions['id'] . '[/spattach]', $article_info['body']);
 					}
 				}
 				// We have errors on this file, build out the issues for display to the user
@@ -697,7 +699,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		{
 			$context['article'] = array(
 				'id' => 0,
-				'article_id' => 'article' . mt_rand(1, 5000),
+				'article_id' => 'article' . random_int(1, 5000),
 				'category' => array('id' => 0),
 				'title' => $txt['sp_articles_default_title'],
 				'body' => '',
@@ -906,7 +908,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 				$this->_attachments['total_size'] += $this->_attachments['size'];
 
 				$context['attachments']['current'][] = array(
-					'name' => '<u>' . htmlspecialchars($this->_attachments['name'], ENT_COMPAT, 'UTF-8') . '</u>',
+					'name' => '<u>' . htmlspecialchars($this->_attachments['name'], ENT_COMPAT) . '</u>',
 					'size' => $this->_attachments['size'],
 					'id' => $attachID,
 					'unchecked' => false,
@@ -930,6 +932,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
 		$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
 		$context['attachments']['restrictions'] = array();
+		$context['attachments']['ila_enabled'] = !empty($modSettings['attachment_inline_enabled']);
 
 		if (!empty($modSettings['attachmentCheckExtensions']))
 		{
@@ -941,8 +944,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 		}
 
 		$context['attachments']['templates'] = array(
-			'add_new' => 'template_article_new_attachments',
 			'existing' => 'template_article_existing_attachments',
+			'add_new' => 'template_article_new_attachments',
 		);
 
 		$attachmentRestrictionTypes = array('attachmentNumPerPostLimit', 'attachmentPostLimit', 'attachmentSizeLimit');
@@ -964,6 +967,43 @@ class ManagePortalArticles_Controller extends Action_Controller
 			}
 		}
 
+		// The portal articles always allow "ila" style attachments, so show that insert interface
+		addInlineJavascript('
+		let IlaDropEvents = {
+			UploadSuccess: function($button, data) {
+				let inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
+					trigger: $(\'<div class="share icon i-share" />\'),
+					template: ' . JavaScriptEscape('<div class="insertoverlay">
+						<input type="button" class="button" value="' . $txt['insert'] . '">
+						<ul data-group="tabs" class="tabs">
+							<li data-tab="size">' . $txt['ila_opt_size'] . '</li><li data-tab="align">' . $txt['ila_opt_align'] . '</li>
+						</ul>
+						<div class="container" data-visual="size">
+							<label><input data-size="thumb" type="radio" name="imgmode">' . $txt['ila_opt_size_thumb'] . '</label>
+							<label><input data-size="full" type="radio" name="imgmode">' . $txt['ila_opt_size_full'] . '</label>
+							<label><input data-size="cust" type="radio" name="imgmode">' . $txt['ila_opt_size_cust'] . '</label>
+							<div class="customsize">
+								<input type="range" class="range" min="100" max="500"><input type="text" class="visualizesize" disabled="disabled">
+							</div>
+						</div>
+						<div class="container" data-visual="align">
+							<label><input data-align="none" type="radio" name="align">' . $txt['ila_opt_align_none'] . '</label>
+							<label><input data-align="left" type="radio" name="align">' . $txt['ila_opt_align_left'] . '</label>
+							<label><input data-align="center" type="radio" name="align">' . $txt['ila_opt_align_center'] . '</label>
+							<label><input data-align="right" type="radio" name="align">' . $txt['ila_opt_align_right'] . '</label>
+						</div>
+					</div>') . '
+				});
+				inlineAttach.addInterface($button, data.attachid);
+			},
+			RemoveSuccess: function(attachid) {
+				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
+					trigger: $(\'<div class="share icon i-share" />\')
+				});
+				inlineAttach.removeAttach(attachid);
+			}
+		};', true);
+
 		// Load up the drag and drop attachment magic
 		addInlineJavascript('
 		var dropAttach = dragDropAttachment({
@@ -984,6 +1024,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 				areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . ',
 			}),
 			existingSelector: ".inline_insert",
+			events: IlaDropEvents' . (isset($this->_is_aid) ? ',
+			topic: ' . $this->_is_aid : '') . '
 		});', true);
 	}
 

@@ -9,6 +9,8 @@
  * @version 1.0.0 RC1
  */
 
+use BBC\ParserWrapper;
+
 
 /**
  * Board Block, Displays a list of posts from selected board(s)
@@ -201,6 +203,7 @@ class Board_News_Block extends SP_Abstract_Block
 				'id' => $row['id_topic'],
 				'message_id' => $row['id_msg'],
 				'icon' => '<img src="' . $settings[$this->icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" class="icon" alt="' . $row['icon'] . '" />',
+				'icon_name' => $row['icon'],
 				'subject' => $row['subject'],
 				'time' => standardTime($row['poster_time']),
 				'views' => $row['num_views'],
@@ -263,7 +266,7 @@ class Board_News_Block extends SP_Abstract_Block
 		// We will show attachments in the block, regardless, so save and restore
 		$attachmentShowImages = $this->_modSettings['attachmentShowImages'];
 		$this->_modSettings['attachmentShowImages'] = 1;
-		$this->attachments = getAttachments($posts, false);
+		$this->attachments = getAttachments($posts);
 		$this->_modSettings['attachmentShowImages'] = $attachmentShowImages;
 
 		if (!isset($attachments))
@@ -307,7 +310,7 @@ class Board_News_Block extends SP_Abstract_Block
 		{
 			// A little razzle dazzle since loadAttachment is dependant on this
 			// poor behavior
-			$o_topic = isset($topic) && $topic !== null ? $topic : null;
+			$o_topic = $topic ?? null;
 			$topic = $id_topic;
 			$this_attachs = loadAttachmentContext($id_msg);
 			$topic = $o_topic;
@@ -335,7 +338,7 @@ class Board_News_Block extends SP_Abstract_Block
 			}
 
 			$img_tag = substr($body, $pos, strpos($body, '[/img]', $pos) + 6);
-			$parser = \BBC\ParserWrapper::instance();
+			$parser = ParserWrapper::instance();
 			$img_html = $parser->parseMessage($img_tag, true);
 			$body = str_replace($img_tag, '<div class="sp_attachment_thumb">' . $img_html . '</div>', $body);
 
@@ -393,7 +396,7 @@ function template_sp_boardNews_error($data)
  */
 function template_sp_boardNews($data)
 {
-	global $context, $scripturl, $txt;
+	global $context, $scripturl, $txt, $modSettings;
 
 	// Auto video embedding enabled?
 	if ($data['embed_videos'])
@@ -410,25 +413,26 @@ function template_sp_boardNews($data)
 		$attachment = $news['attachment'];
 
 		echo '
-			<h3 class="category_header">
-				<span class="floatleft sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
+			<h3 class="category_header">' . (empty($modSettings['messageIcons_enable'])
+				? '<span class="icon i-' . $news['icon_name'] . '"></span>'
+				: '<span class="floatleft sp_article_icon">' . $news['icon'] . '</span>') . '
+				<a href="', $news['href'], '" >', $news['subject'], '</a>
 			</h3>
 			<div id="msg_', $news['message_id'], '" class="sp_article_content">
 				<div class="sp_content_padding">';
 
-		// @todo replace the <img> with $news['avatar']['img'] and some css for the max-width
 		if (!empty($news['avatar']['href']))
 		{
 			echo '
 					<a href="', $scripturl, '?action=profile;u=', $news['poster']['id'], '">
 						<img src="', $news['avatar']['href'], '" alt="', $news['poster']['name'], '" style="max-width:40px" class="floatright" />
 					</a>
-					<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], '<br />', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
+					<div>', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], '<br />', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
 		}
 		else
 		{
 			echo '
-					<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], ' | ', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
+					<div>', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], ' | ', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
 		}
 
 		echo '

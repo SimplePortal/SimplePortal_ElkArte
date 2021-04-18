@@ -320,7 +320,7 @@ class ManagePortalCategories_Controller extends Action_Controller
 		{
 			$context['category'] = array(
 				'id' => 0,
-				'category_id' => 'category' . mt_rand(1, 5000),
+				'category_id' => 'category' . random_int(1, 5000),
 				'name' => $txt['sp_categories_default_name'],
 				'description' => '',
 				'permissions' => 3,

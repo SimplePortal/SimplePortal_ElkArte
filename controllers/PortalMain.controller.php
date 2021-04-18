@@ -46,6 +46,14 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	}
 
 	/**
+	 * Don't track for xml requests
+	 */
+	public function trackStats($action = '')
+	{
+		return !isset($this->_req->xml);
+	}
+
+	/**
 	 * Used to change the default action with a new one.
 	 *
 	 * Called statically from the Dispatcher to the controller listed in $modSettings['front_page']
@@ -100,7 +108,7 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 			{
 				$default_action = array(
 					'file' => $file,
-					'controller' => isset($controller) ? $controller : null,
+					'controller' => $controller ?? null,
 					'function' => $function
 				);
 			}
@@ -179,9 +187,6 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	{
 		global $context, $modSettings;
 
-		$context['sub_template'] = 'portal_index';
-		loadTemplate('Portal');
-
 		// Showing articles on the index page?
 		if (!empty($modSettings['sp_articles_index']))
 		{
@@ -208,10 +213,20 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 				$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
 				$context['articles'][$article['id']]['time'] = $article['date'];
 
+				// Fetch attachments, if there are any
+				if (!empty($modSettings['attachmentEnable']) && !empty($article['has_attachments']))
+				{
+					$context['articles'][$article['id']]['attachment'] = sportal_load_attachment_context($article['id']);
+				}
+
 				// Parse / shorten as required
-				$context['articles'][$article['id']]['cut'] = sportal_parse_cutoff_content($context['articles'][$article['id']]['preview'], $article['type'], $modSettings['sp_articles_length'], $context['articles'][$article['id']]['article_id']);
+				$context['article']['id'] = $article['id'];
+				sportal_parse_cutoff_content($context['articles'][$article['id']]['preview'], $article['type'], $modSettings['sp_articles_length'], $context['articles'][$article['id']]['article_id']);
 			}
 		}
+
+		$context['sub_template'] = 'portal_index';
+		Templates::instance()->load('Portal');
 	}
 
 	/**

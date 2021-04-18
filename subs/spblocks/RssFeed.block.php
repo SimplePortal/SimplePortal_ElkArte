@@ -130,7 +130,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 
 			preg_match_all('~<([A-Za-z]+)>(.+?)</\\1>~', $item, $match);
 
-			foreach ($match[0] as $tag_id => $dummy)
+			foreach (array_keys($match[0]) as $tag_id)
 			{
 				if (Util::strpos($match[2][$tag_id], '#cdata_escape_encode#') === 0)
 				{

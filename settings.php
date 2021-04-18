@@ -50,6 +50,7 @@ foreach ($defaults as $index => $value)
 
 updateSettings($updates);
 updateSettings(array('front_page' => 'PortalMain_Controller'));
+Hooks::instance()->enableIntegration('Portal_Integrate');
 
 $standalone_file = BOARDDIR . '/PortalStandalone.php';
 

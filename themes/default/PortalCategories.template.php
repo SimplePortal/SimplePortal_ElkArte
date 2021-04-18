@@ -79,7 +79,7 @@ function template_view_category()
 			</div>
 			<hr />
 			<div id="msg_', $article['id'], '" class="inner sp_inner">', $article['preview'], '
-				<div class="sp_article_extra">',
+				<div class="sp_article_extra clear">',
 					(!empty($article['cut']) ? '<a class="linkbutton" href="' . $article['href'] . '">' . $txt['sp_read_more'] . '</a>' : ''),
 					(!empty($article['comment_count']) ? '<a class="linkbutton" href="' . $article['href'] . '#sp_view_comments">' . $txt['sp-articlesComments'] . '</a>' : ''),
 					'<a class="linkbutton" href="', $article['href'], '#sp_comment">', $txt['sp_write_comment'], '</a>

@@ -96,7 +96,7 @@ class Recent_Block extends SP_Abstract_Block
 		$color_ids = array();
 		foreach ($this->data['items'] as $item)
 		{
-			if (!empty($item['poster']['id']))
+			if (!empty($item['poster']) && isset($item['poster']['id']))
 				$color_ids[] = $item['poster']['id'];
 		}
 
@@ -136,7 +136,7 @@ function template_sp_recent($data)
 		foreach ($data['items'] as $item)
 		{
 			echo '
-			', $item['new'] ? '' : ' <a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
+			', empty($item['is_new']) ? '' : ' <a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
 			<a href="', $item['href'], '">', $item['subject'], '</a>
 			<span class="smalltext">', $txt['by'], ' ', $item['poster']['link'],
 				'<br />[', $item['time'], '] ', $txt['in'], ' <em>', $item['board']['link'], '</em>
@@ -152,14 +152,14 @@ function template_sp_recent($data)
 		$embed_class = sp_embed_class($data['class_type'], '', 'sp_recent_icon centertext');
 		foreach ($data['items'] as $item)
 		{
-			if (!empty($item['is_last']))
+			if (!empty($item['is_last']) || empty($item['html_time']))
 				continue;
 
 			echo '
 				<tr>
 					<td ', $embed_class, '></td>
 					<td class="sp_recent_subject">',
-						empty($item['new']) ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
+						empty($item['is_new']) ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
 						<a href="', $item['href'], '">', $item['subject'], '</a>
 						<br />[', $item['board']['link'], ']
 					</td>
