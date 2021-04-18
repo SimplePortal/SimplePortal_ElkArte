@@ -25,7 +25,7 @@ $helptxt['sp_maintenance'] = 'When maintenance is enabled, portal is only visibl
 $helptxt['sp_standalone_url'] = 'Full URL to the standalone file.<br /><br />Example: http://myforum.com/portal.php';
 $helptxt['portaltheme'] = 'Select the theme which will be used for the portal.';
 $helptxt['sp_disableForumRedirect'] = 'If this box is unchecked, users will be redirected to the portal after they login or logout. If this box is checked, then users will be redirected to the BoardIndex.';
-$helptxt['sp_disableColor'] = 'If the Member Color Link mod is installed, this will disable the mod on the portal (except in the who\'s online list).';
+$helptxt['sp_disableColor'] = 'This will disable the coloring of Membergroups on the portal (except in the who\'s online list).';
 $helptxt['sp_disableMobile'] = 'Master setting to disable the portal on any devices it detects as mobile (phone not tablets).  To disable on a per block basis, leave this on and use visibility profiles.';
 $helptxt['sp_disable_random_bullets'] = 'Disables random coloring for bullet images used in portal lists.';
 $helptxt['sp_disable_php_validation'] = 'Disables validation of PHP block codes, which is to prevent syntax and database errors in code.';
@@ -40,7 +40,7 @@ $helptxt['rightwidth'] = 'If right side blocks are enabled, their width can be s
 $helptxt['sp_IntegrationHide'] = 'Use this setting to hide blocks in certain forum sections.';
 
 // Article settings
-$helptxt['sp_articles_index'] = 'This setting enables articles to be displayed on the portal.';
+$helptxt['sp_articles_index'] = 'This setting enables articles to be displayed on the portal, independent of an article block';
 $helptxt['sp_articles_index_per_page'] = 'This sets the maximum amount of articles shown per page.';
 $helptxt['sp_articles_index_total'] = 'This sets the total number of articles that will be available on the portal index';
 $helptxt['sp_articles_length'] = 'This setting allows a limit to be set on the amount of characters an article can display on the portal page. If the article exceeds this limit it will be shortened and have an ellipsis (...) link on the end, which allows the user to view the entire article.';
