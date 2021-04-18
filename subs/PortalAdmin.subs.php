@@ -56,9 +56,8 @@ function getFunctionInfo($function = null)
 			continue;
 		}
 
-		// Ensure they have permissions to view this block
-		$perms = $class::permissionsRequired();
-		if (!allowedTo($perms))
+		// Check if the block has defined any special permissions
+		if (!allowedTo($class::permissionsRequired()))
 		{
 			continue;
 		}
@@ -523,7 +522,7 @@ function sp_check_duplicate_category($id, $namespace = '')
  *
  * If adding a new one, will return the id of the new category
  *
- * @param mixed[] $data field name to value for use in query
+ * @param array $data field name to value for use in query
  * @param boolean $is_new
  *
  * @return int
@@ -532,7 +531,7 @@ function sp_update_category($data, $is_new = false)
 {
 	$db = database();
 
-	$id = isset($data['id']) ? $data['id'] : null;
+	$id = $data['id'] ?? null;
 
 	// Field definitions
 	$fields = array(
@@ -797,7 +796,7 @@ function sp_duplicate_articles($article_id, $namespace)
  * - expects to have $context populated from sportal_get_articles()
  * - add items as a new article is is_new is true otherwise updates and existing one
  *
- * @param mixed[] $article_info array of fields details to save/update
+ * @param array $article_info array of fields details to save/update
  * @param boolean $is_new true for new insertion, false to update
  * @param boolean $update_counts true to update category counts
  *
@@ -997,7 +996,7 @@ function sp_delete_pages($page_ids = array())
  *
  * - Add items as a new page is is_new is true otherwise updates and existing one
  *
- * @param mixed[] $page_info array of fields details to save/update
+ * @param array $page_info array of fields details to save/update
  * @param boolean $is_new true for new insertion, false to update
  *
  * @return int
@@ -1410,9 +1409,7 @@ function sp_load_profiles($start, $items_per_page, $sort, $type = 1)
 		$profiles[$row['id_profile']] = array(
 			'id' => $row['id_profile'],
 			'name' => $row['name'],
-			'label' => isset($txt['sp_admin_profiles' . substr($row['name'], 1)])
-				? $txt['sp_admin_profiles' . substr($row['name'], 1)]
-				: $row['name'],
+			'label' => $txt['sp_admin_profiles' . substr($row['name'], 1)] ?? $row['name'],
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalprofiles;sa=editpermission;profile_id=' . $row['id_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalprofiles;sa=deletepermission;profile_id=' . $row['id_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_profiles_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
@@ -1589,7 +1586,7 @@ function sp_block_nextrow($block_column, $block_id = 0)
 /**
  * Inserts a new block to the portal
  *
- * @param mixed[] $blockInfo
+ * @param array $blockInfo
  */
 function sp_block_insert($blockInfo)
 {
@@ -1613,7 +1610,7 @@ function sp_block_insert($blockInfo)
  * - Removes all parameters stored with the box in anticipation of new
  * ones being supplied
  *
- * @param mixed[] $blockInfo
+ * @param array $blockInfo
  */
 function sp_block_update($blockInfo)
 {
@@ -1658,7 +1655,7 @@ function sp_block_update($blockInfo)
 /**
  * Inserts parameters for a specific block
  *
- * @param mixed[] $new_parameters
+ * @param array $new_parameters
  * @param int $id_block
  */
 function sp_block_insert_parameters($new_parameters, $id_block)
@@ -1809,7 +1806,7 @@ function sp_block_delete($block_id)
 /**
  * Function to add or update a profile, style, permissions or display
  *
- * @param mixed[] $profile_info The data to insert/update
+ * @param array $profile_info The data to insert/update
  * @param bool $is_new if to update or insert
  *
  * @return int
@@ -2055,7 +2052,7 @@ function sp_custom_menu_items($start, $items_per_page, $sort)
 /**
  * Function to add or update a menu
  *
- * @param mixed[] $menu_info The data to insert/update
+ * @param array $menu_info The data to insert/update
  * @param bool $is_new if to update or insert
  *
  * @return int
