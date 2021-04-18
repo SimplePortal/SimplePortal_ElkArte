@@ -38,6 +38,14 @@ class Shoutbox_Controller extends Action_Controller
 	}
 
 	/**
+	 * Override default method, just say no for xml
+	 */
+	public function trackStats($action = '')
+	{
+		return !isset($this->_req->xml);
+	}
+
+	/**
 	 * The Shoutbox ... allows for the adding, editing, deleting and viewing of shouts
 	 */
 	public function action_sportal_shoutbox()
