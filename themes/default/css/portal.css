@@ -348,33 +348,40 @@ table.sp_articles {
 #sp_left {
 	padding-right: .5em;
 	height: 100%;
+	/* fixed width, cant grow or shrink */
 	flex: 0 0 auto;
 }
 
 #sp_right {
 	padding-left: .5em;
 	height: 100%;
+	/* fixed width, cant grow or shrink */
 	flex: 0 0 auto;
 }
 
 #sp_center {
+	/* variable width, grow or shrink as needed to fill space
+	 the 200px width is simply a start as 1 1 auto will fill available */
 	flex: 1 1 auto;
 	padding: 2px;
+	width: 200px;
 }
 
+/*
 #sp_center::after{
 	display: block;
 	clear: both;
 	content: "";
 }
-
+*/
 #sp_center_top, #sp_center_bottom {
 }
 
 #sp_header, #sp_footer {
 	margin: 0;
 	vertical-align: top;
-	clear: both;
+	/*
+	clear: both;*/
 }
 
 div.sp_block {
@@ -419,13 +426,10 @@ h3.sp_secondary_header, h2.sp_secondary_header {
 
 .sp_article_block_container {
 	overflow: auto;
-	margin: 0 0 .1em 0;
-	padding: 0 0 .5em 0;
-	border: 1px solid #CCCCCC;
-	border-top: none;
-	border-radius: 5px;
+	margin: .1em 0;
+	padding: 0 .1em .5em .1em;
+	border: none;
 	background: transparent;
-	box-shadow: 4px 6px 3px -5px rgba(0, 0, 0, 0.4);
 }
 
 .sp_article_block .bbc_list {
@@ -1045,26 +1049,6 @@ dl.sp_form img,
 	height: 100%;
 }
 
-/* Upshrink image in the block headers */
-.sp_category_toggle {
-	position: relative;
-	display: block;
-	float: right;
-	overflow: hidden;
-	padding: 0 16px;
-	border-radius: 2px;
-}
-
-.sp_category_toggle span {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	margin-top: -150%;
-	margin-left: -150%;
-	padding: 47px 50px;
-	background: url(../images/_light/expcol.png) no-repeat;
-}
-
 .sp_category_header {
 	padding-right: 5px;
 }
@@ -1073,7 +1057,7 @@ dl.sp_form img,
 ------------------------------------------------- */
 .dot:before {
 	display: inline-block;
-	padding-right: .25em;
+	padding-right: 5px;
 	width: 18px;
 	height: 18px;
 	background: url(../images/sp/dots.png) no-repeat;
@@ -1231,9 +1215,9 @@ dl.sp_form img,
 /*---------------------------*/
 
 /* This one does 1280 screens at default font size. */
-@media screen and (max-width: 80em) {
+@media screen and (max-width: 80em) not (hover: hover) {
 	.wrapper {
-		min-width: 98%;
+		min-width: 99%;
 	}
 }
 
@@ -1243,29 +1227,27 @@ dl.sp_form img,
 		min-width: 100%;
 	}
 
-	/* let the blocks wrap */
+	/* To let the blocks wrap we drop flex such that sp_left and sp_right "stack" on the left */
 	#sp_main {
-		flex-flow: row wrap;
-		justify-content: flex-start;
-		flex-direction: row;
-		align-items: stretch;
+		display: block;
 	}
 
 	#sp_center {
-		flex: 0 0 75%;
-		max-width: 100%;
+		float: right;
+		width: 75%;
+		box-sizing: border-box;
 	}
 
 	#sp_left, #sp_right {
-		flex: 0 0 24%;
-		padding-right: 0;
-		padding-left: 0;
+		/* Take over any ACP defined width */
+		width: 25% !important;
+		float: left;
+		box-sizing: border-box;
 	}
 }
 
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
-	/* allow the right and left cols to shrink if they can */
 	#sp_right {
 		padding-left: 0 !important;
 	}
@@ -1281,13 +1263,15 @@ dl.sp_form img,
 
 /* This one does 640 and smaller screens at default font size. */
 @media screen and (max-width: 40em) {
+	/* Back in to flex for narrow screens, center block on top, left/right side by side below center */
 	#sp_main {
-		flex-direction: column;
+		flex-direction: row;
+		display: flex;
+		flex-wrap: wrap;
 	}
 
 	#sp_left, #sp_right {
-		width: 100% !important;
-		flex: 0 0 100%;
+		flex: 1 1 50%;
 	}
 
 	#sp_left {
@@ -1300,6 +1284,7 @@ dl.sp_form img,
 
 	#sp_center {
 		flex: 0 0 100%;
+		min-width: 100%;
 	}
 
 	#sp_center_top {
@@ -1311,7 +1296,6 @@ dl.sp_form img,
 		order: 4;
 		min-width: 100%;
 	}
-
 
 	#sp_collapse_side1, #sp_collapse_side2, #sp_collapse_side3, #sp_collapse_side4 {
 		padding: 6px;
