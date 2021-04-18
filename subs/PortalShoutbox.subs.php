@@ -9,6 +9,8 @@
  * @version 1.0.0 Beta 1
  */
 
+use BBC\BBCParser;
+use BBC\Codes;
 use BBC\ParserWrapper;
 
 
@@ -86,7 +88,7 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
  * Loads all the shouts for a given shoutbox
  *
  * @param int $shoutbox id of the shoutbox to get data from
- * @param mixed[] $parameters
+ * @param array $parameters
  *
  * @return array
  */
@@ -105,18 +107,15 @@ function sportal_get_shouts($shoutbox, $parameters)
 	$cache = !empty($parameters['cache']);
 	$can_delete = !empty($parameters['can_moderate']);
 
-	// BBC Parser
-	$parser = ParserWrapper::instance();
-	$codes = $parser->getCodes()->getTags();
+	// BBC Parser just for the shoutbox
+	$parser = new BBCParser($codes = new Codes());
 
-	// We only allow a few codes in the shoutbox, so turn off others for now
-	$restore = array();
-	foreach ($codes as $key => $code)
+	// We only allow a few codes in the shoutbox, so turn off others
+	foreach ($codes->getTags() as $key => $code)
 	{
 		if (!in_array($key, $bbc))
 		{
-			$parser->getCodes()->disable($key);
-			$restore[$key] = $code;
+			$codes->disable($key);
 		}
 	}
 
@@ -146,8 +145,6 @@ function sportal_get_shouts($shoutbox, $parameters)
 		$shouts = array();
 		while ($row = $db->fetch_assoc($request))
 		{
-			// Disable the aeva mod for the shoutbox.
-			$context['aeva_disable'] = true;
 			$online_color = !empty($row['member_group_color']) ? $row['member_group_color'] : $row['post_group_color'];
 			$shouts[$row['id_shout']] = array(
 				'id' => $row['id_shout'],
@@ -161,7 +158,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 					'color' => $online_color,
 				),
 				'time' => $row['log_time'],
-				'text' => $parser->parseMessage($row['body'], true)
+				'text' => $parser->enableSmileys(true)->parse($row['body'])
 			);
 		}
 		$db->free_result($request);
@@ -170,13 +167,10 @@ function sportal_get_shouts($shoutbox, $parameters)
 		{
 			cache_put_data('shoutbox_shouts-' . $shoutbox, $shouts, 240);
 		}
-
-		// Restore BBC codes
-		foreach ($restore as $key => $code)
-		{
-			$parser->getCodes()->restore($key);
-		}
 	}
+
+	// Restore BBC codes
+	unset($parser);
 
 	foreach ($shouts as $shout)
 	{
@@ -345,8 +339,6 @@ function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
 
 	// Update the view
 	sportal_update_shoutbox($shoutbox_id, $prune ? count($shouts) - 1 : count($shouts));
-
-	return;
 }
 
 /**
@@ -377,6 +369,4 @@ function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
 	);
 
 	cache_put_data('shoutbox_shouts-' . $shoutbox_id, null, 240);
-
-	return;
 }
