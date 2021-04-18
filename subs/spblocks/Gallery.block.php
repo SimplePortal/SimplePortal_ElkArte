@@ -4,20 +4,17 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2017 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0 RC1
  */
-
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Gallery Block, show a gallery box with gallery items
  *
  * @param mixed[] $parameters
  *		'limit' => number of gallery items to show
- *		'type' =>
+ *		'type' => 0 recent 1 random
  *		'direction' => 0 horizontal or 1 vertical display in the block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
@@ -94,10 +91,13 @@ class Gallery_Block extends SP_Abstract_Block
 	{
 		$mod = '';
 
-		// Right now we only know about one gallery, but more may be added,
-		// maybe even ones we can tell folks about :P
+		// This does exist for ElkArte, but can't be shared I'm afraid
 		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
 			$mod = 'aeva_media';
+
+		// This does exist and is available
+		if (file_exists(SOURCEDIR . '/levgal_src/LevGal-Bootstrap.php'))
+			$mod = 'levgal';
 
 		return $mod;
 	}
@@ -120,7 +120,28 @@ class Gallery_Block extends SP_Abstract_Block
 			aeva_loadSettings();
 
 			// Just images
-			$data = aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC', true, array(), 'm.type = \'image\'');
+			return aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC', true, array(), 'm.type = \'image\'');
+		}
+
+		if ($this->data['mod'] === 'levgal')
+		{
+			if (!allowedTo(array('lgal_view', 'lgal_manage')))
+			{
+				return array();
+			}
+
+			switch ($type)
+			{
+				case 0:
+				default:
+					$itemList = LevGal_Bootstrap::getModel('LevGal_Model_ItemList');
+					$data = $itemList->getLatestItems($limit);
+					break;
+				case 1:
+					$itemList = LevGal_Bootstrap::getModel('LevGal_Model_ItemList');
+					$data = $itemList->getRandomItems($limit);
+					break;
+			}
 		}
 
 		return $data;
@@ -139,7 +160,31 @@ function template_sp_gallery_error($data)
 }
 
 /**
- * Main template for aeva block
+ * Main template for Levertine Block
+ *
+ * @param mixed[] $data
+ */
+function template_sp_gallery_levgal($item, $data)
+{
+	global $scripturl, $txt;
+
+	echo '
+		<a class="sp_attach_title" href="', $item['item_url'], '">', $item['item_name'], '</a>
+		<br />' . ($data['fancybox_enabled']
+			? '<a href="' . $item['item_url'] . '" rel="gallery" data-fancybox="1">'
+			: '<a href="' . $item['item_url'] . '">') . '
+			<img src="', $item['thumbnail'], '" alt="', $item['item_name'], '" title="', $item['item_name'], '" /></a>
+		</a>
+		<br />
+		<div class="sp_image_topic">
+		', $txt['lgal_sort_by_views'], ': ', $item['num_views'], '<br />
+		', $txt['lgal_posted_by'], ' ', !empty($item['id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $item['id_member'] . '">' . $item['poster_name'] . '</a>' : $item['poster_name'], '<br />
+ 		', $txt['lgal_posted_in'], ' <a href="', $item['album_url'], '">', $item['album_name'], '</a>
+		</div>';
+}
+
+/**
+ * Template for aeva block
  *
  * @param mixed[] $data
  */
@@ -150,8 +195,8 @@ function template_sp_gallery_aeva_media($item, $data)
 	echo '
 		<a class="sp_attach_title" href="', $scripturl, '?action=media;sa=item;in=', $item['id'], '">', $item['title'], '</a>
 		<br />' . ($data['fancybox_enabled']
-		? '<a href="' . $scripturl . '?action=media;sa=media;in=' . $item['id'] . '" rel="gallery" data-fancybox="1">'
-		: '<a href="' . $scripturl . '?action=media;sa=item;in=' . $item['id'] . '">') . '
+			? '<a href="' . $scripturl . '?action=media;sa=media;in=' . $item['id'] . '" rel="gallery" data-fancybox="1">'
+			: '<a href="' . $scripturl . '?action=media;sa=item;in=' . $item['id'] . '">') . '
 			<img src="', $scripturl, '?action=media;sa=media;in=', $item['id'], ';thumb" alt="" />
 		</a>
 		<br />
