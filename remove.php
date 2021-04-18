@@ -30,8 +30,15 @@ foreach ($defaults as $index => $value)
 	$updates[$index] = $value;
 }
 
+if (!empty($modSettings['admin_features']))
+{
+	$updates['admin_features'] = str_replace(',pt', '', $modSettings['admin_features']);
+}
 updateSettings($updates);
 Hooks::instance()->disableIntegration('Portal_Integrate');
+
+// And let ElkArte know we have been mucking about so the cache is reset
+updateSettings(array('settings_updated' => time()));
 
 if (ELK === 'SSI')
 {

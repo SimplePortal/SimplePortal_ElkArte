@@ -37,7 +37,9 @@ $defaults = array(
 );
 
 $updates = array(
-	'sp_version' => '1.0 RC1',
+	'sp_version' => '1.0 RC2',
+	'front_page' => 'PortalMain_Controller',
+	'admin_features' => $modSettings['admin_features'] . ',pt'
 );
 
 foreach ($defaults as $index => $value)
@@ -49,7 +51,8 @@ foreach ($defaults as $index => $value)
 }
 
 updateSettings($updates);
-updateSettings(array('front_page' => 'PortalMain_Controller'));
+
+// Enable the core feature by default on install
 Hooks::instance()->enableIntegration('Portal_Integrate');
 
 $standalone_file = BOARDDIR . '/PortalStandalone.php';
