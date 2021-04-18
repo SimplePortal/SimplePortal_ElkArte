@@ -9,7 +9,6 @@
  * @version 1.0.0 RC1
  */
 
-
 /**
  * Article Block, show the list of articles in the system
  *
@@ -20,7 +19,6 @@
  * 		'view' => 0 compact 1 full
  * 		'length' => length for the body text preview
  * 		'avatar' => whether to show the author avatar or not
- * 		'attachment' => Show the first attachment as "blog" image
  *
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
@@ -48,7 +46,6 @@ class Articles_Block extends SP_Abstract_Block
 			'view' => 'select',
 			'length' => 'int',
 			'avatar' => 'check',
-			'attachment' => 'check',
 		);
 
 		parent::__construct($db);
@@ -98,7 +95,6 @@ class Articles_Block extends SP_Abstract_Block
 		$this->data['view'] = empty($parameters['view']) ? 0 : 1;
 		$this->data['length'] = isset($parameters['length']) ? (int) $parameters['length'] : 250;
 		$this->data['avatar'] = empty($parameters['avatar']) ? 0 : (int) $parameters['avatar'];
-		$attachments = !empty($parameters['attachment']);
 
 		// Fetch some articles
 		$this->data['articles'] = sportal_get_articles(null, true, true, $type ? 'RAND()' : 'spa.date DESC', $category, $limit);
@@ -110,12 +106,6 @@ class Articles_Block extends SP_Abstract_Block
 			$this->setTemplate('template_sp_articles_error');
 
 			return;
-		}
-
-		// Get the first image attachment for each article for this group
-		if (!empty($attachments) && !empty($this->data['view']))
-		{
-			$this->loadAttachments();
 		}
 
 		// Doing the color thing
@@ -136,7 +126,12 @@ class Articles_Block extends SP_Abstract_Block
 	 */
 	private function prepare_view()
 	{
+		global $context;
+
 		require_once(SUBSDIR . '/Post.subs.php');
+
+		// Needed for basic Lightbox functionality
+		loadJavascriptFile('topic.js', ['defer' => true]);
 
 		foreach ($this->data['articles'] as $aid => $article)
 		{
@@ -145,6 +140,7 @@ class Articles_Block extends SP_Abstract_Block
 			censor($article['body']);
 
 			// Parse and optionally shorten the result
+			$context['article']['id'] = $article['id'];
 			$article['cut'] = sportal_parse_cutoff_content($article['body'], $article['type'], $this->_modSettings['sp_articles_length'], $article['article_id']);
 
 			if ($this->_modSettings['sp_resize_images'])
@@ -183,95 +179,6 @@ class Articles_Block extends SP_Abstract_Block
 				if (!empty($color_profile[$p['author']['id']]['link']))
 				{
 					$this->data['articles'][$k]['author']['link'] = $color_profile[$p['author']['id']]['link'];
-				}
-			}
-		}
-	}
-
-	/**
-	 * Load the first available attachment in an article (if any) for a group of articles
-	 *
-	 * - Does not check permission, assumes article access has been vetted
-	 */
-	protected function loadAttachments()
-	{
-		require_once(SUBSDIR . '/Attachments.subs.php');
-
-		// We will show attachments in the block, regardless, so save and restore
-		$attachmentShowImages = $this->_modSettings['attachmentShowImages'];
-		$this->_modSettings['attachmentShowImages'] = 1;
-		$articles = array();
-
-		// Just ones with attachments
-		foreach ($this->data['articles'] as $id_article => $article)
-		{
-			if (!empty($article['has_attachments']))
-			{
-				$articles[] = $id_article;
-			}
-		}
-
-		$attachments = sportal_get_articles_attachments($articles);
-		$this->_modSettings['attachmentShowImages'] = $attachmentShowImages;
-
-		// For each article, grab the first *image* attachment
-		foreach ($attachments as $id_article => $attach)
-		{
-			if (!isset($this->data['articles'][$id_article]['attachments']))
-			{
-				foreach ($attach as $key => $val)
-				{
-					$is_image = !empty($val['width']) && !empty($val['height']);
-					if ($is_image)
-					{
-						$this->data['articles'][$id_article]['attachments'] = $val;
-						break;
-					}
-				}
-			}
-		}
-
-		// Finalize the details for the template
-		$this->setArticleAttach($articles);
-	}
-
-	/**
-	 * Load the attachment details into context
-	 *
-	 * - If the article was found to have attachments (via loadAttachments) then
-	 * it will load that attachment data into context for use in the template
-	 * - If the message did not have attachments, it is then searched for the first
-	 * bbc IMG tag, and that image is used.
-	 *
-	 * @param int[] $articles
-	 */
-	protected function setArticleAttach($articles)
-	{
-		global $scripturl;
-
-		foreach ($articles as $id_article)
-		{
-			if (!empty($this->data['articles'][$id_article]['attachments']))
-			{
-				$attachment = $this->data['articles'][$id_article]['attachments'];
-				$this->data['articles'][$id_article]['attachments'] += array(
-					'id' => $attachment['id_attach'],
-					'href' => $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'],
-					'link' => '<a href="' . $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'] . '">' . htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8') . '</a>',
-					'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8')),
-				);
-			}
-			// No attachments, perhaps an IMG tag then?
-			else
-			{
-				$body = $this->data['articles'][$id_article]['body'];
-				$pos = strpos($body, '[img');
-				if ($pos !== false)
-				{
-					$img_tag = substr($body, $pos, strpos($body, '[/img]', $pos) + 6);
-					$parser = \BBC\ParserWrapper::instance();
-					$img_html = $parser->parseMessage($img_tag, true);
-					$this->data['articles'][$id_article]['body'] = str_replace($img_tag, '<div class="sp_attachment_thumb">' . $img_html . '</div>', $body);
 				}
 			}
 		}
@@ -346,7 +253,7 @@ function template_sp_articles($data)
 					<a href="', $scripturl, '?action=profile;u=', $article['author']['id'], '">
 						<img src="', $article['author']['avatar']['href'], '" alt="', $article['author']['name'], '" style="max-width:40px" class="floatright" />
 					</a>
-					<span class="middletext">
+					<span>
 						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], htmlTime($article['date']), $article['author']['link']), '
 						<br />
 						', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
@@ -355,7 +262,7 @@ function template_sp_articles($data)
 			else
 			{
 				echo '
-					<span class="middletext">
+					<span>
 						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], htmlTime($article['date']), $article['author']['link']), '
 						<br />
 						', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '

@@ -161,16 +161,16 @@ function template_articles_edit_below()
 	echo '
 					<div id="postAdditionalOptions">';
 
-	// If this post already has attachments on it - give information about them.
-	if (!empty($context['attachments']['current']))
-	{
-		$context['attachments']['templates']['existing']();
-	}
-
 	// Is the user allowed to post any additional ones? If so give them the boxes to do it!
 	if ($context['attachments']['can']['post'])
 	{
 		$context['attachments']['templates']['add_new']();
+	}
+
+	// If this post already has attachments on it - give information about them.
+	if (!empty($context['attachments']['current']))
+	{
+		$context['attachments']['templates']['existing']();
 	}
 
 	echo '
@@ -182,18 +182,17 @@ function template_articles_edit_below()
 }
 
 /**
- * Creates a list of attachments already attached to this message
+ * Creates a list of attachments already attached to this article
  */
 function template_article_existing_attachments()
 {
 	global $context, $txt, $modSettings;
 
 	echo '
-						<dl id="postAttachment">
 							<dt>
 								', $txt['attached'], ':
 							</dt>
-							<dd class="smalltext" style="width: 100%;">
+							<dd class="smalltext">
 								<input type="hidden" name="attach_del[]" value="0" />
 								', $txt['uncheck_unwatchd_attach'], ':
 							</dd>';
@@ -202,8 +201,10 @@ function template_article_existing_attachments()
 	{
 		echo '
 							<dd class="smalltext">
-								<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'],
-								!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']) ? sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0)) : '', '</label>
+								<label for="attachment_', $attachment['id'], '">
+									<input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'],
+									!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']) ? sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0)) : '', '
+								</label>
 							</dd>';
 	}
 
@@ -219,6 +220,7 @@ function template_article_new_attachments()
 	global $context, $txt, $modSettings;
 
 	echo '
+						<span id="postAttachment"></span>
 						<dl id="postAttachment2">';
 
 	// But, only show them if they haven't reached a limit
@@ -226,8 +228,10 @@ function template_article_new_attachments()
 	{
 		echo '
 							<dt class="drop_area">
-								<i class="fa fa-upload"></i> ', $txt['attach_drop_files'], '
-								<input class="drop_area_fileselect input_file" type="file" multiple="multiple" name="attachment_click[]" id="attachment_click" />
+								<i class="icon i-upload"></i>
+								<span class="desktop">', $txt['attach_drop_files'], '</span>
+								<span class="mobile">', $txt['attach_drop_files_mobile'], '</span>
+								<input id="attachment_click" class="drop_area_fileselect input_file" type="file" multiple="multiple" name="attachment_click[]" />
 							</dt>
 							<dd class="progress_tracker"></dd>
 							<dd class="drop_attachments_error"></dd>
@@ -284,6 +288,5 @@ function template_article_new_attachments()
 	}
 
 	echo '
-							</dd>
-						</dl>';
+							</dd>';
 }

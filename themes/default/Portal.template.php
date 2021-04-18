@@ -9,6 +9,8 @@
  * @version 1.0.0 RC1
  */
 
+use BBC\ParserWrapper;
+
 /**
  * Used to display articles on the portal
  */
@@ -55,7 +57,7 @@ function template_portal_index()
 				</div>
 				<hr />
 				<div class="inner sp_inner">', $article['preview'], '</div>
-				<div class="sp_article_extra">
+				<div class="sp_article_extra clear">
 					<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
 					<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
 				</div>
@@ -149,7 +151,7 @@ function template_portal_above()
 	$flex = '';
 	if ((empty($modSettings['showleft']) || empty($context['SPortal']['blocks'][1]))
 		&& (empty($modSettings['showright']) || empty($context['SPortal']['blocks'][4])))
-		$flex = 'flex: 0 0 100%;';
+		$flex = 'flex: 0 0 100%;min-width: 100%;';
 
 	echo '
 		<div id="sp_center" style="' . $flex . '">
@@ -216,7 +218,7 @@ function template_portal_below()
 	}
 
 	// Close the main portal div
-	echo '	
+	echo '
 	</div>';
 
 	// Footer Blocks
@@ -282,6 +284,8 @@ function template_block_default($block, $side)
 	// Show a title bar or not, some blocks have their own bars
 	if (empty($block['style']['no_title']))
 	{
+		$parser = ParserWrapper::instance();
+
 		echo '
 						<h3 class="sp_category_header ', strpos($block['style']['title']['class'], 'custom') === false ? $block['style']['title']['class'] : '', ' sp_drag_header"', !empty($block['style']['title']['style']) ? ' style="' . $block['style']['title']['style'] . '"' : '', '>';
 
@@ -289,12 +293,12 @@ function template_block_default($block, $side)
 			echo '
 							<span class="sp_category_toggle">&nbsp;
 								<a href="javascript:sp_collapseBlock(\'', $block['id'], '\')">
-									<span id="sp_collapse_', $block['id'], '" class="', $block['collapsed'] ? 'expand' : 'collapse', '"></span>
+									<span id="sp_collapse_', $block['id'], '" class="chevricon i-chevron-', $block['collapsed'] ? 'down' : 'up', '"></span>
 								</a>
 							</span>';
 
 		echo '
-							', parse_bbc($block['label']), '
+							', $parser->parseMessage($block['label'], true), '
 						</h3>';
 	}
 

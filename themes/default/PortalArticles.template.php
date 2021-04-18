@@ -53,7 +53,7 @@ function template_view_articles()
 				</div>
 				<hr />
 				<div id="msg_', $id, '" class="inner sp_inner">', $article['preview'], '<a href="', $article['href'], '">...</a></div>
-				<div class="sp_article_extra">
+				<div class="sp_article_extra clear">
 					<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
 					<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
 				</div>
@@ -276,11 +276,16 @@ function template_article_schema_script()
  */
 function template_sp_display_attachments($article, $ignoring)
 {
+	global $context;
+
 	echo '
-							<div id="msg_', $article['id'], '_footer" class="attachments"', $ignoring ? ' style="display:none;"' : '', '>';
+							<div id="msg_', $article['id'], '_footer" class="attachments clear"', $ignoring ? ' style="display:none;"' : '', '>';
 
 	foreach ($article['attachment'] as $attachment)
 	{
+		if (in_array($attachment['id'], $context['ila_dont_show_attach_below']))
+			continue;
+
 		echo '
 								<figure class="attachment_block">';
 

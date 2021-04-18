@@ -193,7 +193,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 	$has_attachments = sportal_article_has_attachments($id_articles);
 	foreach ($has_attachments as $id_article => $article)
 	{
-		$return[$id_article]['has_attachments'] = $has_attachments[$id_article];
+		$return[$id_article]['has_attachments'] = $article;
 	}
 
 	// Use color profiles?
@@ -612,7 +612,7 @@ function sportal_recount_comments($article_id)
  *
  * - It does no permissions check.
  *
- * @param mixed[] $attachmentQuery
+ * @param array $attachmentQuery
  */
 function removeArticleAttachments($attachmentQuery)
 {
@@ -724,7 +724,7 @@ function attachmentsSizeForArticle($id_article, $include_count = true)
  * - Renames the temporary file.
  * - Creates a thumbnail if the file is an image and the option enabled.
  *
- * @param mixed[] $attachmentOptions associative array of options
+ * @param array $attachmentOptions associative array of options
  * @return bool
  */
 function createArticleAttachment(&$attachmentOptions)
@@ -733,6 +733,8 @@ function createArticleAttachment(&$attachmentOptions)
 
 	$db = database();
 
+	// Going to need some help
+	require_once(SUBSDIR . '/Attachments.subs.php');
 	require_once(SUBSDIR . '/Graphics.subs.php');
 
 	// If this is an image we need to set a few additional parameters.
@@ -933,7 +935,7 @@ function sportal_get_articles_attachments($articles, $template = false)
 			foreach ($attachment as $current)
 			{
 				$return[$aid][] = array(
-					'name' => htmlspecialchars($current['filename'], ENT_COMPAT, 'UTF-8'),
+					'name' => htmlspecialchars($current['filename'], ENT_COMPAT),
 					'size' => $current['filesize'],
 					'id' => $current['id_attach'],
 					'approved' => true,
@@ -973,11 +975,11 @@ function sportal_load_attachment_context($id_article)
 		{
 			$attachmentData[$i] = array(
 				'id' => $attachment['id_attach'],
-				'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8')),
+				'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'], ENT_COMPAT)),
 				'size' => ($attachment['filesize'] < 1024000) ? round($attachment['filesize'] / 1024, 2) . ' ' . $txt['kilobyte'] : round($attachment['filesize'] / 1024 / 1024, 2) . ' ' . $txt['megabyte'],
 				'byte_size' => $attachment['filesize'],
 				'href' => $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'],
-				'link' => '<a href="' . $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'] . '">' . htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8') . '</a>',
+				'link' => '<a href="' . $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'] . '">' . htmlspecialchars($attachment['filename'], ENT_COMPAT) . '</a>',
 				'is_image' => !empty($attachment['width']) && !empty($attachment['height']) && !empty($modSettings['attachmentShowImages']),
 				'file_hash' => $attachment['file_hash'],
 				'id_folder' => $modSettings['sp_articles_attachment_dir'],
@@ -1073,6 +1075,110 @@ function sportal_get_attachment_from_article($article, $attach)
 	$db->free_result($request);
 
 	return $attachmentData;
+}
+
+function sportal_get_attachment_thumb_from_article($article, $attach)
+{
+	$db = database();
+
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
+	// Make sure this attachment is with this article.
+	$request = $db->query('', '
+		SELECT 
+			th.filename, th.file_hash, th.fileext, th.id_attach, th.id_thumb, th.attachment_type, th.mime_type, th.width, th.height,
+			a.filename AS attach_filename, a.file_hash AS attach_file_hash, a.fileext AS attach_fileext,
+			a.id_attach AS attach_id_attach, a.id_thumb AS attach_id_thumb, a.attachment_type AS attach_attachment_type, 
+			a.mime_type AS attach_mime_type, a.width AS attach_width, a.height AS attach_height
+		FROM {db_prefix}sp_attachments AS a
+			LEFT JOIN {db_prefix}sp_attachments AS th ON (th.id_attach = a.id_thumb)
+		WHERE a.id_attach = {int:attach}',
+		array(
+			'attach' => $attach,
+			'article' => $article,
+		)
+	);
+	$attachmentData = array_fill(0, 8, '');
+	if ($db->num_rows($request) != 0)
+	{
+		$fetch = $db->fetch_assoc($request);
+
+		// If there is a hash then the thumbnail exists
+		if (!empty($fetch['file_hash']))
+		{
+			$attachmentData = array(
+				$fetch['filename'],
+				$fetch['file_hash'],
+				$fetch['fileext'],
+				$fetch['id_attach'],
+				$fetch['attachment_type'],
+				$fetch['mime_type'],
+				$fetch['width'],
+				$fetch['height'],
+			);
+		}
+		// otherwise $modSettings['attachmentThumbnails'] may be (or was) off, so original file
+		elseif (getValidMimeImageType($fetch['attach_mime_type']) !== '')
+		{
+			$attachmentData = array(
+				$fetch['attach_filename'],
+				$fetch['attach_file_hash'],
+				$fetch['attach_fileext'],
+				$fetch['attach_id_attach'],
+				$fetch['attach_attachment_type'],
+				$fetch['attach_mime_type'],
+				$fetch['attach_width'],
+				$fetch['attach_height'],
+			);
+		}
+	}
+	$db->free_result($request);
+
+	return $attachmentData;
+}
+
+/**
+ * Returns if the given attachment ID is an image file or not
+ *
+ * What it does:
+ *
+ * - Given an attachment id, checks that it exists as an attachment
+ * - Verifies the message its associated is on a board the user can see
+ * - Sets 'is_image' if the attachment is an image file
+ * - Returns basic attachment values
+ *
+ * @package Attachments
+ * @param int $id_attach
+ *
+ * @returns array|boolean
+ */
+function isArticleAttachmentImage($id_attach)
+{
+	$db = database();
+
+	// Make sure this attachment is on this board.
+	$request = $db->query('', '
+		SELECT
+			a.filename, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.size, a.width, a.height
+		FROM {db_prefix}sp_attachments as a
+		WHERE id_attach = {int:attach}
+			AND attachment_type = {int:type}
+		LIMIT 1',
+		array(
+			'attach' => $id_attach,
+			'type' => 0,
+		)
+	);
+	$attachmentData = array();
+	if ($db->num_rows($request) != 0)
+	{
+		$attachmentData = $db->fetch_assoc($request);
+		$attachmentData['is_image'] = substr($attachmentData['mime_type'], 0, 5) === 'image';
+		$attachmentData['size'] = byte_format($attachmentData['size']);
+	}
+	$db->free_result($request);
+
+	return !empty($attachmentData) ? $attachmentData : false;
 }
 
 /**
