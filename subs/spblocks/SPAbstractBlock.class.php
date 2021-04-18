@@ -9,6 +9,7 @@
  * @version 1.0.0 RC1
  */
 
+use ElkArte\ValuesContainer;
 
 /**
  * Abstract Simple Portal block
@@ -18,40 +19,22 @@
  */
 abstract class SP_Abstract_Block
 {
-	/**
-	 * Database object
-	 * @var object
-	 */
-	protected $_db = null;
+	/** @var \Database*/
+	protected $_db;
 
-	/**
-	 * The modSettings
-	 * @var object
-	 */
+	/** @var array|\ElkArte\ValuesContainer */
 	protected $_modSettings = array();
 
-	/**
-	 * Block parameters
-	 * @var array
-	 */
+	/** @var array Block parameters */
 	protected $block_parameters = array();
 
-	/**
-	 * Data array for use in the blocks
-	 * @var mixed[]
-	 */
+	/** @var array Data array for use in the blocks */
 	protected $data = array();
 
-	/**
-	 * Name of the template function to call
-	 * @var string
-	 */
+	/** @var string Name of the template function to call */
 	protected $template = '';
 
-	/**
-	 * If the block supports refreshing, sets the time in seconds
-	 * @var array
-	 */
+	/** @var array If the block supports refreshing, sets the time in seconds */
 	protected $refresh = array();
 
 	/**
@@ -65,11 +48,7 @@ abstract class SP_Abstract_Block
 
 		$this->_db = $db;
 
-		$this->_modSettings = new \ElkArte\ValuesContainer($modSettings ?: array());
-
-		// Allow custom blocks to set $txt values for name and description
-		$this->blockName();
-		$this->blockDescription();
+		$this->_modSettings = new ValuesContainer($modSettings ?: array());
 	}
 
 	/**
@@ -113,7 +92,7 @@ abstract class SP_Abstract_Block
 	}
 
 	/**
-	 * Validates that a user can access a block
+	 * Validates that a user can access a block, defaults to yes they can
 	 *
 	 * @return string[]
 	 */
@@ -124,7 +103,7 @@ abstract class SP_Abstract_Block
 
 	/**
 	 * Sets the name of the block in $txt string for use with custom
-	 * blocks.  $txt['sp_function_Block_Name_label']
+	 * blocks. $txt['sp_function_Block_Name_label']
 	 *
 	 * @return string
 	 */
@@ -155,7 +134,7 @@ abstract class SP_Abstract_Block
 		addInlineJavascript('
 			$(document).ready(function()
 			{
-				var $block = $("#sp_block_' . (int) $this->refresh['id'] . '"),
+				let $block = $("#sp_block_' . (int) $this->refresh['id'] . '"),
 					$container = $block.find("' . $this->refresh['class'] . '"),
 					params = {"block" : ' . (int) $this->refresh['id'] . '};
 

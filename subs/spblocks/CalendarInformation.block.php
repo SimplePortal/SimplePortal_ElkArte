@@ -237,7 +237,7 @@ function template_sp_calendarInformation($data)
 			foreach ($events as $event)
 			{
 				echo '
-			<li ', sp_embed_class('event'), '>', $event['link'], ' - ', timeformat(strtotime($startdate), '%d %b'), '</li>';
+			<li ', sp_embed_class('event'), '>', $event['link'], ' - ', standardTime(strtotime($startdate), '%d %b'), '</li>';
 			}
 		}
 	}

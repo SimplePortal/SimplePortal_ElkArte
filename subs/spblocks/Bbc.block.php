@@ -9,6 +9,8 @@
  * @version 1.0.0 RC1
  */
 
+use BBC\ParserWrapper;
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -45,7 +47,7 @@ class Bbc_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		$parser = \BBC\ParserWrapper::instance();
+		$parser = ParserWrapper::instance();
 		$this->data['content'] = !empty($parameters['content']) ? $parser->parseMessage($parameters['content'], true) : '';
 
 		$this->setTemplate('template_sp_bbc');

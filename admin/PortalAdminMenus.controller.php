@@ -562,7 +562,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 		{
 			$context['item'] = array(
 				'id' => 0,
-				'namespace' => 'item' . mt_rand(1, 5000),
+				'namespace' => 'item' . random_int(1, 5000),
 				'title' => $txt['sp_menus_default_menu_item_name'],
 				'url' => '',
 				'target' => 0,
