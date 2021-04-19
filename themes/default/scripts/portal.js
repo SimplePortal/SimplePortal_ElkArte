@@ -39,7 +39,7 @@ function sp_collapseBlock(id)
 }
 
 /**
- * Used to collapse side (if enabled)
+ * Used to collapse sides (if enabled)
  *
  * @param {string} id
  */
@@ -50,7 +50,7 @@ function sp_collapseSide(id)
 	sp_sides[1] = "sp_left";
 	sp_sides[4] = "sp_right";
 
-	var mode = document.getElementById(sp_sides[id]).style.display === "" ? 0 : 1;
+	let mode = document.getElementById(sp_sides[id]).style.display === "" ? 0 : 1;
 
 	// Guests use a cookie, members a theme option to remember the choice
 	if (elk_member_id === 0)
@@ -63,7 +63,7 @@ function sp_collapseSide(id)
 	}
 
 	// Update the side expand/collapse image
-	document.getElementById("sp_collapse_side" + id).className = (mode ? "dot collapse" : "dot expand");
+	document.getElementById("sp_collapse_side" + id).className = (mode ? "icon collapse" : "icon expand");
 
 	// Hide the side with a touch of animation
 	$('#' + sp_sides[id]).toggle(400);

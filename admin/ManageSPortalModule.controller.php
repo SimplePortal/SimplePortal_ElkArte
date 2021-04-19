@@ -45,19 +45,18 @@ class ManageSPortalModule_Controller extends Action_Controller
 
 		$core_features['pt'] = array(
 			'url' => 'action=admin;area=portalconfig',
-			'settings' => array(
-				'disable_sp' => 1,
-			),
 			'setting_callback' => function ($value) {
 				// Enabling
 				if ($value)
 				{
 					Hooks::instance()->enableIntegration('Portal_Integrate');
+					return array('disable_sp' => '');
 				}
 				// Disabling
 				else
 				{
 					Hooks::instance()->disableIntegration('Portal_Integrate');
+					return array('disable_sp' => 1);
 				}
 			},
 		);
