@@ -35,6 +35,7 @@ function sp_is_active()
 	// Need to determine if we are even active
 	if ((!empty($modSettings['sp_disableMobile']) && $context['browser_body_id'] === 'mobile') && empty($_GET['page']) && empty($_GET['article'])
 		|| !empty($settings['disable_sp'])
+		|| !empty($modSettings['disable_sp'])
 		|| empty($modSettings['sp_portal_mode'])
 		|| ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum'))
 		|| isset($_GET['debug'])
