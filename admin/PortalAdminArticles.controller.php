@@ -404,6 +404,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings;
 
+		checkSession();
+
 		// Use our standard validation functions in a few spots
 		require_once(SUBSDIR . '/DataValidator.class.php');
 		$validator = new Data_Validator();
@@ -502,12 +504,18 @@ class ManagePortalArticles_Controller extends Action_Controller
 			preparsecode($article_info['body']);
 		}
 
-		// Bind attachments to the article, create any needed thumbnails, move to sp attachment directory
-		$this->finalizeArticleAttachments($article_info);
+		// Bind attachments to the article if existing, create any needed thumbnails,
+		// move them to the sp attachment directory
+		$attachIDs = $this->finalizeArticleAttachments($article_info);
 
-		// Save away
-		checkSession();
+		// Save the article
 		$this->_is_aid = sp_save_article($article_info, empty($this->_is_aid));
+
+		// If this was a new article, with attachments, bind them to one another.
+		if (empty($validator->article_id) && !empty($attachIDs))
+		{
+			bindArticleAttachments($this->_is_aid, $attachIDs);
+		}
 
 		// And return to the listing
 		redirectexit('action=admin;area=portalarticles');
@@ -1024,8 +1032,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 				areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . ',
 			}),
 			existingSelector: ".inline_insert",
-			events: IlaDropEvents' . (isset($this->_is_aid) ? ',
-			topic: ' . $this->_is_aid : '') . '
+			events: IlaDropEvents' . (!empty($this->_is_aid) ? ',
+			article: ' . $this->_is_aid  : '') . '
 		});', true);
 	}
 

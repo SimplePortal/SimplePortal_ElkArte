@@ -868,6 +868,27 @@ function createArticleAttachment(&$attachmentOptions)
 }
 
 /**
+ * Binds a set of attachments to a specific article.
+ *
+ * @param int $id_article
+ * @param int[] $attachment_ids
+ */
+function bindArticleAttachments($id_article, $attachment_ids)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}sp_attachments
+		SET id_article = {int:id_article}
+		WHERE id_attach IN ({array_int:attachment_list})',
+		array(
+			'attachment_list' => $attachment_ids,
+			'id_article' => $id_article,
+		)
+	);
+}
+
+/**
  * Get all attachments associated with an article or set of articles.
  *
  * What it does:
