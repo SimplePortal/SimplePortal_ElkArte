@@ -248,6 +248,8 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	 */
 	public function action_sportal_resetLayout()
 	{
+		global $scripturl;
+
 		checkSession('request');
 
 		// Remove the block layout settings
@@ -255,7 +257,7 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 		resetMemberLayout();
 
 		// Redirect to the main page
-		redirectexit();
+		redirectexit($scripturl . '?action=portal');
 	}
 
 	/**
