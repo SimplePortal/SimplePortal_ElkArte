@@ -23,6 +23,7 @@ global $modSettings, $package_cache;
 $defaults = array(
 	'sp_portal_mode' => 0,
 	'front_page' => '',
+	'sp_disable' => 1,
 );
 
 foreach ($defaults as $index => $value)

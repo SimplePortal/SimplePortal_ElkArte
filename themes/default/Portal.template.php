@@ -19,7 +19,9 @@ function template_portal_index()
 	global $context, $txt;
 
 	if (empty($context['articles']))
+	{
 		return;
+	}
 
 	echo '
 	<div id="sp_index" class="sp_article_block_container">';
@@ -35,19 +37,25 @@ function template_portal_index()
  				<div class="sp_article_detail">';
 
 		if (!empty($article['author']['avatar']['image']))
+		{
 			echo $article['author']['avatar']['image'];
+		}
 
 		echo '
 					<span>
 						', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']);
 
 		if (!empty($article['author']['avatar']['image']))
+		{
 			echo '
 						<br />';
+		}
 		else
+		{
 			echo '
 					</span>
 					<span class="floatright">';
+		}
 
 		echo '
 						', sprintf($article['view_count'] == 1
@@ -67,10 +75,12 @@ function template_portal_index()
 
 	// Pages as well?
 	if (!empty($context['article_page_index']))
+	{
 		echo '
 		<div class="sp_page_index">',
 			template_pagesection(), '
 		</div>';
+	}
 
 	echo '
 	</div>';
@@ -89,29 +99,37 @@ function template_portal_above()
 		echo '
 	<div class="righttext sp_fullwidth">';
 		if ($context['SPortal']['sides'][4]['active'])
+		{
 			echo '
 		<a id="sp_collapse_side4" class="icon ', $context['SPortal']['sides'][1]['collapsed']
 				? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(4)"></a>';
+		}
 
 		if ($context['SPortal']['sides'][1]['active'])
+		{
 			echo '
 		<a id="sp_collapse_side1" class="icon ', $context['SPortal']['sides'][1]['collapsed']
-			? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(1)"></a>';
+				? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(1)"></a>';
+		}
 
 		if (!empty($context['SPortal']['blocks']['custom_arrange']) &&
 			($context['site_action'] === 'sportal' || $context['site_action'] === 'portalmain'))
+		{
 			echo '
 		<a id="sp_reset_blocks" class="icon reset" title="', $txt['sp_reset blocks'], '" href="' . $scripturl . '?action=portal;sa=resetlayout;' . $context['session_var'] . '=' . $context['session_id'] . '"></a>';
+		}
 
 		echo '
 	</div>';
 	}
 	// No side collapsing but a custom arrangement?
 	elseif (!empty($context['SPortal']['blocks']['custom_arrange']) && $context['site_action'] === 'sportal' && ($context['SPortal']['sides'][1]['active'] || $context['SPortal']['sides'][4]['active']))
+	{
 		echo '
 	<div class="righttext sp_fullwidth">
 		<a id="sp_reset_blocks" class="icon reset" title="', $txt['sp_reset blocks'], '" href="' . $scripturl . '?action=portal;sa=resetlayout;' . $context['session_var'] . '=' . $context['session_id'] . '"></a>
 	</div>';
+	}
 
 	// Output any header blocks
 	if (!empty($context['SPortal']['blocks'][5]))
@@ -120,7 +138,9 @@ function template_portal_above()
 	<div id="sp_header" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][5] as $block)
+		{
 			template_block($block, 5);
+		}
 
 		echo '
 	</div>';
@@ -140,7 +160,9 @@ function template_portal_above()
 			<div id="sp_left_div" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][1] as $block)
+		{
 			template_block($block, 1);
+		}
 
 		echo '
 			</div>
@@ -151,7 +173,9 @@ function template_portal_above()
 	$flex = '';
 	if ((empty($modSettings['showleft']) || empty($context['SPortal']['blocks'][1]))
 		&& (empty($modSettings['showright']) || empty($context['SPortal']['blocks'][4])))
+	{
 		$flex = 'flex: 0 0 100%;min-width: 100%;';
+	}
 
 	echo '
 		<div id="sp_center" style="' . $flex . '">
@@ -161,11 +185,15 @@ function template_portal_above()
 	if (!empty($context['SPortal']['blocks'][2]))
 	{
 		foreach ($context['SPortal']['blocks'][2] as $block)
+		{
 			template_block($block, 2);
+		}
 
 		if (empty($context['SPortal']['on_portal']))
+		{
 			echo '
 					<br class="sp_side_clear" />';
+		}
 	}
 }
 
@@ -187,11 +215,15 @@ function template_portal_below()
 	if (!empty($context['SPortal']['blocks'][3]))
 	{
 		if (empty($context['SPortal']['on_portal']))
+		{
 			echo '
 					<br class="sp_side_clear" />';
+		}
 
 		foreach ($context['SPortal']['blocks'][3] as $block)
+		{
 			template_block($block, 3);
+		}
 	}
 
 	echo '
@@ -210,7 +242,9 @@ function template_portal_below()
 			<div id="sp_right_div" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][4] as $block)
+		{
 			template_block($block, 4);
+		}
 
 		echo '
 			</div>
@@ -228,7 +262,9 @@ function template_portal_below()
 	<div id="sp_footer" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][6] as $block)
+		{
 			template_block($block, 6);
+		}
 
 		echo '
 	</div>';
@@ -247,7 +283,9 @@ function template_block($block, $side = -1)
 
 	// Make sure that we have some valid block data.
 	if (empty($block) || empty($block['type']))
+	{
 		return;
+	}
 
 	// Board news gets special formatting, really intended to be at the top of a column
 	// @todo move the sp_boardNews-specific style to the board news template
@@ -265,7 +303,9 @@ function template_block($block, $side = -1)
 	}
 
 	if (isset($txt['sp_custom_block_title_' . $block['id']]))
+	{
 		$block['label'] = $txt['sp_custom_block_title_' . $block['id']];
+	}
 
 	template_block_default($block, $side);
 }
@@ -290,12 +330,14 @@ function template_block_default($block, $side)
 						<h3 class="sp_category_header ', strpos($block['style']['title']['class'], 'custom') === false ? $block['style']['title']['class'] : '', ' sp_drag_header"', !empty($block['style']['title']['style']) ? ' style="' . $block['style']['title']['style'] . '"' : '', '>';
 
 		if (empty($block['force_view']))
+		{
 			echo '
 							<span class="sp_category_toggle">&nbsp;
 								<a href="javascript:sp_collapseBlock(\'', $block['id'], '\')">
 									<span id="sp_collapse_', $block['id'], '" class="chevricon i-chevron-', $block['collapsed'] ? 'down' : 'up', '"></span>
 								</a>
 							</span>';
+		}
 
 		echo '
 							', $parser->parseMessage($block['label'], true), '
@@ -308,7 +350,7 @@ function template_block_default($block, $side)
 		: ' sp_no_body_style"', $block['collapsed'] && empty($block['force_view'])
 		? ' style="display: none;"'
 		: '', '>
-							<div class="', 	$block['type'] !== 'sp_menu'
+							<div class="', $block['type'] !== 'sp_menu'
 		? 'sp_block sp_' : 'sp_content_padding sp_', strtolower($block['type']), '"',
 		!empty($block['style']['body']['style'])
 		? ' style="' . $block['style']['body']['style'] . '"'

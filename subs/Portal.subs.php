@@ -1051,7 +1051,7 @@ function sp_loadColors($users = array())
  * @param int|null $width
  * @param int|null $height
  * @param string|boolean $title
- * @param int|null $id
+ * @param string|null $id
  *
  * @return string
  */

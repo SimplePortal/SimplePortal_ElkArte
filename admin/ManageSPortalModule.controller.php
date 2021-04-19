@@ -285,9 +285,9 @@ class ManageSPortalModule_Controller extends Action_Controller
 	 */
 	public static function validate_options()
 	{
-		global $context, $scripturl;
+		global $context;
 
-		return function (&$tag, &$data) use (&$context, $scripturl) {
+		return function (&$tag, &$data) use (&$context) {
 			$article = $context['article']['id'] ?? 0;
 
 			// Not a preview, then sanitize the attach id

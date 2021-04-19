@@ -1033,7 +1033,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			}),
 			existingSelector: ".inline_insert",
 			events: IlaDropEvents' . (!empty($this->_is_aid) ? ',
-			article: ' . $this->_is_aid  : '') . '
+			article: ' . $this->_is_aid : '') . '
 		});', true);
 	}
 
@@ -1097,8 +1097,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// If we have some to remove ....
 		if (!empty($article_ids))
 		{
-			// Update the counts as we are about to remove some articles
-			foreach ($article_ids as $index => $article_id)
+			// Update the category counts as we are about to remove some articles
+			foreach ($article_ids as $article_id)
 			{
 				$article_info = sportal_get_articles($article_id);
 				sp_category_update_total($article_info['category']['id']);
