@@ -852,6 +852,14 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 	// The editing so we update what was there
 	else
 	{
+		// They may have chosen to [attach] to an existing image
+		$currentAttachments = sportal_get_articles_attachments($article_info['id']);
+		foreach ($currentAttachments[$article_info['id']] as $attachment)
+		{
+			// Replace ila attach tags with the new valid attachment id and [spattach] tag
+			$article_info['body'] = preg_replace('~\[attach(.*?)\]' . $attachment['id_attach'] . '\[\/attach\]~', '[spattach$1]' . $attachment['id_attach'] . '[/spattach]', $article_info['body']);
+		}
+
 		$update_fields = array();
 		foreach ($fields as $name => $type)
 		{
