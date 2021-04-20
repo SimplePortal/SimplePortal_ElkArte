@@ -1070,7 +1070,9 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 			'stars' => $txt['sp-star'],
 			'arrow' => $txt['sp-arrow'],
 			'modify' => $txt['modify'],
+			'edit' => $txt['edit'],
 			'delete' => $txt['delete'],
+			'trash' => $txt['delete'],
 			'delete_small' => $txt['delete'],
 			'history' => $txt['sp_shoutbox_history'],
 			'refresh' => $txt['sp_shoutbox_refresh'],
@@ -1093,9 +1095,9 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 	$randomizer++;
 
 	// Use a default alt text if available and none was supplied
-	if (empty($alt) && isset($default_alt[$name]))
+	if (empty($alt))
 	{
-		$alt = $default_alt[$name];
+		$alt = $default_alt[$name] ?? '';
 	}
 
 	// You want a title, use the alt text if we can
@@ -1147,6 +1149,8 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 			'arrow' => $txt['sp-arrow'],
 			'modify' => $txt['modify'],
 			'delete' => $txt['delete'],
+			'trash' => $txt['delete'],
+			'edit' => $txt['edit'],
 			'delete_small' => $txt['delete'],
 			'history' => $txt['sp_shoutbox_history'],
 			'refresh' => $txt['sp_shoutbox_refresh'],
@@ -1162,13 +1166,9 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 	}
 
 	// Use a default title text if available and none was supplied
-	if (empty($title) && isset($default_title[$name]))
+	if (empty($title))
 	{
-		$title = $default_title[$name];
-	}
-	else
-	{
-		$title = $name;
+		$title = $default_title[$name] ?? $name;
 	}
 
 	// dots / start using colors

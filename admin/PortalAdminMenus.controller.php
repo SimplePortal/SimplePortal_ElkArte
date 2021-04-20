@@ -382,8 +382,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($row)
-						{
+						'function' => function ($row) {
 							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
 						},
 						'class' => 'centertext',
