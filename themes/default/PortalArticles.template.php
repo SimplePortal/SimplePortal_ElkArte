@@ -118,6 +118,13 @@ function template_view_article()
 				<div id="msg_', $context['article']['id'], '" class="messageContent inner sp_inner">' ,
 					$context['article']['body'];
 
+	if ($context['article']['can_moderate'] && empty($context['preview']))
+		echo '
+				<div class="submitbutton">
+					<a class="linkbutton" href="?action=admin;area=portalarticles;sa=edit;article_id=' . $context['article']['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . $txt['edit'] . '</a>
+					<a class="linkbutton" href="?action=admin;area=portalarticles;sa=delete;article_id=' . $context['article']['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['quickmod_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . $txt['delete'] . '</a>
+				</div>';
+
 	// Assuming there are attachments...
 	if (!empty($context['article']['attachment']))
 	{
@@ -293,7 +300,7 @@ function template_sp_display_attachments($article, $ignoring)
 		{
 			if ($attachment['thumbnail']['has_thumb'])
 				echo '
-										<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" ', $attachment['thumbnail']['lightbox'], '">
+										<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" ', $attachment['thumbnail']['lightbox'], '>
 											<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" />
 										</a>';
 			else

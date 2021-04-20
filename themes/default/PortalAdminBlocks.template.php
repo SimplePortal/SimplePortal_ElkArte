@@ -61,6 +61,7 @@ function template_block_list()
 				<tr id="block_',$block['id'],'" class="content">
 					<td>', $block['label'], '</td>
 					<td>', $block['type_text'], '</td>
+					<td class="centertext">', $block['status'], '</td>
 					<td class="centertext">', implode(' ', $block['actions']), '</td>
 				</tr>';
 		}
