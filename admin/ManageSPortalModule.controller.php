@@ -104,7 +104,7 @@ class ManageSPortalModule_Controller extends Action_Controller
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1;image"><img src="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1{width}{height}" alt="" class="bbc_img {align}" /></a>',
+				Codes::ATTR_CONTENT => '<a id="link_$1" class="sp_attach" data-lightboximage="$1" data-lightboxmessage="0" href="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1;image"><img src="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1{width}{height}" alt="" class="bbc_img {align}" /></a>',
 				Codes::ATTR_VALIDATE => self::validate_options(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				Codes::ATTR_BLOCK_LEVEL => false,
@@ -131,7 +131,7 @@ class ManageSPortalModule_Controller extends Action_Controller
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="{article}" href="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1;image"><img src="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1{height}{width}" alt="" class="bbc_img {align}" /></a>',
+				Codes::ATTR_CONTENT => '<a id="link_$1" class="sp_attach" data-lightboximage="$1" data-lightboxmessage="{article}" href="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1;image"><img src="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1{height}{width}" alt="" class="bbc_img {align}" /></a>',
 				Codes::ATTR_VALIDATE => self::validate_options(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				Codes::ATTR_BLOCK_LEVEL => false,
@@ -165,7 +165,7 @@ class ManageSPortalModule_Controller extends Action_Controller
 						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
-				Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" data-lightboxmessage="{article}" href="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1;image"><img src="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1{type}" alt="" class="bbc_img {align}" /></a>',
+				Codes::ATTR_CONTENT => '<a id="link_$1" class="sp_attach" data-lightboximage="$1" data-lightboxmessage="{article}" href="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1;image"><img src="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1{type}" alt="" class="bbc_img {align}" /></a>',
 				Codes::ATTR_VALIDATE => self::validate_options(),
 				Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				Codes::ATTR_BLOCK_LEVEL => false,
@@ -267,7 +267,7 @@ class ManageSPortalModule_Controller extends Action_Controller
 				}
 				else
 				{
-					$data = '<a href="' . $scripturl . '?action=portal;sa=spattach;article=' . $article . ';attach=' . $num . '"><img src="' . $check . '" alt="' . $is_image['filename'] . '" class="bbc_img" /></a>';
+					$data = '<a class="sp_attach" href="' . $scripturl . '?action=portal;sa=spattach;article=' . $article . ';attach=' . $num . '"><img src="' . $check . '" alt="' . $is_image['filename'] . '" class="bbc_img" /></a>';
 				}
 			}
 
