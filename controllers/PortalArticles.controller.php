@@ -125,7 +125,7 @@ class PortalArticles_Controller extends Action_Controller
 
 		$context['article']['style'] = sportal_select_style($context['article']['styles']);
 		$context['article']['body'] = censor($context['article']['body']);
-		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return', $article_id);
+		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
 
 		// Fetch attachments, if there are any
 		if (!empty($modSettings['attachmentEnable']) && !empty($context['article']['has_attachments']))

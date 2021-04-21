@@ -206,8 +206,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '
-								<a href="?action=admin;area=portalarticles;sa=edit;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
-								<a href="?action=admin;area=portalarticles;sa=delete;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_articles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+								<a href="?action=admin;area=portalarticles;sa=edit;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('edit') . '</a>&nbsp;
+								<a href="?action=admin;area=portalarticles;sa=delete;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_articles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('trash') . '</a>',
 							'params' => array(
 								'id' => true,
 							),
@@ -916,7 +916,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 				$this->_attachments['total_size'] += $this->_attachments['size'];
 
 				$context['attachments']['current'][] = array(
-					'name' => '<u>' . htmlspecialchars($this->_attachments['name'], ENT_COMPAT) . '</u>',
+					'name' => '<span class="underline">' . htmlspecialchars($this->_attachments['name'], ENT_COMPAT) . '</span>',
 					'size' => $this->_attachments['size'],
 					'id' => $attachID,
 					'unchecked' => false,
@@ -940,7 +940,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
 		$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
 		$context['attachments']['restrictions'] = array();
-		$context['attachments']['ila_enabled'] = !empty($modSettings['attachment_inline_enabled']);
+		$context['attachments']['ila_enabled'] = true;
 
 		if (!empty($modSettings['attachmentCheckExtensions']))
 		{
@@ -1033,7 +1033,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			}),
 			existingSelector: ".inline_insert",
 			events: IlaDropEvents' . (!empty($this->_is_aid) ? ',
-			article: ' . $this->_is_aid  : '') . '
+			article: ' . $this->_is_aid : '') . '
 		});', true);
 	}
 
@@ -1097,8 +1097,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// If we have some to remove ....
 		if (!empty($article_ids))
 		{
-			// Update the counts as we are about to remove some articles
-			foreach ($article_ids as $index => $article_id)
+			// Update the category counts as we are about to remove some articles
+			foreach ($article_ids as $article_id)
 			{
 				$article_info = sportal_get_articles($article_id);
 				sp_category_update_total($article_info['category']['id']);

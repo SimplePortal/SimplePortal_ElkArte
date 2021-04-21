@@ -10,7 +10,7 @@
  *
  * This version of SimplePortal is based on SimplePortal core 2.4
  *
- * 	This file here, unbelievably, has your portal within.
+ * This file here, unbelievably, has your portal within.
  *
  * In order to use SimplePortal in standalone mode:
  * - Go to "SPortal Admin" >> "Configuration" >> "General Settings"

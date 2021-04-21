@@ -186,24 +186,16 @@ function template_articles_edit_below()
  */
 function template_article_existing_attachments()
 {
-	global $context, $txt, $modSettings;
-
-	echo '
-							<dt>
-								', $txt['attached'], ':
-							</dt>
-							<dd class="smalltext">
-								<input type="hidden" name="attach_del[]" value="0" />
-								', $txt['uncheck_unwatchd_attach'], ':
-							</dd>';
+	global $context;
 
 	foreach ($context['attachments']['current'] as $attachment)
 	{
+		$label = $attachment['name'];
+
 		echo '
 							<dd class="smalltext">
 								<label for="attachment_', $attachment['id'], '">
-									<input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'],
-									!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']) ? sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0)) : '', '
+									<input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check inline_insert" data-attachid="', $attachment['id'], '" data-size="', $attachment['size'], '"/> ', $label, '
 								</label>
 							</dd>';
 	}
@@ -247,7 +239,7 @@ function template_article_new_attachments()
 		{
 			echo '
 								<script>
-									var allowed_attachments = ', $context['attachments']['num_allowed'], ',
+									let allowed_attachments = ', $context['attachments']['num_allowed'], ',
 										current_attachment = 1,
 										txt_more_attachments_error = "', $txt['more_attachments_error'], '",
 										txt_more_attachments = "', $txt['more_attachments'], '",
@@ -290,3 +282,4 @@ function template_article_new_attachments()
 	echo '
 							</dd>';
 }
+

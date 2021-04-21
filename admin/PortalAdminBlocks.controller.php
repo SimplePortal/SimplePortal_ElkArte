@@ -167,8 +167,13 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'class' => 'first_th',
 			),
 			'type' => array(
-				'width' => '40%',
+				'width' => '30%',
 				'label' => $txt['sp-adminColumnType'],
+			),
+			'status' => array(
+				'width' => '10%',
+				'label' => $txt['sp-blocksActive'],
+				'class' => 'centertext',
 			),
 			'action' => array(
 				'width' => '20%',
@@ -184,12 +189,12 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			foreach ($context['blocks'][$side['name']] as $block_id => $block)
 			{
 				$context['sides'][$side_id]['last'] = $block_id;
-				$context['blocks'][$side['name']][$block_id]['actions'] = array(
-					'state_icon' => '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
+				$context['blocks'][$side['name']][$block_id]['status'] = '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
 						onclick="sp_change_status(\'' . $block['id']  . '\', \'block\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');return false;">' .
-						sp_embed_image(empty($block['state']) ? 'deactive' : 'active', (!empty($block['state']) ? $txt['sp-blocksDeactivate'] : $txt['sp-blocksActivate']), null, null, true, 'status_image_' . $block['id']) . '</a>',
+					sp_embed_image(empty($block['state']) ? 'deactive' : 'active', (!empty($block['state']) ? $txt['sp-blocksDeactivate'] : $txt['sp-blocksActivate']), null, null, true, 'status_image_' . $block['id']) . '</a>';
+				$context['blocks'][$side['name']][$block_id]['actions'] = array(
 					'edit' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=edit;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
-					'delete' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=delete;block_id=' . $block['id'] . ';col=' . $block['column'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp-deleteblock'] . '\');">' . sp_embed_image('delete') . '</a>',
+					'delete' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=delete;block_id=' . $block['id'] . ';col=' . $block['column'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp-deleteblock'] . '\');">' . sp_embed_image('trash') . '</a>',
 				);
 			}
 		}
