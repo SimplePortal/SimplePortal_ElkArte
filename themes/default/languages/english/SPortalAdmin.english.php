@@ -287,6 +287,7 @@ $txt['sp_admin_articles_col_permissions'] = 'Permissions';
 $txt['sp_admin_articles_col_styles'] = 'Style';
 $txt['sp_admin_articles_activate'] = 'Activate';
 $txt['sp_admin_articles_deactivate'] = 'Deactivate';
+$txt['sp_admin_namespace_requirements'] = 'A unique alpha_numeric "permalink"';
 
 $txt['sp_articles_default_title'] = 'Untitled Article';
 

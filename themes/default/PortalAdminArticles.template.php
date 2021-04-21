@@ -52,6 +52,7 @@ function template_articles_edit_above()
 						</dt>
 						<dd>
 							<input type="text" name="namespace" id="article_namespace" value="', $context['article']['article_id'], '" class="input_text" />
+							<span class="smalltext">', $txt['sp_admin_namespace_requirements'], '</span>
 						</dd>
 						<dt>
 							<label for="article_category">', $txt['sp_admin_articles_col_category'], ':</label>
