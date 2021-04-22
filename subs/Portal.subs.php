@@ -58,7 +58,7 @@ function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings, $sportal_version;
 
-	$sportal_version = '1.0.0 RC1';
+	$sportal_version = '1.0.0 RC2';
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 	{
