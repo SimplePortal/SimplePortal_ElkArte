@@ -246,6 +246,7 @@ table.sp_articles {
 .sp_inner {
 	border-top: 1px solid transparent;
 	min-height: 3em;
+	margin-top: 4px;
 }
 
 .sp_article_icon {
@@ -253,7 +254,7 @@ table.sp_articles {
 }
 
 .sp_article_content {
-	margin: 0.5em 0;
+	margin: 0.25em 0;
 }
 
 .sp_article_content .sp_attachment_thumb {
@@ -435,8 +436,12 @@ h3.sp_secondary_header, h2.sp_secondary_header {
 	overflow: hidden;
 }
 
+a.sp_attach > img.bbc_img {
+	padding: 0 5px;
+}
+
 .portalbg {
-	padding: 10px 0;
+	padding: 5px 0;
 }
 
 .portalbg2 {
