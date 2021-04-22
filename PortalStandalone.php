@@ -36,6 +36,8 @@ if (!file_exists($forum_dir . '/index.php'))
 	die('Wrong $forum_dir value. Please make sure that the $forum_dir variable points to your forum\'s directory.');
 }
 
+// Load the SSI magic.
+require_once($forum_dir . '/SSI.php');
 // Get out the forum's Elkarte version number.
 $data = substr(file_get_contents($forum_dir . '/index.php'), 0, 4096);
 if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $data, $match))
@@ -47,8 +49,6 @@ if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $data, $match))
 	}
 }
 
-// Load the SSI magic.
-require_once($forum_dir . '/SSI.php');
 
 // Its all about the blocks
 require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');

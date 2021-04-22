@@ -9,8 +9,6 @@
  * @version 1.0.0 RC2
  */
 
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Board Stats block, shows count of users online names

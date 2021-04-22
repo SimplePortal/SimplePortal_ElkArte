@@ -9,6 +9,7 @@
  * @version 1.0.0 RC2
  */
 
+
 /**
  * Gallery Block, show a gallery box with gallery items
  *
@@ -95,7 +96,7 @@ class Gallery_Block extends SP_Abstract_Block
 		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
 			$mod = 'aeva_media';
 
-		// This does exist and is available
+		// This does exist and is available!
 		if (file_exists(SOURCEDIR . '/levgal_src/LevGal-Bootstrap.php'))
 			$mod = 'levgal';
 

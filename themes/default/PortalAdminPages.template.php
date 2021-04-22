@@ -39,6 +39,7 @@ function template_pages_edit()
 						</dd>
 						<dt>
 							<label for="page_namespace">', $txt['sp_admin_pages_col_namespace'], ':</label>
+							<span class="smalltext">', $txt['sp_admin_namespace_requirements'], '</span>
 						</dt>
 						<dd>
 							<input type="text" name="namespace" id="page_namespace" value="', $context['SPortal']['page']['page_id'], '" class="input_text" />

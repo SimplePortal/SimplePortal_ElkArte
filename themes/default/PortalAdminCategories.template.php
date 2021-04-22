@@ -35,6 +35,7 @@ function template_categories_edit()
 						</dt>
 						<dd>
 							<input type="text" name="namespace" id="category_namespace" value="', $context['category']['category_id'], '" class="input_text" />
+							<span class="smalltext">', $txt['sp_admin_namespace_requirements'], '</span>
 						</dd>
 						<dt>
 							<label for="category_description">', $txt['sp_admin_categories_col_description'], ':</label>

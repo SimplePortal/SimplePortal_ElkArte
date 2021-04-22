@@ -20,6 +20,31 @@ use ElkArte\sources\Frontpage_Interface;
 class PortalMain_Controller extends Action_Controller implements Frontpage_Interface
 {
 	/**
+	 * Common actions for all methods in the class
+	 */
+	public function pre_dispatch()
+	{
+		global $context;
+
+		if (!sp_is_active())
+		{
+			redirectexit();
+		}
+
+		$context['page_title'] = $context['forum_name'];
+
+		if (isset($context['page_title_html_safe']))
+		{
+			$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title']));
+		}
+
+		if (!empty($context['standalone']))
+		{
+			setupMenuContext();
+		}
+	}
+
+	/**
 	 * Default method, just forwards
 	 */
 	public function action_index()
@@ -50,7 +75,12 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	 */
 	public function trackStats($action = '')
 	{
-		return !isset($this->_req->xml);
+		if (isset($this->_req->xml))
+		{
+			return false;
+		}
+
+		return parent::trackStats($action);
 	}
 
 	/**
@@ -158,26 +188,6 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 
 		// Adds Frontpage, Integrate and Standalone portal mode options.
 		return array(array('select', 'sp_portal_mode', explode('|', $txt['sp_portal_mode_options'])));
-	}
-
-	/**
-	 * Common actions for all methods in the class
-	 */
-	public function pre_dispatch()
-	{
-		global $context;
-
-		$context['page_title'] = $context['forum_name'];
-
-		if (isset($context['page_title_html_safe']))
-		{
-			$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title']));
-		}
-
-		if (!empty($context['standalone']))
-		{
-			setupMenuContext();
-		}
 	}
 
 	/**

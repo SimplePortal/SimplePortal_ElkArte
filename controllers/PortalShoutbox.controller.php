@@ -42,7 +42,12 @@ class Shoutbox_Controller extends Action_Controller
 	 */
 	public function trackStats($action = '')
 	{
-		return !isset($this->_req->xml);
+		if (isset($this->_req->xml))
+		{
+			return false;
+		}
+
+		return parent::trackStats($action);
 	}
 
 	/**

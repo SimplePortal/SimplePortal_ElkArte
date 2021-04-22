@@ -9,8 +9,6 @@
  * @version 1.0.0 RC2
  */
 
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Attachment Block, Displays a list of recent attachments (by name)

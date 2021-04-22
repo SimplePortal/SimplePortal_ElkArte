@@ -11,7 +11,6 @@
 
 use BBC\ParserWrapper;
 
-
 /**
  * Board Block, Displays a list of posts from selected board(s)
  *
@@ -28,19 +27,13 @@ use BBC\ParserWrapper;
  */
 class Board_News_Block extends SP_Abstract_Block
 {
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $attachments = array();
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $color_ids = array();
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $icon_sources = array();
 
 	/**
@@ -209,11 +202,11 @@ class Board_News_Block extends SP_Abstract_Block
 				'views' => $row['num_views'],
 				'body' => $row['body'],
 				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $txt['sp_read_more'] . '</a>',
+				'link' => '<a class="linkbutton" href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $txt['sp_read_more'] . '</a>',
 				'replies' => $row['num_replies'],
 				'comment_href' => !empty($row['locked']) ? '' : $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';num_replies=' . $row['num_replies'],
-				'comment_link' => !empty($row['locked']) ? '' : '| <a href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';num_replies=' . $row['num_replies'] . '">' . $txt['ssi_write_comment'] . '</a>',
-				'new_comment' => !empty($row['locked']) ? '' : '| <a href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . '">' . $txt['ssi_write_comment'] . '</a>',
+				'comment_link' => !empty($row['locked']) ? '' : '<a class="linkbutton" href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';num_replies=' . $row['num_replies'] . '">' . $txt['reply'] . '</a>',
+				'new_comment' => !empty($row['locked']) ? '' : '<a class="linkbutton" href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . '">' . $txt['reply'] . '</a>',
 				'poster' => array(
 					'id' => $row['id_member'],
 					'name' => $row['poster_name'],
@@ -304,7 +297,16 @@ class Board_News_Block extends SP_Abstract_Block
 	 */
 	protected function getMessageAttach($id_msg, $id_topic, &$body)
 	{
-		global $topic;
+		global $topic, $modSettings;
+
+		// If ILA is enable and this post has ILA tags, assume they don't need any attachment help
+		if (!empty($modSettings['attachment_inline_enabled']))
+		{
+			if (strpos($body, '[attach') !== false)
+			{
+				return '';
+			}
+		}
 
 		if (!empty($this->attachments[$id_msg]))
 		{
@@ -436,7 +438,8 @@ function template_sp_boardNews($data)
 		}
 
 		echo '
-					<div class="post"><hr />';
+					<div class="post">
+						<hr />';
 
 		if (!empty($attachment))
 		{
@@ -453,7 +456,7 @@ function template_sp_boardNews($data)
 
 		echo $news['body'], '
 					</div>
-				<div class="righttext">', $news['link'], ' ', $news['new_comment'], '</div>
+				<div class="submitbutton">', $news['link'], ' ', $news['new_comment'], '</div>
 			</div>
 		</div>';
 	}

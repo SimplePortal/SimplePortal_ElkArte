@@ -11,7 +11,6 @@
 
 use BBC\ParserWrapper;
 
-
 /**
  * Shoutbox Block, show the shoutbox thoughts box
  *
