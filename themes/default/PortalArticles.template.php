@@ -25,7 +25,7 @@ function template_view_articles()
 	if (empty($context['articles']))
 	{
 		echo '
-		<div class="sp_content_padding">',
+		<div class="infobox">',
 			$txt['error_sp_no_articles'], '
 		</div>';
 	}
@@ -196,7 +196,7 @@ function template_view_article()
 						<input type="submit" name="submit" value="', !empty($context['article']['comment']) ? $txt['sp_modify'] : $txt['sp_submit'], '" class="right_submit" />
 						<input type="hidden" name="comment" value="', !empty($context['article']['comment']['id']) ? $context['article']['comment']['id'] : 0, '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				</div>
+					</div>
 				</form>
 			</section>';
 		}
@@ -290,8 +290,11 @@ function template_sp_display_attachments($article, $ignoring)
 
 	foreach ($article['attachment'] as $attachment)
 	{
-		if (in_array($attachment['id'], $context['ila_dont_show_attach_below']))
+		if (!empty($context['ila_dont_show_attach_below'])
+			&& in_array($attachment['id'], $context['ila_dont_show_attach_below']))
+		{
 			continue;
+		}
 
 		echo '
 								<figure class="attachment_block">';
