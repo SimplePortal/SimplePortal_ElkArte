@@ -11,7 +11,6 @@
 
 use BBC\ParserWrapper;
 
-
 /**
  * Returns the number of views and comments for a given article
  *
@@ -950,7 +949,6 @@ function sportal_get_articles_attachments($articles, $template = false)
 	if ($template)
 	{
 		$return = array();
-
 		foreach ($attachments as $aid => $attachment)
 		{
 			foreach ($attachment as $current)

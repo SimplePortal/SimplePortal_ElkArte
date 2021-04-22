@@ -59,8 +59,8 @@ function template_portal_index()
 
 		echo '
 						', sprintf($article['view_count'] == 1
-							? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1
-							? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
+			? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1
+			? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
 					</span>
 				</div>
 				<hr />
@@ -78,7 +78,7 @@ function template_portal_index()
 	{
 		echo '
 		<div class="sp_page_index">',
-			template_pagesection(), '
+		template_pagesection(), '
 		</div>';
 	}
 
@@ -87,7 +87,7 @@ function template_portal_index()
 }
 
 /**
- * Displays the above blocks, this includes header, left and top blocks
+ * Displays the above blocks, this includes header, left and center-top blocks
  */
 function template_portal_above()
 {
@@ -169,16 +169,20 @@ function template_portal_above()
 		</div>';
 	}
 
-	// Followed by all the Top Blocks
+	// No left or right? Then force the center section to go full witch
 	$flex = '';
 	if ((empty($modSettings['showleft']) || empty($context['SPortal']['blocks'][1]))
 		&& (empty($modSettings['showright']) || empty($context['SPortal']['blocks'][4])))
 	{
-		$flex = 'flex: 0 0 100%;min-width: 100%;';
+		$flex = 'flex: 0 0 100%; min-width: 100%;';
 	}
 
+	// Our container for the center section's
 	echo '
-		<div id="sp_center" style="' . $flex . '">
+		<div id="sp_center" style="' . $flex . '">';
+
+	// Followed by all the Center-Top Blocks
+	echo '
 			<div id="sp_center_top" class="sp_main_cell">
 				<div id="sp_top_div" class="sp_column">';
 
@@ -195,6 +199,10 @@ function template_portal_above()
 					<br class="sp_side_clear" />';
 		}
 	}
+
+	echo '
+				</div>
+			</div>';
 }
 
 /**
@@ -204,10 +212,8 @@ function template_portal_below()
 {
 	global $context, $modSettings;
 
-	// Close the top block section, begin the bottom
+	// Onto the Center-Bottom blocks
 	echo '
-				</div>
-			</div>
 			<div id="sp_center_bottom" class="sp_main_cell">
 				<div id="sp_bottom_div" class="sp_column">';
 
@@ -228,7 +234,10 @@ function template_portal_below()
 
 	echo '
 				</div>
-			</div>
+			</div>';
+
+	// Close our sp_center container
+	echo '
 		</div>';
 
 	// Then the right blocks
@@ -251,7 +260,7 @@ function template_portal_below()
 		</div>';
 	}
 
-	// Close the main portal div
+	// Close the sp_main portal div
 	echo '
 	</div>';
 
@@ -350,9 +359,9 @@ function template_block_default($block, $side)
 		: ' sp_no_body_style"', $block['collapsed'] && empty($block['force_view'])
 		? ' style="display: none;"'
 		: '', '>
-							<div class="', $block['type'] !== 'sp_menu'
+							<div class="', 	$block['type'] !== 'sp_menu'
 		? 'sp_block sp_' : 'sp_content_padding sp_', strtolower($block['type']), '"',
-		!empty($block['style']['body']['style'])
+	!empty($block['style']['body']['style'])
 		? ' style="' . $block['style']['body']['style'] . '"'
 		: '', '>';
 
