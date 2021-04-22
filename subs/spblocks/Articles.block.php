@@ -9,6 +9,7 @@
  * @version 1.0.0 RC2
  */
 
+
 /**
  * Article Block, show the list of articles in the system
  *
@@ -270,8 +271,7 @@ function template_sp_articles($data)
 			}
 
 			echo '
-					<div class="post inner sp_inner">
-						<hr />';
+					<div class="post inner sp_inner">';
 
 			if (!empty($article['attachments']))
 			{
@@ -292,10 +292,11 @@ function template_sp_articles($data)
 					<div class="sp_article_block">',
 			$article['body'], '
 					</div>
-				</div>
-				<div class="righttext">
+				
+				<div class="submitbutton">
 					<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
-				</div>
+					<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
+				</div></div>
 			</div>
 		</div>';
 		}
