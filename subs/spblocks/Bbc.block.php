@@ -11,9 +11,6 @@
 
 use BBC\ParserWrapper;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Generic BBC Block, creates a BBC formatted block with parse_bbc
  *
