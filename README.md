@@ -2,11 +2,14 @@
 
 ### This is SimplePortal for the ElkArte Forum platform.
 
-The version is based on SimplePortal 2.4 and attempts to retain all functionality of that version.  It also adds some **unique functionality** that is available only under the ElkArte platform.
+The version is based on SimplePortal 2.4 and retains all functionality of that version.  It also adds some **unique functionality** that is available only under the ElkArte platform.
 
 [![Open Issues](http://img.shields.io/github/issues/SimplePortal/SimplePortal_ElkArte.svg?style=flat)](https://github.com/SimplePortal/SimplePortal_ElkArte/issues)
 [![Current Release](https://img.shields.io/github/release/SimplePortal/SimplePortal_ElkArte.svg?style=flat)](https://github.com/SimplePortal/SimplePortal_ElkArte/releases)
 [![License](http://img.shields.io/badge/License-BSD-green.svg?style=flat)](http://opensource.org/licenses/BSD-3-Clause)
+[![Build Status](https://scrutinizer-ci.com/g/Spuds/SimplePortal_ElkArte/badges/build.png?b=myDevel)](https://scrutinizer-ci.com/g/Spuds/SimplePortal_ElkArte/build-status/myDevel)
+[![Downloads](https://img.shields.io/github/downloads/SimplePortal/SimplePortal_ElkArte/total)](https://github.com/SimplePortal/SimplePortal_ElkArte/releases)
+[![GitHub commits](https://img.shields.io/github/commits-since/SimplePortal/SimplePortal_ElkArte/v1.0.0-RC1.svg)](https://github.com/SimplePortal/SimplePortal_ElkArte/commit/)
 
 SimplePortal is always developing, and is produced with the user in mind first. User feedback is the number one method of growth for SimplePortal, and our users are always finding ways for Simpleportal to grow. SimplePortal stays competitive with other portal software by adding numerous user-requested features such as articles, block types, and the ability to completely customize the portal page.
 
