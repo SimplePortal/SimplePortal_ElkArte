@@ -95,9 +95,27 @@ function template_change_status()
 	global $context, $txt;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8" ?', '>
-	<elk>
-		<id>', $context['item_id'], '</id>
-		<status>', $context['status'], '</status>
-		<label>', $txt['sp-blocks' . ($context['status'] === 'active' ? 'Deactivate' : 'Activate')] . '</label>
-	</elk>';
+<elk>
+	<id>', $context['item_id'], '</id>
+	<status>', $context['status'], '</status>
+	<label>', $txt['sp-blocks' . ($context['status'] === 'active' ? 'Deactivate' : 'Activate')] . '</label>
+</elk>';
+}
+
+/**
+ * Return an xml response to a format swap/change request
+ */
+function template_format_xml()
+{
+	global $context;
+
+	// Cleanup the conversion
+	$text = trim($context['SPortal']['text']);
+	$text = preg_replace("~(\s*[\n]\s*){2,}~", "\n\n", $text);
+	$text = str_replace("\n\x00", '', $text);
+
+	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+<elk>
+	<format>', $text, '</format>
+</elk>';
 }
