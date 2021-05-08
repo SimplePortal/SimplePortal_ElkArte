@@ -10,6 +10,7 @@
  */
 
 use BBC\ParserWrapper;
+use BBC\PreparseCode;
 
 
 /**
@@ -100,7 +101,8 @@ class Shoutbox_Controller extends Action_Controller
 				require_once(SUBSDIR . '/Post.subs.php');
 
 				$_REQUEST['shout'] = Util::htmlspecialchars(trim($_REQUEST['shout']));
-				preparsecode($_REQUEST['shout']);
+				$preparse = PreparseCode::instance();
+				$preparse->preparsecode($_REQUEST['shout'], false);
 
 				if (!empty($_REQUEST['shout']))
 				{

@@ -30,8 +30,6 @@ class PortalRefresh_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Portal.subs.php');
 		require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');
 
-
-
 		// Not running via ssi then we need to get SSI for many block functions
 		if (ELK !== 'SSI')
 		{

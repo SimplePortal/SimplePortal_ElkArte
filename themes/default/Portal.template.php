@@ -59,8 +59,8 @@ function template_portal_index()
 
 		echo '
 						', sprintf($article['view_count'] == 1
-			? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1
-			? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
+							? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1
+							? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
 					</span>
 				</div>
 				<hr />
@@ -78,7 +78,7 @@ function template_portal_index()
 	{
 		echo '
 		<div class="sp_page_index">',
-		template_pagesection(), '
+			template_pagesection(), '
 		</div>';
 	}
 
@@ -109,7 +109,7 @@ function template_portal_above()
 		{
 			echo '
 		<a id="sp_collapse_side1" class="icon ', $context['SPortal']['sides'][1]['collapsed']
-				? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(1)"></a>';
+			? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(1)"></a>';
 		}
 
 		if (!empty($context['SPortal']['blocks']['custom_arrange']) &&
@@ -361,7 +361,7 @@ function template_block_default($block, $side)
 		: '', '>
 							<div class="', 	$block['type'] !== 'sp_menu'
 		? 'sp_block sp_' : 'sp_content_padding sp_', strtolower($block['type']), '"',
-	!empty($block['style']['body']['style'])
+		!empty($block['style']['body']['style'])
 		? ' style="' . $block['style']['body']['style'] . '"'
 		: '', '>';
 
