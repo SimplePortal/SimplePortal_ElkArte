@@ -9,6 +9,7 @@
  * @version 1.0.0 RC2
  */
 
+use BBC\PreparseCode;
 use ElkArte\Errors\ErrorContext;
 
 /**
@@ -18,6 +19,7 @@ use ElkArte\Errors\ErrorContext;
  */
 class ManagePortalPages_Controller extends Action_Controller
 {
+	/** @var array */
 	protected $blocks = array();
 
 	/**
@@ -51,6 +53,10 @@ class ManagePortalPages_Controller extends Action_Controller
 		// Start up the controller, provide a hook since we can
 		$action = new Action('portal_page');
 
+		// Default to the list action
+		$subAction = $action->initialize($subActions, 'list');
+		$context['sub_action'] = $subAction;
+
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['sp_admin_pages_title'],
 			'help' => 'sp_PagesArea',
@@ -60,10 +66,6 @@ class ManagePortalPages_Controller extends Action_Controller
 				'add' => array(),
 			),
 		);
-
-		// Default to the list action
-		$subAction = $action->initialize($subActions, 'list');
-		$context['sub_action'] = $subAction;
 
 		// Go!
 		$action->dispatch($subAction);
@@ -248,26 +250,16 @@ class ManagePortalPages_Controller extends Action_Controller
 	 */
 	public function action_edit()
 	{
-		global $txt, $context, $options;
+		global $txt, $context;
 
 		$context['SPortal']['is_new'] = empty($_REQUEST['page_id']);
+		$context['SPortal']['preview'] = false;
 
 		$pages_errors = ErrorContext::context('pages', 0);
 
 		// Some help will be needed
 		require_once(SUBSDIR . '/Editor.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
-
-		// Convert this to BBC?
-		if (!empty($_REQUEST['content_mode']) && $_POST['type'] === 'bbc')
-		{
-			require_once(SUBSDIR . 'Html2BBC.class.php');
-			$bbc_converter = new Html_2_BBC($_REQUEST['content']);
-			$_REQUEST['content'] = $bbc_converter->get_bbc();
-
-			$_REQUEST['content'] = un_htmlspecialchars($_REQUEST['content']);
-			$_POST['content'] = $_REQUEST['content'];
-		}
 
 		// Saving the work?
 		if (!empty($_POST['submit']) && !$pages_errors->hasErrors())
@@ -293,7 +285,7 @@ class ManagePortalPages_Controller extends Action_Controller
 			// Fix up bbc errors before we go to the preview
 			if ($context['SPortal']['page']['type'] === 'bbc')
 			{
-				preparsecode($context['SPortal']['page']['body']);
+				PreparseCode::instance()->preparsecode($context['SPortal']['page']['body'], false);
 			}
 
 			loadTemplate('PortalPages');
@@ -310,6 +302,9 @@ class ManagePortalPages_Controller extends Action_Controller
 			else
 			{
 				$context['SPortal']['preview'] = true;
+
+				// The editor will steal focus so we have to delay
+				addInlineJavascript('setTimeout(() => $("html, body").animate({scrollTop: $("#preview_section").offset().top}, 250), 750);', true);
 			}
 		}
 		// New page, set up with a random page ID
@@ -335,38 +330,15 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		if ($context['SPortal']['page']['type'] === 'bbc')
 		{
-			$context['SPortal']['page']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($context['SPortal']['page']['body']));
+			$context['SPortal']['page']['body'] = PreparseCode::instance()->un_preparsecode($context['SPortal']['page']['body']);
+			$context['SPortal']['page']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $context['SPortal']['page']['body']);
 		}
 
 		// Set up the editor, values, initial state, etc
-		if ($context['SPortal']['page']['type'] !== 'bbc')
-		{
-			// No wizzy mode if they don't need it
-			$temp_editor = !empty($options['wysiwyg_default']);
-			$options['wysiwyg_default'] = false;
-		}
+		$this->prepareEditor();
 
-		$editorOptions = array(
-			'id' => 'content',
-			'value' => $context['SPortal']['page']['body'],
-			'width' => '100%',
-			'height' => '225px',
-			'preview_type' => 2,
-		);
-		create_control_richedit($editorOptions);
-		$context['post_box_name'] = $editorOptions['id'];
-
-		if (isset($temp_editor))
-		{
-			$options['wysiwyg_default'] = $temp_editor;
-		}
-
-		// Set the editor box as needed (editor or textbox, etc)
-		addInlineJavascript('
-			$(function() {
-				diewithfire = window.setTimeout(function() {sp_update_editor("' . $context['SPortal']['page']['type'] . '", "");}, 200);
-			});
-		');
+		// Set the globals, spplugin will set the editor box as needed (editor or textbox, etc)
+		addConversionJS($context['SPortal']['page']['type']);
 
 		// Permissions
 		$context['SPortal']['page']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
@@ -387,6 +359,41 @@ class ManagePortalPages_Controller extends Action_Controller
 		$context['SPortal']['page']['body'] = sportal_parse_content($context['SPortal']['page']['body'], $context['SPortal']['page']['type'], 'return');
 		$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp_admin_pages_add'] : $txt['sp_admin_pages_edit'];
 		$context['sub_template'] = 'pages_edit';
+	}
+
+	/**
+	 * Sets up editor options as needed for SP, temporarily ignores any user options
+	 * so we can enable it in the proper mode bbc/php/html
+	 */
+	private function prepareEditor()
+	{
+		global $context, $options;
+
+		if ($context['SPortal']['page']['type'] !== 'bbc')
+		{
+			// No wizzy mode if they don't need it
+			$temp_editor = !empty($options['wysiwyg_default']);
+			$options['wysiwyg_default'] = false;
+		}
+
+		$editorOptions = array(
+			'id' => 'content',
+			'value' => $context['SPortal']['page']['body'],
+			'width' => '100%',
+			'height' => '275px',
+			'preview_type' => 1,
+		);
+		$editorOptions['plugin_addons'] = array();
+		$editorOptions['plugin_addons'][] = 'spplugin';
+		create_control_richedit($editorOptions);
+
+		$context['post_box_name'] = $editorOptions['id'];
+		$context['post_box_class'] = $context['article']['type'] !== 'bbc' ? 'sceditor-container' : 'sp-sceditor-container';
+
+		if (isset($temp_editor))
+		{
+			$options['wysiwyg_default'] = $temp_editor;
+		}
 	}
 
 	/**
@@ -480,7 +487,7 @@ class ManagePortalPages_Controller extends Action_Controller
 			'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
 			'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
 			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
-			'type' => in_array($_POST['type'], array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
+			'type' => in_array($_POST['type'], array('bbc', 'html', 'php', 'markdown')) ? $_POST['type'] : 'bbc',
 			'permissions' => (int) $_POST['permissions'],
 			'styles' => (int) $_POST['styles'],
 			'status' => !empty($_POST['status']) ? 1 : 0,
@@ -488,7 +495,7 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		if ($page_info['type'] === 'bbc')
 		{
-			preparsecode($page_info['body']);
+			PreparseCode::instance()->preparsecode($page_info['body'], false);
 		}
 
 		// Save away
