@@ -9,6 +9,7 @@
  * @version 1.0.0 RC2
  */
 
+use BBC\PreparseCode;
 
 /**
  * SimplePortal Blocks Administration controller class.
@@ -190,7 +191,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			{
 				$context['sides'][$side_id]['last'] = $block_id;
 				$context['blocks'][$side['name']][$block_id]['status'] = '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
-						onclick="sp_change_status(\'' . $block['id']  . '\', \'block\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');return false;">' .
+					onclick="sp_change_status(\'' . $block['id']  . '\', \'block\');return false;">' .
 					sp_embed_image(empty($block['state']) ? 'deactive' : 'active', (!empty($block['state']) ? $txt['sp-blocksDeactivate'] : $txt['sp-blocksActivate']), null, null, true, 'status_image_' . $block['id']) . '</a>';
 				$context['blocks'][$side['name']][$block_id]['actions'] = array(
 					'edit' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=edit;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
@@ -702,7 +703,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	/**
 	 * Preparse the post parameters for use
 	 *
-	 * - Cleans them as needed an places them back in $_POST
+	 * - Cleans them as needed an places them back in $_POST, yes ugly use of superglobals
 	 *
 	 * @param string $type
 	 * @param string $name
@@ -716,7 +717,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 			// Prepare the message a bit for some additional testing.
 			$value = Util::htmlspecialchars($value, ENT_QUOTES);
-			preparsecode($value);
+			PreparseCode::instance()->preparsecode($value, false);
 
 			// Store now the correct and fixed value ;)
 			$_POST['parameters'][$name] = $value;
