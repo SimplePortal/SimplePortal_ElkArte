@@ -2,7 +2,7 @@
 
 ### This is SimplePortal for the ElkArte Forum platform.
 
-The version is based on SimplePortal 2.4 and retains all functionality of that version.  It also adds some **unique functionality** that is available only under the ElkArte platform.
+The version is based on SimplePortal 2.4 and retains all functionality of that version.  It also adds **unique functionality** that is available only under the ElkArte platform.
 
 [![Open Issues](http://img.shields.io/github/issues/SimplePortal/SimplePortal_ElkArte.svg?style=flat)](https://github.com/SimplePortal/SimplePortal_ElkArte/issues)
 [![Current Release](https://img.shields.io/github/release/SimplePortal/SimplePortal_ElkArte.svg?style=flat)](https://github.com/SimplePortal/SimplePortal_ElkArte/releases)
@@ -27,13 +27,13 @@ Users can also drag and drop the blocks to create a layout that works with their
 ### Articles
 With the article system enabled, you can easily publish them directly on the Portal, no block is necessary.  You can also show articles on any SimplePortal Page, or wherever you have blocks displayed, using an article block.
 
-You can create your articles using BBCode, HTML or even PHP depending on your needs.  You can attach images to your articles and place them inline or aligned to the left or right to give them a blog look and feel.
+You can create your articles using BBCode, HTML, Markdown or even PHP depending on your needs.  You can attach images to your articles and place them inline or aligned to the left or right to give them a blog look and feel.
 
-Articles are assigned to and organized by categories.  You can easily create different categories, and your users can then browse articles by category.  No blog system would be complete without a comment functionality and SimplePortal makes that easy. 
+Articles are assigned to and organized by categories.  You can easily create many different categories, and your users can then browse articles by category.  No blog system would be complete without a comment functionality and SimplePortal makes that easy. 
 
 ### Pages
-The Simple Portal Custom page is something like the Simple Portal Portal Page. It has areas for blocks surrounding a central area.  The center area of a Simple Portal Custom Page is like a Simple Portal Block. The center area is similar to a custom BBC, HTML, or PHP block.
+The Simple Portal Custom page is something like the Simple Portal Portal Page. It has areas for blocks surrounding a central area.  The center area of a Simple Portal Custom Page is like a Simple Portal Block. The center area is similar to a custom BBC, HTML, Markdown, or PHP block.
 
-When you create or edit a new Simple Portal Page, you will choose from BBC, HTML, or PHP. You will input your text, and save your page. You can discover the URL of the new page by looking at the pages list.
+When you create or edit a new Simple Portal Page, you will choose from BBC, HTML, Markdown, or PHP. You will input your text, and save your page. You can discover the URL of the new page by looking at the pages list.
 
 If you want links to your new page to appear somewhere that others can see, you will have to place these links yourself.  But don't worry -- this part is simple.
