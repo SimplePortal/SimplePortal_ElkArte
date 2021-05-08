@@ -56,9 +56,10 @@ function sp_is_active()
  */
 function sportal_init($standalone = false)
 {
-	global $context, $scripturl, $modSettings, $settings, $sportal_version;
+	global $context, $scripturl, $modSettings, $settings;
 
-	$sportal_version = '1.0.0 RC2';
+	define('SPORTAL_VERSION', '1.0.0 RC2');
+	define('SPORTAL_STALE', 'spRC2');
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 	{
@@ -74,7 +75,7 @@ function sportal_init($standalone = false)
 	if (!$standalone)
 	{
 		// Load the portal css and the default css if its not yet loaded.
-		loadCSSFile('portal.css');
+		loadCSSFile('portal.css', ['stale' => SPORTAL_STALE]);
 
 		// rtl css as well?
 		if (!empty($context['right_to_left']))
@@ -231,17 +232,16 @@ function sportal_init_headers()
 	addJavascriptVar(array('sp_script_url' => '\'' . $safe_scripturl . '\''));
 
 	// Load up some javascript!
-	loadJavascriptFile('portal.js?sp100rc1');
+	loadJavascriptFile('portal.js', ['stale' => SPORTAL_STALE]);
 
 	// We use drag and sort blocks for the front page
 	$javascript = '';
 	if ($modSettings['sp_portal_mode'] == 1)
 	{
-		$modSettings['jquery_include_ui'] = true;
-
 		// Javascript to allow D&D ordering of the front page blocks, not for guests
-		if (empty($_REQUEST['action']) && !($user_info['is_guest'] || $user_info['id'] == 0))
+		if (empty($_REQUEST['action']) && empty($_REQUEST['board']) && !($user_info['is_guest'] || $user_info['id'] == 0))
 		{
+			$modSettings['jquery_include_ui'] = true;
 			$javascript .= '
 				// Set up our sortable call
 				$().elkSortable({
@@ -1051,7 +1051,7 @@ function sp_loadColors($users = array())
  * @param int|null $width
  * @param int|null $height
  * @param string|boolean $title
- * @param string|null $id
+ * @param int|null $id
  *
  * @return string
  */
@@ -1589,7 +1589,7 @@ function sportal_parse_cutoff_content(&$body, $type, $length = 0, $link_id = nul
  */
 function sportal_parse_content($body, $type, $output_method = 'echo')
 {
-	if (($type === 'bbc' || $type === 'html') && strpos($body, '[cutoff]') !== false)
+	if (in_array($type, array('bbc', 'html', 'markdown')) && strpos($body, '[cutoff]') !== false)
 	{
 		$body = str_replace('[cutoff]', '', $body);
 	}
@@ -1598,25 +1598,30 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 	{
 		case 'bbc':
 			$parser = ParserWrapper::instance();
-			if ($output_method === 'echo')
-			{
-				echo $parser->parseMessage($body, true);
-			}
-			else
+			if ($output_method !== 'echo')
 			{
 				return $parser->parseMessage($body, true);
 			}
+
+			echo $parser->parseMessage($body, true);
+			break;
+		case 'markdown':
+			require_once(EXTDIR . '/markdown/markdown.php');
+			if ($output_method !== 'echo')
+			{
+				return un_htmlspecialchars(Markdown($body));
+			}
+
+			echo un_htmlspecialchars(Markdown($body));
 			break;
 		case 'html':
-			if ($output_method === 'echo')
-			{
-				echo un_htmlspecialchars($body);
-			}
-			else
+			if ($output_method !== 'echo')
 			{
 				$body = un_htmlspecialchars($body);
 				return preg_replace('~\x{00a0}~su',' ',$body);
 			}
+
+			echo un_htmlspecialchars($body);
 			break;
 		case 'php':
 			$body = trim(un_htmlspecialchars($body));
@@ -1628,14 +1633,12 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 			$result = ob_get_contents();
 			ob_end_clean();
 
-			if ($output_method === 'echo')
-			{
-				echo $result;
-			}
-			else
+			if ($output_method !== 'echo')
 			{
 				return $result;
 			}
+
+			echo $result;
 			break;
 	}
 
