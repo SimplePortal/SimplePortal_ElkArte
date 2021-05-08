@@ -259,7 +259,7 @@ table.sp_articles {
 
 .sp_article_content .sp_attachment_thumb {
 	float: left;
-	margin: 5px 10px 0 0;
+	margin: 5px 10px -3px 0;
 }
 
 .sp_article_content .post:after {

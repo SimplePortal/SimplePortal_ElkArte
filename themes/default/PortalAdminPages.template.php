@@ -50,7 +50,7 @@ function template_pages_edit()
 						<dd>
 							<select name="type" id="page_type">';
 
-	$content_types = array('bbc', 'html', 'php');
+	$content_types = array('bbc', 'html', 'php', 'markdown');
 	foreach ($content_types as $type)
 		echo '
 								<option value="', $type, '"', $context['SPortal']['page']['type'] == $type ? ' selected="selected"' : '', '>', $txt['sp_pages_type_' . $type], '</option>';
@@ -99,11 +99,13 @@ function template_pages_edit()
 				<div>',
 					template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message'), '
 				</div>
+				<div class="submitbutton">
+					<input type="submit" name="submit" value="', $context['page_title'], '" />
+					<input type="submit" name="preview" value="', $txt['sp_admin_pages_preview'], '" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="page_id" value="', $context['SPortal']['page']['id'], '" />
+				</div>
 			</div>
-			<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
-			<input type="submit" name="preview" value="', $txt['sp_admin_pages_preview'], '" class="right_submit" />
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="page_id" value="', $context['SPortal']['page']['id'], '" />
 		</form>
 	</div>';
 
