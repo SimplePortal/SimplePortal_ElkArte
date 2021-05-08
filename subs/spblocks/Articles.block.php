@@ -20,6 +20,7 @@
  * 		'view' => 0 compact 1 full
  * 		'length' => length for the body text preview
  * 		'avatar' => whether to show the author avatar or not
+ * 		'attachment' => Show the first attachment as "blog" image *if* no ILA tags found
  *
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
@@ -47,6 +48,7 @@ class Articles_Block extends SP_Abstract_Block
 			'view' => 'select',
 			'length' => 'int',
 			'avatar' => 'check',
+			'attachment' => 'check',
 		);
 
 		parent::__construct($db);
@@ -93,6 +95,7 @@ class Articles_Block extends SP_Abstract_Block
 		$category = empty($parameters['category']) ? 0 : (int) $parameters['category'];
 		$limit = empty($parameters['limit']) ? 5 : (int) $parameters['limit'];
 		$type = empty($parameters['type']) ? 0 : 1;
+		$attachments = !empty($parameters['attachment']);
 		$this->data['view'] = empty($parameters['view']) ? 0 : 1;
 		$this->data['length'] = isset($parameters['length']) ? (int) $parameters['length'] : 250;
 		$this->data['avatar'] = empty($parameters['avatar']) ? 0 : (int) $parameters['avatar'];
@@ -109,6 +112,26 @@ class Articles_Block extends SP_Abstract_Block
 			return;
 		}
 
+		// Prepare what we have for the template
+		$this->prepare_data($attachments);
+
+		// Set the template name
+		$this->setTemplate('template_sp_articles');
+	}
+
+	/**
+	 * Fetches attachments, colors ID's, censors text, runs the parsers on the data
+	 *
+	 * @param bool $attachments
+	 */
+	private function prepare_data($attachments)
+	{
+		// Get the first image attachment for each article for this group
+		if (!empty($attachments) && !empty($this->data['view']))
+		{
+			$this->data['articles'] = setBlogAttachments(getBlogAttachments($this->data['articles']));
+		}
+
 		// Doing the color thing
 		$this->_color_ids();
 
@@ -117,9 +140,6 @@ class Articles_Block extends SP_Abstract_Block
 		{
 			$this->prepare_view();
 		}
-
-		// Set the template name
-		$this->setTemplate('template_sp_articles');
 	}
 
 	/**
@@ -127,12 +147,10 @@ class Articles_Block extends SP_Abstract_Block
 	 */
 	private function prepare_view()
 	{
-		global $context;
-
-		require_once(SUBSDIR . '/Post.subs.php');
+		global $context, $scripturl;
 
 		// Needed for basic Lightbox functionality
-		loadJavascriptFile('topic.js', ['defer' => true]);
+		loadJavascriptFile('topic.js');
 
 		foreach ($this->data['articles'] as $aid => $article)
 		{
@@ -147,6 +165,12 @@ class Articles_Block extends SP_Abstract_Block
 			if ($this->_modSettings['sp_resize_images'])
 			{
 				$article['body'] = str_ireplace('class="bbc_img', 'class="bbc_img sp_article', $article['body']);
+			}
+
+			// Check if we need the blog attachment, no if we rendered any ILA/[sp attach] tags
+			if (strpos($article['body'], '<img src="' . $scripturl . '?action=portal;sa=spattach;article=') !== false)
+			{
+				$article['attachments'] = array();
 			}
 
 			// Account for embedded videos
@@ -296,7 +320,8 @@ function template_sp_articles($data)
 				<div class="submitbutton">
 					<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
 					<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
-				</div></div>
+				</div>
+				</div>
 			</div>
 		</div>';
 		}

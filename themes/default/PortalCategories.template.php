@@ -9,6 +9,7 @@
  * @version 1.0.0 RC2
  */
 
+
 function template_view_categories()
 {
 	global $context, $txt;
@@ -55,13 +56,13 @@ function template_view_category()
 	if (empty($context['articles']))
 	{
 		echo '
-		<div class="sp_content_padding">', $txt['error_sp_no_articles'], '</div>';
+		<div class="infobox">', $txt['error_sp_no_articles'], '</div>';
 	}
 
 	foreach ($context['articles'] as $article)
 	{
 		echo '
-		<article class="sp_content_padding">
+		<article class="sp_article_content">
 			<div class="sp_article_detail">';
 
 		if (!empty($article['author']['avatar']['image']))
@@ -78,7 +79,25 @@ function template_view_category()
 				<h4>', $article['link'], '</h4>
 			</div>
 			<hr />
-			<div id="msg_', $article['id'], '" class="inner sp_inner">', $article['preview'], '
+			<div id="msg_', $article['id'], '" class="post inner sp_inner">';
+
+		if (!empty($article['attachments']))
+		{
+			echo '
+					<div class="sp_attachment_thumb">';
+
+			// If you want Fancybox to tag this, remove nfb_ from the id
+			echo '
+						<a href="', $article['href'], '" id="nfb_link_', $article['attachments']['id'], '">
+							<img src="', $article['attachments']['href'], '" alt="" title="', $article['attachments']['name'], '" id="thumb_', $article['attachments']['id'], '" />
+						</a>';
+
+			echo '
+					</div>';
+		}
+
+		echo
+				$article['preview'], '
 				<div class="sp_article_extra clear">',
 					(!empty($article['cut']) ? '<a class="linkbutton" href="' . $article['href'] . '">' . $txt['sp_read_more'] . '</a>' : ''),
 					(!empty($article['comment_count']) ? '<a class="linkbutton" href="' . $article['href'] . '#sp_view_comments">' . $txt['sp-articlesComments'] . '</a>' : ''),

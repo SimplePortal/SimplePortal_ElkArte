@@ -747,9 +747,9 @@ class ManageSPortalModule_Controller extends Action_Controller
 	 */
 	public static function sp_integrate_buffer($tourniquet)
 	{
-		global $sportal_version, $context, $modSettings, $forum_copyright;
+		global $context, $modSettings, $forum_copyright;
 
-		$fix = str_replace('{version}', $sportal_version, '<a href="https://simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . strftime('%Y') . '</a>');
+		$fix = str_replace('{version}', SPORTAL_VERSION, '<a href="https://simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . strftime('%Y') . '</a>');
 
 		if ((ELK === 'SSI' && empty($context['standalone']))
 			|| !Template_Layers::instance()->hasLayers()

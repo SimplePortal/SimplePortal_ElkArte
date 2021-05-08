@@ -191,6 +191,15 @@ class Board_News_Block extends SP_Abstract_Block
 				$this->color_ids[$row['id_member']] = $row['id_member'];
 			}
 
+			// If ILA is enable and what we rendered has ILA tags, assume they don't need any further attachment help
+			if (!empty($this->_modSettings['attachment_inline_enabled']))
+			{
+				if (strpos($row['body'], '<img src="' . $scripturl . '?action=dlattach;attach=') !== false)
+				{
+					$attach = array();
+				}
+			}
+
 			// Build an array of message information for output
 			$this->data['news'][] = array(
 				'id' => $row['id_topic'],
@@ -297,16 +306,7 @@ class Board_News_Block extends SP_Abstract_Block
 	 */
 	protected function getMessageAttach($id_msg, $id_topic, &$body)
 	{
-		global $topic, $modSettings;
-
-		// If ILA is enable and this post has ILA tags, assume they don't need any attachment help
-		if (!empty($modSettings['attachment_inline_enabled']))
-		{
-			if (strpos($body, '[attach') !== false)
-			{
-				return '';
-			}
-		}
+		global $topic;
 
 		if (!empty($this->attachments[$id_msg]))
 		{

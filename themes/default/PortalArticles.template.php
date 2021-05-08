@@ -33,8 +33,8 @@ function template_view_articles()
 	foreach ($context['articles'] as $id => $article)
 	{
 		echo '
-			<div class="sp_content_padding">
-				<div class="sp_article_detail">';
+		<div class="sp_content_padding">
+			<div class="sp_article_detail">';
 
 		// Start off with the avatar
 		if (!empty($article['author']['avatar']['image']))
@@ -44,19 +44,18 @@ function template_view_articles()
 
 		// And now the article
 		echo '
-					<span class="sp_article_latest">
-						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '
-						<br />
-						', sprintf($article['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['views']), ', ', sprintf($article['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '
-					</span>
-					<h4>', $article['link'], '</h4>
-				</div>
-				<hr />
-				<div id="msg_', $id, '" class="inner sp_inner">', $article['preview'], '<a href="', $article['href'], '">...</a></div>
-				<div class="sp_article_extra clear">
-					<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
-					<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
-				</div>
+				<span class="sp_article_latest">
+					', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '
+					<br />
+					', sprintf($article['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['views']), ', ', sprintf($article['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '
+				</span>
+				<h4>', $article['link'], '</h4>
+			</div>
+			<div id="msg_', $id, '" class="inner sp_inner">', $article['preview'], '<a href="', $article['href'], '">...</a></div>
+			<div class="sp_article_extra clear">
+				<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
+				<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
+			</div>
 		</div>';
 	}
 
@@ -98,25 +97,25 @@ function template_view_article()
 		echo $context['article']['author']['avatar']['image'];
 
 	echo '
-					<span class="sp_article_latest">
-						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $context['article']['category']['link'], $context['article']['date'], $context['article']['author']['link']);
+				<span class="sp_article_latest">
+					', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $context['article']['category']['link'], $context['article']['date'], $context['article']['author']['link']);
 
 	if (!empty($context['article']['author']['avatar']['image']))
 		echo '
-						<br />';
+					<br />';
 	else
 		echo '
-					</span><br>
-					<span class="floatright">';
+				</span>
+				<br />
+				<span class="floatright">';
 
 	echo '
-					', sprintf($context['article']['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $context['article']['view_count']), ', ',
-					sprintf($context['article']['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $context['article']['comment_count']), '
-					</span>
-				</div>
-				<hr />
-				<div id="msg_', $context['article']['id'], '" class="messageContent inner sp_inner">' ,
-					$context['article']['body'];
+				', sprintf($context['article']['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $context['article']['view_count']), ', ',
+				sprintf($context['article']['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $context['article']['comment_count']), '
+				</span>
+			</div>
+			<div id="msg_', $context['article']['id'], '" class="messageContent inner sp_inner">' ,
+				$context['article']['body'];
 
 	if ($context['article']['can_moderate'] && empty($context['preview']))
 		echo '
@@ -132,7 +131,7 @@ function template_view_article()
 	}
 
 	echo '		
-				</div>
+			</div>
 		</div>';
 
 	// Not just previewing the new article, then show comments etc
@@ -225,7 +224,7 @@ function template_article_schema_script()
 	$description = Util::shorten_text(preg_replace('~\s\s+~', ' ', $post));
 
 	$smd = array(
-		'@context' => 'http://schema.org',
+		'@context' => 'https://schema.org',
 		'@type' => 'Article',
 		'headline' => $context['article']['title'],
 		'author' => array(

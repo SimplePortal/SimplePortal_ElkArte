@@ -9,6 +9,7 @@
  * @version 1.0.0 RC2
  */
 
+use BBC\PreparseCode;
 use ElkArte\Errors\AttachmentErrorContext;
 use ElkArte\Errors\ErrorContext;
 
@@ -294,17 +295,6 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// Load dependency's, prepare error checking
 		$this->editInit();
 
-		// Started with HTML editor and now converting to BBC?
-		if (!empty($_REQUEST['content_mode']) && $_POST['type'] === 'bbc')
-		{
-			require_once(SUBSDIR . '/Html2BBC.class.php');
-			$convert = $_REQUEST['content'];
-			$bbc_converter = new Html_2_BBC($convert);
-			$convert = $bbc_converter->get_bbc();
-			$convert = un_htmlspecialchars($convert);
-			$_POST['content'] = $convert;
-		}
-
 		// Want to save the work?
 		if (!empty($_POST['submit']) && !$this->article_errors->hasErrors() && !$this->attach_errors->hasErrors())
 		{
@@ -329,7 +319,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// On to the editor
 		if ($context['article']['type'] === 'bbc')
 		{
-			$context['article']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($context['article']['body']));
+			$context['article']['body'] = PreparseCode::instance()->un_preparsecode($context['article']['body']);
+			$context['article']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $context['article']['body']);
 		}
 
 		$this->prepareEditor();
@@ -344,12 +335,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 			$this->article_attachment_dd();
 		}
 
-		// Set the editor to the right mode based on type (bbc, html, php)
-		addInlineJavascript('
-			$(function() {
-				diewithfire = window.setTimeout(function() {sp_update_editor("' . $context['article']['type'] . '", "");}, 200);
-			});
-		');
+		// Set the globals, spplugin will be called with editor init to set mode
+		addConversionJS($context['article']['type']);
 
 		// Finally the main template
 		loadTemplate('PortalAdminArticles');
@@ -493,7 +480,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			'namespace' => $validator->namespace,
 			'title' => $validator->title,
 			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
-			'type' => in_array($validator->type, array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
+			'type' => in_array($validator->type, array('bbc', 'html', 'php', 'markdown')) ? $_POST['type'] : 'bbc',
 			'permissions' => $validator->permissions,
 			'styles' => $validator->styles,
 			'status' => !empty($_POST['status']) ? 1 : 0,
@@ -501,7 +488,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		if ($article_info['type'] === 'bbc')
 		{
-			preparsecode($article_info['body']);
+			PreparseCode::instance()->preparsecode($article_info['body'], false);
 		}
 
 		// Bind attachments to the article if existing, create any needed thumbnails,
@@ -700,6 +687,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 				// We reuse this template for the preview
 				loadTemplate('PortalArticles');
 				$context['preview'] = true;
+
+				// The editor will steal focus so we have to delay
+				addInlineJavascript('setTimeout(() => $("html, body").animate({scrollTop: $("#preview_section").offset().top}, 250), 750);', true);
 			}
 		}
 		// Something new?
@@ -770,7 +760,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		if ($article['type'] === 'bbc')
 		{
-			preparsecode($article['body']);
+			PreparseCode::instance()->preparsecode($article['body'], false);
 		}
 
 		return $article;
@@ -792,15 +782,18 @@ class ManagePortalArticles_Controller extends Action_Controller
 		}
 
 		// Fire up the editor with the values
-		$editor_options = array(
+		$editorOptions = array(
 			'id' => 'content',
 			'value' => $context['article']['body'],
 			'width' => '100%',
 			'height' => '275px',
-			'preview_type' => 2,
+			'preview_type' => 1,
 		);
-		create_control_richedit($editor_options);
-		$context['post_box_name'] = $editor_options['id'];
+		$editorOptions['plugin_addons'] = array();
+		$editorOptions['plugin_addons'][] = 'spplugin';
+		create_control_richedit($editorOptions);
+		$context['post_box_name'] = $editorOptions['id'];
+		$context['post_box_class'] = $context['article']['type'] !== 'bbc' ? 'sceditor-container' : 'sp-sceditor-container';
 		$context['attached'] = '';
 
 		// Restore their settings

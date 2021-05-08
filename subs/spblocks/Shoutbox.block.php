@@ -10,6 +10,7 @@
  */
 
 use BBC\ParserWrapper;
+use BBC\PreparseCode;
 
 /**
  * Shoutbox Block, show the shoutbox thoughts box
@@ -128,7 +129,8 @@ class Shoutbox_Block extends SP_Abstract_Block
 				require_once(SUBSDIR . '/Post.subs.php');
 
 				$_POST['new_shout'] = Util::htmlspecialchars(trim($_POST['new_shout']));
-				preparsecode($_POST['new_shout']);
+				$preparse = PreparseCode::instance();
+				$preparse->preparsecode($_POST['new_shout'], false);
 
 				if (!empty($_POST['new_shout']))
 				{

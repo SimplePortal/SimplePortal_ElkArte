@@ -10,6 +10,7 @@
  */
 
 use BBC\ParserWrapper;
+use BBC\PreparseCode;
 
 /**
  * Article controller.
@@ -59,9 +60,7 @@ class PortalArticles_Controller extends Action_Controller
 
 		// Set up for pagination
 		$total_articles = sportal_get_articles_count();
-		$per_page = min($total_articles, !empty($modSettings['sp_articles_per_page'])
-			? $modSettings['sp_articles_per_page']
-			: 10);
+		$per_page = min($total_articles, !empty($modSettings['sp_articles_per_page']) ? $modSettings['sp_articles_per_page'] : 10);
 		$start = !empty($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 
 		if ($total_articles > $per_page)
@@ -163,7 +162,8 @@ class PortalArticles_Controller extends Action_Controller
 
 			// Prep the body / comment
 			$body = Util::htmlspecialchars(trim($_POST['body']));
-			preparsecode($body);
+			$preparse = PreparseCode::instance();
+			$preparse->preparsecode($body, false);
 
 			// Update or add a new comment
 			$parser = ParserWrapper::instance();
@@ -252,7 +252,7 @@ class PortalArticles_Controller extends Action_Controller
 		}
 
 		// Needed for basic Lightbox functionality
-		loadJavascriptFile('topic.js', ['defer' => true]);
+		loadJavascriptFile('topic.js', ['defer' => false]);
 
 		$context['description'] = trim(preg_replace('~<[^>]+>~', ' ', $context['article']['body']));
 		$context['description'] = Util::shorten_text(preg_replace('~\s\s+|&nbsp;|&quot;|&#039;~', ' ', $context['description']), 384, true);

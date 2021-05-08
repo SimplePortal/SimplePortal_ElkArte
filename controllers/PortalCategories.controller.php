@@ -33,6 +33,7 @@ class PortalCategories_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		loadTemplate('PortalCategories');
+		loadCSSFile('portal.css', ['stale' => SPORTAL_STALE]);
 	}
 
 	/**
@@ -89,6 +90,10 @@ class PortalCategories_Controller extends Action_Controller
 
 		// Load the articles in this category
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', $context['category']['id'], $per_page, $start);
+
+		// Get the first "image/attachment" when in blog view
+		$context['articles'] = setBlogAttachments(getBlogAttachments($context['articles']));
+
 		foreach ($context['articles'] as $article)
 		{
 			$context['articles'][$article['id']]['preview'] = censor($article['body']);
@@ -98,6 +103,12 @@ class PortalCategories_Controller extends Action_Controller
 			// Parse / shorten as required
 			$context['article']['id'] = $article['id'];
 			$context['articles'][$article['id']]['cut'] = sportal_parse_cutoff_content($context['articles'][$article['id']]['preview'], $article['type'], $modSettings['sp_articles_length'], $context['articles'][$article['id']]['article_id']);
+
+			// We have to wait until we cut to see if we need the attachment or not
+			if (strpos($context['articles'][$article['id']]['preview'], '<img src="' . $scripturl . '?action=portal;sa=spattach;article=') !== false)
+			{
+				$context['articles'][$article['id']]['attachments'] = array();
+			}
 		}
 
 		// Auto video embedding enabled?
@@ -111,7 +122,7 @@ class PortalCategories_Controller extends Action_Controller
 		}
 
 		// Needed for basic Lightbox functionality
-		loadJavascriptFile('topic.js', ['defer' => true]);
+		loadJavascriptFile('topic.js', ['defer' => false]);
 
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?category=' . $context['category']['category_id'],

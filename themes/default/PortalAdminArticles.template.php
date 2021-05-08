@@ -20,7 +20,7 @@ function template_articles_edit_above()
 	// Taking a peek before you publish?
 	echo '
 	<div id="preview_section" class="forumposts"', !empty($context['preview']) ? '' : ' style="display: none;"', '>',
-	!empty($context['preview']) ? template_view_article() : '', '
+		!empty($context['preview']) ? template_view_article() : '', '
 	</div>';
 
 	// If an error occurred, explain what happened.
@@ -75,7 +75,7 @@ function template_articles_edit_above()
 						<dd>
 							<select name="type" id="article_type">';
 
-	$content_types = array('bbc', 'html', 'php');
+	$content_types = array('bbc', 'html', 'php', 'markdown');
 	foreach ($content_types as $type)
 	{
 		echo '
@@ -131,11 +131,11 @@ function template_articles()
 {
 	global $context, $txt;
 
-	echo '
-					<div>', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message'), '</div>
+	echo
+					template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message'), '
 					<div class="submitbutton">
-						<input type="submit" name="submit" value="', $txt['save'], '" accesskey="s" tabindex="', $context['tabindex']++, '" class="button_submit" />
-						<input type="submit" name="preview" value="', $txt['sp_admin_articles_preview'], '" accesskey="p" tabindex="', $context['tabindex']++, '" class="button_submit" />
+						<input type="submit" name="submit" value="', $context['page_title'], '" accesskey="s" tabindex="', $context['tabindex']++, '" />
+						<input type="submit" name="preview" value="', $txt['sp_admin_articles_preview'], '" accesskey="p" tabindex="', $context['tabindex']++, '" />
 						<input type="hidden" name="article_id" value="', $context['article']['id'], '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
 
@@ -148,6 +148,7 @@ function template_articles()
 
 	echo '
 					</div>';
+
 
 	addInlineJavascript('sp_editor_change_type("article_type");', true);
 }
@@ -283,4 +284,3 @@ function template_article_new_attachments()
 	echo '
 							</dd>';
 }
-

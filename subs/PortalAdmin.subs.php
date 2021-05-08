@@ -479,7 +479,7 @@ function sp_load_categories($start = null, $items_per_page = null, $sort = null)
 			'articles' => $row['articles'],
 			'status' => $row['status'],
 			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalcategories;sa=status;category_id=' . $row['id_category'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
-				onclick="sp_change_status(\'' . $row['id_category'] . '\', \'category\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');return false;">' .
+				onclick="sp_change_status(\'' . $row['id_category'] . '\', \'category\');return false;">' .
 				sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_categories_' . (!empty($row['status']) ? 'de' : '') . 'activate'], null, null, true, 'status_image_' . $row['id_category']) . '</a>',
 		);
 	}
@@ -708,7 +708,7 @@ function sp_load_articles($start, $items_per_page, $sort)
 			'date' => standardTime($row['date']),
 			'status' => $row['status'],
 			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" 
-				onclick="sp_change_status(\'' . $row['id_article'] . '\', \'articles\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');return false;">' .
+				onclick="sp_change_status(\'' . $row['id_article'] . '\', \'articles\');return false;">' .
 				sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de' : '') . 'activate'], null, null, true, 'status_image_' . $row['id_article']) . '</a>',
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=edit;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
@@ -971,7 +971,7 @@ function sp_load_pages($start, $items_per_page, $sort)
 			'views' => $row['views'],
 			'status' => $row['status'],
 			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=status;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
-				onclick="sp_change_status(\'' . $row['id_page'] . '\', \'page\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');return false;">' .
+				onclick="sp_change_status(\'' . $row['id_page'] . '\', \'page\');return false;">' .
 				sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_pages_' . (!empty($row['status']) ? 'de' : '') . 'activate'], null, null, true, 'status_image_' . $row['id_page']) . '</a>',
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=edit;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
@@ -2267,4 +2267,41 @@ function sp_menu_items($start, $items_per_page, $sort, $menu_id)
 	$db->free_result($request);
 
 	return $items;
+}
+
+/**
+ * SCEditor spplugin Plugin.
+ * Used to set editor initial state and the setup so type conversion can
+ * happen.  Just call the plugin with initial and new states.
+ *
+ * @param string $type
+ */
+function addConversionJS($type)
+{
+	// Set the globals, spplugin will be called with editor init to set mode
+	addInlineJavascript('
+		let start_state = "' . $type . '",
+			editor;
+			
+		$.sceditor.plugins.spplugin = function(initial_state, new_state) {
+			let base = this;
+		
+			if (typeof new_state !== "undefined")
+			{
+				sp_to_new(initial_state, new_state);
+			}
+		
+			base.init = function() {
+				editor = this;
+			};
+		
+			base.signalReady = function() {
+				if (start_state !== "bbc")
+				{
+					editor.sourceMode(true);
+					document.getElementById("editor_toolbar_container").style.display = "none";
+				}
+			};
+		};
+	');
 }

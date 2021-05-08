@@ -38,7 +38,9 @@ abstract class SP_Abstract_Block
 	protected $refresh = array();
 
 	/**
-	 * Class constructor, makes db available
+	 * Class constructor, makes db and modSettings available to the blocks
+	 *
+	 * - Called by sp_instantiate_block function (via block constructor)
 	 *
 	 * @param Database|null $db
 	 */
@@ -52,9 +54,11 @@ abstract class SP_Abstract_Block
 	}
 
 	/**
-	 * Returns optional block parameters
+	 * Returns block parameters used to build the ACP block "options" configuration page
 	 *
-	 * @return mixed[]
+	 * - Possible Params include boards|boards_select|check|int|select|text|textarea
+	 *
+	 * @return array
 	 */
 	public function parameters()
 	{
