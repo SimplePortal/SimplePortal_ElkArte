@@ -1240,3 +1240,87 @@ function sportal_article_has_attachments($articles)
 
 	return $attachments;
 }
+
+/**
+ * Load the first available attachment in an article (if any) for a group of articles
+ *
+ * - Does not check permission, assumes article access has been vetted
+ *
+ * @param array $articles array as loaded by sportal_get_articles();
+ */
+function getBlogAttachments($articles)
+{
+	// Just ones with attachments
+	$getAttachments = array();
+	foreach ($articles as $id_article => $article)
+	{
+		if (!empty($article['has_attachments']))
+		{
+			$getAttachments[] = $id_article;
+		}
+	}
+
+	// For each article, grab the first *image* attachment
+	$attachments = sportal_get_articles_attachments($getAttachments);
+	foreach ($attachments as $id_article => $attach)
+	{
+		if (!isset($articles[$id_article]['attachments']))
+		{
+			foreach ($attach as $val)
+			{
+				$is_image = !empty($val['width']) && !empty($val['height']);
+				if ($is_image)
+				{
+					$articles[$id_article]['attachments'] = $val;
+					break;
+				}
+			}
+		}
+	}
+
+	return $articles;
+}
+
+/**
+ * Load the blog level attachment details
+ *
+ * - If the article was found to have attachments (via getBlogAttachments) then
+ * it will load that attachment data for use in a template
+ * - If the message did not have attachments, it is then searched for the first
+ * bbc IMG tag, and that image is used.
+ *
+ * @param array $articles as setup by getBlogAttachments();
+ */
+function setBlogAttachments($articles)
+{
+	global $scripturl;
+
+	foreach ($articles as $id_article => $article)
+	{
+		if (!empty($article['attachments']))
+		{
+			$attachment = $article['attachments'];
+			$articles[$id_article]['attachments'] += array(
+				'id' => $attachment['id_attach'],
+				'href' => $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'],
+				'link' => '<a href="' . $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'] . '">' . htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8') . '</a>',
+				'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8')),
+			);
+		}
+		// No attachments, perhaps an IMG tag then?
+		else
+		{
+			$body = $article['body'];
+			$pos = strpos($body, '[img');
+			if ($pos !== false)
+			{
+				$img_tag = substr($body, $pos, strpos($body, '[/img]', $pos) + 6);
+				$parser = ParserWrapper::instance();
+				$img_html = $parser->parseMessage($img_tag, true);
+				$articles[$id_article]['body'] = str_replace($img_tag, '<div class="sp_attachment_thumb">' . $img_html . '</div>', $body);
+			}
+		}
+	}
+
+	return $articles;
+}
