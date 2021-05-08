@@ -760,7 +760,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		if ($article['type'] === 'bbc')
 		{
-			PreparseCode::instance()->preparsecode($article_info['body'], false);
+			PreparseCode::instance()->preparsecode($article['body'], false);
 		}
 
 		return $article;

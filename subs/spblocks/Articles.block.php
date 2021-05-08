@@ -112,6 +112,20 @@ class Articles_Block extends SP_Abstract_Block
 			return;
 		}
 
+		// Prepare what we have for the template
+		$this->prepare_data($attachments);
+
+		// Set the template name
+		$this->setTemplate('template_sp_articles');
+	}
+
+	/**
+	 * Fetches attachments, colors ID's, censors text, runs the parsers on the data
+	 *
+	 * @param bool $attachments
+	 */
+	private function prepare_data($attachments)
+	{
 		// Get the first image attachment for each article for this group
 		if (!empty($attachments) && !empty($this->data['view']))
 		{
@@ -126,9 +140,6 @@ class Articles_Block extends SP_Abstract_Block
 		{
 			$this->prepare_view();
 		}
-
-		// Set the template name
-		$this->setTemplate('template_sp_articles');
 	}
 
 	/**
