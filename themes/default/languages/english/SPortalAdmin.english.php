@@ -53,7 +53,6 @@ $txt['sp_articles_comments_per_page'] = 'Articles Comments Per Page';
 $txt['sp_articles_length'] = 'Maximum Characters Before Article Cut-off';
 $txt['sp_articles_attachment_dir'] = 'Articles Attachment Directory';
 
-
 // Blocks area
 $txt['sp-adminBlockListName'] = 'Block List';
 $txt['sp-adminBlockInuse'] = 'Used in %s Block';
@@ -613,6 +612,7 @@ $txt['sp-adminCatDesc'] = 'Here you can manage and configure SimplePortal.';
 
 // Errors
 $txt['sp_form_errors_detected'] = 'The following error or errors occurred while saving or editing:';
+$txt['sp_php_validation_fail'] = 'PHP Validation Failed.  You have an error in your code.';
 
 // Portal CoreFeature
 $txt['core_settings_item_pt'] = 'SimplePortal';
