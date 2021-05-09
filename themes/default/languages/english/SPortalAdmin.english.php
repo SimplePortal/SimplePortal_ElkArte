@@ -219,6 +219,7 @@ $txt['sp_param_Articles_category'] = 'Category';
 $txt['sp_param_Articles_limit'] = 'Articles to Display';
 $txt['sp_param_Articles_type'] = 'Type';
 $txt['sp_param_Articles_avatar'] = 'Author Avatar';
+$txt['sp_param_Articles_attachment'] = 'Display first attachment';
 $txt['sp_param_Articles_length'] = 'Maximum Characters';
 $txt['sp_param_Articles_view'] = 'Display';
 $txt['sp_param_Shoutbox_shoutbox'] = 'Shoutbox to Display';
@@ -294,6 +295,7 @@ $txt['sp_articles_default_title'] = 'Untitled Article';
 $txt['sp_articles_type_bbc'] = 'BBC';
 $txt['sp_articles_type_html'] = 'HTML';
 $txt['sp_articles_type_php'] = 'PHP';
+$txt['sp_articles_type_markdown'] = 'Markdown';
 
 // Categories Area
 $txt['sp_admin_categories_title'] = 'Categories';
@@ -358,6 +360,7 @@ $txt['sp_pages_default_title'] = 'Untitled Page';
 $txt['sp_pages_type_bbc'] = 'BBC';
 $txt['sp_pages_type_html'] = 'HTML';
 $txt['sp_pages_type_php'] = 'PHP';
+$txt['sp_pages_type_markdown'] = 'Markdown';
 
 // Shoutboxes Area
 $txt['sp_admin_shoutbox_title'] = 'Shoutbox';
@@ -444,10 +447,10 @@ $txt['sp_admin_menus_col_actions'] = 'Actions';
 
 $txt['sp_admin_menus_link_type_custom'] = 'Custom';
 $txt['sp_admin_menus_link_type_action'] = 'Action';
-$txt['sp_admin_menus_link_type_board'] = 'Board';
-$txt['sp_admin_menus_link_type_page'] = 'Page';
-$txt['sp_admin_menus_link_type_category'] = 'Category';
-$txt['sp_admin_menus_link_type_article'] = 'Article';
+$txt['sp_admin_menus_link_type_boards'] = 'Board';
+$txt['sp_admin_menus_link_type_pages'] = 'Page';
+$txt['sp_admin_menus_link_type_categories'] = 'Category';
+$txt['sp_admin_menus_link_type_articles'] = 'Article';
 
 $txt['sp_admin_menus_link_target_0'] = 'Current window';
 $txt['sp_admin_menus_link_target_1'] = 'New window';
