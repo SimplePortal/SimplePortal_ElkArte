@@ -705,7 +705,14 @@ function sportal_process_visibility($query)
 			'{$forum}' => $forum,
 		);
 
-		return eval(str_replace(array_keys($variables), array_values($variables), un_htmlspecialchars($code)) . ';');
+		try
+		{
+			return eval(str_replace(array_keys($variables), array_values($variables), un_htmlspecialchars($code)) . ';');
+		}
+		catch (\Throwable $e)
+		{
+			return un_htmlspecialchars($code);
+		}
 	}
 
 	if (!empty($query))
@@ -1119,8 +1126,8 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 
 	// Build the image tag
 	return '<img src="' . $settings['sp_images_url'] . '/' . $name . '.png" alt="' . $alt . '"' . (!empty($title)
-		? ' title="' . $title . '"' : '') . (!empty($width) ? ' width="' . $width . '"' : '') . (!empty($height)
-		? ' height="' . $height . '"' : '') . (!empty($id) ? ' id="' . $id . '"' : '') . ' />';
+			? ' title="' . $title . '"' : '') . (!empty($width) ? ' width="' . $width . '"' : '') . (!empty($height)
+			? ' height="' . $height . '"' : '') . (!empty($id) ? ' id="' . $id . '"' : '') . ' />';
 }
 
 /**
@@ -1624,13 +1631,22 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 			echo un_htmlspecialchars($body);
 			break;
 		case 'php':
+			global $txt;
+
 			$body = trim(un_htmlspecialchars($body));
 			$body = trim($body, '<?php');
 			$body = trim($body, '?>');
 
 			ob_start();
-			eval($body);
-			$result = ob_get_contents();
+			try
+			{
+				eval($body);
+				$result = ob_get_contents();
+			}
+			catch (\Throwable $e)
+			{
+				$result = $txt['sp_php_validation_fail'] . ', "' . $e->getMessage() . '", ' . $txt['line'] . ' ' . $e->getLine();
+			}
 			ob_end_clean();
 
 			if ($output_method !== 'echo')

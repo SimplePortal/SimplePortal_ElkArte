@@ -77,6 +77,12 @@ class Php_Block extends SP_Abstract_Block
  */
 function template_sp_php($data)
 {
-	// Can be scary :0
-	eval($data['content']);
+	try
+	{
+		eval($data['content']);
+	}
+	catch (\Throwable $e)
+	{
+		// Pass through
+	}
 }
