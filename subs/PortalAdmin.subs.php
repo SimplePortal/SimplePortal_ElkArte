@@ -849,7 +849,7 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 		);
 		$article_info['id'] = $db->insert_id('{db_prefix}sp_articles', 'id_article');
 	}
-	// The editing so we update what was there
+	// Then editing so we update what was there
 	else
 	{
 		// They may have chosen to [attach] to an existing image

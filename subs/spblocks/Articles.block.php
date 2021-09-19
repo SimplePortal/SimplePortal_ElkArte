@@ -267,7 +267,7 @@ function template_sp_articles($data)
 		{
 			echo '
 			<h3 class="secondary_header">',
-				$article['title'], '
+			$article['title'], '
 			</h3>
 			<div id="msg_', $article['article_id'], '" class="sp_article_content">
 				<div class="sp_content_padding">';
