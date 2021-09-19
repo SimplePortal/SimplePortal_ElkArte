@@ -4,14 +4,14 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
 function template_permission_profiles_edit()
 {
-	global $context, $scripturl, $txt;
+	global $context, $scripturl, $txt, $settings;
 
 	echo '
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalprofiles;sa=editpermission" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
@@ -27,6 +27,9 @@ function template_permission_profiles_edit()
 							<input type="text" name="name" id="profile_name" value="', $context['profile']['name'], '" class="input_text" />
 						</dd>
 						<dt>
+							<a href="', $scripturl, '?action=quickhelp;help=sp_ProfilesArea" onclick="return reqOverlayDiv(this.href);" class="help">
+								<img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" />
+							</a>
 							', $txt['sp_admin_profiles_col_permissions'], ':
 						</dt>
 						<dd>

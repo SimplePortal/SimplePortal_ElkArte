@@ -4,22 +4,20 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
+use BBC\ParserWrapper;
+use BBC\PreparseCode;
 
 /**
  * Article controller.
  *
  * - This class handles requests for Article Functionality
  */
-class Articles_Controller extends Action_Controller
+class PortalArticles_Controller extends Action_Controller
 {
 	/**
 	 * This method is executed before any action handler.
@@ -62,9 +60,7 @@ class Articles_Controller extends Action_Controller
 
 		// Set up for pagination
 		$total_articles = sportal_get_articles_count();
-		$per_page = min($total_articles, !empty($modSettings['sp_articles_per_page'])
-			? $modSettings['sp_articles_per_page']
-			: 10);
+		$per_page = min($total_articles, !empty($modSettings['sp_articles_per_page']) ? $modSettings['sp_articles_per_page'] : 10);
 		$start = !empty($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 
 		if ($total_articles > $per_page)
@@ -76,7 +72,7 @@ class Articles_Controller extends Action_Controller
 		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
 		foreach ($context['articles'] as $article)
 		{
-			$context['articles'][$article['id']]['preview'] = censorText($article['body']);
+			$context['articles'][$article['id']]['preview'] = censor($article['body']);
 			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
 			$context['articles'][$article['id']]['time'] = $article['date'];
 
@@ -114,11 +110,7 @@ class Articles_Controller extends Action_Controller
 
 		$article_id = !empty($_REQUEST['article']) ? $_REQUEST['article'] : 0;
 
-		if (is_int($article_id))
-		{
-			$article_id = (int) $article_id;
-		}
-		else
+		if (!is_int($article_id))
 		{
 			$article_id = Util::htmlspecialchars($article_id, ENT_QUOTES);
 		}
@@ -127,11 +119,11 @@ class Articles_Controller extends Action_Controller
 		$context['article'] = sportal_get_articles($article_id, true, true);
 		if (empty($context['article']['id']))
 		{
-			fatal_lang_error('error_sp_article_not_found', false);
+			throw new Elk_Exception('error_sp_article_not_found', false);
 		}
 
 		$context['article']['style'] = sportal_select_style($context['article']['styles']);
-		$context['article']['body'] = censorText($context['article']['body']);
+		$context['article']['body'] = censor($context['article']['body']);
 		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
 
 		// Fetch attachments, if there are any
@@ -170,17 +162,19 @@ class Articles_Controller extends Action_Controller
 
 			// Prep the body / comment
 			$body = Util::htmlspecialchars(trim($_POST['body']));
-			preparsecode($body);
+			$preparse = PreparseCode::instance();
+			$preparse->preparsecode($body, false);
 
 			// Update or add a new comment
-			if (!empty($body) && trim(strip_tags(parse_bbc($body, false), '<img>')) !== '')
+			$parser = ParserWrapper::instance();
+			if (!empty($body) && trim(strip_tags($parser->parseMessage($body, false), '<img>')) !== '')
 			{
 				if (!empty($_POST['comment']))
 				{
 					list ($comment_id, $author_id,) = sportal_fetch_article_comment((int) $_POST['comment']);
 					if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
 					{
-						fatal_lang_error('error_sp_cannot_comment_modify', false);
+						throw new Elk_Exception('error_sp_cannot_comment_modify', false);
 					}
 
 					sportal_modify_article_comment($comment_id, $body);
@@ -204,7 +198,7 @@ class Articles_Controller extends Action_Controller
 			list ($comment_id, $author_id, $body) = sportal_fetch_article_comment((int) $_GET['modify']);
 			if (empty($comment_id) || (!$context['article']['can_moderate'] && $user_info['id'] != $author_id))
 			{
-				fatal_lang_error('error_sp_cannot_comment_modify', false);
+				throw new Elk_Exception('error_sp_cannot_comment_modify', false);
 			}
 
 			require_once(SUBSDIR . '/Post.subs.php');
@@ -222,7 +216,7 @@ class Articles_Controller extends Action_Controller
 
 			if (sportal_delete_article_comment((int) $_GET['delete']) === false)
 			{
-				fatal_lang_error('error_sp_cannot_comment_delete', false);
+				throw new Elk_Exception('error_sp_cannot_comment_delete', false);
 			}
 
 			redirectexit('article=' . $context['article']['article_id']);
@@ -257,6 +251,9 @@ class Articles_Controller extends Action_Controller
 			);
 		}
 
+		// Needed for basic Lightbox functionality
+		loadJavascriptFile('topic.js', ['defer' => false]);
+
 		$context['description'] = trim(preg_replace('~<[^>]+>~', ' ', $context['article']['body']));
 		$context['description'] = Util::shorten_text(preg_replace('~\s\s+|&nbsp;|&quot;|&#039;~', ' ', $context['description']), 384, true);
 
@@ -282,22 +279,27 @@ class Articles_Controller extends Action_Controller
 		// Make sure some attachment was requested and they can view them
 		if (!isset($_GET['article'], $_GET['attach']))
 		{
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		// No funny business, you need to have access to the article to see its attachments
 		if (sportal_article_access($_GET['article']) === false)
 		{
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		// We need to do some work on attachments.
 		$id_article = (int) $_GET['article'];
 		$id_attach = (int) $_GET['attach'];
-		$attachment = sportal_get_attachment_from_article($id_article, $id_attach);
+
+		if (isset($_GET['thumb']))
+			$attachment = sportal_get_attachment_thumb_from_article($id_article, $id_attach);
+		else
+			$attachment = sportal_get_attachment_from_article($id_article, $id_attach);
+
 		if (empty($attachment))
 		{
-			fatal_lang_error('no_access', false);
+			throw new Elk_Exception('no_access', false);
 		}
 
 		list ($real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $width, $height) = $attachment;
@@ -335,7 +337,8 @@ class Articles_Controller extends Action_Controller
 
 				// Answer the question - no, it hasn't been modified ;).
 				header('HTTP/1.1 304 Not Modified');
-			}   exit(0);
+			}
+			exit(0);
 		}
 
 		// Check whether the ETag was sent back, and cache based on that...
@@ -368,29 +371,19 @@ class Articles_Controller extends Action_Controller
 		}
 		else
 		{
-			header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
-			unset($_GET['image']);
+			header('Content-Type: application/octet-stream');
 		}
 
 		$disposition = !isset($_GET['image']) ? 'attachment' : 'inline';
+		$fileName = str_replace('"', '',  $filename);
 
-		// Different browsers like different standards...
-		if (isBrowser('firefox'))
+		// Send as UTF-8 if the name requires that
+		$altName = '';
+		if (preg_match('~[\x80-\xFF]~', $fileName))
 		{
-			header('Content-Disposition: ' . $disposition . '; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)));
+			$altName = "; filename*=UTF-8''" . rawurlencode($fileName);
 		}
-		elseif (isBrowser('opera'))
-		{
-			header('Content-Disposition: ' . $disposition . '; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename) . '"');
-		}
-		elseif (isBrowser('ie'))
-		{
-			header('Content-Disposition: ' . $disposition . '; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)) . '"');
-		}
-		else
-		{
-			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
-		}
+		header('Content-Disposition: ' . $disposition . '; filename="' . $fileName . '"' . $altName);
 
 		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
 		if (!isset($_GET['image']) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')))
@@ -423,23 +416,16 @@ class Articles_Controller extends Action_Controller
 			$fp = fopen($filename, 'rb');
 			while (!feof($fp))
 			{
-				if (isset($callback))
-				{
-					echo $callback(fread($fp, 8192));
-				}
-				else
-				{
-					echo fread($fp, 8192);
-				}
+				echo fread($fp, 8192);
 
 				flush();
 			}
 			fclose($fp);
 		}
 		// On some of the less-bright hosts, readfile() is disabled.  It's just a faster, more byte safe, version of what's in the if.
-		elseif (isset($callback) || @readfile($filename) === null)
+		elseif (@readfile($filename) === null)
 		{
-			echo isset($callback) ? $callback(file_get_contents($filename)) : file_get_contents($filename);
+			echo file_get_contents($filename);
 		}
 
 		obExit(false);

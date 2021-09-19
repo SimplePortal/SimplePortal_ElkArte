@@ -4,18 +4,18 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0 Beta 1
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
+use BBC\BBCParser;
+use BBC\Codes;
+use BBC\ParserWrapper;
+
 
 /**
- * Load a shoutboxs parameters by ID
+ * Load a shout box's parameters by ID
  *
  * @param int|null $shoutbox_id
  * @param boolean $active
@@ -88,7 +88,7 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
  * Loads all the shouts for a given shoutbox
  *
  * @param int $shoutbox id of the shoutbox to get data from
- * @param mixed[] $parameters
+ * @param array $parameters
  *
  * @return array
  */
@@ -106,6 +106,18 @@ function sportal_get_shouts($shoutbox, $parameters)
 	$reverse = !empty($parameters['reverse']);
 	$cache = !empty($parameters['cache']);
 	$can_delete = !empty($parameters['can_moderate']);
+
+	// BBC Parser just for the shoutbox
+	$parser = new BBCParser($codes = new Codes());
+
+	// We only allow a few codes in the shoutbox, so turn off others
+	foreach ($codes->getTags() as $key => $code)
+	{
+		if (!in_array($key, $bbc))
+		{
+			$codes->disable($key);
+		}
+	}
 
 	// Cached, use it first
 	if (!empty($start) || !$cache || ($shouts = cache_get_data('shoutbox_shouts-' . $shoutbox, 240)) === null)
@@ -133,8 +145,6 @@ function sportal_get_shouts($shoutbox, $parameters)
 		$shouts = array();
 		while ($row = $db->fetch_assoc($request))
 		{
-			// Disable the aeva mod for the shoutbox.
-			$context['aeva_disable'] = true;
 			$online_color = !empty($row['member_group_color']) ? $row['member_group_color'] : $row['post_group_color'];
 			$shouts[$row['id_shout']] = array(
 				'id' => $row['id_shout'],
@@ -148,7 +158,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 					'color' => $online_color,
 				),
 				'time' => $row['log_time'],
-				'text' => parse_bbc($row['body'], true, '', $bbc),
+				'text' => $parser->enableSmileys(true)->parse($row['body'])
 			);
 		}
 		$db->free_result($request);
@@ -159,9 +169,12 @@ function sportal_get_shouts($shoutbox, $parameters)
 		}
 	}
 
+	// Restore BBC codes
+	unset($parser);
+
 	foreach ($shouts as $shout)
 	{
-		// Private shouts @username: only get shown to the shouter and shoutee, and the admin
+		// Private shouts @username: only get shown to the shouter and shoutee, and the admin ;)
 		if (preg_match('~^@(.+?): ~u', $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
 		{
 			unset($shouts[$shout['id']]);
@@ -180,7 +193,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 		$shouts[$shout['id']]['time'] = standardTime($shouts[$shout['id']]['time']);
 		$shouts[$shout['id']]['text'] = preg_replace('~(</?)div([^<]*>)~', '$1span$2', $shouts[$shout['id']]['text']);
 		$shouts[$shout['id']]['text'] = preg_replace('~<a([^>]+>)([^<]+)</a>~', '<a$1' . $txt['sp_link'] . '</a>', $shouts[$shout['id']]['text']);
-		$shouts[$shout['id']]['text'] = censorText($shouts[$shout['id']]['text']);
+		$shouts[$shout['id']]['text'] = censor($shouts[$shout['id']]['text']);
 
 		// Ignored user, hide the shout with option to show it
 		if (!empty($modSettings['enable_buddylist']) && in_array($shout['author']['id'], $context['user']['ignoreusers']))
@@ -209,7 +222,8 @@ function sportal_get_shoutbox_count($shoutbox_id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}sp_shouts
 		WHERE id_shoutbox = {int:current}',
 		array(
@@ -238,6 +252,7 @@ function sportal_create_shout($shoutbox, $shout)
 	global $user_info;
 
 	$db = database();
+	$parser = ParserWrapper::instance();
 
 	// If a guest shouts in the woods, and no one is there to hear them
 	if ($user_info['is_guest'])
@@ -251,7 +266,7 @@ function sportal_create_shout($shoutbox, $shout)
 		return false;
 	}
 
-	if (trim(strip_tags(parse_bbc($shout, false), '<img>')) === '')
+	if (trim(strip_tags($parser->parseMessage($shout, false), '<img>')) === '')
 	{
 		return false;
 	}

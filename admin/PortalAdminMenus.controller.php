@@ -4,15 +4,11 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
 
 /**
  * SimplePortal Menus Administration controller class.
@@ -229,7 +225,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			{
-				fatal_lang_error('sp_error_menu_name_empty', false);
+				throw new Elk_Exception('sp_error_menu_name_empty', false);
 			}
 
 			$menu_info = array(
@@ -302,7 +298,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 
 		if (empty($context['menu']))
 		{
-			fatal_lang_error('error_sp_menu_not_found', false);
+			throw new Elk_Exception('error_sp_menu_not_found', false);
 		}
 
 		// Build the list option array to display the custom items in this custom menu
@@ -462,7 +458,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 		// No menu, no further
 		if (empty($context['menu']))
 		{
-			fatal_lang_error('error_sp_menu_not_found', false);
+			throw new Elk_Exception('error_sp_menu_not_found', false);
 		}
 
 		// Need to know if we are adding or editing
@@ -498,10 +494,10 @@ class ManagePortalMenus_Controller extends Action_Controller
 			// If you messed this up, back you go
 			if (!$validator->validate($_POST))
 			{
-				// @todo, should set  Error_Context::context and display in tempalte instead
+				// @todo, should set  ErrorContext::context and display in template instead
 				foreach ($validator->validation_errors() as $id => $error)
 				{
-					fatal_lang_error($error, false);
+					throw new Elk_Exception($error, false);
 				}
 			}
 
@@ -509,13 +505,13 @@ class ManagePortalMenus_Controller extends Action_Controller
 			$has_duplicate = sp_menu_check_duplicate_items($validator->item_id, $validator->namespace);
 			if (!empty($has_duplicate))
 			{
-				fatal_lang_error('sp_error_item_namespace_duplicate', false);
+				throw new Elk_Exception('sp_error_item_namespace_duplicate', false);
 			}
 
 			// Can't have a simple numeric namespace
 			if (preg_replace('~[0-9]+~', '', $validator->namespace) === '')
 			{
-				fatal_lang_error('sp_error_item_namespace_numeric', false);
+				throw new Elk_Exception('sp_error_item_namespace_numeric', false);
 			}
 
 			$item_info = array(
@@ -530,7 +526,6 @@ class ManagePortalMenus_Controller extends Action_Controller
 			// Adjust the url for the link type
 			$link_type = !empty($_POST['link_type']) ? $_POST['link_type'] : '';
 			$link_item = !empty($_POST['link_item']) ? $_POST['link_item'] : '';
-			$link_item_id = 0;
 			if ($link_type !== 'custom')
 			{
 				if (preg_match('~^\d+|[A-Za-z0-9_\-]+$~', $link_item, $match))
@@ -539,7 +534,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 				}
 				else
 				{
-					fatal_lang_error('sp_error_item_link_item_invalid', false);
+					throw new Elk_Exception('sp_error_item_link_item_invalid', false);
 				}
 
 				switch ($link_type)
@@ -567,7 +562,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 		{
 			$context['item'] = array(
 				'id' => 0,
-				'namespace' => 'item' . mt_rand(1, 5000),
+				'namespace' => 'item' . random_int(1, 5000),
 				'title' => $txt['sp_menus_default_menu_item_name'],
 				'url' => '',
 				'target' => 0,

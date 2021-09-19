@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
 function template_shoutbox_edit()
@@ -58,10 +58,10 @@ function template_shoutbox_edit()
 								</ul>
 							</fieldset>
 							<a href="javascript:void(0);" onclick="document.getElementById(\'moderators\').style.display = \'block\'; document.getElementById(\'moderators_groups_link\').style.display = \'none\'; return false;" id="moderators_groups_link" style="display: none;">[ ', $txt['avatar_select_permission'], ' ]</a>
-							<script"><!-- // --><![CDATA[
+							<script>
 								document.getElementById("moderators").style.display = "none";
 								document.getElementById("moderators_groups_link").style.display = "";
-							// ]]></script>
+							</script>
 						</dd>
 						<dt>
 							<a href="', $scripturl, '?action=quickhelp;help=sp-shoutboxesWarning" onclick="return reqOverlayDiv(this.href);" class="help">

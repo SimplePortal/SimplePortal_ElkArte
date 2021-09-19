@@ -4,10 +4,12 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
+
+use BBC\ParserWrapper;
 
 /**
  * Used to display articles on the portal
@@ -17,7 +19,9 @@ function template_portal_index()
 	global $context, $txt;
 
 	if (empty($context['articles']))
+	{
 		return;
+	}
 
 	echo '
 	<div id="sp_index" class="sp_article_block_container">';
@@ -33,19 +37,25 @@ function template_portal_index()
  				<div class="sp_article_detail">';
 
 		if (!empty($article['author']['avatar']['image']))
+		{
 			echo $article['author']['avatar']['image'];
+		}
 
 		echo '
 					<span>
 						', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']);
 
 		if (!empty($article['author']['avatar']['image']))
+		{
 			echo '
 						<br />';
+		}
 		else
+		{
 			echo '
 					</span>
 					<span class="floatright">';
+		}
 
 		echo '
 						', sprintf($article['view_count'] == 1
@@ -55,7 +65,7 @@ function template_portal_index()
 				</div>
 				<hr />
 				<div class="inner sp_inner">', $article['preview'], '</div>
-				<div class="sp_article_extra">
+				<div class="sp_article_extra clear">
 					<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
 					<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
 				</div>
@@ -65,17 +75,19 @@ function template_portal_index()
 
 	// Pages as well?
 	if (!empty($context['article_page_index']))
+	{
 		echo '
 		<div class="sp_page_index">',
 			template_pagesection(), '
 		</div>';
+	}
 
 	echo '
 	</div>';
 }
 
 /**
- * Displays the above blocks, this includes header, left and top blocks
+ * Displays the above blocks, this includes header, left and center-top blocks
  */
 function template_portal_above()
 {
@@ -86,30 +98,38 @@ function template_portal_above()
 	{
 		echo '
 	<div class="righttext sp_fullwidth">';
+		if ($context['SPortal']['sides'][4]['active'])
+		{
+			echo '
+		<a id="sp_collapse_side4" class="icon ', $context['SPortal']['sides'][1]['collapsed']
+				? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(4)"></a>';
+		}
 
 		if ($context['SPortal']['sides'][1]['active'])
+		{
 			echo '
-		<a id="sp_collapse_side1" class="dot ', $context['SPortal']['sides'][1]['collapsed']
+		<a id="sp_collapse_side1" class="icon ', $context['SPortal']['sides'][1]['collapsed']
 			? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(1)"></a>';
+		}
 
-		if ($context['SPortal']['sides'][4]['active'])
+		if (!empty($context['SPortal']['blocks']['custom_arrange']) &&
+			($context['site_action'] === 'sportal' || $context['site_action'] === 'portalmain'))
+		{
 			echo '
-		<a id="sp_collapse_side4" class="dot ', $context['SPortal']['sides'][1]['collapsed']
-			? 'expand' : 'collapse', '" href="#side" onclick="return sp_collapseSide(4)"></a>';
-
-		if (!empty($context['SPortal']['blocks']['custom_arrange']) && $context['site_action'] === 'sportal')
-			echo '
-		<a id="sp_reset_blocks" class="dot dotgrid" title="', $txt['sp_reset blocks'], '" href="' . $scripturl . '?action=portal;sa=resetlayout;' . $context['session_var'] . '=' . $context['session_id'] . '"></a>';
+		<a id="sp_reset_blocks" class="icon reset" title="', $txt['sp_reset blocks'], '" href="' . $scripturl . '?action=portal;sa=resetlayout;' . $context['session_var'] . '=' . $context['session_id'] . '"></a>';
+		}
 
 		echo '
 	</div>';
 	}
 	// No side collapsing but a custom arrangement?
 	elseif (!empty($context['SPortal']['blocks']['custom_arrange']) && $context['site_action'] === 'sportal' && ($context['SPortal']['sides'][1]['active'] || $context['SPortal']['sides'][4]['active']))
+	{
 		echo '
 	<div class="righttext sp_fullwidth">
-		<a id="sp_reset_blocks" class="dot dotgrid" title="', $txt['sp_reset blocks'], '" href="' . $scripturl . '?action=portal;sa=resetlayout;' . $context['session_var'] . '=' . $context['session_id'] . '"></a>
+		<a id="sp_reset_blocks" class="icon reset" title="', $txt['sp_reset blocks'], '" href="' . $scripturl . '?action=portal;sa=resetlayout;' . $context['session_var'] . '=' . $context['session_id'] . '"></a>
 	</div>';
+	}
 
 	// Output any header blocks
 	if (!empty($context['SPortal']['blocks'][5]))
@@ -118,13 +138,15 @@ function template_portal_above()
 	<div id="sp_header" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][5] as $block)
+		{
 			template_block($block, 5);
+		}
 
 		echo '
 	</div>';
 	}
 
-	// The main portal div
+	// The flex main portal div
 	echo '
 	<div id="sp_main">';
 
@@ -132,38 +154,34 @@ function template_portal_above()
 	if (!empty($modSettings['showleft']) && !empty($context['SPortal']['blocks'][1]))
 	{
 		echo '
-		<div id="sp_left" class="sp_main_cell"', !empty($modSettings['leftwidth']) ? ' style="width:' . $modSettings['leftwidth'] . 'px"'
+		<div id="sp_left" class="sp_main_cell"', !empty($modSettings['leftwidth']) ? ' style="width:' . $modSettings['leftwidth'] . '"'
 			: '', $context['SPortal']['sides'][1]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
 			? ' style="display: none;"' : '', '>
 			<div id="sp_left_div" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][1] as $block)
+		{
 			template_block($block, 1);
+		}
 
 		echo '
 			</div>
 		</div>';
 	}
 
-	// Then the right blocks (due to float)
-	if (!empty($modSettings['showright']) && !empty($context['SPortal']['blocks'][4]))
+	// No left or right? Then force the center section to go full witch
+	$flex = '';
+	if ((empty($modSettings['showleft']) || empty($context['SPortal']['blocks'][1]))
+		&& (empty($modSettings['showright']) || empty($context['SPortal']['blocks'][4])))
 	{
-		echo '
-			<div id="sp_right" class="sp_main_cell"', !empty($modSettings['rightwidth'])
-				? ' style="width:' . $modSettings['rightwidth'] . 'px"' : '',
-				$context['SPortal']['sides'][4]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
-				? ' style="display: none;"' : '', '>
-				<div id="sp_right_div" class="sp_column">';
-
-		foreach ($context['SPortal']['blocks'][4] as $block)
-			template_block($block, 4);
-
-		echo '
-				</div>
-			</div>';
+		$flex = 'flex: 0 0 100%; min-width: 100%;';
 	}
 
-	// Followed by all the Top Blocks
+	// Our container for the center section's
+	echo '
+		<div id="sp_center" style="' . $flex . '">';
+
+	// Followed by all the Center-Top Blocks
 	echo '
 			<div id="sp_center_top" class="sp_main_cell">
 				<div id="sp_top_div" class="sp_column">';
@@ -171,12 +189,20 @@ function template_portal_above()
 	if (!empty($context['SPortal']['blocks'][2]))
 	{
 		foreach ($context['SPortal']['blocks'][2] as $block)
+		{
 			template_block($block, 2);
+		}
 
 		if (empty($context['SPortal']['on_portal']))
+		{
 			echo '
 					<br class="sp_side_clear" />';
+		}
 	}
+
+	echo '
+				</div>
+			</div>';
 }
 
 /**
@@ -186,10 +212,8 @@ function template_portal_below()
 {
 	global $context, $modSettings;
 
-	// Close the top block section, begin the bottom
+	// Onto the Center-Bottom blocks
 	echo '
-				</div>
-			</div>
 			<div id="sp_center_bottom" class="sp_main_cell">
 				<div id="sp_bottom_div" class="sp_column">';
 
@@ -197,16 +221,47 @@ function template_portal_below()
 	if (!empty($context['SPortal']['blocks'][3]))
 	{
 		if (empty($context['SPortal']['on_portal']))
+		{
 			echo '
 					<br class="sp_side_clear" />';
+		}
 
 		foreach ($context['SPortal']['blocks'][3] as $block)
+		{
 			template_block($block, 3);
+		}
 	}
 
 	echo '
+				</div>
+			</div>';
+
+	// Close our sp_center container
+	echo '
+		</div>';
+
+	// Then the right blocks
+	if (!empty($modSettings['showright']) && !empty($context['SPortal']['blocks'][4]))
+	{
+		echo '
+		<div id="sp_right" class="sp_main_cell"', !empty($modSettings['rightwidth'])
+			? ' style="width:' . $modSettings['rightwidth'] . '"' : '',
+		$context['SPortal']['sides'][4]['collapsed'] && empty($modSettings['sp_disable_side_collapse'])
+			? ' style="display: none;"' : '', '>
+			<div id="sp_right_div" class="sp_column">';
+
+		foreach ($context['SPortal']['blocks'][4] as $block)
+		{
+			template_block($block, 4);
+		}
+
+		echo '
 			</div>
-		</div>
+		</div>';
+	}
+
+	// Close the sp_main portal div
+	echo '
 	</div>';
 
 	// Footer Blocks
@@ -216,7 +271,9 @@ function template_portal_below()
 	<div id="sp_footer" class="sp_column">';
 
 		foreach ($context['SPortal']['blocks'][6] as $block)
+		{
 			template_block($block, 6);
+		}
 
 		echo '
 	</div>';
@@ -235,7 +292,9 @@ function template_block($block, $side = -1)
 
 	// Make sure that we have some valid block data.
 	if (empty($block) || empty($block['type']))
+	{
 		return;
+	}
 
 	// Board news gets special formatting, really intended to be at the top of a column
 	// @todo move the sp_boardNews-specific style to the board news template
@@ -253,7 +312,9 @@ function template_block($block, $side = -1)
 	}
 
 	if (isset($txt['sp_custom_block_title_' . $block['id']]))
+	{
 		$block['label'] = $txt['sp_custom_block_title_' . $block['id']];
+	}
 
 	template_block_default($block, $side);
 }
@@ -272,19 +333,23 @@ function template_block_default($block, $side)
 	// Show a title bar or not, some blocks have their own bars
 	if (empty($block['style']['no_title']))
 	{
+		$parser = ParserWrapper::instance();
+
 		echo '
 						<h3 class="sp_category_header ', strpos($block['style']['title']['class'], 'custom') === false ? $block['style']['title']['class'] : '', ' sp_drag_header"', !empty($block['style']['title']['style']) ? ' style="' . $block['style']['title']['style'] . '"' : '', '>';
 
 		if (empty($block['force_view']))
+		{
 			echo '
 							<span class="sp_category_toggle">&nbsp;
 								<a href="javascript:sp_collapseBlock(\'', $block['id'], '\')">
-									<span id="sp_collapse_', $block['id'], '" class="', $block['collapsed'] ? 'expand' : 'collapse', '"></span>
+									<span id="sp_collapse_', $block['id'], '" class="chevricon i-chevron-', $block['collapsed'] ? 'down' : 'up', '"></span>
 								</a>
 							</span>';
+		}
 
 		echo '
-							', parse_bbc($block['label']), '
+							', $parser->parseMessage($block['label'], true), '
 						</h3>';
 	}
 

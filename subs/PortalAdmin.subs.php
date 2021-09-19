@@ -4,56 +4,11 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
-/**
- * Toggles the current state of a block / control
- *
- * - Calls sp_changeState to toggle the on/off status
- * - Directs back based on type passed
- *
- * @param string $type type of control
- * @param int $id id of the control
- */
-function sportal_admin_state_change($type, $id)
-{
-	if (!in_array($type, array('block', 'category', 'article')))
-	{
-		fatal_lang_error('error_sp_id_empty', false);
-	}
-
-	// Toggle the current state
-	sp_changeState($type, $id);
-
-	// Based on the type, find our way back
-	if ($type === 'block')
-	{
-		$sides = array(1 => 'left', 2 => 'top', 3 => 'bottom', 4 => 'right');
-		$list = !empty($_GET['redirect']) && isset($sides[$_GET['redirect']]) ? $sides[$_GET['redirect']] : 'list';
-
-		redirectexit('action=admin;area=portalblocks;sa=' . $list);
-	}
-	elseif ($type === 'category')
-	{
-		redirectexit('action=admin;area=portalarticles;sa=categories');
-	}
-	elseif ($type === 'article')
-	{
-		redirectexit('action=admin;area=portalarticles;sa=articles');
-	}
-	else
-	{
-		redirectexit('action=admin;area=portalconfig');
-	}
-}
 
 /**
  * Fetches all the classes (blocks) in the system
@@ -69,6 +24,8 @@ function sportal_admin_state_change($type, $id)
  */
 function getFunctionInfo($function = null)
 {
+	global $txt;
+
 	$return = array();
 
 	// Looking for a specific block or all of them
@@ -99,9 +56,8 @@ function getFunctionInfo($function = null)
 			continue;
 		}
 
-		// Ensure they have permissions to view this block
-		$perms = $class::permissionsRequired();
-		if (!allowedTo($perms))
+		// Check if the block has defined any special permissions
+		if (!allowedTo($class::permissionsRequired()))
 		{
 			continue;
 		}
@@ -112,7 +68,18 @@ function getFunctionInfo($function = null)
 			'function' => str_replace('_Block', '', $class),
 			'custom_label' => $class::blockName(),
 			'custom_desc' => $class::blockDescription(),
+			'standard_label' => isset($txt['sp_function_' . str_replace('_Block', '', $class) . '_label']) ? $txt['sp_function_' . str_replace('_Block', '', $class) . '_label'] : str_replace('_Block', '', $class)
 		);
+	}
+
+	// Show the block list in alpha order
+	if ($function === null)
+	{
+		usort($return, function ($a, $b) {
+			$a_string = !empty($a['custom_label']) ? $a['custom_label'] : $a['standard_label'];
+			$b_string = !empty($b['custom_label']) ? $b['custom_label'] : $b['standard_label'];
+			return strcmp($a_string, $b_string);
+		});
 	}
 
 	return $function === null ? $return : current($return);
@@ -165,7 +132,7 @@ function fixColumnRows($column_id = null)
  * @param string|null $type type of control
  * @param int|null $id specific id of the control
  *
- * @return bool
+ * @return int|bool
  */
 function sp_changeState($type = null, $id = null)
 {
@@ -235,7 +202,22 @@ function sp_changeState($type = null, $id = null)
 		)
 	);
 
-	return true;
+	// Get the new state
+	$request = $db->query('', '
+		SELECT {raw:column}
+		FROM {db_prefix}{raw:table}
+		WHERE {raw:query_id} = {int:id}',
+		array(
+			'table' => $query['table'],
+			'column' => $query['column'],
+			'query_id' => $query['query_id'],
+			'id' => $id,
+		)
+	);
+	list ($state) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $state;
 }
 
 /**
@@ -496,9 +478,9 @@ function sp_load_categories($start = null, $items_per_page = null, $sort = null)
 			'link' => '<a href="' . $scripturl . '?category=' . $row['namespace'] . '">' . $row['name'] . '</a>',
 			'articles' => $row['articles'],
 			'status' => $row['status'],
-			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalcategories;sa=status;category_id=' . $row['id_category'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status'])
-				? 'deactive' : 'active', $txt['sp_admin_categories_' . (!empty($row['status']) ? 'de'
-				: '') . 'activate']) . '</a>',
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalcategories;sa=status;category_id=' . $row['id_category'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
+				onclick="sp_change_status(\'' . $row['id_category'] . '\', \'category\');return false;">' .
+				sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_categories_' . (!empty($row['status']) ? 'de' : '') . 'activate'], null, null, true, 'status_image_' . $row['id_category']) . '</a>',
 		);
 	}
 	$db->free_result($request);
@@ -512,12 +494,13 @@ function sp_load_categories($start = null, $items_per_page = null, $sort = null)
  * @param int $id
  * @param string $namespace
  */
-function sp_check_duplicate_category($id, $namespace)
+function sp_check_duplicate_category($id, $namespace = '')
 {
 	$db = database();
 
 	$result = $db->query('', '
-		SELECT id_category
+		SELECT 
+			id_category
 		FROM {db_prefix}sp_categories
 		WHERE namespace = {string:namespace}
 			AND id_category != {int:current}
@@ -525,7 +508,7 @@ function sp_check_duplicate_category($id, $namespace)
 		array(
 			'limit' => 1,
 			'namespace' => $namespace,
-			'current' => $id,
+			'current' => (int) $id,
 		)
 	);
 	list ($has_duplicate) = $db->fetch_row($result);
@@ -539,7 +522,7 @@ function sp_check_duplicate_category($id, $namespace)
  *
  * If adding a new one, will return the id of the new category
  *
- * @param mixed[] $data field name to value for use in query
+ * @param array $data field name to value for use in query
  * @param boolean $is_new
  *
  * @return int
@@ -548,7 +531,7 @@ function sp_update_category($data, $is_new = false)
 {
 	$db = database();
 
-	$id = isset($data['id']) ? $data['id'] : null;
+	$id = $data['id'] ?? null;
 
 	// Field definitions
 	$fields = array(
@@ -652,7 +635,8 @@ function sp_count_articles()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+		    COUNT(*)
 		FROM {db_prefix}sp_articles'
 	);
 	list ($total_articles) = $db->fetch_row($request);
@@ -723,9 +707,9 @@ function sp_load_articles($start, $items_per_page, $sort)
 			'type_text' => $txt['sp_articles_type_' . $row['type']],
 			'date' => standardTime($row['date']),
 			'status' => $row['status'],
-			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status'])
-				? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de'
-				: '') . 'activate']) . '</a>',
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" 
+				onclick="sp_change_status(\'' . $row['id_article'] . '\', \'articles\');return false;">' .
+				sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de' : '') . 'activate'], null, null, true, 'status_image_' . $row['id_article']) . '</a>',
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=edit;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=delete;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_articles_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
@@ -812,7 +796,7 @@ function sp_duplicate_articles($article_id, $namespace)
  * - expects to have $context populated from sportal_get_articles()
  * - add items as a new article is is_new is true otherwise updates and existing one
  *
- * @param mixed[] $article_info array of fields details to save/update
+ * @param array $article_info array of fields details to save/update
  * @param boolean $is_new true for new insertion, false to update
  * @param boolean $update_counts true to update category counts
  *
@@ -865,9 +849,20 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 		);
 		$article_info['id'] = $db->insert_id('{db_prefix}sp_articles', 'id_article');
 	}
-	// The editing so we update what was there
+	// Then editing so we update what was there
 	else
 	{
+		// They may have chosen to [attach] to an existing image
+		$currentAttachments = sportal_get_articles_attachments($article_info['id']);
+		if (!empty($currentAttachments[$article_info['id']]))
+		{
+			foreach ($currentAttachments[$article_info['id']] as $attachment)
+			{
+				// Replace ila attach tags with the new valid attachment id and [spattach] tag
+				$article_info['body'] = preg_replace('~\[attach(.*?)\]' . $attachment['id_attach'] . '\[\/attach\]~', '[spattach$1]' . $attachment['id_attach'] . '[/spattach]', $article_info['body']);
+			}
+		}
+
 		$update_fields = array();
 		foreach ($fields as $name => $type)
 		{
@@ -924,7 +919,8 @@ function sp_count_pages()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+		    COUNT(*)
 		FROM {db_prefix}sp_pages'
 	);
 	list ($total_pages) = $db->fetch_row($request);
@@ -974,9 +970,9 @@ function sp_load_pages($start, $items_per_page, $sort)
 			'type_text' => $txt['sp_pages_type_' . $row['type']],
 			'views' => $row['views'],
 			'status' => $row['status'],
-			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=status;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status'])
-				? 'deactive' : 'active', $txt['sp_admin_pages_' . (!empty($row['status']) ? 'de'
-				: '') . 'activate']) . '</a>',
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=status;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
+				onclick="sp_change_status(\'' . $row['id_page'] . '\', \'page\');return false;">' .
+				sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_pages_' . (!empty($row['status']) ? 'de' : '') . 'activate'], null, null, true, 'status_image_' . $row['id_page']) . '</a>',
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=edit;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=delete;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_pages_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
@@ -1011,7 +1007,7 @@ function sp_delete_pages($page_ids = array())
  *
  * - Add items as a new page is is_new is true otherwise updates and existing one
  *
- * @param mixed[] $page_info array of fields details to save/update
+ * @param array $page_info array of fields details to save/update
  * @param boolean $is_new true for new insertion, false to update
  *
  * @return int
@@ -1103,7 +1099,8 @@ function sp_count_shoutbox()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+		    COUNT(*)
 		FROM {db_prefix}sp_shoutboxes'
 	);
 	list ($total_shoutbox) = $db->fetch_row($request);
@@ -1365,7 +1362,7 @@ function sp_prune_shoutbox($shoutbox_id, $where, $parameters, $all = false)
 /**
  * Returns the total count of profiles in the system
  *
- * @param int $type (1 = permissions, 2 = styles)
+ * @param int $type (1 = permissions, 2 = styles, 3 = visability)
  */
 function sp_count_profiles($type = 1)
 {
@@ -1392,7 +1389,7 @@ function sp_count_profiles($type = 1)
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
- * @param int $type (1 = permissions, 2 = styles)
+ * @param int $type (1 = permissions, 2 = styles, 3 = display)
  *
  * @return array
  */
@@ -1423,9 +1420,7 @@ function sp_load_profiles($start, $items_per_page, $sort, $type = 1)
 		$profiles[$row['id_profile']] = array(
 			'id' => $row['id_profile'],
 			'name' => $row['name'],
-			'label' => isset($txt['sp_admin_profiles' . substr($row['name'], 1)])
-				? $txt['sp_admin_profiles' . substr($row['name'], 1)]
-				: $row['name'],
+			'label' => $txt['sp_admin_profiles' . substr($row['name'], 1)] ?? $row['name'],
 			'actions' => array(
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalprofiles;sa=editpermission;profile_id=' . $row['id_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalprofiles;sa=deletepermission;profile_id=' . $row['id_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_profiles_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
@@ -1602,7 +1597,7 @@ function sp_block_nextrow($block_column, $block_id = 0)
 /**
  * Inserts a new block to the portal
  *
- * @param mixed[] $blockInfo
+ * @param array $blockInfo
  */
 function sp_block_insert($blockInfo)
 {
@@ -1626,7 +1621,7 @@ function sp_block_insert($blockInfo)
  * - Removes all parameters stored with the box in anticipation of new
  * ones being supplied
  *
- * @param mixed[] $blockInfo
+ * @param array $blockInfo
  */
 function sp_block_update($blockInfo)
 {
@@ -1671,7 +1666,7 @@ function sp_block_update($blockInfo)
 /**
  * Inserts parameters for a specific block
  *
- * @param mixed[] $new_parameters
+ * @param array $new_parameters
  * @param int $id_block
  */
 function sp_block_insert_parameters($new_parameters, $id_block)
@@ -1822,7 +1817,7 @@ function sp_block_delete($block_id)
 /**
  * Function to add or update a profile, style, permissions or display
  *
- * @param mixed[] $profile_info The data to insert/update
+ * @param array $profile_info The data to insert/update
  * @param bool $is_new if to update or insert
  *
  * @return int
@@ -2068,7 +2063,7 @@ function sp_custom_menu_items($start, $items_per_page, $sort)
 /**
  * Function to add or update a menu
  *
- * @param mixed[] $menu_info The data to insert/update
+ * @param array $menu_info The data to insert/update
  * @param bool $is_new if to update or insert
  *
  * @return int
@@ -2272,4 +2267,41 @@ function sp_menu_items($start, $items_per_page, $sort, $menu_id)
 	$db->free_result($request);
 
 	return $items;
+}
+
+/**
+ * SCEditor spplugin Plugin.
+ * Used to set editor initial state and the setup so type conversion can
+ * happen.  Just call the plugin with initial and new states.
+ *
+ * @param string $type
+ */
+function addConversionJS($type)
+{
+	// Set the globals, spplugin will be called with editor init to set mode
+	addInlineJavascript('
+		let start_state = "' . $type . '",
+			editor;
+			
+		$.sceditor.plugins.spplugin = function(initial_state, new_state) {
+			let base = this;
+		
+			if (typeof new_state !== "undefined")
+			{
+				sp_to_new(initial_state, new_state);
+			}
+		
+			base.init = function() {
+				editor = this;
+			};
+		
+			base.signalReady = function() {
+				if (start_state !== "bbc")
+				{
+					editor.sourceMode(true);
+					document.getElementById("editor_toolbar_container").style.display = "none";
+				}
+			};
+		};
+	');
 }

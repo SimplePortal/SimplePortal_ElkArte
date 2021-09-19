@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
 // General strings
@@ -152,7 +152,7 @@ $txt['error_sp_no_visibility_profiles'] = 'There are no visibility profiles avai
 $txt['error_sp_no_pages'] = 'There are no pages available.';
 $txt['error_sp_no_categories'] = 'There are no categories available.';
 $txt['error_sp_no_articles'] = 'There are no articles available.';
-$txt['error_sp_no_comments'] = 'There are no comments on this article yet. Be the first one to comment!';
+$txt['error_sp_no_comments'] = 'There are no comments on this, be the first one!';
 $txt['error_sp_no_profiles'] = 'There are no profiles added yet!';
 $txt['error_sp_no_custom_menus'] = 'There are no custom menus added yet!';
 $txt['error_sp_no_menu_items'] = 'There are no menu items added yet!';

@@ -4,14 +4,13 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
 if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
 {
-	$_GET['debug'] = 'Blue Dream!';
 	require_once(dirname(__FILE__) . '/SSI.php');
 }
 elseif (!defined('ELK'))
@@ -26,8 +25,8 @@ $defaults = array(
 	'sp_disableForumRedirect' => 1,
 	'showleft' => 1,
 	'showright' => 1,
-	'leftwidth' => 200,
-	'rightwidth' => 200,
+	'leftwidth' => '225px',
+	'rightwidth' => '225px',
 	'sp_adminIntegrationHide' => 1,
 	'sp_resize_images' => 1,
 	'sp_articles_index_per_page' => 5,
@@ -38,7 +37,9 @@ $defaults = array(
 );
 
 $updates = array(
-	'sp_version' => '1.0 Beta 2',
+	'sp_version' => '1.0.0',
+	'front_page' => 'PortalMain_Controller',
+	'admin_features' => $modSettings['admin_features'] . ',pt'
 );
 
 foreach ($defaults as $index => $value)
@@ -50,6 +51,9 @@ foreach ($defaults as $index => $value)
 }
 
 updateSettings($updates);
+
+// Enable the core feature by default on install
+Hooks::instance()->enableIntegration('Portal_Integrate');
 
 $standalone_file = BOARDDIR . '/PortalStandalone.php';
 
@@ -68,7 +72,7 @@ elseif (file_exists($standalone_file))
 	}
 }
 
-if (ELK == 'SSI')
+if (ELK === 'SSI')
 {
 	echo 'Settings changes were carried out successfully.';
 }

@@ -5,9 +5,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  *
  * This version of SimplePortal ElkArte is based on SimplePortal core 2.4
  */
@@ -15,13 +15,12 @@
 <package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
 	<name>SimplePortal</name>
-	<version>1.0.0 Beta 2</version>
-	<type>modification</type>
-	<install for="1.0.3 - 1.0.99">
+	<version>1.0.0</version>
+	<type>addon</type>
+	<install for="1.1.7 - 1.1.99">
 		<readme type="inline">This will install SimplePortal for Elkarte.</readme>
 		<modification>modification.xml</modification>
 		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
-		<require-dir name="sources" destination="BOARDDIR" />
 		<require-dir name="admin" destination="SOURCEDIR" />
 		<require-dir name="subs" destination="SOURCEDIR" />
 		<require-dir name="controllers" destination="SOURCEDIR" />
@@ -29,63 +28,35 @@
 		<require-dir name="sp_attach" destination="BOARDDIR" />
 		<database>database.php</database>
 		<code>settings.php</code>
-		<hook hook="integrate_current_action" function="sp_integrate_current_action" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_action_boardindex_after" function="sp_integrate_boardindex" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_actions" function="sp_integrate_actions" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_admin_areas" function="sp_integrate_admin_areas" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_load_permissions" function="sp_integrate_load_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_whos_online" function="sp_integrate_whos_online" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_action_frontpage" function="sp_integrate_frontpage" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_quickhelp" function="sp_integrate_quickhelp" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_buffer" function="sp_integrate_buffer" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_redirect" function="sp_integrate_redirect" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_sa_xmlhttp" function="sp_integrate_xmlhttp" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_pre_log_stats" function="sp_integrate_pre_log_stats" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_load_illegal_guest_permissions" function="sp_integrate_load_illegal_guest_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook hook="integrate_pre_parsebbc" function="sp_integrate_pre_parsebbc" file="SOURCEDIR/PortalIntegration.subs.php" />
 		<credits url="www.simpleportal.net" license="BSD 3" copyright="Simple Portal Team">SimplePortal</credits>
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
 
-	<uninstall for="1.0 - 1.0.99">
+	<uninstall for="1.1 - 1.1.99">
 		<readme type="inline">This will uninstall SimplePortal for Elkarte.</readme>
-		<hook reverse="true" hook="integrate_current_action" function="sp_integrate_current_action" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_action_boardindex_after" function="sp_integrate_boardindex" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_actions" function="sp_integrate_actions" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_admin_areas" function="sp_integrate_admin_areas" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_load_permissions" function="sp_integrate_load_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_whos_online" function="sp_integrate_whos_online" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_action_frontpage" function="sp_integrate_frontpage" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_quickhelp" function="sp_integrate_quickhelp" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_buffer" function="sp_integrate_buffer" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_menu_buttons" function="sp_integrate_menu_buttons" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_redirect" function="sp_integrate_redirect" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_sa_xmlhttp" function="sp_integrate_xmlhttp" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_pre_log_stats" function="sp_integrate_pre_log_stats" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_load_illegal_guest_permissions" function="sp_integrate_load_illegal_guest_permissions" file="SOURCEDIR/PortalIntegration.subs.php" />
-		<hook reverse="true" hook="integrate_pre_parsebbc" function="sp_integrate_pre_parsebbc" file="SOURCEDIR/PortalIntegration.subs.php" />
+		<code>remove.php</code>
 		<modification reverse="true">modification.xml</modification>
 		<remove-file name="BOARDDIR/PortalStandalone.php" />
 		<remove-file name="CONTROLLERDIR/PortalArticles.controller.php" />
+		<remove-file name="CONTROLLERDIR/PortalCategories.controller.php" />
 		<remove-file name="CONTROLLERDIR/PortalMain.controller.php" />
 		<remove-file name="CONTROLLERDIR/PortalPages.controller.php" />
-		<remove-file name="CONTROLLERDIR/PortalShoutbox.controller.php" />
-		<remove-file name="CONTROLLERDIR/PortalCategories.controller.php" />
 		<remove-file name="CONTROLLERDIR/PortalRefresh.controller.php" />
+		<remove-file name="CONTROLLERDIR/PortalShoutbox.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminArticles.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminBlocks.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminCategories.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminMain.controller.php" />
-		<remove-file name="ADMINDIR/PortalAdminPages.controller.php" />
-		<remove-file name="ADMINDIR/PortalAdminShoutbox.controller.php" />
-		<remove-file name="ADMINDIR/PortalAdminProfiles.controller.php" />
-		<remove-file name="ADMINDIR/PortalAdminCategories.controller.php" />
 		<remove-file name="ADMINDIR/PortalAdminMenus.controller.php" />
+		<remove-file name="ADMINDIR/PortalAdminPages.controller.php" />
+		<remove-file name="ADMINDIR/PortalAdminProfiles.controller.php" />
+		<remove-file name="ADMINDIR/PortalAdminShoutbox.controller.php" />
+		<remove-file name="ADMINDIR/ManageSPortalModule.controller.php" />
 		<remove-file name="SUBSDIR/Portal.subs.php" />
 		<remove-file name="SUBSDIR/PortalAdmin.subs.php" />
 		<remove-file name="SUBSDIR/PortalArticle.subs.php" />
 		<remove-file name="SUBSDIR/PortalShoutbox.subs.php" />
+		<remove-file name="SUBSDIR/Portal.integrate.php" />
 		<remove-file name="SUBSDIR/spblocks/AdminInfo.block.php" />
 		<remove-file name="SUBSDIR/spblocks/BoardStats.block.php" />
 		<remove-file name="SUBSDIR/spblocks/Recent.block.php" />
@@ -115,7 +86,6 @@
 		<remove-file name="SUBSDIR/spblocks/UserInfo.block.php" />
 		<remove-file name="SUBSDIR/spblocks/Shoutbox.block.php" />
 		<remove-file name="SUBSDIR/spblocks/SPAbstractBlock.class.php" />
-		<remove-file name="SOURCEDIR/PortalIntegration.subs.php" />
 		<remove-file name="THEMEDIR/Portal.template.php" />
 		<remove-file name="THEMEDIR/PortalArticles.template.php" />
 		<remove-file name="THEMEDIR/PortalPages.template.php" />
@@ -147,6 +117,7 @@
 		<remove-file name="IMAGESDIR/admin/articles.png" />
 		<remove-file name="IMAGESDIR/admin/blocks.png" />
 		<remove-file name="IMAGESDIR/admin/categories.png" />
+		<remove-file name="IMAGESDIR/admin/feature_pt.png" />
 		<remove-file name="IMAGESDIR/admin/pages.png" />
 		<remove-file name="IMAGESDIR/admin/profiles.png" />
 		<remove-file name="IMAGESDIR/admin/shoutbox.png" />

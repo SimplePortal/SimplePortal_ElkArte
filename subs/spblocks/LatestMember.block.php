@@ -4,15 +4,11 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
 
 /**
  * Latest member block, shows name and join date for X latest members
@@ -50,7 +46,7 @@ class Latest_Member_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $scripturl, $color_profile;
+		global $scripturl;
 
 		// Load in the latest members
 		require_once(SUBSDIR . '/Members.subs.php');

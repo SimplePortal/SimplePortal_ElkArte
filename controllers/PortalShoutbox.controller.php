@@ -4,15 +4,14 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
+use BBC\ParserWrapper;
+use BBC\PreparseCode;
+
 
 /**
  * Shoutbox controller.
@@ -40,6 +39,19 @@ class Shoutbox_Controller extends Action_Controller
 	}
 
 	/**
+	 * Override default method, just say no for xml
+	 */
+	public function trackStats($action = '')
+	{
+		if (isset($this->_req->xml))
+		{
+			return false;
+		}
+
+		return parent::trackStats($action);
+	}
+
+	/**
 	 * The Shoutbox ... allows for the adding, editing, deleting and viewing of shouts
 	 */
 	public function action_sportal_shoutbox()
@@ -62,12 +74,13 @@ class Shoutbox_Controller extends Action_Controller
 			}
 			else
 			{
-				fatal_lang_error('error_sp_shoutbox_not_exist', false);
+				throw new Elk_Exception('error_sp_shoutbox_not_exist', false);
 			}
 		}
 
 		// Any warning title for the shoutbox, like Not For Support ;P
-		$context['SPortal']['shoutbox']['warning'] = parse_bbc($context['SPortal']['shoutbox']['warning']);
+		$parser = ParserWrapper::instance();
+		$context['SPortal']['shoutbox']['warning'] = $parser->parseMessage($context['SPortal']['shoutbox']['warning'], true);
 
 		$can_moderate = allowedTo('sp_admin') || allowedTo('sp_manage_shoutbox');
 		if (!$can_moderate && !empty($context['SPortal']['shoutbox']['moderator_groups']))
@@ -88,7 +101,8 @@ class Shoutbox_Controller extends Action_Controller
 				require_once(SUBSDIR . '/Post.subs.php');
 
 				$_REQUEST['shout'] = Util::htmlspecialchars(trim($_REQUEST['shout']));
-				preparsecode($_REQUEST['shout']);
+				$preparse = PreparseCode::instance();
+				$preparse->preparsecode($_REQUEST['shout'], false);
 
 				if (!empty($_REQUEST['shout']))
 				{
@@ -108,7 +122,7 @@ class Shoutbox_Controller extends Action_Controller
 
 			if (!$can_moderate)
 			{
-				fatal_lang_error('error_sp_cannot_shoutbox_moderate', false);
+				throw new Elk_Exception('error_sp_cannot_shoutbox_moderate', false);
 			}
 
 			$delete = (int) $_REQUEST['delete'];
@@ -134,7 +148,7 @@ class Shoutbox_Controller extends Action_Controller
 			$context['SPortal']['shouts'] = sportal_get_shouts($shoutbox_id, $shout_parameters);
 
 			// Return a clean xml response
-			Template_Layers::getInstance()->removeAll();
+			Template_Layers::instance()->removeAll();
 			$context['sub_template'] = 'shoutbox_xml';
 			$context['SPortal']['updated'] = empty($context['SPortal']['shoutbox']['last_update']) || $context['SPortal']['shoutbox']['last_update'] > $request_time;
 

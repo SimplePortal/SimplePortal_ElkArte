@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
 global $db_prefix, $db_package_log;
@@ -175,6 +175,8 @@ function updateTableStructures()
 
 /**
  * Update sp_blocks to use visibility profiles in place of display and mobile view values
+ *
+ * @param bool $has_visibility_profiles;
  */
 function updateVisibilityProfiles($has_visibility_profiles)
 {
@@ -231,7 +233,9 @@ function updateVisibilityProfiles($has_visibility_profiles)
 			// Build the visibility value that represents this row
 			$updates[$row['id_block']] = (!empty($selections) ? implode(',', $selections) : '') . '|' . (!empty($query) ? implode(',', $query) : '') . (!empty($mobile_view) ? '|' . $mobile_view : '');
 			if (empty($updates[$row['id_block']]) || $updates[$row['id_block']] === '|')
+			{
 				$updates[$row['id_block']] = 'portal|';
+			}
 		}
 		$db->free_result($result);
 
@@ -295,6 +299,8 @@ function updateVisibilityProfiles($has_visibility_profiles)
 
 /**
  * Update tables to use styles profiles id's in place of old style text
+ *
+ * @param bool $has_style_profiles
  */
 function updateStyleProfiles($has_style_profiles)
 {

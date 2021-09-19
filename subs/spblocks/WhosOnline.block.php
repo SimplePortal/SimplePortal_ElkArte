@@ -4,15 +4,11 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
 
 /**
  * Who's online block, shows count of users online names
@@ -50,11 +46,11 @@ class Whos_Online_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $modSettings, $context;
+		global $context;
 
 		// Interface with the online today addon?
 		$this->data['online_today'] = '';
-		if (!empty($parameters['online_today']) && !empty($modSettings['onlinetoday']) && file_exists(SUBSDIR . '/OnlineToday.class.php'))
+		if (!empty($parameters['online_today']) && !empty($this->_modSettings['onlinetoday']) && file_exists(SUBSDIR . '/OnlineToday.class.php'))
 		{
 			require_once(SUBSDIR . '/OnlineToday.class.php');
 
@@ -64,7 +60,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 		}
 
 		// Spiders
-		$this->data['show_spiders'] = !empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] < 3 || allowedTo('admin_forum'));
+		$this->data['show_spiders'] = !empty($this->_modSettings['show_spider_online']) && ($this->_modSettings['show_spider_online'] < 3 || allowedTo('admin_forum'));
 
 		loadLanguage('index', '', false, true);
 
@@ -129,7 +125,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 		}
 		$this->_db->free_result($request);
 
-		foreach ($this->data['stats']['users_online'] as $key => $user)
+		foreach (array_keys($this->data['stats']['users_online']) as $key)
 		{
 			$this->data['stats']['users_online'][$key]['avatar'] = $avatars[$this->data['stats']['users_online'][$key]['id']];
 		}
@@ -143,7 +139,7 @@ class Whos_Online_Block extends SP_Abstract_Block
  */
 function template_sp_whosOnline($data)
 {
-	global $scripturl, $modSettings, $txt, $context;
+	global $scripturl, $txt, $context, $modSettings;
 
 	echo '
 			<ul class="sp_list">

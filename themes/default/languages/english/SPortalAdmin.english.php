@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
 // Configuration area
@@ -16,6 +16,7 @@ $txt['sp-adminGeneralSettingsName'] = 'General Settings';
 $txt['sp-adminBlockSettingsName'] = 'Block Settings';
 $txt['sp-adminArticleSettingsName'] = 'Article Settings';
 $txt['sp-adminother'] = 'Other';
+$txt['PortalMain_Controller'] = 'Portal';
 
 // General settings
 $txt['portalactive'] = 'Enable SimplePortal';
@@ -51,7 +52,6 @@ $txt['sp_articles_per_page'] = 'Articles Per Page on Article List';
 $txt['sp_articles_comments_per_page'] = 'Articles Comments Per Page';
 $txt['sp_articles_length'] = 'Maximum Characters Before Article Cut-off';
 $txt['sp_articles_attachment_dir'] = 'Articles Attachment Directory';
-
 
 // Blocks area
 $txt['sp-adminBlockListName'] = 'Block List';
@@ -218,8 +218,8 @@ $txt['sp_param_Articles_category'] = 'Category';
 $txt['sp_param_Articles_limit'] = 'Articles to Display';
 $txt['sp_param_Articles_type'] = 'Type';
 $txt['sp_param_Articles_avatar'] = 'Author Avatar';
-$txt['sp_param_Articles_length'] = 'Maximum Characters';
 $txt['sp_param_Articles_attachment'] = 'Display first attachment';
+$txt['sp_param_Articles_length'] = 'Maximum Characters';
 $txt['sp_param_Articles_view'] = 'Display';
 $txt['sp_param_Shoutbox_shoutbox'] = 'Shoutbox to Display';
 $txt['sp_param_Gallery_limit'] = 'Items to Display';
@@ -287,12 +287,14 @@ $txt['sp_admin_articles_col_permissions'] = 'Permissions';
 $txt['sp_admin_articles_col_styles'] = 'Style';
 $txt['sp_admin_articles_activate'] = 'Activate';
 $txt['sp_admin_articles_deactivate'] = 'Deactivate';
+$txt['sp_admin_namespace_requirements'] = 'A unique alpha_numeric "permalink"';
 
 $txt['sp_articles_default_title'] = 'Untitled Article';
 
 $txt['sp_articles_type_bbc'] = 'BBC';
 $txt['sp_articles_type_html'] = 'HTML';
 $txt['sp_articles_type_php'] = 'PHP';
+$txt['sp_articles_type_markdown'] = 'Markdown';
 
 // Categories Area
 $txt['sp_admin_categories_title'] = 'Categories';
@@ -357,6 +359,7 @@ $txt['sp_pages_default_title'] = 'Untitled Page';
 $txt['sp_pages_type_bbc'] = 'BBC';
 $txt['sp_pages_type_html'] = 'HTML';
 $txt['sp_pages_type_php'] = 'PHP';
+$txt['sp_pages_type_markdown'] = 'Markdown';
 
 // Shoutboxes Area
 $txt['sp_admin_shoutbox_title'] = 'Shoutbox';
@@ -443,10 +446,10 @@ $txt['sp_admin_menus_col_actions'] = 'Actions';
 
 $txt['sp_admin_menus_link_type_custom'] = 'Custom';
 $txt['sp_admin_menus_link_type_action'] = 'Action';
-$txt['sp_admin_menus_link_type_board'] = 'Board';
-$txt['sp_admin_menus_link_type_page'] = 'Page';
-$txt['sp_admin_menus_link_type_category'] = 'Category';
-$txt['sp_admin_menus_link_type_article'] = 'Article';
+$txt['sp_admin_menus_link_type_boards'] = 'Board';
+$txt['sp_admin_menus_link_type_pages'] = 'Page';
+$txt['sp_admin_menus_link_type_categories'] = 'Category';
+$txt['sp_admin_menus_link_type_articles'] = 'Article';
 
 $txt['sp_admin_menus_link_target_0'] = 'Current window';
 $txt['sp_admin_menus_link_target_1'] = 'New window';
@@ -609,3 +612,9 @@ $txt['sp-adminCatDesc'] = 'Here you can manage and configure SimplePortal.';
 
 // Errors
 $txt['sp_form_errors_detected'] = 'The following error or errors occurred while saving or editing:';
+$txt['sp_php_validation_fail'] = 'PHP Validation Failed.  You have an error in your code.';
+
+// Portal CoreFeature
+$txt['core_settings_item_pt'] = 'SimplePortal';
+$txt['core_settings_item_pt_desc'] = 'Enabling this feature will enable the SimplePortal addon.';
+

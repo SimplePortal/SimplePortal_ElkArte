@@ -4,15 +4,11 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
 
 /**
  * Generic PHP Block, creates a PHP block to do whatever you can imagine :D
@@ -81,6 +77,12 @@ class Php_Block extends SP_Abstract_Block
  */
 function template_sp_php($data)
 {
-	// Can be scary :0
-	eval($data['content']);
+	try
+	{
+		eval($data['content']);
+	}
+	catch (\Throwable $e)
+	{
+		// Pass through
+	}
 }

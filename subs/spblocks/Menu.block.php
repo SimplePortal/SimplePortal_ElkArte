@@ -4,15 +4,11 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
 
 /**
  * Menu Block, creates a sidebar menu block based on the system main menu
@@ -38,6 +34,7 @@ class Menu_Block extends SP_Abstract_Block
 
 		if (empty($context['menu_buttons']))
 		{
+			setupThemeContext();
 			setupMenuContext();
 		}
 
@@ -72,8 +69,9 @@ function template_sp_menu($data)
 			{
 				echo '
 					<li ', sp_embed_class('dot', '', 'sp_list_indent'), '>
-						<a title="', $sub_button['title'], '" href="', $sub_button['href'], '">', $sub_button['title'], '</a></li>';
-}
+						<a title="', $sub_button['title'], '" href="', $sub_button['href'], '">', $sub_button['title'], '</a>
+					</li>';
+			}
 
 			echo '
 				</ul>';

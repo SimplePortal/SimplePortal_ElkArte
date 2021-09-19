@@ -4,13 +4,11 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-	die('No access...');
 
 /**
  * Board Stats block, shows count of users online names
@@ -49,7 +47,7 @@ class Board_Stats_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $modSettings, $user_info;
+		global $user_info;
 
 		$this->data['averages'] = !empty($parameters['averages']);
 
@@ -57,7 +55,7 @@ class Board_Stats_Block extends SP_Abstract_Block
 
 		// Basic totals are easy
 		$this->data['totals'] = ssi_boardStats('array');
-		$this->data['totals']['mostOnline'] = $modSettings['mostOnline'];
+		$this->data['totals']['mostOnline'] = $this->_modSettings['mostOnline'];
 
 		// Get the averages from the activity log, its the most recent snapshot
 		if ($this->data['averages'])

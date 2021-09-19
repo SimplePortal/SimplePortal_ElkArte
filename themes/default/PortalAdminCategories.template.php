@@ -4,14 +4,17 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
+
 
 function template_categories_edit()
 {
 	global $context, $scripturl, $txt;
+
+	template_show_error('category_errors');
 
 	echo '
 	<div id="sp_edit_category">
@@ -32,6 +35,7 @@ function template_categories_edit()
 						</dt>
 						<dd>
 							<input type="text" name="namespace" id="category_namespace" value="', $context['category']['category_id'], '" class="input_text" />
+							<span class="smalltext">', $txt['sp_admin_namespace_requirements'], '</span>
 						</dd>
 						<dt>
 							<label for="category_description">', $txt['sp_admin_categories_col_description'], ':</label>
