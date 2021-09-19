@@ -4,15 +4,11 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
 
 /**
  * RSS Block, Displays rss feed in a block.
@@ -119,7 +115,9 @@ class Rss_Feed_Block extends SP_Abstract_Block
 		}
 
 		$data = str_replace(array("\n", "\r", "\t"), '', $data);
-		$data = preg_replace_callback('~<\!\[CDATA\[(.+?)\]\]>~u', create_function('$m', 'return "#cdata_escape_encode#" . Util::htmlspecialchars($m[1]);'), $data);
+		$data = preg_replace_callback('~<\!\[CDATA\[(.+?)\]\]>~u', function($m) {
+			return "#cdata_escape_encode#" . Util::htmlspecialchars($m[1]);
+		}, $data);
 
 		// Find all the feed items
 		preg_match_all('~<item>(.+?)</item>~', $data, $items);
@@ -132,7 +130,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 
 			preg_match_all('~<([A-Za-z]+)>(.+?)</\\1>~', $item, $match);
 
-			foreach ($match[0] as $tag_id => $dummy)
+			foreach (array_keys($match[0]) as $tag_id)
 			{
 				if (Util::strpos($match[2][$tag_id], '#cdata_escape_encode#') === 0)
 				{

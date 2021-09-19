@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
 // Configuration area
@@ -523,4 +523,3 @@ $txt['sp-adminCatDesc'] = 'Ici vous pouvez gérer SimplePortal.';
 
 // Errors
 $txt['sp_form_errors_detected'] = 'La ou les erreurs suivantes sont survenues durant la sauvegarde ou l\'édition :';
-?>

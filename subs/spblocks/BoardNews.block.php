@@ -4,15 +4,12 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
+use BBC\ParserWrapper;
 
 /**
  * Board Block, Displays a list of posts from selected board(s)
@@ -30,19 +27,13 @@ if (!defined('ELK'))
  */
 class Board_News_Block extends SP_Abstract_Block
 {
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $attachments = array();
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $color_ids = array();
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $icon_sources = array();
 
 	/**
@@ -75,7 +66,7 @@ class Board_News_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $scripturl, $txt, $settings, $modSettings, $context;
+		global $scripturl, $txt, $settings, $context;
 
 		// Break out / sanitize all the parameters
 		$board = !empty($parameters['board']) ? explode('|', $parameters['board']) : null;
@@ -102,14 +93,14 @@ class Board_News_Block extends SP_Abstract_Block
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 			WHERE {query_see_board}
-				AND ' . (empty($board) ? 't.id_first_msg >= {int:min_msg_id}' : 't.id_board IN ({array_int:current_board})') . ($modSettings['postmod_active'] ? '
+				AND ' . (empty($board) ? 't.id_first_msg >= {int:min_msg_id}' : 't.id_board IN ({array_int:current_board})') . ($this->_modSettings['postmod_active'] ? '
 				AND t.approved = {int:is_approved}' : '') . '
 				AND (t.locked != {int:locked} OR m.icon != {string:icon})
 			ORDER BY t.id_first_msg DESC
 			LIMIT {int:limit}',
 			array(
 				'current_board' => $board,
-				'min_msg_id' => $modSettings['maxMsgID'] - 45 * min($limit, 5),
+				'min_msg_id' => $this->_modSettings['maxMsgID'] - 45 * min($limit, 5),
 				'is_approved' => 1,
 				'locked' => 1,
 				'icon' => 'moved',
@@ -124,6 +115,7 @@ class Board_News_Block extends SP_Abstract_Block
 		$this->_db->free_result($request);
 
 		// No posts, basic error message it is
+		$current_url = '';
 		if (empty($posts))
 		{
 			$this->setTemplate('template_sp_boardNews_error');
@@ -168,11 +160,12 @@ class Board_News_Block extends SP_Abstract_Block
 		}
 
 		$this->data['news'] = array();
+
 		while ($row = $this->_db->fetch_assoc($request))
 		{
 			// Good time to do this is ... now
-			censorText($row['subject']);
-			censorText($row['body']);
+			censor($row['subject']);
+			censor($row['body']);
 
 			$attach = !empty($attachments) ? $this->getMessageAttach($row['id_msg'], $row['id_topic'], $row['body']) : '';
 			$limited = sportal_parse_cutoff_content($row['body'], 'bbc', $length);
@@ -183,12 +176,12 @@ class Board_News_Block extends SP_Abstract_Block
 				$row['body'] .= '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0" title="' . $row['subject'] . '">&hellip;</a>';
 			}
 
-			if (empty($modSettings['messageIconChecks_disable']) && !isset($this->icon_sources[$row['icon']]))
+			if (empty($this->_modSettings['messageIconChecks_disable']) && !isset($this->icon_sources[$row['icon']]))
 			{
 				$this->icon_sources[$row['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['icon'] . '.png') ? 'images_url' : 'default_images_url';
 			}
 
-			if ($modSettings['sp_resize_images'])
+			if ($this->_modSettings['sp_resize_images'])
 			{
 				$row['body'] = str_ireplace('class="bbc_img', 'class="bbc_img sp_article', $row['body']);
 			}
@@ -198,21 +191,31 @@ class Board_News_Block extends SP_Abstract_Block
 				$this->color_ids[$row['id_member']] = $row['id_member'];
 			}
 
+			// If ILA is enable and what we rendered has ILA tags, assume they don't need any further attachment help
+			if (!empty($this->_modSettings['attachment_inline_enabled']))
+			{
+				if (strpos($row['body'], '<img src="' . $scripturl . '?action=dlattach;attach=') !== false)
+				{
+					$attach = array();
+				}
+			}
+
 			// Build an array of message information for output
 			$this->data['news'][] = array(
 				'id' => $row['id_topic'],
 				'message_id' => $row['id_msg'],
 				'icon' => '<img src="' . $settings[$this->icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" class="icon" alt="' . $row['icon'] . '" />',
+				'icon_name' => $row['icon'],
 				'subject' => $row['subject'],
 				'time' => standardTime($row['poster_time']),
 				'views' => $row['num_views'],
 				'body' => $row['body'],
 				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $txt['sp_read_more'] . '</a>',
+				'link' => '<a class="linkbutton" href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $txt['sp_read_more'] . '</a>',
 				'replies' => $row['num_replies'],
 				'comment_href' => !empty($row['locked']) ? '' : $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';num_replies=' . $row['num_replies'],
-				'comment_link' => !empty($row['locked']) ? '' : '| <a href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';num_replies=' . $row['num_replies'] . '">' . $txt['ssi_write_comment'] . '</a>',
-				'new_comment' => !empty($row['locked']) ? '' : '| <a href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . '">' . $txt['ssi_write_comment'] . '</a>',
+				'comment_link' => !empty($row['locked']) ? '' : '<a class="linkbutton" href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';num_replies=' . $row['num_replies'] . '">' . $txt['reply'] . '</a>',
+				'new_comment' => !empty($row['locked']) ? '' : '<a class="linkbutton" href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . '">' . $txt['reply'] . '</a>',
 				'poster' => array(
 					'id' => $row['id_member'],
 					'name' => $row['poster_name'],
@@ -243,7 +246,7 @@ class Board_News_Block extends SP_Abstract_Block
 		$this->_color_ids();
 
 		// Account for embedded videos
-		$this->data['embed_videos'] = !empty($modSettings['enableVideoEmbeding']);
+		$this->data['embed_videos'] = !empty($this->_modSettings['enableVideoEmbeding']);
 
 		if (!empty($per_page))
 		{
@@ -258,15 +261,15 @@ class Board_News_Block extends SP_Abstract_Block
 	 */
 	protected function loadAttachments($posts)
 	{
-		global $modSettings, $attachments;
+		global $attachments;
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// We will show attachments in the block, regardless, so save and restore
-		$attachmentShowImages = $modSettings['attachmentShowImages'];
-		$modSettings['attachmentShowImages'] = 1;
-		$this->attachments = getAttachments($posts, false);
-		$modSettings['attachmentShowImages'] = $attachmentShowImages;
+		$attachmentShowImages = $this->_modSettings['attachmentShowImages'];
+		$this->_modSettings['attachmentShowImages'] = 1;
+		$this->attachments = getAttachments($posts);
+		$this->_modSettings['attachmentShowImages'] = $attachmentShowImages;
 
 		if (!isset($attachments))
 		{
@@ -309,7 +312,7 @@ class Board_News_Block extends SP_Abstract_Block
 		{
 			// A little razzle dazzle since loadAttachment is dependant on this
 			// poor behavior
-			$o_topic = isset($topic) && $topic !== null ? $topic : null;
+			$o_topic = $topic ?? null;
 			$topic = $id_topic;
 			$this_attachs = loadAttachmentContext($id_msg);
 			$topic = $o_topic;
@@ -337,7 +340,8 @@ class Board_News_Block extends SP_Abstract_Block
 			}
 
 			$img_tag = substr($body, $pos, strpos($body, '[/img]', $pos) + 6);
-			$img_html = parse_bbc($img_tag);
+			$parser = ParserWrapper::instance();
+			$img_html = $parser->parseMessage($img_tag, true);
 			$body = str_replace($img_tag, '<div class="sp_attachment_thumb">' . $img_html . '</div>', $body);
 
 			return array();
@@ -394,7 +398,7 @@ function template_sp_boardNews_error($data)
  */
 function template_sp_boardNews($data)
 {
-	global $context, $scripturl, $txt;
+	global $context, $scripturl, $txt, $modSettings;
 
 	// Auto video embedding enabled?
 	if ($data['embed_videos'])
@@ -411,29 +415,31 @@ function template_sp_boardNews($data)
 		$attachment = $news['attachment'];
 
 		echo '
-			<h3 class="category_header">
-				<span class="floatleft sp_article_icon">', $news['icon'], '</span><a href="', $news['href'], '" >', $news['subject'], '</a>
+			<h3 class="category_header">' . (empty($modSettings['messageIcons_enable'])
+				? '<span class="icon i-' . $news['icon_name'] . '"></span>'
+				: '<span class="floatleft sp_article_icon">' . $news['icon'] . '</span>') . '
+				<a href="', $news['href'], '" >', $news['subject'], '</a>
 			</h3>
 			<div id="msg_', $news['message_id'], '" class="sp_article_content">
 				<div class="sp_content_padding">';
 
-		// @todo replace the <img> with $news['avatar']['img'] and some css for the max-width
 		if (!empty($news['avatar']['href']))
 		{
 			echo '
 					<a href="', $scripturl, '?action=profile;u=', $news['poster']['id'], '">
 						<img src="', $news['avatar']['href'], '" alt="', $news['poster']['name'], '" style="max-width:40px" class="floatright" />
 					</a>
-					<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], '<br />', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
+					<div>', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], '<br />', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
 		}
 		else
 		{
 			echo '
-					<div class="middletext">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], ' | ', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
+					<div>', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], ' | ', $txt['sp-articlesViews'], ': ', $news['views'], ' | ', $txt['sp-articlesComments'], ': ', $news['replies'], '</div>';
 		}
 
 		echo '
-					<div class="post"><hr />';
+					<div class="post">
+						<hr />';
 
 		if (!empty($attachment))
 		{
@@ -450,7 +456,7 @@ function template_sp_boardNews($data)
 
 		echo $news['body'], '
 					</div>
-				<div class="righttext">', $news['link'], ' ', $news['new_comment'], '</div>
+				<div class="submitbutton">', $news['link'], ' ', $news['new_comment'], '</div>
 			</div>
 		</div>';
 	}

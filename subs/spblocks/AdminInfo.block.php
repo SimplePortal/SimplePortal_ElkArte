@@ -4,20 +4,18 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
+use ElkArte\Errors\Log;
+
 
 /**
  * Admin info block
  *
- * @param mixed[] $parameters not used in this block
+ * @param array $parameters not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -33,7 +31,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $user_info, $modSettings;
+		global $user_info;
 
 		$this->data['admin'] = array();
 		$this->data['moderation'] = array();
@@ -43,7 +41,6 @@ class Admin_Info_Block extends SP_Abstract_Block
 		{
 			// Function to get the stats
 			require_once(SUBSDIR . '/Moderation.subs.php');
-			require_once(SUBSDIR . '/Error.subs.php');
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// Moderation totals
@@ -52,7 +49,8 @@ class Admin_Info_Block extends SP_Abstract_Block
 			// The admin may want to know about errors and users waiting activation
 			if ($user_info['is_admin'])
 			{
-				$this->data['admin']['errors'] = numErrors(null);
+				$errorLog = new Log(database());
+				$this->data['admin']['errors'] = $errorLog->numErrors(array());
 
 				$activation_numbers = countInactiveMembers();
 				$this->data['admin']['awaiting_activation'] = 0;
@@ -69,7 +67,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 			$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 			// Any posts / topics / attachments awaiting approval
-			if ($modSettings['postmod_active'] && !empty($approve_boards))
+			if ($this->_modSettings['postmod_active'] && !empty($approve_boards))
 			{
 				$this->data['moderation']['topics'] = $totals['topics'];
 				$this->data['moderation']['posts'] = $totals['posts'];
@@ -83,7 +81,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 			}
 
 			// Failed emails
-			if (!empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'))
+			if (!empty($this->_modSettings['maillist_enabled']) && allowedTo('approve_emails'))
 			{
 				$this->data['moderation']['emailmod'] = $totals['emailmod'];
 			}
@@ -95,13 +93,21 @@ class Admin_Info_Block extends SP_Abstract_Block
 			}
 
 			// Members waiting approval (3,4,5 codes)
-			if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])))
+			if (allowedTo('moderate_forum') && ((!empty($this->_modSettings['registration_method']) && $this->_modSettings['registration_method'] == 2) || !empty($this->_modSettings['approveAccountDeletion'])))
 			{
 				$this->data['moderation']['memberreq'] = $totals['memberreq'];
 			}
 		}
 
 		$this->setTemplate('template_sp_admininfo');
+	}
+
+	/**
+	 * Permissions check fo access to this one
+	 */
+	public static function permissionsRequired()
+	{
+		return array('admin_forum');
 	}
 }
 

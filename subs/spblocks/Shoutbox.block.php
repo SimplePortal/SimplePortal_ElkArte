@@ -4,15 +4,13 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
+use BBC\ParserWrapper;
+use BBC\PreparseCode;
 
 /**
  * Shoutbox Block, show the shoutbox thoughts box
@@ -44,6 +42,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 	 * Returns optional block parameters
 	 *
 	 * @return mixed[]
+	 * @throws \Elk_Exception
 	 */
 	public function parameters()
 	{
@@ -81,7 +80,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 
 		if (empty($this->block_parameters['shoutbox']))
 		{
-			fatal_error(allowedTo(array('sp_admin', 'sp_manage_shoutbox')) ? $txt['error_sp_no_shoutbox'] . '<br />' . sprintf($txt['error_sp_no_shoutbox_sp_moderator'], $scripturl . '?action=admin;area=portalshoutbox;sa=add') : $txt['error_sp_no_shoutbox_normaluser'], false);
+			throw new Elk_Exception(allowedTo(array('sp_admin', 'sp_manage_shoutbox')) ? $txt['error_sp_no_shoutbox'] . '<br />' . sprintf($txt['error_sp_no_shoutbox_sp_moderator'], $scripturl . '?action=admin;area=portalshoutbox;sa=add') : $txt['error_sp_no_shoutbox_normaluser'], false);
 		}
 
 		return $this->block_parameters;
@@ -94,10 +93,11 @@ class Shoutbox_Block extends SP_Abstract_Block
 	 *
 	 * @param mixed[] $parameters
 	 * @param int $id
+	 * @throws \Elk_Exception
 	 */
 	public function setup($parameters, $id)
 	{
-		global $context, $modSettings, $user_info, $settings, $txt, $editortxt;
+		global $context, $user_info, $settings, $txt;
 
 		loadTemplate('PortalShoutbox');
 		loadLanguage('Editor');
@@ -115,7 +115,10 @@ class Shoutbox_Block extends SP_Abstract_Block
 		}
 
 		// Going to add to the shoutbox \
-		if (!empty($_POST['new_shout']) && !empty($_POST['submit_shout']) && !empty($_POST['shoutbox_id']) && $_POST['shoutbox_id'] == $this->data['id'])
+		if (!empty($_POST['new_shout'])
+			&& !empty($_POST['submit_shout'])
+			&& !empty($_POST['shoutbox_id'])
+			&& $_POST['shoutbox_id'] == $this->data['id'])
 		{
 			// Make sure things are in order
 			checkSession();
@@ -126,7 +129,8 @@ class Shoutbox_Block extends SP_Abstract_Block
 				require_once(SUBSDIR . '/Post.subs.php');
 
 				$_POST['new_shout'] = Util::htmlspecialchars(trim($_POST['new_shout']));
-				preparsecode($_POST['new_shout']);
+				$preparse = PreparseCode::instance();
+				$preparse->preparsecode($_POST['new_shout'], false);
 
 				if (!empty($_POST['new_shout']))
 				{
@@ -155,15 +159,18 @@ class Shoutbox_Block extends SP_Abstract_Block
 		);
 		$this->data['shouts'] = sportal_get_shouts($this->data['id'], $shout_parameters);
 
-		$this->data['warning'] = parse_bbc($this->data['warning']);
+		$parser = ParserWrapper::instance();
+		$this->data['warning'] = $parser->parseMessage($this->data['warning'], true);
 		$context['can_shout'] = $context['user']['is_logged'];
 
 		if ($context['can_shout'])
 		{
 			// Set up the smiley tags for the shoutbox
-			$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'];
 			$this->data['smileys'] = array('normal' => array(), 'popup' => array());
-			if (empty($modSettings['smiley_enable']))
+			$settings['smileys_url'] = determineSmileySet($user_info['smiley_set'], $this->_modSettings['smiley_sets_known']);
+			$settings['smileys_url'] = $this->_modSettings['smileys_url'] . '/' . $settings['smileys_url'] . '/';
+
+			if (empty($this->_modSettings['smiley_enable']))
 			{
 				$this->data['smileys']['normal'] = $this->_smileys();
 			}
@@ -220,6 +227,11 @@ class Shoutbox_Block extends SP_Abstract_Block
 		$this->setTemplate('template_shoutbox_embed');
 	}
 
+	/**
+	 * Load in the avaialbe BBC codes that a shoutbox can use
+	 *
+	 * @return array
+	 */
 	private function _bbc()
 	{
 		global $editortxt;

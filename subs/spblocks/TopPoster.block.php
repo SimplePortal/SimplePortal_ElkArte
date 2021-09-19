@@ -4,15 +4,11 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
 
 /**
  * Top Posters block, shows the top posters on the site, with avatar and name
@@ -63,6 +59,8 @@ class Top_Poster_Block extends SP_Abstract_Block
 		// If not top poster of all time we need to set a start time
 		if (!empty($type))
 		{
+			$start_time = time();
+
 			// Today
 			if ($type == 1)
 			{
@@ -206,7 +204,7 @@ function template_sp_topPoster($data)
 			<tr>
 				<td class="sp_top_poster centertext">', !empty($member['avatar']['href']) ? '
 					<a href="' . $scripturl . '?action=profile;u=' . $member['id'] . '">
-						<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" style="max-width:40px" />
+						<img src="' . $member['avatar']['href'] . '" alt="' . $member['name'] . '" />
 					</a>' : '', '
 				</td>
 				<td>

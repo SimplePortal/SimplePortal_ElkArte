@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
 /**
@@ -25,7 +25,7 @@ function template_view_articles()
 	if (empty($context['articles']))
 	{
 		echo '
-		<div class="sp_content_padding">',
+		<div class="infobox">',
 			$txt['error_sp_no_articles'], '
 		</div>';
 	}
@@ -33,8 +33,8 @@ function template_view_articles()
 	foreach ($context['articles'] as $id => $article)
 	{
 		echo '
-			<div class="sp_content_padding">
-				<div class="sp_article_detail">';
+		<div class="sp_content_padding">
+			<div class="sp_article_detail">';
 
 		// Start off with the avatar
 		if (!empty($article['author']['avatar']['image']))
@@ -44,19 +44,18 @@ function template_view_articles()
 
 		// And now the article
 		echo '
-					<span class="sp_article_latest">
-						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '
-						<br />
-						', sprintf($article['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['views']), ', ', sprintf($article['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '
-					</span>
-					<h4>', $article['link'], '</h4>
-				</div>
-				<hr />
-				<div id="msg_', $id, '" class="inner sp_inner">', $article['preview'], '<a href="', $article['href'], '">...</a></div>
-				<div class="sp_article_extra">
-					<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
-					<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
-				</div>
+				<span class="sp_article_latest">
+					', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '
+					<br />
+					', sprintf($article['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['views']), ', ', sprintf($article['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '
+				</span>
+				<h4>', $article['link'], '</h4>
+			</div>
+			<div id="msg_', $id, '" class="inner sp_inner">', $article['preview'], '<a href="', $article['href'], '">...</a></div>
+			<div class="sp_article_extra clear">
+				<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
+				<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
+			</div>
 		</div>';
 	}
 
@@ -98,25 +97,32 @@ function template_view_article()
 		echo $context['article']['author']['avatar']['image'];
 
 	echo '
-					<span class="sp_article_latest">
-						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $context['article']['category']['link'], $context['article']['date'], $context['article']['author']['link']);
+				<span class="sp_article_latest">
+					', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $context['article']['category']['link'], $context['article']['date'], $context['article']['author']['link']);
 
 	if (!empty($context['article']['author']['avatar']['image']))
 		echo '
-						<br />';
+					<br />';
 	else
 		echo '
-					</span><br>
-					<span class="floatright">';
+				</span>
+				<br />
+				<span class="floatright">';
 
 	echo '
-					', sprintf($context['article']['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $context['article']['view_count']), ', ',
-					sprintf($context['article']['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $context['article']['comment_count']), '
-					</span>
-				</div>
-				<hr />
-				<div id="msg_', $context['article']['id'], '" class="messageContent inner sp_inner">' ,
-					$context['article']['body'];
+				', sprintf($context['article']['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $context['article']['view_count']), ', ',
+				sprintf($context['article']['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $context['article']['comment_count']), '
+				</span>
+			</div>
+			<div id="msg_', $context['article']['id'], '" class="messageContent inner sp_inner">' ,
+				$context['article']['body'];
+
+	if ($context['article']['can_moderate'] && empty($context['preview']))
+		echo '
+				<div class="submitbutton">
+					<a class="linkbutton" href="?action=admin;area=portalarticles;sa=edit;article_id=' . $context['article']['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . $txt['edit'] . '</a>
+					<a class="linkbutton" href="?action=admin;area=portalarticles;sa=delete;article_id=' . $context['article']['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['quickmod_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . $txt['delete'] . '</a>
+				</div>';
 
 	// Assuming there are attachments...
 	if (!empty($context['article']['attachment']))
@@ -125,7 +131,7 @@ function template_view_article()
 	}
 
 	echo '		
-				</div>
+			</div>
 		</div>';
 
 	// Not just previewing the new article, then show comments etc
@@ -189,7 +195,7 @@ function template_view_article()
 						<input type="submit" name="submit" value="', !empty($context['article']['comment']) ? $txt['sp_modify'] : $txt['sp_submit'], '" class="right_submit" />
 						<input type="hidden" name="comment" value="', !empty($context['article']['comment']['id']) ? $context['article']['comment']['id'] : 0, '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				</div>
+					</div>
 				</form>
 			</section>';
 		}
@@ -218,7 +224,7 @@ function template_article_schema_script()
 	$description = Util::shorten_text(preg_replace('~\s\s+~', ' ', $post));
 
 	$smd = array(
-		'@context' => 'http://schema.org',
+		'@context' => 'https://schema.org',
 		'@type' => 'Article',
 		'headline' => $context['article']['title'],
 		'author' => array(
@@ -276,11 +282,19 @@ function template_article_schema_script()
  */
 function template_sp_display_attachments($article, $ignoring)
 {
+	global $context;
+
 	echo '
-							<div id="msg_', $article['id'], '_footer" class="attachments"', $ignoring ? ' style="display:none;"' : '', '>';
+							<div id="msg_', $article['id'], '_footer" class="attachments clear"', $ignoring ? ' style="display:none;"' : '', '>';
 
 	foreach ($article['attachment'] as $attachment)
 	{
+		if (!empty($context['ila_dont_show_attach_below'])
+			&& in_array($attachment['id'], $context['ila_dont_show_attach_below']))
+		{
+			continue;
+		}
+
 		echo '
 								<figure class="attachment_block">';
 
@@ -288,19 +302,21 @@ function template_sp_display_attachments($article, $ignoring)
 		{
 			if ($attachment['thumbnail']['has_thumb'])
 				echo '
-										<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" onclick="', $attachment['thumbnail']['javascript'], '">
+										<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" ', $attachment['thumbnail']['lightbox'], '>
 											<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" />
 										</a>';
 			else
 				echo '
-										<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="width:', $attachment['width'], 'px; height:', $attachment['height'], 'px;" />';
+										<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;" />';
 		}
 
 		echo '
-										<figcaption><a href="', $attachment['href'], '" class="attachment_name">', $attachment['name'], '</a>
+										<figcaption>
+											<a href="', $attachment['href'], '" class="attachment_name">',
+												$attachment['name'], '
+											</a>
 											<span class="attachment_details">', $attachment['size'], ($attachment['is_image'] ? ' / ' . $attachment['real_width'] . 'x' . $attachment['real_height'] : ''), '</span>
-										</figcaption>';
-		echo '
+										</figcaption>
 								</figure>';
 	}
 

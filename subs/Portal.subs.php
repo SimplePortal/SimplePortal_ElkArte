@@ -4,26 +4,62 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
+use BBC\ParserWrapper;
+
+/**
+ * Return if the portal is active, or active in a given area.
+ *
+ * @return bool
+ */
+function sp_is_active()
 {
-	die('No access...');
+	global $modSettings, $context, $settings, $maintenance, $user_info;
+
+	$context['disable_sp'] = false;
+
+	// This to ensure BrowserDetector has run, Elkarte 1.1.4 will return this value properly, until then
+	// we need to make the call and then check browser_body_id below.
+	isBrowser('mobile');
+
+	// Frontpage hooks are called early in the flow
+	if (!isset($user_info['is_guest']))
+	{
+		loadUserSettings();
+	}
+
+	// Need to determine if we are even active
+	if ((!empty($modSettings['sp_disableMobile']) && $context['browser_body_id'] === 'mobile') && empty($_GET['page']) && empty($_GET['article'])
+		|| !empty($settings['disable_sp'])
+		|| !empty($modSettings['disable_sp'])
+		|| empty($modSettings['sp_portal_mode'])
+		|| ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum'))
+		|| isset($_GET['debug'])
+		|| (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'])
+		|| (empty($modSettings['front_page']) || $modSettings['front_page'] !== 'PortalMain_Controller'))
+	{
+		$context['disable_sp'] = true;
+	}
+
+	return !$context['disable_sp'];
 }
 
 /**
  * Initializes the portal, outputs all the blocks as needed
  *
  * @param boolean $standalone
+ * @throws \Elk_Exception
  */
 function sportal_init($standalone = false)
 {
-	global $context, $scripturl, $modSettings, $settings, $maintenance, $sportal_version;
+	global $context, $scripturl, $modSettings, $settings;
 
-	$sportal_version = '1.0.0 Beta 2';
+	define('SPORTAL_VERSION', '1.0.0');
+	define('SPORTAL_STALE', 'sp100');
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 	{
@@ -39,7 +75,7 @@ function sportal_init($standalone = false)
 	if (!$standalone)
 	{
 		// Load the portal css and the default css if its not yet loaded.
-		loadCSSFile('portal.css');
+		loadCSSFile('portal.css', ['stale' => SPORTAL_STALE]);
 
 		// rtl css as well?
 		if (!empty($context['right_to_left']))
@@ -66,10 +102,8 @@ function sportal_init($standalone = false)
 	}
 
 	// Portal not enabled, or mobile, or debug, or maintenance, or .... then bow out now
-	if (!empty($modSettings['sp_disableMobile']) && empty($_GET['page']) && empty($_GET['article']) || !empty($settings['disable_sp']) || empty($modSettings['sp_portal_mode']) || ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')) || isset($_GET['debug']) || (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
+	if (!sp_is_active())
 	{
-		$context['disable_sp'] = true;
-
 		if ($standalone)
 		{
 			$get_string = '';
@@ -96,7 +130,7 @@ function sportal_init($standalone = false)
 		}
 
 		// Portal specific templates and language
-		loadTemplate('Portal');
+		Templates::instance()->load('Portal');
 		loadLanguage('SPortal');
 
 		if (!empty($modSettings['sp_maintenance']) && !allowedTo('sp_admin'))
@@ -161,9 +195,9 @@ function sportal_init($standalone = false)
 	$context['SPortal']['on_portal'] = sportal_process_visibility('portal');
 
 	// Add the portal template
-	if (!Template_Layers::getInstance()->hasLayers(true) && !in_array('portal', Template_Layers::getInstance()->getLayers()))
+	if (!Template_Layers::instance()->hasLayers(true) && !in_array('portal', Template_Layers::instance()->getLayers()))
 	{
-		Template_Layers::getInstance()->add('portal');
+		Template_Layers::instance()->add('portal');
 	}
 }
 
@@ -198,17 +232,16 @@ function sportal_init_headers()
 	addJavascriptVar(array('sp_script_url' => '\'' . $safe_scripturl . '\''));
 
 	// Load up some javascript!
-	loadJavascriptFile('portal.js?sp110');
+	loadJavascriptFile('portal.js', ['stale' => SPORTAL_STALE]);
 
 	// We use drag and sort blocks for the front page
 	$javascript = '';
 	if ($modSettings['sp_portal_mode'] == 1)
 	{
-		$modSettings['jquery_include_ui'] = true;
-
 		// Javascript to allow D&D ordering of the front page blocks, not for guests
-		if (empty($_REQUEST['action']) && !($user_info['is_guest'] || $user_info['id'] == 0))
+		if (empty($_REQUEST['action']) && empty($_REQUEST['board']) && !($user_info['is_guest'] || $user_info['id'] == 0))
 		{
+			$modSettings['jquery_include_ui'] = true;
 			$javascript .= '
 				// Set up our sortable call
 				$().elkSortable({
@@ -242,9 +275,7 @@ function sportal_init_headers()
 	}
 
 	// Mark it as done so we don't do it again
-	$initialized = true;
-
-	return $initialized;
+	return true;
 }
 
 /**
@@ -374,7 +405,7 @@ function sportal_load_blocks()
 		$context['SPortal']['blocks'] = array();
 	}
 
-	// For each active block, determine it style and get an instance of it for use
+	// For each active block, determine the style and get an instance of it for use
 	foreach ($blocks as $block)
 	{
 		if (!$context['SPortal']['sides'][$block['column']]['active'] || empty($block['type']))
@@ -428,9 +459,7 @@ function sp_instantiate_block($name, $id = 0)
 		$instances[$name. '_' . $id] = new $class($db);
 	}
 
-	$instance = $instances[$name. '_' . $id];
-
-	return $instance;
+	return $instances[$name. '_' . $id];
 }
 
 /**
@@ -478,16 +507,17 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 
 	$query = array();
 	$parameters = array();
+
 	if (!empty($column_id))
 	{
 		$query[] = 'spb.col = {int:col}';
-		$parameters['col'] = !empty($column_id) ? $column_id : 0;
+		$parameters['col'] = $column_id;
 	}
 
 	if (!empty($block_id))
 	{
 		$query[] = 'spb.id_block = {int:id_block}';
-		$parameters['id_block'] = !empty($block_id) ? $block_id : 0;
+		$parameters['id_block'] = $block_id;
 	}
 
 	if (!empty($permission))
@@ -523,6 +553,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 			elseif (!isset($show_it[$row['visibility']]))
 			{
 				$show_it[$row['visibility']] = sportal_check_visibility($row['visibility']);
+
 				if ($show_it[$row['visibility']] === false)
 				{
 					continue;
@@ -568,7 +599,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
  *
  * @param string[]|string|null $query
  *
- * @return array
+ * @return boolean|array
  */
 function sportal_process_visibility($query)
 {
@@ -600,7 +631,7 @@ function sportal_process_visibility($query)
 	$page = !empty($page_info['id']) ? 'p' . $page_info['id'] : '';
 	$category = !empty($category_info['id']) ? 'c' . $category_info['id'] : '';
 	$article = !empty($article_info['id']) ? 'a' . $article_info['id'] : '';
-	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] == 1) || $action === 'portal' || !empty($context['standalone']) ? true : false;
+	$portal = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] == 1) || $action === 'portal' || !empty($context['standalone']);
 	$forum = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] != 1) || $action === 'forum';
 
 	// Will hopefully get larger in the future.
@@ -674,7 +705,14 @@ function sportal_process_visibility($query)
 			'{$forum}' => $forum,
 		);
 
-		return eval(str_replace(array_keys($variables), array_values($variables), un_htmlspecialchars($code)) . ';');
+		try
+		{
+			return eval(str_replace(array_keys($variables), array_values($variables), un_htmlspecialchars($code)) . ';');
+		}
+		catch (\Throwable $e)
+		{
+			return un_htmlspecialchars($code);
+		}
 	}
 
 	if (!empty($query))
@@ -696,7 +734,6 @@ function sportal_process_visibility($query)
 			continue;
 		}
 
-		$name = '';
 		$item = '';
 
 		// Is this a weird action?
@@ -837,7 +874,7 @@ function sportal_process_visibility($query)
  *
  * @param int $visibility_id
  *
- * @return bool if to show the block or not
+ * @return mixed if to show the block or not
  */
 function sportal_check_visibility($visibility_id)
 {
@@ -960,7 +997,7 @@ function sp_loadColors($users = array())
 	{
 		$color_profile = array();
 	}
-	// Otherwise, we will need to do some reformating of the old data.
+	// Otherwise, we will need to do some reformatting of the old data.
 	else
 	{
 		foreach ($users as $k => $u)
@@ -1040,7 +1077,9 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 			'stars' => $txt['sp-star'],
 			'arrow' => $txt['sp-arrow'],
 			'modify' => $txt['modify'],
+			'edit' => $txt['edit'],
 			'delete' => $txt['delete'],
+			'trash' => $txt['delete'],
 			'delete_small' => $txt['delete'],
 			'history' => $txt['sp_shoutbox_history'],
 			'refresh' => $txt['sp_shoutbox_refresh'],
@@ -1063,9 +1102,9 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 	$randomizer++;
 
 	// Use a default alt text if available and none was supplied
-	if (empty($alt) && isset($default_alt[$name]))
+	if (empty($alt))
 	{
-		$alt = $default_alt[$name];
+		$alt = $default_alt[$name] ?? '';
 	}
 
 	// You want a title, use the alt text if we can
@@ -1086,11 +1125,9 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 	}
 
 	// Build the image tag
-	$image = '<img src="' . $settings['sp_images_url'] . '/' . $name . '.png" alt="' . $alt . '"' . (!empty($title)
-		? ' title="' . $title . '"' : '') . (!empty($width) ? ' width="' . $width . '"' : '') . (!empty($height)
-		? ' height="' . $height . '"' : '') . (!empty($id) ? ' id="' . $id . '"' : '') . ' />';
-
-	return $image;
+	return '<img src="' . $settings['sp_images_url'] . '/' . $name . '.png" alt="' . $alt . '"' . (!empty($title)
+			? ' title="' . $title . '"' : '') . (!empty($width) ? ' width="' . $width . '"' : '') . (!empty($height)
+			? ' height="' . $height . '"' : '') . (!empty($id) ? ' id="' . $id . '"' : '') . ' />';
 }
 
 /**
@@ -1119,6 +1156,8 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 			'arrow' => $txt['sp-arrow'],
 			'modify' => $txt['modify'],
 			'delete' => $txt['delete'],
+			'trash' => $txt['delete'],
+			'edit' => $txt['edit'],
 			'delete_small' => $txt['delete'],
 			'history' => $txt['sp_shoutbox_history'],
 			'refresh' => $txt['sp_shoutbox_refresh'],
@@ -1134,13 +1173,9 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 	}
 
 	// Use a default title text if available and none was supplied
-	if (empty($title) && isset($default_title[$name]))
+	if (empty($title))
 	{
-		$title = $default_title[$name];
-	}
-	else
-	{
-		$title = $name;
+		$title = $default_title[$name] ?? $name;
 	}
 
 	// dots / start using colors
@@ -1411,6 +1446,8 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 
 	$db = database();
 
+	$page_id = is_int($page_id) || is_string($page_id) ? $page_id : 0;
+
 	// If we already have the information, just return it
 	$cache_name = implode(':', array($page_id, $active, $allowed));
 	if (isset($cache[$cache_name]))
@@ -1559,7 +1596,7 @@ function sportal_parse_cutoff_content(&$body, $type, $length = 0, $link_id = nul
  */
 function sportal_parse_content($body, $type, $output_method = 'echo')
 {
-	if (($type === 'bbc' || $type === 'html') && strpos($body, '[cutoff]') !== false)
+	if (in_array($type, array('bbc', 'html', 'markdown')) && strpos($body, '[cutoff]') !== false)
 	{
 		$body = str_replace('[cutoff]', '', $body);
 	}
@@ -1567,44 +1604,57 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 	switch ($type)
 	{
 		case 'bbc':
-			if ($output_method === 'echo')
+			$parser = ParserWrapper::instance();
+			if ($output_method !== 'echo')
 			{
-				echo parse_bbc($body);
+				return $parser->parseMessage($body, true);
 			}
-			else
+
+			echo $parser->parseMessage($body, true);
+			break;
+		case 'markdown':
+			require_once(EXTDIR . '/markdown/markdown.php');
+			if ($output_method !== 'echo')
 			{
-				return parse_bbc($body);
+				return un_htmlspecialchars(Markdown($body));
 			}
+
+			echo un_htmlspecialchars(Markdown($body));
 			break;
 		case 'html':
-			if ($output_method === 'echo')
-			{
-				echo un_htmlspecialchars($body);
-			}
-			else
+			if ($output_method !== 'echo')
 			{
 				$body = un_htmlspecialchars($body);
 				return preg_replace('~\x{00a0}~su',' ',$body);
 			}
+
+			echo un_htmlspecialchars($body);
 			break;
 		case 'php':
+			global $txt;
+
 			$body = trim(un_htmlspecialchars($body));
 			$body = trim($body, '<?php');
 			$body = trim($body, '?>');
 
 			ob_start();
-			eval($body);
-			$result = ob_get_contents();
+			try
+			{
+				eval($body);
+				$result = ob_get_contents();
+			}
+			catch (\Throwable $e)
+			{
+				$result = $txt['sp_php_validation_fail'] . ', "' . $e->getMessage() . '", ' . $txt['line'] . ' ' . $e->getLine();
+			}
 			ob_end_clean();
 
-			if ($output_method === 'echo')
-			{
-				echo $result;
-			}
-			else
+			if ($output_method !== 'echo')
 			{
 				return $result;
 			}
+
+			echo $result;
 			break;
 	}
 
@@ -1705,6 +1755,7 @@ function sportal_get_menu_items($item_id = null, $sort = 'id_item')
  * What is does:
  * - If no profile id is supplied, all profiles are returned
  * - If type = 1 (generally the case), the profile group permissions are returned
+ * - Type 2 are Style and Type 3 are Visibility profiles
  *
  * @param int|null $profile_id
  * @param int|null $type
@@ -1747,9 +1798,7 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 		$return[$row['id_profile']] = array(
 			'id' => $row['id_profile'],
 			'name' => $row['name'],
-			'label' => isset($txt['sp_admin_profiles' . substr($row['name'], 1)])
-				? $txt['sp_admin_profiles' . substr($row['name'], 1)]
-				: $row['name'],
+			'label' => $txt['sp_admin_profiles' . substr($row['name'], 1)] ?? $row['name'],
 			'type' => $row['type'],
 			'value' => $row['value'],
 		);
@@ -1773,6 +1822,7 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 		elseif ($row['type'] == 3)
 		{
 			list ($selections, $query, $mobile_view) = array_pad(explode('|', $row['value']), 3, '');
+			$query = str_replace('&vert;', '|', $query);
 
 			$return[$row['id_profile']] = array_merge($return[$row['id_profile']], array(
 				'selections' => explode(',', $selections),
@@ -1836,7 +1886,7 @@ function sp_prevent_flood($type, $fatal = true)
 
 	if (!allowedTo('admin_forum'))
 	{
-		$time_limit = isset($limits[$type]) ? $limits[$type] : $modSettings['spamWaitTime'];
+		$time_limit = $limits[$type] ?? $modSettings['spamWaitTime'];
 	}
 	else
 	{
@@ -1867,12 +1917,11 @@ function sp_prevent_flood($type, $fatal = true)
 	{
 		if ($fatal)
 		{
-			fatal_lang_error('error_sp_flood_' . $type, false, array($time_limit));
+			throw new Elk_Exception('error_sp_flood_' . $type, false, array($time_limit));
 		}
 		else
 		{
-			return isset($txt['error_sp_flood_' . $type]) ? sprintf($txt['error_sp_flood_' . $type], $time_limit)
-				: true;
+			return isset($txt['error_sp_flood_' . $type]) ? sprintf($txt['error_sp_flood_' . $type], $time_limit) : true;
 		}
 	}
 

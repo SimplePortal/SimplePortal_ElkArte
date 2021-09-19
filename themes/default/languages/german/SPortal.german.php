@@ -4,10 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- *
- * @version 1.0.0 Beta 1
+ * @version 1.0.0
  */
 
 // General strings

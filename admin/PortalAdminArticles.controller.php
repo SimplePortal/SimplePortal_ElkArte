@@ -4,15 +4,14 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
+use BBC\PreparseCode;
+use ElkArte\Errors\AttachmentErrorContext;
+use ElkArte\Errors\ErrorContext;
 
 /**
  * SimplePortal Article Administration controller class.
@@ -20,13 +19,16 @@ if (!defined('ELK'))
  */
 class ManagePortalArticles_Controller extends Action_Controller
 {
-	/** @var bool|int */
+	/** @var bool|int hold the article id if existing */
 	protected $_is_aid;
+
 	/** @var array */
 	protected $_attachments;
-	/** @var Error_Context */
+
+	/** @var ErrorContext */
 	protected $article_errors;
-	/** @var Attachment_Error_Context */
+
+	/** @var AttachmentErrorContext */
 	protected $attach_errors;
 
 	/**
@@ -205,8 +207,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '
-								<a href="?action=admin;area=portalarticles;sa=edit;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
-								<a href="?action=admin;area=portalarticles;sa=delete;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_articles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+								<a href="?action=admin;area=portalarticles;sa=edit;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('edit') . '</a>&nbsp;
+								<a href="?action=admin;area=portalarticles;sa=delete;article_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_articles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('trash') . '</a>',
 							'params' => array(
 								'id' => true,
 							),
@@ -238,8 +240,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="remove_articles" value="' . $txt['sp_admin_articles_remove'] . '" class="right_submit" />',
+					'value' => '<a class="linkbutton" href="?action=admin;area=portalarticles;sa=add;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="a">' . $txt['sp_admin_articles_add'] . '</a>
+						<input type="submit" name="remove_articles" value="' . $txt['sp_admin_articles_remove'] . '" />',
 				),
 			),
 		);
@@ -291,17 +295,6 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// Load dependency's, prepare error checking
 		$this->editInit();
 
-		// Started with HTML editor and now converting to BBC?
-		if (!empty($_REQUEST['content_mode']) && $_POST['type'] === 'bbc')
-		{
-			require_once(SUBSDIR . '/Html2BBC.class.php');
-			$convert = $_REQUEST['content'];
-			$bbc_converter = new Html_2_BBC($convert);
-			$convert = $bbc_converter->get_bbc();
-			$convert = un_htmlspecialchars($convert);
-			$_POST['content'] = $convert;
-		}
-
 		// Want to save the work?
 		if (!empty($_POST['submit']) && !$this->article_errors->hasErrors() && !$this->attach_errors->hasErrors())
 		{
@@ -326,7 +319,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// On to the editor
 		if ($context['article']['type'] === 'bbc')
 		{
-			$context['article']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), un_preparsecode($context['article']['body']));
+			$context['article']['body'] = PreparseCode::instance()->un_preparsecode($context['article']['body']);
+			$context['article']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $context['article']['body']);
 		}
 
 		$this->prepareEditor();
@@ -341,19 +335,15 @@ class ManagePortalArticles_Controller extends Action_Controller
 			$this->article_attachment_dd();
 		}
 
-		// Set the editor to the right mode based on type (bbc, html, php)
-		addInlineJavascript('
-			$(window).load(function() {
-				diewithfire = window.setTimeout(function() {sp_update_editor("' . $context['article']['type'] . '", "");}, 200);
-			});
-		');
+		// Set the globals, spplugin will be called with editor init to set mode
+		addConversionJS($context['article']['type']);
 
 		// Finally the main template
 		loadTemplate('PortalAdminArticles');
 		$context['sub_template'] = 'articles';
 
 		// The article above/below template
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = Template_Layers::instance();
 		$template_layers->add('articles_edit');
 
 		// Page out values
@@ -378,15 +368,14 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// Going to use editor, attachment and post functions
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Editor.subs.php');
-		require_once(SOURCEDIR . '/AttachmentErrorContext.class.php');
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		loadLanguage('Post');
 		loadLanguage('Errors');
 
 		// Errors are likely
-		$this->article_errors = Error_Context::context('article', 0);
-		$this->attach_errors = Attachment_Error_Context::context();
+		$this->article_errors = ErrorContext::context('article', 0);
+		$this->attach_errors = AttachmentErrorContext::context();
 		$this->attach_errors->activate();
 
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment'));
@@ -401,6 +390,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 	private function _sportal_admin_article_edit_save()
 	{
 		global $context, $txt, $modSettings;
+
+		checkSession();
 
 		// Use our standard validation functions in a few spots
 		require_once(SUBSDIR . '/DataValidator.class.php');
@@ -471,8 +462,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 			}
 		}
 
-		// Check / Save attachments
-		$this->saveArticleAttachments();
+		// Check / Prep attachments
+		$this->processArticleAttachments();
 
 		// None shall pass ... with errors
 		if ($this->article_errors->hasErrors() || $this->attach_errors->hasErrors())
@@ -489,7 +480,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			'namespace' => $validator->namespace,
 			'title' => $validator->title,
 			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
-			'type' => in_array($validator->type, array('bbc', 'html', 'php')) ? $_POST['type'] : 'bbc',
+			'type' => in_array($validator->type, array('bbc', 'html', 'php', 'markdown')) ? $_POST['type'] : 'bbc',
 			'permissions' => $validator->permissions,
 			'styles' => $validator->styles,
 			'status' => !empty($_POST['status']) ? 1 : 0,
@@ -497,20 +488,24 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		if ($article_info['type'] === 'bbc')
 		{
-			preparsecode($article_info['body']);
+			PreparseCode::instance()->preparsecode($article_info['body'], false);
 		}
 
-		// Save away
-		checkSession();
+		// Bind attachments to the article if existing, create any needed thumbnails,
+		// move them to the sp attachment directory
+		$attachIDs = $this->finalizeArticleAttachments($article_info);
+
+		// Save the article
 		$this->_is_aid = sp_save_article($article_info, empty($this->_is_aid));
 
-		// Set attachments to the article, create any needed thumbnails
-		$this->finalizeArticleAttachments();
+		// If this was a new article, with attachments, bind them to one another.
+		if (empty($validator->article_id) && !empty($attachIDs))
+		{
+			bindArticleAttachments($this->_is_aid, $attachIDs);
+		}
 
 		// And return to the listing
 		redirectexit('action=admin;area=portalarticles');
-
-		return true;
 	}
 
 	/**
@@ -518,9 +513,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 *
 	 * - Remove existing ones that have been "unchecked" in the form
 	 * - Performs security, size, type, etc checks
-	 * - Moves files to the appropriate directory
+	 * - Moves files to the current attachment directory, we will move it again to sp attachment in
+	 * the following steps.
 	 */
-	private function saveArticleAttachments()
+	private function processArticleAttachments()
 	{
 		global $user_info, $context, $modSettings;
 
@@ -529,15 +525,17 @@ class ManagePortalArticles_Controller extends Action_Controller
 		{
 			$keep_temp = array();
 			$keep_ids = array();
-			foreach ($_POST['attach_del'] as $dummy)
+			foreach ($_POST['attach_del'] as $idRemove)
 			{
-				if (strpos($dummy, 'post_tmp_' . $user_info['id']) !== false)
+				$attachID = getAttachmentIdFromPublic($idRemove);
+
+				if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
 				{
-					$keep_temp[] = $dummy;
+					$keep_temp[] = $attachID;
 				}
 				else
 				{
-					$keep_ids[] = (int) $dummy;
+					$keep_ids[] = (int) $attachID;
 				}
 			}
 
@@ -571,13 +569,11 @@ class ManagePortalArticles_Controller extends Action_Controller
 		}
 
 		// Upload any new attachments.
+		$context['attachments']['can']['post'] = (allowedTo('post_attachment')
+			|| ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		if ($context['attachments']['can']['post'])
 		{
-			if ($this->_is_aid)
-			{
-				list($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForArticle($this->_is_aid);
-			}
-
+			list($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForArticle($this->_is_aid);
 			processAttachments();
 		}
 	}
@@ -587,12 +583,11 @@ class ManagePortalArticles_Controller extends Action_Controller
 	 * and linking attachments to the specific article.  Saves the articles in the SP
 	 * attachment directory.
 	 */
-	private function finalizeArticleAttachments()
+	private function finalizeArticleAttachments(&$article_info)
 	{
-		global $context, $user_info, $ignore_temp, $modSettings;
+		global $context, $user_info, $modSettings, $ignore_temp;
 
 		$attachIDs = array();
-
 		if (empty($ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']))
 		{
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
@@ -618,8 +613,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 						'poster' => $user_info['id'],
 						'name' => $attachment['name'],
 						'tmp_name' => $attachment['tmp_name'],
-						'size' => isset($attachment['size']) ? $attachment['size'] : 0,
-						'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
+						'size' => $attachment['size'] ?? 0,
+						'mime_type' => $attachment['type'] ?? '',
 						'id_folder' => $modSettings['sp_articles_attachment_dir'],
 						'approved' => true,
 						'errors' => array(),
@@ -632,6 +627,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 						{
 							$attachIDs[] = $attachmentOptions['thumb'];
 						}
+
+						// Replace ila attach tags with the new valid attachment id and [spattach] tag
+						$article_info['body'] = preg_replace('~\[attach(.*?)\]' . $attachment['public_attachid'] . '\[\/attach\]~', '[spattach$1]' . $attachmentOptions['id'] . '[/spattach]', $article_info['body']);
 					}
 				}
 				// We have errors on this file, build out the issues for display to the user
@@ -689,6 +687,9 @@ class ManagePortalArticles_Controller extends Action_Controller
 				// We reuse this template for the preview
 				loadTemplate('PortalArticles');
 				$context['preview'] = true;
+
+				// The editor will steal focus so we have to delay
+				addInlineJavascript('setTimeout(() => $("html, body").animate({scrollTop: $("#preview_section").offset().top}, 250), 750);', true);
 			}
 		}
 		// Something new?
@@ -696,7 +697,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		{
 			$context['article'] = array(
 				'id' => 0,
-				'article_id' => 'article' . mt_rand(1, 5000),
+				'article_id' => 'article' . random_int(1, 5000),
 				'category' => array('id' => 0),
 				'title' => $txt['sp_articles_default_title'],
 				'body' => '',
@@ -759,7 +760,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		if ($article['type'] === 'bbc')
 		{
-			preparsecode($article['body']);
+			PreparseCode::instance()->preparsecode($article['body'], false);
 		}
 
 		return $article;
@@ -781,15 +782,18 @@ class ManagePortalArticles_Controller extends Action_Controller
 		}
 
 		// Fire up the editor with the values
-		$editor_options = array(
+		$editorOptions = array(
 			'id' => 'content',
 			'value' => $context['article']['body'],
 			'width' => '100%',
 			'height' => '275px',
-			'preview_type' => 2,
+			'preview_type' => 1,
 		);
-		create_control_richedit($editor_options);
-		$context['post_box_name'] = $editor_options['id'];
+		$editorOptions['plugin_addons'] = array();
+		$editorOptions['plugin_addons'][] = 'spplugin';
+		create_control_richedit($editorOptions);
+		$context['post_box_name'] = $editorOptions['id'];
+		$context['post_box_class'] = $context['article']['type'] !== 'bbc' ? 'sceditor-container' : 'sp-sceditor-container';
 		$context['attached'] = '';
 
 		// Restore their settings
@@ -810,19 +814,19 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$context['article']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		if (empty($context['article']['permission_profiles']))
 		{
-			fatal_lang_error('error_sp_no_permission_profiles', false);
+			throw new Elk_Exception('error_sp_no_permission_profiles', false);
 		}
 
 		$context['article']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
 		if (empty($context['article']['permission_profiles']))
 		{
-			fatal_lang_error('error_sp_no_style_profiles', false);
+			throw new Elk_Exception('error_sp_no_style_profiles', false);
 		}
 
 		$context['article']['categories'] = sportal_get_categories();
 		if (empty($context['article']['categories']))
 		{
-			fatal_lang_error('error_sp_no_category', false);
+			throw new Elk_Exception('error_sp_no_category', false);
 		}
 	}
 
@@ -893,17 +897,19 @@ class ManagePortalArticles_Controller extends Action_Controller
 				}
 
 				// In session but the file is missing, then some house cleaning
-				if (!file_exists($attachment['tmp_name']))
+				if (isset($attachment['tmp_name']) && !file_exists($attachment['tmp_name']))
 				{
 					unset($_SESSION['temp_attachments'][$attachID]);
 					continue;
 				}
 
+				$this->_attachments['name'] = !empty($this->_attachments['name']) ? $this->_attachments['name'] : '';
+				$this->_attachments['size'] = !empty($this->_attachments['size']) ? $this->_attachments['size'] : 0;
 				$this->_attachments['quantity']++;
 				$this->_attachments['total_size'] += $this->_attachments['size'];
 
 				$context['attachments']['current'][] = array(
-					'name' => '<u>' . htmlspecialchars($this->_attachments['name'], ENT_COMPAT, 'UTF-8') . '</u>',
+					'name' => '<span class="underline">' . htmlspecialchars($this->_attachments['name'], ENT_COMPAT) . '</span>',
 					'size' => $this->_attachments['size'],
 					'id' => $attachID,
 					'unchecked' => false,
@@ -927,6 +933,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
 		$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
 		$context['attachments']['restrictions'] = array();
+		$context['attachments']['ila_enabled'] = true;
 
 		if (!empty($modSettings['attachmentCheckExtensions']))
 		{
@@ -938,8 +945,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 		}
 
 		$context['attachments']['templates'] = array(
-			'add_new' => 'template_article_new_attachments',
 			'existing' => 'template_article_existing_attachments',
+			'add_new' => 'template_article_new_attachments',
 		);
 
 		$attachmentRestrictionTypes = array('attachmentNumPerPostLimit', 'attachmentPostLimit', 'attachmentSizeLimit');
@@ -961,9 +968,46 @@ class ManagePortalArticles_Controller extends Action_Controller
 			}
 		}
 
+		// The portal articles always allow "ila" style attachments, so show that insert interface
+		addInlineJavascript('
+		let IlaDropEvents = {
+			UploadSuccess: function($button, data) {
+				let inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
+					trigger: $(\'<div class="share icon i-share" />\'),
+					template: ' . JavaScriptEscape('<div class="insertoverlay">
+						<input type="button" class="button" value="' . $txt['insert'] . '">
+						<ul data-group="tabs" class="tabs">
+							<li data-tab="size">' . $txt['ila_opt_size'] . '</li><li data-tab="align">' . $txt['ila_opt_align'] . '</li>
+						</ul>
+						<div class="container" data-visual="size">
+							<label><input data-size="thumb" type="radio" name="imgmode">' . $txt['ila_opt_size_thumb'] . '</label>
+							<label><input data-size="full" type="radio" name="imgmode">' . $txt['ila_opt_size_full'] . '</label>
+							<label><input data-size="cust" type="radio" name="imgmode">' . $txt['ila_opt_size_cust'] . '</label>
+							<div class="customsize">
+								<input type="range" class="range" min="100" max="500"><input type="text" class="visualizesize" disabled="disabled">
+							</div>
+						</div>
+						<div class="container" data-visual="align">
+							<label><input data-align="none" type="radio" name="align">' . $txt['ila_opt_align_none'] . '</label>
+							<label><input data-align="left" type="radio" name="align">' . $txt['ila_opt_align_left'] . '</label>
+							<label><input data-align="center" type="radio" name="align">' . $txt['ila_opt_align_center'] . '</label>
+							<label><input data-align="right" type="radio" name="align">' . $txt['ila_opt_align_right'] . '</label>
+						</div>
+					</div>') . '
+				});
+				inlineAttach.addInterface($button, data.attachid);
+			},
+			RemoveSuccess: function(attachid) {
+				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
+					trigger: $(\'<div class="share icon i-share" />\')
+				});
+				inlineAttach.removeAttach(attachid);
+			}
+		};', true);
+
 		// Load up the drag and drop attachment magic
 		addInlineJavascript('
-		var dropAttach = dragDropAttachment.prototype.init({
+		var dropAttach = dragDropAttachment({
 			board: 0,
 			allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
 			totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
@@ -971,25 +1015,47 @@ class ManagePortalArticles_Controller extends Action_Controller
 			numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
 			totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
 			numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+			fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>\',
 			oTxt: ({
 				allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
 				totalSizeAllowed : ' . JavaScriptEscape($txt['attach_max_total_file_size']) . ',
 				individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
 				numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
 				postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
+				areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . ',
 			}),
+			existingSelector: ".inline_insert",
+			events: IlaDropEvents' . (!empty($this->_is_aid) ? ',
+			article: ' . $this->_is_aid : '') . '
 		});', true);
 	}
 
 	/**
-	 * Toggle an articles status on/off
+	 * Toggle an articles active status on/off
 	 */
 	public function action_status()
 	{
-		checkSession('get');
+		global $context;
+
+		checkSession(isset($_REQUEST['xml']) ? '' : 'get');
 
 		$article_id = !empty($_REQUEST['article_id']) ? (int) $_REQUEST['article_id'] : 0;
-		sp_changeState('article', $article_id);
+		$state = sp_changeState('article', $article_id);
+
+		// Doing this the ajax way?
+		if (isset($_REQUEST['xml']))
+		{
+			$context['item_id'] = $article_id;
+			$context['status'] = !empty($state) ? 'active' : 'deactive';
+
+			// Clear out any template layers, add the xml response
+			loadTemplate('PortalAdmin');
+			$template_layers = Template_Layers::instance();
+			$template_layers->removeAll();
+			$context['sub_template'] = 'change_status';
+
+			obExit();
+		}
 
 		redirectexit('action=admin;area=portalarticles');
 	}
@@ -1024,8 +1090,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// If we have some to remove ....
 		if (!empty($article_ids))
 		{
-			// Update the counts as we are about to remove some articles
-			foreach ($article_ids as $index => $article_id)
+			// Update the category counts as we are about to remove some articles
+			foreach ($article_ids as $article_id)
 			{
 				$article_info = sportal_get_articles($article_id);
 				sp_category_update_total($article_info['category']['id']);

@@ -4,15 +4,11 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
 
 /**
  * User info block, shows avatar, group, icons, posts, karma, etc
@@ -33,7 +29,7 @@ class User_Info_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $context, $scripturl, $txt, $user_info, $color_profile, $memberContext, $modSettings;
+		global $context, $scripturl, $txt, $user_info, $color_profile, $memberContext;
 
 		$this->data['session_id'] = $context['session_id'];
 		$this->data['session_var'] = $context['session_var'];
@@ -67,6 +63,7 @@ class User_Info_Block extends SP_Abstract_Block
 		else
 		{
 			$this->data['is_guest'] = false;
+			$context['admin_features'] = $context['admin_features'] ?? array();
 
 			// load up the members details
 			loadMemberData($user_info['id']);
@@ -92,7 +89,7 @@ class User_Info_Block extends SP_Abstract_Block
 			}
 
 			// What do they like?
-			if (!empty($modSettings['likes_enabled']))
+			if (!empty($this->_modSettings['likes_enabled']))
 			{
 				$this->data['show_likes'] = true;
 			}
@@ -102,17 +99,17 @@ class User_Info_Block extends SP_Abstract_Block
 			}
 
 			// Is Karma available
-			if (!empty($modSettings['karmaMode']))
+			if (!empty($this->_modSettings['karmaMode']))
 			{
 				$this->data['show_karma'] = true;
 				$this->data['member_info']['karma']['total'] = $this->data['member_info']['karma']['good'] - $this->data['member_info']['karma']['bad'];
-				$this->data['karma_label'] = $modSettings['karmaLabel'];
+				$this->data['karma_label'] = $this->_modSettings['karmaLabel'];
 
-				if ($modSettings['karmaMode'] == 1)
+				if ($this->_modSettings['karmaMode'] == 1)
 				{
 					$this->data['karma_value'] = $this->data['member_info']['karma']['total'];
 				}
-				elseif ($modSettings['karmaMode'] == 2)
+				elseif ($this->_modSettings['karmaMode'] == 2)
 				{
 					$this->data['karma_value'] = '+' . $this->data['member_info']['karma']['good'] . '/-' . $this->data['member_info']['karma']['bad'];
 				}

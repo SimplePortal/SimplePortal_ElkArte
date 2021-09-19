@@ -4,13 +4,12 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-	die('No access...');
+use BBC\ParserWrapper;
 
 /**
  * Generic BBC Block, creates a BBC formatted block with parse_bbc
@@ -45,7 +44,8 @@ class Bbc_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		$this->data['content'] = !empty($parameters['content']) ? parse_bbc($parameters['content']) : '';
+		$parser = ParserWrapper::instance();
+		$this->data['content'] = !empty($parameters['content']) ? $parser->parseMessage($parameters['content'], true) : '';
 
 		$this->setTemplate('template_sp_bbc');
 	}

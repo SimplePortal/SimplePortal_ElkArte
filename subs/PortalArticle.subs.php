@@ -4,15 +4,12 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0 Beta 1
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
+use BBC\ParserWrapper;
 
 /**
  * Returns the number of views and comments for a given article
@@ -195,7 +192,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 	$has_attachments = sportal_article_has_attachments($id_articles);
 	foreach ($has_attachments as $id_article => $article)
 	{
-		$return[$id_article]['has_attachments'] = $has_attachments[$id_article];
+		$return[$id_article]['has_attachments'] = $article;
 	}
 
 	// Use color profiles?
@@ -420,6 +417,7 @@ function sportal_get_comments($article_id = null, $limit = null, $start = null)
 	);
 	$return = array();
 	$member_ids = array();
+	$parser = ParserWrapper::instance();
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row['id_author']))
@@ -429,7 +427,7 @@ function sportal_get_comments($article_id = null, $limit = null, $start = null)
 
 		$return[$row['id_comment']] = array(
 			'id' => $row['id_comment'],
-			'body' => censorText(parse_bbc($row['body'])),
+			'body' => censor($parser->parseMessage($row['body'], true)),
 			'time' => htmlTime($row['log_time']),
 			'author' => array(
 				'id' => $row['id_author'],
@@ -529,7 +527,7 @@ function sportal_modify_article_comment($comment_id, $body)
  *
  * @param int $comment_id comment it
  *
- * @return null
+ * @return boolean
  */
 function sportal_delete_article_comment($comment_id)
 {
@@ -613,7 +611,7 @@ function sportal_recount_comments($article_id)
  *
  * - It does no permissions check.
  *
- * @param mixed[] $attachmentQuery
+ * @param array $attachmentQuery
  */
 function removeArticleAttachments($attachmentQuery)
 {
@@ -638,6 +636,7 @@ function removeArticleAttachments($attachmentQuery)
 			'restriction' => $restriction,
 		)
 	);
+	$attach = array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		$filename = $attachmentQuery['id_folder'] . '/' . $row['id_attach'] . '_' . $row['file_hash'] . '.elk';
@@ -676,6 +675,11 @@ function removeArticleAttachments($attachmentQuery)
 function attachmentsSizeForArticle($id_article, $include_count = true)
 {
 	$db = database();
+
+	if (empty($id_article))
+	{
+		return $include_count ? array(0, 0) : array(0);
+	}
 
 	if ($include_count)
 	{
@@ -719,7 +723,7 @@ function attachmentsSizeForArticle($id_article, $include_count = true)
  * - Renames the temporary file.
  * - Creates a thumbnail if the file is an image and the option enabled.
  *
- * @param mixed[] $attachmentOptions associative array of options
+ * @param array $attachmentOptions associative array of options
  * @return bool
  */
 function createArticleAttachment(&$attachmentOptions)
@@ -728,23 +732,12 @@ function createArticleAttachment(&$attachmentOptions)
 
 	$db = database();
 
+	// Going to need some help
+	require_once(SUBSDIR . '/Attachments.subs.php');
 	require_once(SUBSDIR . '/Graphics.subs.php');
 
-	// These are the only valid image types.
-	$validImageTypes = array(
-		1 => 'gif',
-		2 => 'jpeg',
-		3 => 'png',
-		5 => 'psd',
-		6 => 'bmp',
-		7 => 'tiff',
-		8 => 'tiff',
-		9 => 'jpeg',
-		14 => 'iff'
-	);
-
 	// If this is an image we need to set a few additional parameters.
-	$size = @getimagesize($attachmentOptions['tmp_name']);
+	$size = elk_getimagesize($attachmentOptions['tmp_name']);
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
 
 	// If it's an image get the mime type right.
@@ -756,9 +749,9 @@ function createArticleAttachment(&$attachmentOptions)
 			$attachmentOptions['mime_type'] = $size['mime'];
 		}
 		// Otherwise a valid one?
-		elseif (isset($validImageTypes[$size[2]]))
+		else
 		{
-			$attachmentOptions['mime_type'] = 'image/' . $validImageTypes[$size[2]];
+			$attachmentOptions['mime_type'] = getValidMimeImageType($size[2]);
 		}
 	}
 
@@ -772,7 +765,7 @@ function createArticleAttachment(&$attachmentOptions)
 	// Get the hash if no hash has been given yet.
 	if (empty($attachmentOptions['file_hash']))
 	{
-		$attachmentOptions['file_hash'] = sha1(md5($attachmentOptions['name'] . time()) . mt_rand());
+		$attachmentOptions['file_hash'] = getAttachmentFilename($attachmentOptions['name'], 0, null, true);
 	}
 
 	// Assuming no-one set the extension let's take a look at it.
@@ -788,13 +781,12 @@ function createArticleAttachment(&$attachmentOptions)
 	$db->insert('',
 		'{db_prefix}sp_attachments',
 		array(
-			'id_article' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
-			'size' => 'int', 'width' => 'int', 'height' => 'int',
-			'mime_type' => 'string-20',
+			'id_article' => 'int', 'id_member' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40',
+			'fileext' => 'string-8', 'size' => 'int', 'width' => 'int', 'height' => 'int', 	'mime_type' => 'string-20'
 		),
 		array(
-			(int) $attachmentOptions['article'], $attachmentOptions['name'], $attachmentOptions['file_hash'], $attachmentOptions['fileext'],
-			(int) $attachmentOptions['size'], (empty($attachmentOptions['width']) ? 0 : (int) $attachmentOptions['width']), (empty($attachmentOptions['height']) ? '0' : (int) $attachmentOptions['height']),
+			(int) $attachmentOptions['article'], (int) $attachmentOptions['poster'], $attachmentOptions['name'], $attachmentOptions['file_hash'],
+			$attachmentOptions['fileext'], (int) $attachmentOptions['size'], (empty($attachmentOptions['width']) ? 0 : (int) $attachmentOptions['width']), (empty($attachmentOptions['height']) ? '0' : (int) $attachmentOptions['height']),
 			(!empty($attachmentOptions['mime_type']) ? $attachmentOptions['mime_type'] : ''),
 		),
 		array('id_attach')
@@ -822,21 +814,16 @@ function createArticleAttachment(&$attachmentOptions)
 		if (createThumbnail($attachmentOptions['destination'], $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
 		{
 			// Figure out how big we actually made it.
-			$size = @getimagesize($attachmentOptions['destination'] . '_thumb');
+			$size = elk_getimagesize($attachmentOptions['destination'] . '_thumb');
 			list ($thumb_width, $thumb_height) = $size;
 
 			if (!empty($size['mime']))
 			{
 				$thumb_mime = $size['mime'];
 			}
-			elseif (isset($validImageTypes[$size[2]]))
-			{
-				$thumb_mime = 'image/' . $validImageTypes[$size[2]];
-			}
-			// Lord only knows how this happened...
 			else
 			{
-				$thumb_mime = '';
+				$thumb_mime = getValidMimeImageType($size[2]);
 			}
 
 			$thumb_filename = $attachmentOptions['name'] . '_thumb';
@@ -848,11 +835,11 @@ function createArticleAttachment(&$attachmentOptions)
 			$db->insert('',
 				'{db_prefix}sp_attachments',
 				array(
-					'id_article' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
+					'id_article' => 'int', 'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
 					'size' => 'int', 'width' => 'int', 'height' => 'int', 'mime_type' => 'string-20',
 				),
 				array(
-					(int) $attachmentOptions['article'], 3, $thumb_filename, $thumb_file_hash, $attachmentOptions['fileext'],
+					(int) $attachmentOptions['article'], (int) $attachmentOptions['poster'], 3, $thumb_filename, $thumb_file_hash, $attachmentOptions['fileext'],
 					$thumb_size, $thumb_width, $thumb_height, $thumb_mime,
 				),
 				array('id_attach')
@@ -877,6 +864,27 @@ function createArticleAttachment(&$attachmentOptions)
 	}
 
 	return true;
+}
+
+/**
+ * Binds a set of attachments to a specific article.
+ *
+ * @param int $id_article
+ * @param int[] $attachment_ids
+ */
+function bindArticleAttachments($id_article, $attachment_ids)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}sp_attachments
+		SET id_article = {int:id_article}
+		WHERE id_attach IN ({array_int:attachment_list})',
+		array(
+			'attachment_list' => $attachment_ids,
+			'id_article' => $id_article,
+		)
+	);
 }
 
 /**
@@ -941,13 +949,12 @@ function sportal_get_articles_attachments($articles, $template = false)
 	if ($template)
 	{
 		$return = array();
-
 		foreach ($attachments as $aid => $attachment)
 		{
 			foreach ($attachment as $current)
 			{
 				$return[$aid][] = array(
-					'name' => htmlspecialchars($current['filename'], ENT_COMPAT, 'UTF-8'),
+					'name' => htmlspecialchars($current['filename'], ENT_COMPAT),
 					'size' => $current['filesize'],
 					'id' => $current['id_attach'],
 					'approved' => true,
@@ -987,11 +994,11 @@ function sportal_load_attachment_context($id_article)
 		{
 			$attachmentData[$i] = array(
 				'id' => $attachment['id_attach'],
-				'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8')),
+				'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'], ENT_COMPAT)),
 				'size' => ($attachment['filesize'] < 1024000) ? round($attachment['filesize'] / 1024, 2) . ' ' . $txt['kilobyte'] : round($attachment['filesize'] / 1024 / 1024, 2) . ' ' . $txt['megabyte'],
 				'byte_size' => $attachment['filesize'],
 				'href' => $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'],
-				'link' => '<a href="' . $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'] . '">' . htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8') . '</a>',
+				'link' => '<a href="' . $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'] . '">' . htmlspecialchars($attachment['filename'], ENT_COMPAT) . '</a>',
 				'is_image' => !empty($attachment['width']) && !empty($attachment['height']) && !empty($modSettings['attachmentShowImages']),
 				'file_hash' => $attachment['file_hash'],
 				'id_folder' => $modSettings['sp_articles_attachment_dir'],
@@ -1043,6 +1050,9 @@ function sportal_load_attachment_context($id_article)
 			}
 			elseif ($attachmentData[$i]['thumbnail']['has_thumb'])
 			{
+				// Data attributes for use in expandThumb
+				$attachmentData[$i]['thumbnail']['lightbox'] = 'data-lightboxmessage="' . $id_article . '" data-lightboximage="' . $attachment['id_attach'] . '"';
+
 				// If the image is too large to show inline, make it a popup.
 				$attachmentData[$i]['thumbnail']['javascript'] = 'return expandThumb(' . $attachment['id_attach'] . ');';
 			}
@@ -1086,6 +1096,110 @@ function sportal_get_attachment_from_article($article, $attach)
 	return $attachmentData;
 }
 
+function sportal_get_attachment_thumb_from_article($article, $attach)
+{
+	$db = database();
+
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
+	// Make sure this attachment is with this article.
+	$request = $db->query('', '
+		SELECT 
+			th.filename, th.file_hash, th.fileext, th.id_attach, th.id_thumb, th.attachment_type, th.mime_type, th.width, th.height,
+			a.filename AS attach_filename, a.file_hash AS attach_file_hash, a.fileext AS attach_fileext,
+			a.id_attach AS attach_id_attach, a.id_thumb AS attach_id_thumb, a.attachment_type AS attach_attachment_type, 
+			a.mime_type AS attach_mime_type, a.width AS attach_width, a.height AS attach_height
+		FROM {db_prefix}sp_attachments AS a
+			LEFT JOIN {db_prefix}sp_attachments AS th ON (th.id_attach = a.id_thumb)
+		WHERE a.id_attach = {int:attach}',
+		array(
+			'attach' => $attach,
+			'article' => $article,
+		)
+	);
+	$attachmentData = array_fill(0, 8, '');
+	if ($db->num_rows($request) != 0)
+	{
+		$fetch = $db->fetch_assoc($request);
+
+		// If there is a hash then the thumbnail exists
+		if (!empty($fetch['file_hash']))
+		{
+			$attachmentData = array(
+				$fetch['filename'],
+				$fetch['file_hash'],
+				$fetch['fileext'],
+				$fetch['id_attach'],
+				$fetch['attachment_type'],
+				$fetch['mime_type'],
+				$fetch['width'],
+				$fetch['height'],
+			);
+		}
+		// otherwise $modSettings['attachmentThumbnails'] may be (or was) off, so original file
+		elseif (getValidMimeImageType($fetch['attach_mime_type']) !== '')
+		{
+			$attachmentData = array(
+				$fetch['attach_filename'],
+				$fetch['attach_file_hash'],
+				$fetch['attach_fileext'],
+				$fetch['attach_id_attach'],
+				$fetch['attach_attachment_type'],
+				$fetch['attach_mime_type'],
+				$fetch['attach_width'],
+				$fetch['attach_height'],
+			);
+		}
+	}
+	$db->free_result($request);
+
+	return $attachmentData;
+}
+
+/**
+ * Returns if the given attachment ID is an image file or not
+ *
+ * What it does:
+ *
+ * - Given an attachment id, checks that it exists as an attachment
+ * - Verifies the message its associated is on a board the user can see
+ * - Sets 'is_image' if the attachment is an image file
+ * - Returns basic attachment values
+ *
+ * @package Attachments
+ * @param int $id_attach
+ *
+ * @returns array|boolean
+ */
+function isArticleAttachmentImage($id_attach)
+{
+	$db = database();
+
+	// Make sure this attachment is on this board.
+	$request = $db->query('', '
+		SELECT
+			a.filename, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.size, a.width, a.height
+		FROM {db_prefix}sp_attachments as a
+		WHERE id_attach = {int:attach}
+			AND attachment_type = {int:type}
+		LIMIT 1',
+		array(
+			'attach' => $id_attach,
+			'type' => 0,
+		)
+	);
+	$attachmentData = array();
+	if ($db->num_rows($request) != 0)
+	{
+		$attachmentData = $db->fetch_assoc($request);
+		$attachmentData['is_image'] = substr($attachmentData['mime_type'], 0, 5) === 'image';
+		$attachmentData['size'] = byte_format($attachmentData['size']);
+	}
+	$db->free_result($request);
+
+	return !empty($attachmentData) ? $attachmentData : false;
+}
+
 /**
  * Get attachment count for a article or group of articles
  *
@@ -1125,4 +1239,88 @@ function sportal_article_has_attachments($articles)
 	$db->free_result($request);
 
 	return $attachments;
+}
+
+/**
+ * Load the first available attachment in an article (if any) for a group of articles
+ *
+ * - Does not check permission, assumes article access has been vetted
+ *
+ * @param array $articles array as loaded by sportal_get_articles();
+ */
+function getBlogAttachments($articles)
+{
+	// Just ones with attachments
+	$getAttachments = array();
+	foreach ($articles as $id_article => $article)
+	{
+		if (!empty($article['has_attachments']))
+		{
+			$getAttachments[] = $id_article;
+		}
+	}
+
+	// For each article, grab the first *image* attachment
+	$attachments = sportal_get_articles_attachments($getAttachments);
+	foreach ($attachments as $id_article => $attach)
+	{
+		if (!isset($articles[$id_article]['attachments']))
+		{
+			foreach ($attach as $val)
+			{
+				$is_image = !empty($val['width']) && !empty($val['height']);
+				if ($is_image)
+				{
+					$articles[$id_article]['attachments'] = $val;
+					break;
+				}
+			}
+		}
+	}
+
+	return $articles;
+}
+
+/**
+ * Load the blog level attachment details
+ *
+ * - If the article was found to have attachments (via getBlogAttachments) then
+ * it will load that attachment data for use in a template
+ * - If the message did not have attachments, it is then searched for the first
+ * bbc IMG tag, and that image is used.
+ *
+ * @param array $articles as setup by getBlogAttachments();
+ */
+function setBlogAttachments($articles)
+{
+	global $scripturl;
+
+	foreach ($articles as $id_article => $article)
+	{
+		if (!empty($article['attachments']))
+		{
+			$attachment = $article['attachments'];
+			$articles[$id_article]['attachments'] += array(
+				'id' => $attachment['id_attach'],
+				'href' => $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'],
+				'link' => '<a href="' . $scripturl . '?action=portal;sa=spattach;article=' . $id_article . ';attach=' . $attachment['id_attach'] . '">' . htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8') . '</a>',
+				'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8')),
+			);
+		}
+		// No attachments, perhaps an IMG tag then?
+		else
+		{
+			$body = $article['body'];
+			$pos = strpos($body, '[img');
+			if ($pos !== false)
+			{
+				$img_tag = substr($body, $pos, strpos($body, '[/img]', $pos) + 6);
+				$parser = ParserWrapper::instance();
+				$img_html = $parser->parseMessage($img_tag, true);
+				$articles[$id_article]['body'] = str_replace($img_tag, '<div class="sp_attachment_thumb">' . $img_html . '</div>', $body);
+			}
+		}
+	}
+
+	return $articles;
 }

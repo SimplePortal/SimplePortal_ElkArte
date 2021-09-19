@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
 global $helptxt;
@@ -25,7 +25,7 @@ $helptxt['sp_maintenance'] = 'When maintenance is enabled, portal is only visibl
 $helptxt['sp_standalone_url'] = 'Full URL to the standalone file.<br /><br />Example: http://myforum.com/portal.php';
 $helptxt['portaltheme'] = 'Select the theme which will be used for the portal.';
 $helptxt['sp_disableForumRedirect'] = 'If this box is unchecked, users will be redirected to the portal after they login or logout. If this box is checked, then users will be redirected to the BoardIndex.';
-$helptxt['sp_disableColor'] = 'If the Member Color Link mod is installed, this will disable the mod on the portal (except in the who\'s online list).';
+$helptxt['sp_disableColor'] = 'This will disable the coloring of Membergroups on the portal (except in the who\'s online list).';
 $helptxt['sp_disableMobile'] = 'Master setting to disable the portal on any devices it detects as mobile (phone not tablets).  To disable on a per block basis, leave this on and use visibility profiles.';
 $helptxt['sp_disable_random_bullets'] = 'Disables random coloring for bullet images used in portal lists.';
 $helptxt['sp_disable_php_validation'] = 'Disables validation of PHP block codes, which is to prevent syntax and database errors in code.';
@@ -40,7 +40,7 @@ $helptxt['rightwidth'] = 'If right side blocks are enabled, their width can be s
 $helptxt['sp_IntegrationHide'] = 'Use this setting to hide blocks in certain forum sections.';
 
 // Article settings
-$helptxt['sp_articles_index'] = 'This setting enables articles to be displayed on the portal.';
+$helptxt['sp_articles_index'] = 'This setting enables articles to be displayed on the portal, independent of an article block';
 $helptxt['sp_articles_index_per_page'] = 'This sets the maximum amount of articles shown per page.';
 $helptxt['sp_articles_index_total'] = 'This sets the total number of articles that will be available on the portal index';
 $helptxt['sp_articles_length'] = 'This setting allows a limit to be set on the amount of characters an article can display on the portal page. If the article exceeds this limit it will be shortened and have an ellipsis (...) link on the end, which allows the user to view the entire article.';
@@ -112,9 +112,7 @@ $helptxt['sp-shoutboxesBBC'] = 'This setting allows you to choose the BBC that c
 $helptxt['sp_MenusArea'] = 'The main menu of the forum can be modified in this area. Additional custom menus can also be created and modified here.';
 
 // Profiles area
-$helptxt['sp_ProfilesArea'] = 'Permission, style and visibility profiles can be managed in this area. The profiles are used for blocks, pages, categories, articles and shoutboxes.';
-
-$helptxt['sp_permissions'] = 'This option enables permissions to be used on blocks. The first three options are the simplest to use and understand.
+$helptxt['sp_ProfilesArea'] = 'This option enables permissions to be used on blocks. The first three options are the simplest to use and understand.
 <ul>
 	<li><strong>Guests:</strong> Any user who is not registered or logged in <em>will</em> see this block. Logged-in users (including Administrators) <em>will not</em> see this block.</li>
 	<li><strong>Members:</strong> Any user who is logged in (including Administrators) <em>will</em> see this block.</li>
@@ -147,7 +145,7 @@ $helptxt['sp_param_sp_boardNews_limit'] = 'The maximum number of news items to b
 $helptxt['sp_param_sp_boardNews_start'] = 'The ID of a particular post to start with (otherwise the first result will be used).';
 $helptxt['sp_param_sp_boardNews_length'] = 'If specified, posts exceeding this limit will be shortened and have an ellipsis (...), or a "Read More" link placed on the end.';
 $helptxt['sp_param_sp_boardNews_avatar'] = 'Enables avatars to be displayed for the member who posted the board news.';
-$helptxt['sp_param_sp_boardNews_attachment'] = 'Enables the first attachment to be displayed as a leading left floated image, giving a blog look to the block';
+$helptxt['sp_param_sp_boardNews_attachment'] = 'Enables the first attachment to be displayed as a leading left floated image, giving a blog look to the block.  If an Inline Attachment is found it will be used instead.';
 $helptxt['sp_param_sp_boardNews_per_page'] = 'How many posts to display per page. Leave empty to disable pagination.';
 $helptxt['sp_param_sp_attachmentImage_limit'] = 'How many recently attached images to display.';
 $helptxt['sp_param_sp_attachmentImage_direction'] = 'Attachment images can be aligned horizontally or vertically.';
@@ -173,7 +171,7 @@ $helptxt['sp_param_sp_articles_type'] = 'Displays random articles, or the latest
 $helptxt['sp_param_sp_articles_view'] = 'Compact will display a simple list of article titles, linked to the article.  Full will display the article full text, or up to the limit characters';
 $helptxt['sp_param_sp_articles_length'] = 'If specified, full articles exceeding this limit will be shortened and have an ellipsis (...) link placed on the end.';
 $helptxt['sp_param_sp_articles_avatar'] = 'Enables the author avatar to be displayed along with the article.';
-$helptxt['sp_param_sp_articles_attachment'] = 'Enables the first article attachment to be displayed as a leading left floated image, giving a blog look to the article block.';
+$helptxt['sp_param_sp_articles_attachment'] = 'Enables the first article attachment to be displayed as a leading left floated image, giving a blog look to the article block.  Inline image attachments will override this settings on a per article basis.';
 $helptxt['sp_param_sp_gallery_limit'] = 'How many items to display.';
 $helptxt['sp_param_sp_gallery_type'] = 'Displays random or the latest gallery items.';
 $helptxt['sp_param_sp_gallery_direction'] = 'Gallery images can be aligned horizontally or vertically.';

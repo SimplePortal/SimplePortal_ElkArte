@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
 global $helptxt;
@@ -110,7 +110,7 @@ $helptxt['sp_ShoutboxArea'] = 'Les chats ont besoin d\'être créés dans cette 
 $helptxt['sp-shoutboxesWarning'] = 'Le message d\'avertissement que vous avez mis ici sera montré dans lchat, toutes les personnes qui utiliseront le chat verront ce message.';
 $helptxt['sp-shoutboxesBBC'] = 'Cette configuration vous permet de choisir les BBC qui peuvent être utilisés dans ce chat.<br /><br />Pressez la touche CTRL pour sélectionner ou déselectionner un BBC particulier. <br /><br />Si vous sélectionnez une série de BBC consécutifs, alors cliquez sur le premier BBC que vous voulez sélectionner, pressez sur la touche MAJ, et cliquez sur le dernier BBC que vous voulez sélectionner.';
 
-$helptxt['sp_permissions'] = 'Cette option active les permissions à utiliser sur les blocs. Les trois premières options sont très simples à utiliser et à comprendre.
+$helptxt['sp_ProfilesArea'] = 'Cette option active les permissions à utiliser sur les blocs. Les trois premières options sont très simples à utiliser et à comprendre.
 <ul>
 	<li><strong>Invités :</strong> Tout utilisateur non-enregistré ou connecté <em>verra</em> ce bloc. Les utilisateurs connectés (incluant les administrateurs) <em>ne verront pas</em> ce bloc.</li>
 	<li><strong>Membres :</strong> Tout utilisateur connecté (incluant les administrateurs) <em>verra</em> ce bloc.</li>
@@ -173,5 +173,3 @@ $helptxt['sp_param_sp_gallery_direction'] = 'La galerie d\'images sera alignée 
 $helptxt['sp_param_sp_html_content'] = 'Saisiez le contenu HTML personnalisé dans cette boîte.';
 $helptxt['sp_param_sp_bbc_content'] = 'Saisiez le contenu BBC personnalisé dans cette boîte.';
 $helptxt['sp_param_sp_php_content'] = 'Saisiez le contenu PHP personnalisé dans cette boîte.';
-
-?>

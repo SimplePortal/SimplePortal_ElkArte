@@ -2,10 +2,12 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
+
+/** global: editor, start_state */
 
 /**
  * Used to collapse an individual block
@@ -14,45 +16,56 @@
  */
 function sp_collapseBlock(id)
 {
-	$("#sp_block_" + id).slideToggle(300).promise().done(function() {
-		var mode = false;
+	$("#sp_block_" + id).slideToggle(300).promise().done(function ()
+	{
+		let mode = false;
 
 		if ($("#sp_block_" + id).is(":visible"))
+		{
 			mode = true;
+		}
 
 		// Save the choice, one way for guest, or theme options for members
 		if (elk_member_id === 0)
+		{
 			document.cookie = "sp_block_" + id + "=" + (mode ? 0 : 1);
+		}
 		else
+		{
 			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null, null);
+		}
 
 		// Swap the class to change the icon
-		$("#sp_collapse_" + id).attr("class", mode ? "collapse" : "expand");
+		$("#sp_collapse_" + id).attr("class", mode ? "chevricon i-chevron-up" : "chevricon i-chevron-down");
 	});
 }
 
 /**
- * Used to collapse side (if enabled)
+ * Used to collapse sides (if enabled)
  *
  * @param {string} id
  */
 function sp_collapseSide(id)
 {
-	var sp_sides = [];
+	let sp_sides = [];
 
 	sp_sides[1] = "sp_left";
 	sp_sides[4] = "sp_right";
 
-	mode = document.getElementById(sp_sides[id]).style.display === "" ? 0 : 1;
+	let mode = document.getElementById(sp_sides[id]).style.display === "" ? 0 : 1;
 
 	// Guests use a cookie, members a theme option to remember the choice
 	if (elk_member_id === 0)
+	{
 		document.cookie = sp_sides[id] + "=" + (mode ? 0 : 1);
+	}
 	else
+	{
 		elk_setThemeOption(sp_sides[id], mode ? 0 : 1, null, null);
+	}
 
 	// Update the side expand/collapse image
-	document.getElementById("sp_collapse_side" + id).className = (mode ? "dot collapse" : "dot expand");
+	document.getElementById("sp_collapse_side" + id).className = (mode ? "icon collapse" : "icon expand");
 
 	// Hide the side with a touch of animation
 	$('#' + sp_sides[id]).toggle(400);
@@ -66,24 +79,28 @@ function sp_collapseSide(id)
  */
 function sp_collapse_object(id, has_image)
 {
-	var mode = document.getElementById("sp_object_" + id).style.display === '' ? 0 : 1;
+	let mode = document.getElementById("sp_object_" + id).style.display === '' ? 0 : 1;
 
 	$("#sp_object_" + id).toggle(300);
 
-	if (typeof(has_image) === "undefined" || has_image === true)
+	if (typeof (has_image) === "undefined" || has_image === true)
+	{
 		document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? '/collapse.png' : '/expand.png');
+	}
 }
 
 function sp_image_resize()
 {
-	var possible_images = document.getElementsByTagName("img");
+	let possible_images = document.getElementsByTagName("img");
 
 	for (var i = 0; i < possible_images.length; i++)
 	{
 		if (possible_images[i].className !== "bbc_img sp_article")
+		{
 			continue;
+		}
 
-		var temp_image = new Image();
+		let temp_image = new Image();
 		temp_image.src = possible_images[i].src;
 
 		if (temp_image.width > 300)
@@ -98,7 +115,7 @@ function sp_image_resize()
 		}
 	}
 
-	if (typeof(window_oldSPImageOnload) !== "undefined" && window_oldSPImageOnload)
+	if (typeof window_oldSPImageOnload !== "undefined" && window_oldSPImageOnload)
 	{
 		window_oldSPImageOnload();
 		window_oldSPImageOnload = null;
@@ -118,14 +135,14 @@ function sp_submit_shout(shoutbox_id, sSessionVar, sSessionId)
 	{
 		shoutbox_indicator(shoutbox_id, true);
 
-		var shout_body = escape(document.getElementById('new_shout_' + shoutbox_id).value.replace(/&#/g, "&#").php_to8bit()).replace(/\+/g, "%2B");
+		let shout_body = document.getElementById('new_shout_' + shoutbox_id).value.replace(/&#/g, "&#38;#").php_urlencode();
 
 		sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;xml', 'shoutbox_id=' + shoutbox_id + '&shout=' + shout_body + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
 
 		document.getElementById('new_shout_' + shoutbox_id).value = '';
-
-		return false;
 	}
+
+	return false;
 }
 
 /**
@@ -143,9 +160,9 @@ function sp_delete_shout(shoutbox_id, shout_id, sSessionVar, sSessionId)
 		shoutbox_indicator(shoutbox_id, true);
 
 		sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;xml', 'shoutbox_id=' + shoutbox_id + '&delete=' + shout_id + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
-
-		return false;
 	}
+
+	return false;
 }
 
 /**
@@ -161,9 +178,9 @@ function sp_refresh_shout(shoutbox_id, last_refresh)
 		shoutbox_indicator(shoutbox_id, true);
 
 		getXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;shoutbox_id=' + shoutbox_id + ';time=' + last_refresh + ';xml', onShoutReceived);
-
-		return false;
 	}
+
+	return false;
 }
 
 /**
@@ -173,7 +190,8 @@ function sp_refresh_shout(shoutbox_id, last_refresh)
  */
 function onShoutReceived(XMLDoc)
 {
-	var shout, shoutbox_id, updated, error, warning, reverse, id, author, time, timeclean, delete_link, content, is_me, new_body = '';
+	let shout, shouts, shoutbox_id, updated, error, warning, reverse, id, author, time,
+		timeclean, delete_link, content, is_me, new_body = '';
 
 	// All valid response will have these
 	shoutbox_id = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("shoutbox")[0].childNodes[0].nodeValue;
@@ -189,10 +207,14 @@ function onShoutReceived(XMLDoc)
 
 		// SHow the "warning" box at the top of the shoutbox
 		if (warning !== "0")
+		{
 			new_body += '<li class="shoutbox_warning smalltext">' + warning + '</li>';
+		}
 
 		if (error !== "0")
+		{
 			document.getElementById('shouts_' + shoutbox_id).innerHTML = new_body + '<li class="smalltext">' + error + '</li>';
+		}
 		else
 		{
 			// Display all the shouts
@@ -215,9 +237,13 @@ function onShoutReceived(XMLDoc)
 
 			// Set the display direction
 			if (reverse !== "0")
+			{
 				document.getElementById('shouts_' + shoutbox_id).scrollTop = document.getElementById('shouts_' + shoutbox_id).scrollHeight;
+			}
 			else
+			{
 				document.getElementById('shouts_' + shoutbox_id).scrollTop = 0;
+			}
 		}
 	}
 
@@ -238,19 +264,6 @@ function shoutbox_indicator(shoutbox_id, turn_on)
 	document.getElementById('shoutbox_load_' + shoutbox_id).style.display = turn_on ? '' : 'none';
 }
 
-function sp_catch_enter(key)
-{
-	var keycode;
-
-	if (window.event)
-		keycode = window.event.keyCode;
-	else if (key)
-		keycode = key.which;
-
-	if (keycode === 13)
-		return true;
-}
-
 function sp_show_ignored_shout(shout_id)
 {
 	document.getElementById('ignored_shout_' + shout_id).style.display = '';
@@ -265,17 +278,17 @@ function sp_show_history_ignored_shout(shout_id)
 
 function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_theme_url, elk_smileys_url)
 {
-	if (typeof(this.oSmileyPopupWindow) !== "undefined" && 'closed' in this.oSmileyPopupWindow && !this.oSmileyPopupWindow.closed)
+	if (typeof (this.oSmileyPopupWindow) !== "undefined" && 'closed' in this.oSmileyPopupWindow && !this.oSmileyPopupWindow.closed)
 	{
 		this.oSmileyPopupWindow.focus();
 		return;
 	}
 
-	if (typeof(sp_smileyRowsContent) === "undefined")
+	if (typeof (sp_smileyRowsContent) === "undefined")
 	{
 		var sp_smileyRowsContent = '';
 
-		for (i = 0; i < sp_smileys.length; i++)
+		for (let i = 0; i < sp_smileys.length; i++)
 		{
 			sp_smileys[i][2] = sp_smileys[i][2].replace(/"/g, '&quot;');
 			sp_smileys[i][0] = sp_smileys[i][0].replace(/"/g, '&quot;');
@@ -294,93 +307,8 @@ function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_them
 }
 
 /**
- * When using html or php, disable the editor so it does not "fight" with what
- * the user wants to enter.
- *
- * @param {string} new_state
- * @param {string} original set to true on first invocation from controller
- */
-function sp_update_editor(new_state, original)
-{
-	var $_textarea = $("textarea"),
-		instance = $_textarea.sceditor("instance"),
-		val = '';
-
-	// Going back to BBC
-	if (new_state === "bbc" && typeof(instance) === "undefined")
-	{
-		// Get the current textbox contents, treat as if html
-		if (original === 'html')
-			val =  $_textarea.html().php_unhtmlspecialchars();
-		else
-			val = '[code]' +  $_textarea.val().replace(/\n/g, '<br \>') + '[/code]';
-
-		// Start the editor again
-		elk_editor();
-
-		// load the editor with the html contents, toggle back to bbc so the editor converts it
-		instance =  $_textarea.sceditor("instance");
-		instance.sourceMode(false);
-		instance.setWysiwygEditorValue(val);
-		instance.sourceMode(true);
-	}
-	// Toggling from BBC to html or php
-	else if (new_state !== "bbc" && typeof(instance) !== "undefined" && original !== '')
-	{
-		// Update the the original text area with current editor contents and stop the editor
-		if (new_state === 'html')
-		{
-			// Get the editors html value, bypass the bbc plugin, this html will have lost
-			// its formatting but it is html
-			if (instance.getSourceEditorValue() !== '')
-			{
-				val = instance.getWysiwygEditorValue(false);
-				val = val.replace(/<span .*>\s?<\/span>/g, '').replace(/<br( \\)?>/g, "\n");
-			}
-		}
-		// From bbc to php
-		else
-		{
-			val = instance.getSourceEditorValue(false).replace(/<br( \\)?>/g, "\n").php_unhtmlspecialchars().replace('[code]', '').replace('[/code]', '');
-		}
-
-		// Don't need the editor any longer, back to a text box and set the value we determined
-		instance.destroy();
-		$("textarea").val(val);
-	}
-	// Load html to the text area
-	else if (new_state !== "bbc" && typeof(instance) !== "undefined")
-	{
-		// Update the the original text area with current editor contents and stop the editor
-		if (new_state === 'html')
-			instance.updateOriginal();
-
-		instance.destroy();
-	}
-}
-
-/**
- * Monitors the onchange and focus events for an element
- *
- * @param {string} element ID of element to attach change/focus events
- */
-function sp_editor_change_type(element) {
-    var previous;
-
-    $('#' + element).on('focus', function () {
-        // Store the current value on focus and on change
-        previous = this.value;
-    }).change(function() {
-        // Handle the editor change
-		sp_update_editor(this.value, previous);
-
-        // Make sure the previous value is updated
-        previous = this.value;
-    });
-}
-
-/**
  * Used by the theme selection block to swap the preview image
+ *
  * @param {type} obj
  */
 function sp_theme_select(obj)
@@ -391,14 +319,17 @@ function sp_theme_select(obj)
 
 /**
  * Used to swap the day on the calendar to update the days events
+ *
  * @param {type} id
  */
 function sp_collapseCalendar(id)
 {
-	new_day = "sp_calendar_" + id;
+	let new_day = "sp_calendar_" + id;
 
 	if (new_day === current_day)
+	{
 		return false;
+	}
 
 	document.getElementById(current_day).style.display = "none";
 	document.getElementById(new_day).style.display = "";
@@ -407,12 +338,13 @@ function sp_collapseCalendar(id)
 
 /**
  * Admin Blocks area, used to expand the areas under advanced
+ *
  * @param {type} id
  */
 function sp_collapseObject(id)
 {
 	var mode = document.getElementById("sp_object_" + id).style.display;
-	mode = (mode === "" | mode === "block") ? false : true;
+	mode = (!(mode === "" || mode === "block"));
 
 	// Make it close smoothly
 	$("#sp_object_" + id).slideToggle(300);
@@ -425,7 +357,7 @@ function sp_collapseObject(id)
  */
 function check_style_options()
 {
-	var	noTitle = document.getElementById("no_title").checked,
+	var noTitle = document.getElementById("no_title").checked,
 		noBody = document.getElementById("no_body").checked;
 
 	document.getElementById("title_default_class").disabled = noTitle;
@@ -461,7 +393,9 @@ function sp_surroundText(text1, text2, oTextHandle)
 			caretPos.select();
 		}
 		else
+		{
 			oTextHandle.focus(caretPos);
+		}
 	}
 	// Compliant text range wrap.
 	else if ('selectionStart' in oTextHandle)
@@ -477,9 +411,13 @@ function sp_surroundText(text1, text2, oTextHandle)
 		if (oTextHandle.setSelectionRange)
 		{
 			if (selection.length === 0)
+			{
 				oTextHandle.setSelectionRange(newCursorPos + text1.length, newCursorPos + text1.length);
+			}
 			else
+			{
 				oTextHandle.setSelectionRange(newCursorPos, newCursorPos + text1.length + selection.length + text2.length);
+			}
 
 			oTextHandle.focus();
 		}
@@ -492,4 +430,210 @@ function sp_surroundText(text1, text2, oTextHandle)
 		oTextHandle.value += text1 + text2;
 		oTextHandle.focus(oTextHandle.value.length - 1);
 	}
+}
+
+/**
+ * Updates the current version container with the current version found in the repository
+ */
+function sp_currentVersion()
+{
+	let oSPVersionContainer = document.getElementById("spCurrentVersion"),
+		oinstalledVersionContainer = document.getElementById("spYourVersion"),
+		sCurrentVersion = oinstalledVersionContainer.innerHTML;
+
+	$.getJSON('https://api.github.com/repos/SimplePortal/SimplePortal_ElkArte/releases', {format: "json"},
+		function (data, textStatus, jqXHR)
+		{
+			let mostRecent = {},
+				init_news = false;
+
+			$.each(data, function (idx, elem)
+			{
+				// No drafts, thank you
+				if (elem.draft)
+				{
+					return;
+				}
+
+				mostRecent = elem;
+
+				// Load announcements for this release
+				sp_setAnnouncement(init_news, elem);
+				init_news = true;
+			});
+
+			let spVersion = mostRecent.tag_name.replace(/simpleportal/i, '').trim();
+
+			oSPVersionContainer.innerHTML = spVersion;
+			if (sCurrentVersion !== spVersion)
+			{
+				oinstalledVersionContainer.innerHTML = '<span class="alert">' + sCurrentVersion + '</span>';
+			}
+		}
+	);
+}
+
+/**
+ * Load in any announcements
+ *
+ * @param init_news
+ * @param announcement
+ */
+function sp_setAnnouncement(init_news, announcement)
+{
+	var oElem = document.getElementById('spAnnouncements'),
+		sMessages = init_news ? oElem.innerHTML : '',
+		sAnnouncementTemplate = '<dl>%content%</dl>',
+		sAnnouncementMessageTemplate = '<dt><a href="%href%">%subject%</a> :: %time%</dt><dd>%message%</dd>';
+
+	var sMessage = sAnnouncementMessageTemplate.replace('%href%', announcement.html_url).replace('%subject%', announcement.name).replace('%time%', announcement.published_at.replace(/[TZ]/g, ' ')).replace('%message%', announcement.body).replace(/\n/g, '<br />').replace(/\r/g, '');
+
+	oElem.innerHTML = sMessages + sAnnouncementTemplate.replace('%content%', sMessage);
+}
+
+/**
+ * Sends an xml request to enable / disable pages, categories, articles, etc.
+ *
+ * @param {int} id
+ * @param {string} type
+ * @returns {boolean}
+ */
+function sp_change_status(id, type)
+{
+	if (type === 'articles')
+	{
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalarticles;sa=status;xml', 'article_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
+	}
+
+	if (type === 'category')
+	{
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalcategories;sa=status;xml', 'category_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
+	}
+
+	if (type === 'page')
+	{
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalpages;sa=status;xml', 'page_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
+	}
+
+	if (type === 'block')
+	{
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalblocks;sa=statechange;xml', 'block_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
+	}
+
+	return false;
+}
+
+/**
+ * Callback function for XML enable ... updates the UI enabled/disabled image as needed.
+ *
+ * @param XMLDoc
+ * @returns {boolean}
+ */
+function sp_on_status_received(XMLDoc)
+{
+	// If it is not valid then clean up
+	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk'))
+	{
+		return false;
+	}
+
+	let xml = XMLDoc.getElementsByTagName('elk')[0],
+		id = xml.getElementsByTagName('id')[0].childNodes[0].nodeValue,
+		status = xml.getElementsByTagName('status')[0].childNodes[0].nodeValue,
+		label = xml.getElementsByTagName('label')[0].childNodes[0].nodeValue,
+		old = status === 'active' ? 'deactive.png' : 'active.png';
+
+	if (id !== 0)
+	{
+		status_image = document.getElementById('status_image_' + id);
+		status_image.src = status_image.src.replace(old, status + '.png');
+		status_image.alt = status_image.title = label;
+	}
+
+	return false;
+}
+
+/**
+ * Monitors the onchange and focus events for the article/page type select box
+ * keeps track of previous and new states (bbc, html, markdown, etc) so conversion
+ * can be attempted.
+ *
+ * @param {string} element ID of element to attach change/focus events
+ */
+function sp_editor_change_type(element)
+{
+	var initial_state;
+
+	$('#' + element).on('focus', function ()
+	{
+		// Store the current value on focus
+		initial_state = this.value;
+	}).change(function ()
+	{
+		// Handle the editor change of format
+		$.sceditor.plugins.spplugin(initial_state, this.value);
+
+		// Make sure the previous value is updated
+		initial_state = this.value;
+	});
+}
+
+/**
+ * Convert the current editor formatting syntax to another language
+ *
+ * @param {string} initial_state one of bbc, html, markdown, php
+ * @param {string} new_state one of bbc, html, markdown, php
+ */
+function sp_to_new(initial_state, new_state) {
+	// Get the current contents and send to off for conversion
+	let val = editor.getSourceEditorValue(false);
+
+	// Send it to the server for conversion
+	sp_change_format(val, initial_state, new_state);
+
+	// If BBC show the editor toolbar
+	document.getElementById("editor_toolbar_container").style.display = (new_state === 'bbc' ? 'block' : 'none');
+}
+
+/**
+ * Sends an xml request to change the format of the editor box
+ *
+ * @param {string} text The current text
+ * @param {string} from Going to bbc, html, php, markdown
+ * @param {string} to Going to bbc, html, php, markdown
+ * @returns {boolean}
+ */
+function sp_change_format(text, from, to)
+{
+	text = text.replace(/&#/g, "&#38;#").php_urlencode();
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalconfig;sa=formatchange;xml', 'text=' + text + '&' + 'from=' + from + '&' + 'to=' + to + '&' + elk_session_var + '=' + elk_session_id, sp_on_format_received);
+
+	return false;
+}
+
+/**
+ * Callback function for XML format ... updates the editor as needed.
+ *
+ * @param XMLDoc
+ * @returns {boolean}
+ */
+function sp_on_format_received(XMLDoc)
+{
+	// If it is not valid then clean up
+	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk'))
+	{
+		return false;
+	}
+
+	let xml = XMLDoc.getElementsByTagName('elk')[0],
+		val = xml.getElementsByTagName('format')[0].firstChild;
+
+	val = val !== null ? val.nodeValue : '';
+
+	// Put the response in the editor wizzy and then toggle back to source
+	editor.sourceMode(false);
+	editor.val(val, true);
+	editor.sourceMode(true);
+
+	return false;
 }

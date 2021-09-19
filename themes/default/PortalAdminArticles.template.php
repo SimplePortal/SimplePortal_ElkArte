@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
 /**
@@ -20,7 +20,7 @@ function template_articles_edit_above()
 	// Taking a peek before you publish?
 	echo '
 	<div id="preview_section" class="forumposts"', !empty($context['preview']) ? '' : ' style="display: none;"', '>',
-	!empty($context['preview']) ? template_view_article() : '', '
+		!empty($context['preview']) ? template_view_article() : '', '
 	</div>';
 
 	// If an error occurred, explain what happened.
@@ -52,6 +52,7 @@ function template_articles_edit_above()
 						</dt>
 						<dd>
 							<input type="text" name="namespace" id="article_namespace" value="', $context['article']['article_id'], '" class="input_text" />
+							<span class="smalltext">', $txt['sp_admin_namespace_requirements'], '</span>
 						</dd>
 						<dt>
 							<label for="article_category">', $txt['sp_admin_articles_col_category'], ':</label>
@@ -74,7 +75,7 @@ function template_articles_edit_above()
 						<dd>
 							<select name="type" id="article_type">';
 
-	$content_types = array('bbc', 'html', 'php');
+	$content_types = array('bbc', 'html', 'php', 'markdown');
 	foreach ($content_types as $type)
 	{
 		echo '
@@ -130,11 +131,11 @@ function template_articles()
 {
 	global $context, $txt;
 
-	echo '
-					<div>', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message'), '</div>
+	echo
+					template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message'), '
 					<div class="submitbutton">
-						<input type="submit" name="submit" value="', $context['page_title'], '" accesskey="s" tabindex="', $context['tabindex']++, '" class="button_submit" />
-						<input type="submit" name="preview" value="', $txt['sp_admin_articles_preview'], '" accesskey="p" tabindex="', $context['tabindex']++, '" class="button_submit" />
+						<input type="submit" name="submit" value="', $context['page_title'], '" accesskey="s" tabindex="', $context['tabindex']++, '" />
+						<input type="submit" name="preview" value="', $txt['sp_admin_articles_preview'], '" accesskey="p" tabindex="', $context['tabindex']++, '" />
 						<input type="hidden" name="article_id" value="', $context['article']['id'], '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
 
@@ -147,6 +148,7 @@ function template_articles()
 
 	echo '
 					</div>';
+
 
 	addInlineJavascript('sp_editor_change_type("article_type");', true);
 }
@@ -161,16 +163,16 @@ function template_articles_edit_below()
 	echo '
 					<div id="postAdditionalOptions">';
 
-	// If this post already has attachments on it - give information about them.
-	if (!empty($context['attachments']['current']))
-	{
-		$context['attachments']['templates']['existing']();
-	}
-
 	// Is the user allowed to post any additional ones? If so give them the boxes to do it!
 	if ($context['attachments']['can']['post'])
 	{
 		$context['attachments']['templates']['add_new']();
+	}
+
+	// If this post already has attachments on it - give information about them.
+	if (!empty($context['attachments']['current']))
+	{
+		$context['attachments']['templates']['existing']();
 	}
 
 	echo '
@@ -182,28 +184,21 @@ function template_articles_edit_below()
 }
 
 /**
- * Creates a list of attachments already attached to this message
+ * Creates a list of attachments already attached to this article
  */
 function template_article_existing_attachments()
 {
-	global $context, $txt, $modSettings;
-
-	echo '
-						<dl id="postAttachment">
-							<dt>
-								', $txt['attached'], ':
-							</dt>
-							<dd class="smalltext" style="width: 100%;">
-								<input type="hidden" name="attach_del[]" value="0" />
-								', $txt['uncheck_unwatchd_attach'], ':
-							</dd>';
+	global $context;
 
 	foreach ($context['attachments']['current'] as $attachment)
 	{
+		$label = $attachment['name'];
+
 		echo '
 							<dd class="smalltext">
-								<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'],
-								!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']) ? sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0)) : '', '</label>
+								<label for="attachment_', $attachment['id'], '">
+									<input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check inline_insert" data-attachid="', $attachment['id'], '" data-size="', $attachment['size'], '"/> ', $label, '
+								</label>
 							</dd>';
 	}
 
@@ -219,6 +214,7 @@ function template_article_new_attachments()
 	global $context, $txt, $modSettings;
 
 	echo '
+						<span id="postAttachment"></span>
 						<dl id="postAttachment2">';
 
 	// But, only show them if they haven't reached a limit
@@ -226,8 +222,10 @@ function template_article_new_attachments()
 	{
 		echo '
 							<dt class="drop_area">
-								<i class="fa fa-upload"></i> ', $txt['attach_drop_files'], '
-								<input class="drop_area_fileselect input_file" type="file" multiple="multiple" name="attachment_click[]" id="attachment_click" />
+								<i class="icon i-upload"></i>
+								<span class="desktop">', $txt['attach_drop_files'], '</span>
+								<span class="mobile">', $txt['attach_drop_files_mobile'], '</span>
+								<input id="attachment_click" class="drop_area_fileselect input_file" type="file" multiple="multiple" name="attachment_click[]" />
 							</dt>
 							<dd class="progress_tracker"></dd>
 							<dd class="drop_attachments_error"></dd>
@@ -243,7 +241,7 @@ function template_article_new_attachments()
 		{
 			echo '
 								<script>
-									var allowed_attachments = ', $context['attachments']['num_allowed'], ',
+									let allowed_attachments = ', $context['attachments']['num_allowed'], ',
 										current_attachment = 1,
 										txt_more_attachments_error = "', $txt['more_attachments_error'], '",
 										txt_more_attachments = "', $txt['more_attachments'], '",
@@ -284,6 +282,5 @@ function template_article_new_attachments()
 	}
 
 	echo '
-							</dd>
-						</dl>';
+							</dd>';
 }

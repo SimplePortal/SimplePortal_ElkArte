@@ -4,15 +4,11 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
 
 /**
  * SimplePortal Shoutbox Administration controller class.
@@ -171,7 +167,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 							'format' => '
 								<a href="?action=admin;area=portalshoutbox;sa=edit;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="m">' . sp_embed_image('modify') . '</a>&nbsp;
 								<a href="?action=admin;area=portalshoutbox;sa=prune;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="p">' . sp_embed_image('bin') . '</a>&nbsp;
-								<a href="?action=admin;area=portalshoutbox;sa=delete;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_shoutbox_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+								<a href="?action=admin;area=portalshoutbox;sa=delete;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_shoutbox_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('trash') . '</a>',
 							'params' => array(
 								'id' => true,
 							),
@@ -258,14 +254,14 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			{
-				fatal_lang_error('sp_error_shoutbox_name_empty', false);
+				throw new Elk_Exception('sp_error_shoutbox_name_empty', false);
 			}
 
 			// No two the same
 			$has_duplicate = sp_check_duplicate_shoutbox($_POST['name'], $_POST['shoutbox_id']);
 			if (!empty($has_duplicate))
 			{
-				fatal_lang_error('sp_error_shoutbox_name_duplicate', false);
+				throw new Elk_Exception('sp_error_shoutbox_name_duplicate', false);
 			}
 
 			if (isset($_POST['moderator_groups']) && is_array($_POST['moderator_groups']) && count($_POST['moderator_groups']) > 0)
@@ -358,7 +354,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 		if (empty($context['SPortal']['shoutbox']['permission_profiles']))
 		{
-			fatal_lang_error('error_sp_no_permission_profiles', false);
+			throw new Elk_Exception('error_sp_no_permission_profiles', false);
 		}
 
 		// We only allow some BBC in the shoutbox
@@ -421,7 +417,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 		if (empty($context['shoutbox']))
 		{
-			fatal_lang_error('error_sp_shoutbox_not_exist', false);
+			throw new Elk_Exception('error_sp_shoutbox_not_exist', false);
 		}
 
 		// Time to remove some chitta-chatta

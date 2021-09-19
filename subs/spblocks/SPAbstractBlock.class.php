@@ -4,15 +4,12 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
+use ElkArte\ValuesContainer;
 
 /**
  * Abstract Simple Portal block
@@ -22,54 +19,46 @@ if (!defined('ELK'))
  */
 abstract class SP_Abstract_Block
 {
-	/**
-	 * Database object
-	 * @var object
-	 */
-	protected $_db = null;
+	/** @var \Database*/
+	protected $_db;
 
-	/**
-	 * Block parameters
-	 * @var array
-	 */
+	/** @var array|\ElkArte\ValuesContainer */
+	protected $_modSettings = array();
+
+	/** @var array Block parameters */
 	protected $block_parameters = array();
 
-	/**
-	 * Data array for use in the blocks
-	 * @var mixed[]
-	 */
+	/** @var array Data array for use in the blocks */
 	protected $data = array();
 
-	/**
-	 * Name of the template function to call
-	 * @var string
-	 */
+	/** @var string Name of the template function to call */
 	protected $template = '';
 
-	/**
-	 * If the block supports refreshing, sets the time in seconds
-	 * @var array
-	 */
+	/** @var array If the block supports refreshing, sets the time in seconds */
 	protected $refresh = array();
 
 	/**
-	 * Class constructor, makes db available
+	 * Class constructor, makes db and modSettings available to the blocks
+	 *
+	 * - Called by sp_instantiate_block function (via block constructor)
 	 *
 	 * @param Database|null $db
 	 */
 	public function __construct($db = null)
 	{
+		global $modSettings;
+
 		$this->_db = $db;
 
-		// Allow custom blocks to set $txt values for name and description
-		$this->blockName();
-		$this->blockDescription();
+		$this->_modSettings = new ValuesContainer($modSettings ?: array());
 	}
 
 	/**
-	 * Returns optional block parameters
+	 * Returns block parameters used to build the ACP block "options" configuration page
 	 *
-	 * @return mixed[]
+	 * - Possible Params include boards|boards_select|check|int|select|text|textarea
+	 *
+	 * @return array
 	 */
 	public function parameters()
 	{
@@ -89,6 +78,9 @@ abstract class SP_Abstract_Block
 	/**
 	 * Called as part of the sportal_load_blocks process to initiate a block prior
 	 * to its being displayed.
+	 *
+	 * @param array $parameters
+	 * @param int $id
 	 */
 	abstract public function setup($parameters, $id);
 
@@ -104,7 +96,7 @@ abstract class SP_Abstract_Block
 	}
 
 	/**
-	 * Validates that a user can access a block
+	 * Validates that a user can access a block, defaults to yes they can
 	 *
 	 * @return string[]
 	 */
@@ -115,7 +107,7 @@ abstract class SP_Abstract_Block
 
 	/**
 	 * Sets the name of the block in $txt string for use with custom
-	 * blocks.  $txt['sp_function_Block_Name_label']
+	 * blocks. $txt['sp_function_Block_Name_label']
 	 *
 	 * @return string
 	 */
@@ -146,7 +138,7 @@ abstract class SP_Abstract_Block
 		addInlineJavascript('
 			$(document).ready(function()
 			{
-				var $block = $("#sp_block_' . (int) $this->refresh['id'] . '"),
+				let $block = $("#sp_block_' . (int) $this->refresh['id'] . '"),
 					$container = $block.find("' . $this->refresh['class'] . '"),
 					params = {"block" : ' . (int) $this->refresh['id'] . '};
 

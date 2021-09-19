@@ -4,15 +4,11 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
 
 /**
  * SimplePortal Profiles Administration controller class.
@@ -181,8 +177,8 @@ class ManagePortalProfile_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=portalprofiles;sa=editpermission;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
-								<a href="?action=admin;area=portalprofiles;sa=deletepermission;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_profiles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+							'format' => '<a href="?action=admin;area=portalprofiles;sa=editpermission;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('edit') . '</a>&nbsp;
+								<a href="?action=admin;area=portalprofiles;sa=deletepermission;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_profiles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('trash') . '</a>',
 							'params' => array(
 								'id' => true,
 							),
@@ -280,7 +276,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			// Always clean the name
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			{
-				fatal_lang_error('sp_error_profile_name_empty', false);
+				throw new Elk_Exception('sp_error_profile_name_empty', false);
 			}
 
 			list($groups_allowed, $groups_denied) = $this->_group_permissions();
@@ -448,8 +444,8 @@ class ManagePortalProfile_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '
-								<a href="?action=admin;area=portalprofiles;sa=editstyle;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
-								<a href="?action=admin;area=portalprofiles;sa=deletestyle;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_profiles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+								<a href="?action=admin;area=portalprofiles;sa=editstyle;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('edit') . '</a>&nbsp;
+								<a href="?action=admin;area=portalprofiles;sa=deletestyle;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_profiles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('trash') . '</a>',
 							'params' => array(
 								'id' => true,
 							),
@@ -520,7 +516,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			// Always clean the profile name
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			{
-				fatal_lang_error('sp_error_profile_name_empty', false);
+				throw new Elk_Exception('sp_error_profile_name_empty', false);
 			}
 
 			// Add the data to place in the fields
@@ -638,8 +634,8 @@ class ManagePortalProfile_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '
-								<a href="?action=admin;area=portalprofiles;sa=editvisibility;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('modify') . '</a>&nbsp;
-								<a href="?action=admin;area=portalprofiles;sa=deletevisibility;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_profiles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('delete') . '</a>',
+								<a href="?action=admin;area=portalprofiles;sa=editvisibility;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('edit') . '</a>&nbsp;
+								<a href="?action=admin;area=portalprofiles;sa=deletevisibility;profile_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_profiles_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('trash') . '</a>',
 							'params' => array(
 								'id' => true,
 							),
@@ -710,7 +706,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			// Always clean the profile name
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			{
-				fatal_lang_error('sp_error_profile_name_empty', false);
+				throw new Elk_Exception('sp_error_profile_name_empty', false);
 			}
 
 			// Get the form values
@@ -808,6 +804,7 @@ class ManagePortalProfile_Controller extends Action_Controller
 			foreach ($items as $item)
 			{
 				$item = Util::htmltrim(Util::htmlspecialchars($item, ENT_QUOTES));
+				$item = str_replace('|', '&vert;', $item);
 
 				if ($item !== '')
 				{

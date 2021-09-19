@@ -4,13 +4,13 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015 SimplePortal Team
+ * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 2
+ * @version 1.0.0
  *
  * This version of SimplePortal is based on SimplePortal core 2.4
  *
- * 	This file here, unbelievably, has your portal within.
+ * This file here, unbelievably, has your portal within.
  *
  * In order to use SimplePortal in standalone mode:
  * - Go to "SPortal Admin" >> "Configuration" >> "General Settings"
@@ -36,15 +36,19 @@ if (!file_exists($forum_dir . '/index.php'))
 	die('Wrong $forum_dir value. Please make sure that the $forum_dir variable points to your forum\'s directory.');
 }
 
+// Load the SSI magic.
+require_once($forum_dir . '/SSI.php');
 // Get out the forum's Elkarte version number.
 $data = substr(file_get_contents($forum_dir . '/index.php'), 0, 4096);
 if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $data, $match))
 {
 	$forum_version = 'ElkArte ' . $match[1];
+	if (!defined('FORUM_VERSION'))
+	{
+		define('FORUM_VERSION', $forum_version);
+	}
 }
 
-// Load the SSI magic.
-require_once($forum_dir . '/SSI.php');
 
 // Its all about the blocks
 require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');
@@ -58,7 +62,7 @@ writeLog();
 
 // Articles
 require_once(CONTROLLERDIR . '/PortalMain.controller.php');
-$controller = new Sportal_Controller();
+$controller = new PortalMain_Controller();
 $controller->pre_dispatch();
 $controller->action_index();
 
