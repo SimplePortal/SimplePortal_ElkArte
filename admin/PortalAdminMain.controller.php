@@ -103,7 +103,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 			}
 			else
 			{
-				updateSettings(array('front_page' => ''));
+				updateSettings(array('front_page' => 'MessageIndex_Controller'));
 			}
 
 			$this->_generalSettingsForm->setConfigValues($_POST);
