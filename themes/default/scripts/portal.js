@@ -4,7 +4,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 RC2
+ * @version 1.0.0
  */
 
 /** global: editor, start_state */

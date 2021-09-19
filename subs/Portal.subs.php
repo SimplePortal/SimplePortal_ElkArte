@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 RC2
+ * @version 1.0.0
  */
 
 use BBC\ParserWrapper;
@@ -58,8 +58,8 @@ function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings;
 
-	define('SPORTAL_VERSION', '1.0.0 RC2');
-	define('SPORTAL_STALE', 'spRC2');
+	define('SPORTAL_VERSION', '1.0.0');
+	define('SPORTAL_STALE', 'sp100');
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 	{

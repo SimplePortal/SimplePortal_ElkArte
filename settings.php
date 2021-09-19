@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 RC2
+ * @version 1.0.0
  */
 
 if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
@@ -37,7 +37,7 @@ $defaults = array(
 );
 
 $updates = array(
-	'sp_version' => '1.0 RC2',
+	'sp_version' => '1.0.0',
 	'front_page' => 'PortalMain_Controller',
 	'admin_features' => $modSettings['admin_features'] . ',pt'
 );
