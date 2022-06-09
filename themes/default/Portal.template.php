@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 use BBC\ParserWrapper;
@@ -298,7 +298,10 @@ function template_block($block, $side = -1)
 
 	// Board news gets special formatting, really intended to be at the top of a column
 	// @todo move the sp_boardNews-specific style to the board news template
-	if ($block['type'] === 'BoardNews')
+	// This prevents it from being in a collapsible div?  Has not been working in years as the 'type'
+	// was wrong (fixed now) but wanted ?
+	/*
+	if ($block['type'] === 'Board_News')
 	{
 		echo '
 			<div id="sp_block_', $block['id'], '" class="sp_block_section', isset($context['SPortal']['sides'][$block['column']]['last']) && $context['SPortal']['sides'][$block['column']]['last'] == $block['id'] && ($block['column'] != 2 || empty($modSettings['sp_articles_index'])) ? '_last' : '', '">';
@@ -310,6 +313,7 @@ function template_block($block, $side = -1)
 
 		return;
 	}
+	*/
 
 	if (isset($txt['sp_custom_block_title_' . $block['id']]))
 	{
@@ -328,7 +332,7 @@ function template_block($block, $side = -1)
 function template_block_default($block, $side)
 {
 	echo '
-					<div class="sp_block_container" id="block_' . $block['id'] . ',' . $side . '">';
+					<div class="sp_block_container sp_block_' . strtolower($block['type']) . '" id="block_' . $block['id'] . ',' . $side . '">';
 
 	// Show a title bar or not, some blocks have their own bars
 	if (empty($block['style']['no_title']))
@@ -357,13 +361,10 @@ function template_block_default($block, $side)
 						<div id="sp_block_' . $block['id'] . '" class="sp_block_section', empty($block['style']['no_body'])
 		? (empty($block['style']['body']['class']) ? '"' : ' ' . $block['style']['body']['class'] . '"')
 		: ' sp_no_body_style"', $block['collapsed'] && empty($block['force_view'])
-		? ' style="display: none;"'
-		: '', '>
-							<div class="', 	$block['type'] !== 'sp_menu'
-		? 'sp_block sp_' : 'sp_content_padding sp_', strtolower($block['type']), '"',
-		!empty($block['style']['body']['style'])
-		? ' style="' . $block['style']['body']['style'] . '"'
-		: '', '>';
+		? ' style="display: none;"' : '', '>
+							<div class="',
+		$block['type'] !== 'Menu' ? 'sp_block sp_' : 'sp_content_padding sp_', strtolower($block['type']), '"',
+		!empty($block['style']['body']['style']) ? ' style="' . $block['style']['body']['style'] . '"' : '', '>';
 
 	// Call the block routine
 	$block['instance']->render();
