@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 /**
@@ -34,7 +34,7 @@ function template_view_articles()
 	{
 		echo '
 		<div class="sp_content_padding">
-			<div class="sp_article_detail">';
+			<div class="sp_article_detail category_header">';
 
 		// Start off with the avatar
 		if (!empty($article['author']['avatar']['image']))
@@ -91,7 +91,7 @@ function template_view_article()
 
 	echo '
 		<div class="sp_content_padding ', $context['article']['style']['body']['class'], '"', !empty($context['article']['style']['body']['style']) ? ' style="' . $context['article']['style']['body']['style'] . '"' : '', '>
-			<div class="sp_article_detail">';
+			<div class="sp_article_detail category_header">';
 
 	if (!empty($context['article']['author']['avatar']['image']))
 		echo $context['article']['author']['avatar']['image'];
