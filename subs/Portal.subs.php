@@ -4,7 +4,7 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.1
  */
@@ -58,8 +58,8 @@ function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings;
 
-	define('SPORTAL_VERSION', '1.0.0');
-	define('SPORTAL_STALE', 'sp100');
+	define('SPORTAL_VERSION', '1.0.1');
+	define('SPORTAL_STALE', 'sp101');
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 	{

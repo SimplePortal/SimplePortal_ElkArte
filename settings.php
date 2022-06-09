@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
@@ -37,7 +37,7 @@ $defaults = array(
 );
 
 $updates = array(
-	'sp_version' => '1.0.0',
+	'sp_version' => '1.0.1',
 	'front_page' => 'PortalMain_Controller',
 	'admin_features' => $modSettings['admin_features'] . ',pt'
 );

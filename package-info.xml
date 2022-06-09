@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
-<!DOCTYPE package-info SYSTEM "http://www.elkarte.net/site/package-info">
+<!DOCTYPE package-info SYSTEM "https://www.elkarte.net/site/package-info">
 <!--
 /**
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  *
  * This version of SimplePortal ElkArte is based on SimplePortal core 2.4
  */
 -->
-<package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
+<package-info xmlns="https://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
 	<name>SimplePortal</name>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<type>addon</type>
 	<install for="1.1.7 - 1.1.99">
 		<readme type="inline">This will install SimplePortal for Elkarte.</readme>
