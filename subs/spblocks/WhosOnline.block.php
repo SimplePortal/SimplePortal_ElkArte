@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 
@@ -127,7 +127,11 @@ class Whos_Online_Block extends SP_Abstract_Block
 
 		foreach (array_keys($this->data['stats']['users_online']) as $key)
 		{
-			$this->data['stats']['users_online'][$key]['avatar'] = $avatars[$this->data['stats']['users_online'][$key]['id']];
+			$this->data['stats']['users_online'][$key]['avatar'] = '';
+			if (isset($avatars[$this->data['stats']['users_online'][$key]['id']]))
+			{
+				$this->data['stats']['users_online'][$key]['avatar'] = $avatars[$this->data['stats']['users_online'][$key]['id']];
+			}
 		}
 	}
 }
