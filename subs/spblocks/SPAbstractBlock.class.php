@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 use ElkArte\ValuesContainer;
@@ -133,22 +133,30 @@ abstract class SP_Abstract_Block
 	public function auto_refresh()
 	{
 		// Lets be reasonable on the refresh, lets not beat on the server
-		$refresh = ((int) $this->refresh['refresh_value'] < 30 ? 30 : (int) $this->refresh['refresh_value']) * 1000;
+		$refresh = (max((int) $this->refresh['refresh_value'], 30)) * 1000;
 
 		addInlineJavascript('
 			$(document).ready(function()
 			{
 				let $block = $("#sp_block_' . (int) $this->refresh['id'] . '"),
 					$container = $block.find("' . $this->refresh['class'] . '"),
-					params = {"block" : ' . (int) $this->refresh['id'] . '};
+					spRefreshParams = {"block" : ' . (int) $this->refresh['id'] . '};
 
-				params[elk_session_var] = elk_session_id;
+				spRefreshParams[elk_session_var] = elk_session_id;
 
 				setInterval(function()
 				{
-					$container.load(
-						elk_prepareScriptUrl(sp_script_url) + "action=PortalRefresh;sa=' . $this->refresh['sa'] . ';api",
-						params);
+					$.ajax({
+						type: "POST",
+						url: elk_prepareScriptUrl(sp_script_url) + "action=PortalRefresh;sa=' . $this->refresh['sa'] . ';api",
+						data: spRefreshParams,
+					})
+					.done(function(result, textStatus) {
+						if (textStatus === "success" && result !== "")
+						{
+							$container.html(result);
+						}
+					});
 				}, ' . $refresh . ');
 			});
 		');
