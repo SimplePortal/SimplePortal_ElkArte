@@ -4,9 +4,9 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 
@@ -34,8 +34,8 @@ class Menu_Block extends SP_Abstract_Block
 
 		if (empty($context['menu_buttons']))
 		{
-			setupThemeContext();
-			setupMenuContext();
+			theme()->setupThemeContext(false);
+			//theme()->setupMenuContext();
 		}
 
 		$this->setTemplate('template_sp_menu');
@@ -58,7 +58,9 @@ function template_sp_menu($data)
 	{
 		echo '
 			<li ', sp_embed_class('dot'), '>
-				<a title="', strip_tags($button['title']), '" href="', $button['href'], '">', ($button['active_button'] ? '<strong>' : ''), $button['title'], ($button['active_button'] ? '</strong>' : ''), '</a>';
+				<a title="', strip_tags($button['title']), '" href="', $button['href'], '">',
+					($button['active_button'] ? '<strong>' : ''), $button['title'], ($button['active_button'] ? '</strong>' : ''), '
+				</a>';
 
 		if (!empty($button['sub_buttons']))
 		{

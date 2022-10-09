@@ -4,9 +4,9 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 
@@ -150,7 +150,7 @@ function template_sp_userInfo($data)
 							<label for="sp_user">', $txt['username'], ':</label>&nbsp;
 						</td>
 						<td>
-							<input type="text" autocomplete="off" id="sp_user" name="user" size="8" value="', $data['username'], '" />
+							<input type="text" autocomplete="off" id="sp_user" name="user" value="', $data['username'], '" />
 						</td>
 					</tr>
 					<tr>
@@ -158,7 +158,7 @@ function template_sp_userInfo($data)
 							<label for="sp_passwrd">', $txt['password'], ':</label>&nbsp;
 						</td>
 						<td>
-							<input type="password" name="passwrd" id="sp_passwrd" size="8" />
+							<input type="password" name="passwrd" id="sp_passwrd" />
 						</td>
 					</tr>
 					<tr>

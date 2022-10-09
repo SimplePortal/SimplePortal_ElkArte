@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 use BBC\ParserWrapper;
@@ -58,8 +58,8 @@ function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings;
 
-	define('SPORTAL_VERSION', '1.0.0');
-	define('SPORTAL_STALE', 'sp100');
+	define('SPORTAL_VERSION', '1.0.1');
+	define('SPORTAL_STALE', 'sp101');
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 	{
@@ -309,7 +309,7 @@ function sportal_load_permissions()
 
 	$context['SPortal']['permissions'] = array(
 		'profiles' => $allowed,
-		'query' => empty($allowed) ? '0=1' : 'FIND_IN_SET(%s, \'' . implode(',', $allowed) . '\')',
+		'query' => empty($allowed) ? '0=1' : 'FIND_IN_SET(%s, "' . implode(',', $allowed) . '")',
 	);
 }
 
@@ -359,7 +359,7 @@ function sportal_load_blocks()
 	// If the member has arranged the blocks, display them like that
 	if (!empty($options['sp_block_layout']))
 	{
-		$layout = @unserialize($options['sp_block_layout']);
+		$layout = @unserialize($options['sp_block_layout'], ['allowed_classes' => false]);
 
 		// If some bad arrangement data found its way in
 		if ($layout === false)

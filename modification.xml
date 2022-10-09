@@ -1,20 +1,20 @@
 <?xml version="1.0"?>
-<!DOCTYPE modification SYSTEM "http://www.elkarte.net/site/modification">
+<!DOCTYPE modification SYSTEM "https://www.elkarte.net/site/modification">
 <!--
 /**
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  *
  * This version of SimplePortal ElkArte is based on SimplePortal core 2.4
  */
 -->
-<modification xmlns="http://www.elkarte.net/site/modification" xmlns:elk="http://www.elkarte.net/">
+<modification xmlns="https://www.elkarte.net/site/modification" xmlns:elk="http://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
-	<version>1.0.0 RC1</version>
+	<version>1.0.1</version>
 
 	<file name="SOURCEDIR/Load.php">
 		<operation>

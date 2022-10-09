@@ -4,9 +4,9 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 
@@ -62,7 +62,7 @@ class Board_Stats_Block extends SP_Abstract_Block
 		{
 			require_once(SUBSDIR . '/Stats.subs.php');
 
-			// All of the average data for the system
+			// All the average data for the system
 			$averages = getAverages();
 
 			// The number of days the forum has been up...
@@ -113,7 +113,17 @@ function template_sp_boardStats($data)
 	global $txt, $scripturl;
 
 	echo '
-		<ul class="sp_list">
+		<ul class="sp_list">';
+
+	if (!isset($data['totals']['members']))
+	{
+		echo '<li>' . $txt['error_sp_no_stats_found'] . '</li>
+		</ul>';
+
+		return;
+	}
+
+	echo '
 			<li ', sp_embed_class('portalstats'), '>', $txt['total_members'], ': <a href="', $scripturl . '?action=memberlist">', comma_format($data['totals']['members']), '</a></li>
 			<li ', sp_embed_class('portalstats'), '>', $txt['total_posts'], ': <a href="', $scripturl . '?action=stats">', comma_format($data['totals']['posts']), '</a></li>
 			<li ', sp_embed_class('portalstats'), '>', $txt['total_topics'], ': ', comma_format($data['totals']['topics']), '</li>

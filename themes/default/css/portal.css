@@ -2,9 +2,9 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 hr {
@@ -278,8 +278,8 @@ table.sp_articles {
 }
 
 .sp_article_detail h4 {
-	font-size: 1.3em;
-	line-height: 35px;
+	font-size: 1.1em;
+	line-height: 2.1;
 }
 
 .sp_article_latest {
@@ -393,6 +393,11 @@ div.sp_block {
 	padding: 0 2px;
 }
 
+/* allows menu block to not clip drop menu */
+.sp_block_container.sp_block_menu, .sp_block_container.sp_block_menu > .sp_block_section  {
+	overflow: visible;
+}
+
 .sp_block_container h3 {
 	font-size: 1.214em;
 }
@@ -417,6 +422,7 @@ div.sp_block {
 .sp_block_section.roundframe {
 	margin-top: 0;
 	border-radius: 5px;
+	padding: 5px;
 }
 
 h3.sp_secondary_header, h2.sp_secondary_header {
@@ -680,7 +686,7 @@ body {
 #sp_view_articles span,
 #sp_view_category span,
 #sp_view_article span {
-	font-size: 0.9em;
+	font-size: 0.8em;
 }
 
 .sp_cat_link:link, .sp_cat_link:visited {
@@ -845,6 +851,10 @@ select#board {
 
 #sp_edit_article {
 	margin: 0 auto;
+}
+
+#sp_edit_article .content {
+	overflow: hidden;
 }
 
 #sp_manage_categories table.table_grid {
