@@ -83,7 +83,7 @@ function sportal_init($standalone = false)
 			loadCSSFile('portal_rtl.css');
 		}
 
-		if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], array('admin')))
+		if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'admin')
 		{
 			loadLanguage('SPortalAdmin');
 		}
@@ -889,7 +889,7 @@ function sportal_check_visibility($visibility_id)
 	}
 
 	// See if we can show this block, here, now, for this ...
-	if ($visibility_id == '0' && !isset($visibilities[$visibility_id]))
+	if ($visibility_id === '0' && !isset($visibilities[$visibility_id]))
 	{
 		// No id, assume its off
 		return false;
@@ -901,10 +901,8 @@ function sportal_check_visibility($visibility_id)
 		{
 			return false;
 		}
-		else
-		{
-			return sportal_process_visibility($visibilities[$visibility_id]['final']);
-		}
+
+		return sportal_process_visibility($visibilities[$visibility_id]['final']);
 	}
 	else
 	{
@@ -941,10 +939,8 @@ function sp_loadCalendarData($type, $low_date, $high_date = false)
 	{
 		return $loaded[$type]($low_date, ($high_date === false ? $low_date : $high_date));
 	}
-	else
-	{
-		return array();
-	}
+
+	return array();
 }
 
 /**
@@ -1561,7 +1557,7 @@ function sportal_parse_cutoff_content(&$body, $type, $length = 0, $link_id = nul
 			case 'html':
 				// Strip tags and cut at the cutoff character count
 				$body = un_htmlspecialchars($body);
-				$body = preg_replace('~\x{00a0}~siu',' ',$body);
+				$body = preg_replace('~\x{00a0}~u',' ',$body);
 				$cutoff = Util::strpos(strip_tags($body), '[cutoff]');
 				$cutoff = empty($cutoff) ? $length : $cutoff;
 				$body = Util::shorten_html($body, $cutoff, '');
@@ -1625,7 +1621,7 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 			if ($output_method !== 'echo')
 			{
 				$body = un_htmlspecialchars($body);
-				return preg_replace('~\x{00a0}~su',' ',$body);
+				return preg_replace('~\x{00a0}~u',' ',$body);
 			}
 
 			echo un_htmlspecialchars($body);

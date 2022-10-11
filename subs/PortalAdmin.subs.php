@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 
@@ -47,7 +47,7 @@ function getFunctionInfo($function = null)
 	foreach ($fs as $item)
 	{
 		// Convert file names to class names, UserInfo.block.pbp => User_Info_Block
-		$class = str_replace('.block.php', '_Block', trim(preg_replace('/((?<=)\p{Lu}(?=\p{Ll}))/', '_$1', $item->getFilename()), '_'));
+		$class = str_replace('.block.php', '_Block', trim(preg_replace('/((?<=)\p{Lu}(?=\p{Ll}))/u', '_$1', $item->getFilename()), '_'));
 
 		// Load the block, make sure we can access it
 		require_once($item->getPathname());
@@ -75,7 +75,7 @@ function getFunctionInfo($function = null)
 	// Show the block list in alpha order
 	if ($function === null)
 	{
-		usort($return, function ($a, $b) {
+		usort($return, static function ($a, $b) {
 			$a_string = !empty($a['custom_label']) ? $a['custom_label'] : $a['standard_label'];
 			$b_string = !empty($b['custom_label']) ? $b['custom_label'] : $b['standard_label'];
 			return strcmp($a_string, $b_string);
@@ -112,7 +112,7 @@ function fixColumnRows($column_id = null)
 	// Now sequentially set the row number for each block in this column
 	foreach ($blockIds as $block)
 	{
-		$counter = $counter + 1;
+		++$counter;
 
 		$db->query('', '
 			UPDATE {db_prefix}sp_blocks
