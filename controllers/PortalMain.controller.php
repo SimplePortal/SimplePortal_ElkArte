@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 use ElkArte\sources\Frontpage_Interface;
@@ -57,7 +57,9 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 			'credits' => array($this, 'action_sportal_credits'),
 			'resetlayout' => array($this, 'action_sportal_resetLayout'),
 			'userorder' => array($this, 'action_userblockorder'),
+			'ulattach' => array('controller' => 'PortalArticles_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalArticles.controller.php', 'function' => 'action_index'),
 			'spattach' => array('controller' => 'PortalArticles_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalArticles.controller.php', 'function' => 'action_index'),
+			'rmattach' => array('controller' => 'PortalArticles_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalArticles.controller.php', 'function' => 'action_index'),
 		);
 
 		// We like action, so lets get ready for some
@@ -216,6 +218,9 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 			// If we have some articles
 			require_once(SUBSDIR . '/PortalArticle.subs.php');
 			$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
+
+			// Get the first "image/attachment" for blog views
+			$context['articles'] = setBlogAttachments(getBlogAttachments($context['articles']));
 
 			foreach ($context['articles'] as $article)
 			{
