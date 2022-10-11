@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 use BBC\PreparseCode;
@@ -60,7 +60,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 
 		loadTemplate('PortalAdminArticles');
 
-		// These are all the actions that we know
+		// These are all the articles actions that we know
 		$subActions = array(
 			'list' => array($this, 'action_list'),
 			'add' => array($this, 'action_edit'),
@@ -83,7 +83,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			),
 		);
 
-		// By default we want to list articles
+		// By default, we want to list articles
 		$subAction = $action->initialize($subActions, 'list');
 		$context['sub_action'] = $subAction;
 
@@ -569,12 +569,18 @@ class ManagePortalArticles_Controller extends Action_Controller
 		}
 
 		// Upload any new attachments.
-		$context['attachments']['can']['post'] = (allowedTo('post_attachment')
-			|| ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+		$context['attachments']['can']['post'] = allowedTo('post_attachment')
+			|| ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments'));
+
 		if ($context['attachments']['can']['post'])
 		{
 			list($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForArticle($this->_is_aid);
+
+			$attachmentUploadDir = $modSettings['attachmentUploadDir'];
+			$modSettings['automanage_attachments'] = 0;
+			$modSettings['attachmentUploadDir'] = [1 => $modSettings['sp_articles_attachment_dir']];
 			processAttachments();
+			$modSettings['attachmentUploadDir'] = $attachmentUploadDir;
 		}
 	}
 
@@ -796,6 +802,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$context['post_box_class'] = $context['article']['type'] !== 'bbc' ? 'sceditor-container' : 'sp-sceditor-container';
 		$context['attached'] = '';
 
+		// Bit of a cheat, so look away
+		$context['js_files']['dropAttachments.js']['filename'] = str_replace('dropAttachments.js', 'spDropAttachments.js', $context['js_files']['dropAttachments.js']['filename']);
+		$context['js_files']['dropAttachments.js']['options']['basename'] = 'spDropAttachments';
+
 		// Restore their settings
 		if (isset($temp_editor))
 		{
@@ -932,6 +942,8 @@ class ManagePortalArticles_Controller extends Action_Controller
 		// If they've unchecked an attachment, they may still want to attach that many more files, but don't allow more than num_allowed_attachments.
 		$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
 		$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
+		$context['attachments']['total_size'] = $this->_attachments['total_size'];
+		$context['attachments']['quantity'] = $this->_attachments['quantity'];
 		$context['attachments']['restrictions'] = array();
 		$context['attachments']['ila_enabled'] = true;
 
@@ -954,16 +966,18 @@ class ManagePortalArticles_Controller extends Action_Controller
 		{
 			if (!empty($modSettings[$type]))
 			{
-				$context['attachments']['restrictions'][] = sprintf($txt['attach_restrict_' . $type], comma_format($modSettings[$type], 0));
+				$context['attachments']['restrictions'][] = $type === 'attachmentNumPerPostLimit'
+					? sprintf($txt['attach_restrict_' . $type], comma_format($modSettings[$type], 0))
+					: sprintf($txt['attach_restrict_' . $type], byte_format($modSettings[$type] * 1024));
 
 				// Show some numbers. If they exist.
 				if ($type === 'attachmentNumPerPostLimit' && $this->_attachments['quantity'] > 0)
 				{
-					$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], $modSettings['attachmentNumPerPostLimit'] - $this->_attachments['quantity']);
+					$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], '<span id="' . $type . '">' . ($modSettings['attachmentNumPerPostLimit'] - $this->_attachments['quantity']) . '</span>');
 				}
 				elseif ($type === 'attachmentPostLimit' && $this->_attachments['total_size'] > 0)
 				{
-					$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], comma_format(round(max($modSettings['attachmentPostLimit'] - ($this->_attachments['total_size'] / 1028), 0)), 0));
+					$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], '<span id="' . $type . '">' . byte_format(max(($modSettings['attachmentPostLimit'] * 1024) - $this->_attachments['total_size'], 0)) . '</span>');
 				}
 			}
 		}
@@ -1010,11 +1024,12 @@ class ManagePortalArticles_Controller extends Action_Controller
 		var dropAttach = dragDropAttachment({
 			board: 0,
 			allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
-			totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
-			individualSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit']) . ',
+			totalSizeAllowed: ' . (empty($modSettings['attachmentPostLimit']) ? 0 : $modSettings['attachmentPostLimit'] * 1024) . ',
+			totalAttachSizeUploaded: ' . (!empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
+			individualSizeAllowed: ' . (empty($modSettings['attachmentSizeLimit']) ? 0 : $modSettings['attachmentSizeLimit'] * 1024) . ',
 			numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
-			totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
-			numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+			numAttachUploaded: ' . (!empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+			resizeImageEnabled: ' . (!empty($modSettings['attachment_image_resize_enabled']) ? 0 : 1) . ',
 			fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>\',
 			oTxt: ({
 				allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
@@ -1023,10 +1038,12 @@ class ManagePortalArticles_Controller extends Action_Controller
 				numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
 				postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
 				areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . ',
+				uploadAbort: ' . JavaScriptEscape($txt['attachment_upload_abort']) . ',
+				processing: ' . JavaScriptEscape($txt['attachment_processing']) . '
 			}),
 			existingSelector: ".inline_insert",
 			events: IlaDropEvents' . (!empty($this->_is_aid) ? ',
-			article: ' . $this->_is_aid : '') . '
+			topic: ' . $this->_is_aid : '') . '
 		});', true);
 	}
 

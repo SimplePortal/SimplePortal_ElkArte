@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 use BBC\PreparseCode;
@@ -452,7 +452,7 @@ class ManagePortalPages_Controller extends Action_Controller
 		}
 
 		// Can't have a simple numeric namespace
-		if (preg_replace('~[0-9]+~', '', $_POST['namespace']) === '')
+		if (preg_replace('~\d+~', '', $_POST['namespace']) === '')
 		{
 			$pages_errors->addError('sp_error_page_namespace_numeric');
 		}

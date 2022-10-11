@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 use BBC\PreparseCode;
@@ -475,7 +475,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 								// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
 								if ($i % 4 == 0)
 								{
-									$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', function ($m) {
+									$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', static function ($m) {
 										return '[html]' . preg_replace('~<br\s?/?>~i', '&lt;br /&gt;<br />', $m[1]) . '[/html]';
 									}, $parts[$i]);
 								}
@@ -893,20 +893,16 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		{
 			throw new Elk_Exception('error_sp_id_empty', false);
 		}
-		else
-		{
-			$block_id = (int) $_REQUEST['block_id'];
-		}
+
+		$block_id = (int) $_REQUEST['block_id'];
 
 		// Can't move outside our known columns 1-6
 		if (empty($_REQUEST['col']) || $_REQUEST['col'] < 1 || $_REQUEST['col'] > 6)
 		{
 			throw new Elk_Exception('error_sp_side_wrong', false);
 		}
-		else
-		{
-			$target_side = (int) $_REQUEST['col'];
-		}
+
+		$target_side = (int) $_REQUEST['col'];
 
 		// Specific row requested?
 		if (empty($_REQUEST['row']))
