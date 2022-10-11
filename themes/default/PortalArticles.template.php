@@ -117,7 +117,7 @@ function template_view_article()
 			<div id="msg_', $context['article']['id'], '" class="messageContent inner sp_inner">' ,
 				$context['article']['body'];
 
-	if ($context['article']['can_moderate'] && empty($context['preview']))
+	if (empty($context['preview']) && $context['article']['can_moderate'])
 		echo '
 				<div class="submitbutton">
 					<a class="linkbutton" href="?action=admin;area=portalarticles;sa=edit;article_id=' . $context['article']['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . $txt['edit'] . '</a>

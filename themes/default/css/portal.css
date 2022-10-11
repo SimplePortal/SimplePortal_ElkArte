@@ -291,7 +291,7 @@ table.sp_articles {
 .sp_article_detail .avatar {
 	float: left;
 	margin-right: 0.5em;
-	max-height: 50px;
+	max-height: 40px;
 }
 
 .sp_article_detail,
@@ -300,7 +300,9 @@ table.sp_articles {
 }
 
 .sp_article_detail {
-	padding-top: .5em;
+	padding: 5px;
+	line-height: 1.1em;
+	font-size: 1.1em;
 }
 
 .sp_article_extra {
@@ -689,6 +691,10 @@ body {
 	font-size: 0.8em;
 }
 
+#sp_view_category .sp_inner {
+	margin-top: 0;
+}
+
 .sp_cat_link:link, .sp_cat_link:visited {
 	padding: 0 6px;
 	display: inline-block;
@@ -973,7 +979,7 @@ dl.sp_form img,
 	margin: 0 auto;
 	padding-top: 1em;
 	max-width: 97%;
-	width: 60em;
+	width: 70em;
 }
 
 #sp_text_editor {

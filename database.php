@@ -124,7 +124,7 @@ function addDefaultStyles()
 }
 
 /**
- * Adds guest only, member ony and everyone permission profiles
+ * Adds guest only, member only and everyone permission profiles
  */
 function addDefaultPermissions()
 {

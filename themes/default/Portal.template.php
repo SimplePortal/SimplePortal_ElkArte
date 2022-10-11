@@ -42,7 +42,7 @@ function template_portal_index()
 		}
 
 		echo '
-					<span>
+					<span class="floatright">
 						', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']);
 
 		if (!empty($article['author']['avatar']['image']))
@@ -63,13 +63,31 @@ function template_portal_index()
 							? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
 					</span>
 				</div>
-				<hr />
-				<div class="inner sp_inner">', $article['preview'], '</div>
+				<div id="msg_', $article['id'], '" class="post inner sp_inner sp_article_content">';
+
+		if (!empty($article['attachments']))
+		{
+			echo '
+					<div class="sp_attachment_thumb">';
+
+			// If you want Fancybox to tag this, remove nfb_ from the id
+			echo '
+						<a href="', $article['href'], '" id="nfb_link_', $article['attachments']['id'], '">
+							<img src="', $article['attachments']['href'], '" alt="" title="', $article['attachments']['name'], '" id="thumb_', $article['attachments']['id'], '" />
+						</a>';
+
+			echo '
+					</div>';
+		}
+
+		echo
+				$article['preview'], '
 				<div class="sp_article_extra clear">
 					<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
 					<a class="linkbutton" href="', $article['href'], '#sp_view_comments">', $txt['sp_write_comment'], '</a>
 				</div>
 			</div>
+		</div>
 		</div>';
 	}
 

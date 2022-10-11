@@ -78,7 +78,6 @@ function template_view_category()
 				</span>
 				<h4>', $article['link'], '</h4>
 			</div>
-			<hr />
 			<div id="msg_', $article['id'], '" class="post inner sp_inner">';
 
 		if (!empty($article['attachments']))
