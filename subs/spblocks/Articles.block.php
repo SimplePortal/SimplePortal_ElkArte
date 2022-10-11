@@ -4,7 +4,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -13,7 +13,7 @@
 /**
  * Article Block, show the list of articles in the system
  *
- * @param mixed[] $parameters
+ * @param array $parameters
  * 		'category' => list of categories to choose article from
  * 		'limit' => number of articles to show
  * 		'type' => 0 latest 1 random
@@ -82,7 +82,7 @@ class Articles_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id)
@@ -213,7 +213,7 @@ class Articles_Block extends SP_Abstract_Block
 /**
  * Error template
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_articles_error($data)
 {
@@ -223,7 +223,7 @@ function template_sp_articles_error($data)
 /**
  * Main template
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_articles($data)
 {

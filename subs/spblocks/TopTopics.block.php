@@ -4,7 +4,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -13,7 +13,7 @@
 /**
  * Top Topics Block, shows top topics by number of view or number of posts
  *
- * @param mixed[] $parameters
+ * @param array $parameters
  *        'limit' => number of posts to show
  *        'type' => 0 replies or 1 views
  * @param int $id - not used in this block
@@ -41,7 +41,7 @@ class Top_Topics_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id)
@@ -75,7 +75,7 @@ class Top_Topics_Block extends SP_Abstract_Block
 /**
  * Error template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_topTopics_error($data)
 {
@@ -85,7 +85,7 @@ function template_sp_topTopics_error($data)
 /**
  * Main template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_topTopics($data)
 {

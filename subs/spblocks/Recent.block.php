@@ -4,7 +4,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -13,7 +13,7 @@
 /**
  * Recent Post or Topic block, shows the most recent posts or topics on the forum
  *
- * @param mixed[] $parameters
+ * @param array $parameters
  *        'boards' => list of boards to get posts from,
  *        'limit' => number of topics/posts to show
  *        'type' => recent 0 posts or 1 topics
@@ -46,7 +46,7 @@ class Recent_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id)
@@ -116,7 +116,7 @@ class Recent_Block extends SP_Abstract_Block
 /**
  * Main template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_recent($data)
 {

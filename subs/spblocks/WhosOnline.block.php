@@ -38,7 +38,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * 		'online_today' => shows all users that were online today (requires user online today addon)
 	 * 		'avatars' => shows the user avatar if available
 	 * 		'refresh' => if we auto refresh the block
@@ -139,7 +139,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 /**
  * Main template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_whosOnline($data)
 {
@@ -161,20 +161,26 @@ function template_sp_whosOnline($data)
 
 	// Online today count only?
 	if ($data['online_today'] === 1 && !empty($context['num_onlinetoday']))
+	{
 		echo '
 				<li ', sp_embed_class('dot'), '> ', $txt['sp-online_today'], ': ', $context['num_onlinetoday'], '</li>';
+	}
 
 	// Show the users online, if any
 	if (!empty($data['stats']['users_online']))
 	{
 		if (allowedTo('who_view') && !empty($modSettings['who_enabled']))
+		{
 			echo '
 				<li ', sp_embed_class('dot'), '>
 					<a href="' . $scripturl . '?action=who">', $txt['online_users'], '</a>: ', $data['stats']['num_users_online'], '
 				</li>';
+		}
 		else
+		{
 			echo '
 				<li ', sp_embed_class('dot'), '> ', $txt['online_users'], ' : ', $data['stats']['num_users_online'], '</li>';
+		}
 
 		echo '
 			</ul>

@@ -4,7 +4,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -14,7 +14,7 @@ use BBC\ParserWrapper;
 /**
  * Board Block, Displays a list of posts from selected board(s)
  *
- * @param mixed[] $parameters
+ * @param array $parameters
  * 			'board' => Board(s) to select posts from
  * 			'limit' => max number of posts to show
  * 			'start' => id of post to start from
@@ -61,7 +61,7 @@ class Board_News_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id)
@@ -123,8 +123,9 @@ class Board_News_Block extends SP_Abstract_Block
 
 			return;
 		}
+
 		// Posts and page limits?
-		elseif (!empty($per_page))
+		if (!empty($per_page))
 		{
 			$limit = count($posts);
 			$start = !empty($_REQUEST['news' . $id]) ? (int) $_REQUEST['news' . $id] : 0;
@@ -192,12 +193,10 @@ class Board_News_Block extends SP_Abstract_Block
 			}
 
 			// If ILA is enable and what we rendered has ILA tags, assume they don't need any further attachment help
-			if (!empty($this->_modSettings['attachment_inline_enabled']))
+			if (!empty($this->_modSettings['attachment_inline_enabled'])
+				&& strpos($row['body'], '<img src="' . $scripturl . '?action=dlattach;attach=') !== false)
 			{
-				if (strpos($row['body'], '<img src="' . $scripturl . '?action=dlattach;attach=') !== false)
-				{
-					$attach = array();
-				}
+				$attach = array();
 			}
 
 			// Build an array of message information for output
@@ -330,22 +329,20 @@ class Board_News_Block extends SP_Abstract_Block
 				'name' => $attachment['name'],
 			);
 		}
+
 		// No attachments, perhaps an IMG tag then?
-		else
+		$pos = strpos($body, '[img');
+		if ($pos === false)
 		{
-			$pos = strpos($body, '[img');
-			if ($pos === false)
-			{
-				return '';
-			}
-
-			$img_tag = substr($body, $pos, strpos($body, '[/img]', $pos) + 6);
-			$parser = ParserWrapper::instance();
-			$img_html = $parser->parseMessage($img_tag, true);
-			$body = str_replace($img_tag, '<div class="sp_attachment_thumb">' . $img_html . '</div>', $body);
-
-			return array();
+			return '';
 		}
+
+		$img_tag = substr($body, $pos, strpos($body, '[/img]', $pos) + 6);
+		$parser = ParserWrapper::instance();
+		$img_html = $parser->parseMessage($img_tag, true);
+		$body = str_replace($img_tag, '<div class="sp_attachment_thumb">' . $img_html . '</div>', $body);
+
+		return array();
 	}
 
 	/**
@@ -384,7 +381,7 @@ class Board_News_Block extends SP_Abstract_Block
 /**
  * Error template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_boardNews_error($data)
 {
@@ -394,7 +391,7 @@ function template_sp_boardNews_error($data)
 /**
  * Main template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_boardNews($data)
 {

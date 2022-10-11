@@ -4,7 +4,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -15,7 +15,7 @@ use BBC\PreparseCode;
 /**
  * Shoutbox Block, show the shoutbox thoughts box
  *
- * @param mixed[] $parameters
+ * @param array $parameters
  *        'shoutbox' => list of shoutboxes to choose from
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
@@ -41,7 +41,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 	/**
 	 * Returns optional block parameters
 	 *
-	 * @return mixed[]
+	 * @return array
 	 * @throws \Elk_Exception
 	 */
 	public function parameters()
@@ -91,7 +91,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 * @throws \Elk_Exception
 	 */
@@ -285,7 +285,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 /**
  * Error template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_shoutbox_error($data)
 {

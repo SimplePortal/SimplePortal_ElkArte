@@ -4,7 +4,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -13,7 +13,7 @@
 /**
  * Calendar Block, Displays a full calendar block
  *
- * @param mixed[] $parameters
+ * @param array $parameters
  *        'events' => show events
  *        'birthdays' => show birthdays
  *        'holidays' => show holidays
@@ -43,7 +43,7 @@ class Calendar_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id)
@@ -95,7 +95,7 @@ class Calendar_Block extends SP_Abstract_Block
 /**
  * Main template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_calendar($data)
 {
@@ -134,18 +134,15 @@ function template_sp_calendar($data)
 			{
 				unset($data['calendar']['weeks'][$week_key]['days'][$day_key]);
 			}
+			elseif (!empty($day['holidays']) || !empty($day['birthdays']) || !empty($day['events']))
+			{
+				echo '
+				<a href="#day" onclick="return sp_collapseCalendar(\'', $day['day'], '\');"><strong>', $day['is_today'] ? '[' : '', $day['day'], $day['is_today'] ? ']' : '', '</strong></a>';
+			}
 			else
 			{
-				if (!empty($day['holidays']) || !empty($day['birthdays']) || !empty($day['events']))
-				{
-					echo '
-					<a href="#day" onclick="return sp_collapseCalendar(\'', $day['day'], '\');"><strong>', $day['is_today'] ? '[' : '', $day['day'], $day['is_today'] ? ']' : '', '</strong></a>';
-				}
-				else
-				{
-					echo '
-					<a href="#day" onclick="return sp_collapseCalendar(\'0\');">', $day['is_today'] ? '[' : '', $day['day'], $day['is_today'] ? ']' : '', '</a>';
-				}
+				echo '
+				<a href="#day" onclick="return sp_collapseCalendar(\'0\');">', $day['is_today'] ? '[' : '', $day['day'], $day['is_today'] ? ']' : '', '</a>';
 			}
 
 			echo '
@@ -168,7 +165,8 @@ function template_sp_calendar($data)
 			{
 				continue;
 			}
-			elseif (empty($day['holidays']) && empty($day['birthdays']) && empty($day['events']))
+
+			if (empty($day['holidays']) && empty($day['birthdays']) && empty($day['events']))
 			{
 				echo '
 		<div class="centertext smalltext" id="sp_calendar_', $day['day'], '">', $txt['error_sp_no_items_day'], '</div>';
