@@ -4,7 +4,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -13,7 +13,7 @@
 /**
  * Attachment Block, Displays a list of recent attachments (by name)
  *
- * @param mixed[] $parameters
+ * @param array $parameters
  *		'limit' => Board(s) to select posts from
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
@@ -39,7 +39,7 @@ class Attachment_Recent_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id)
@@ -66,7 +66,7 @@ class Attachment_Recent_Block extends SP_Abstract_Block
 /**
  * Error template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_attachmentRecent_error($data)
 {
@@ -76,7 +76,7 @@ function template_sp_attachmentRecent_error($data)
 /**
  * Main template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_attachmentRecent($data)
 {
@@ -87,12 +87,14 @@ function template_sp_attachmentRecent($data)
 
 	$embed_class = sp_embed_class('attach');
 	foreach ($data['items'] as $item)
+	{
 		echo '
 			<li ', $embed_class, '>
 				<a href="', $item['file']['href'], '">', $item['file']['filename'], '</a>
 			</li>
 			<li class="smalltext">', $txt['downloads'], ': ', $item['file']['downloads'], '</li>
 			<li class="smalltext">', $txt['filesize'], ': ', $item['file']['filesize'], '</li>';
+	}
 
 	echo '
 		</ul>';

@@ -13,7 +13,7 @@
 /**
  * User info block, shows avatar, group, icons, posts, karma, etc
  *
- * @param mixed[] $parameters not used in this block
+ * @param array $parameters not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
  */
@@ -24,7 +24,7 @@ class User_Info_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id)
@@ -130,7 +130,7 @@ class User_Info_Block extends SP_Abstract_Block
 /**
  * Main template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_userInfo($data)
 {

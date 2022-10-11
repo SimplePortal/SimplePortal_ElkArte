@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 
@@ -391,7 +391,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 		foreach ($disabled_tags as $tag)
 		{
-			if ($tag == 'list')
+			if ($tag === 'list')
 			{
 				$context['disabled_tags']['orderlist'] = true;
 			}

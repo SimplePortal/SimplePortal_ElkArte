@@ -4,7 +4,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -13,7 +13,7 @@
 /**
  * Generic PHP Block, creates a PHP block to do whatever you can imagine :D
  *
- * @param mixed[] $parameters
+ * @param array $parameters
  *        'textarea' =>
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
@@ -39,7 +39,7 @@ class Php_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id = 0)
@@ -48,7 +48,7 @@ class Php_Block extends SP_Abstract_Block
 		$this->data['content'] = trim(un_htmlspecialchars($this->data['content']));
 
 		// Strip leading / trailing php wrapper
-		if (substr($this->data['content'], 0, 5) == '<?php')
+		if (strpos($this->data['content'], '<?php') === 0)
 		{
 			$this->data['content'] = substr($this->data['content'], 5);
 		}
@@ -73,7 +73,7 @@ class Php_Block extends SP_Abstract_Block
 /**
  * Main template for this block, outputs eval !
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_php($data)
 {

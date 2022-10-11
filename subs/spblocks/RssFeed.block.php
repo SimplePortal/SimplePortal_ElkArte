@@ -4,7 +4,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -13,7 +13,7 @@
 /**
  * RSS Block, Displays rss feed in a block.
  *
- * @param mixed[] $parameters
+ * @param array $parameters
  *        'url' => url of the feed
  *        'show_title' => Show the feed title
  *        'show_content' => Show the content of the feed
@@ -51,7 +51,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id)
@@ -93,10 +93,10 @@ class Rss_Feed_Block extends SP_Abstract_Block
 			}
 
 			// No iconv or a false response from it
-			if (!function_exists('iconv') || ($data == false))
+			if (!function_exists('iconv') || !$data)
 			{
 				// PHP (some 5.4 versions) mishandles //TRANSLIT//IGNORE and returns false: see https://bugs.php.net/bug.php?id=61484
-				if ($data == false)
+				if (!$data)
 				{
 					$data = $data_save;
 				}
@@ -115,7 +115,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 		}
 
 		$data = str_replace(array("\n", "\r", "\t"), '', $data);
-		$data = preg_replace_callback('~<\!\[CDATA\[(.+?)\]\]>~u', function($m) {
+		$data = preg_replace_callback('~<\!\[CDATA\[(.+?)\]\]>~u', static function($m) {
 			return "#cdata_escape_encode#" . Util::htmlspecialchars($m[1]);
 		}, $data);
 
@@ -174,10 +174,8 @@ class Rss_Feed_Block extends SP_Abstract_Block
 
 			return;
 		}
-		else
-		{
-			$this->data['items'][count($this->data['items']) - 1]['is_last'] = true;
-		}
+
+		$this->data['items'][count($this->data['items']) - 1]['is_last'] = true;
 
 		$this->setTemplate('template_sp_rssFeed');
 	}
@@ -186,7 +184,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 /**
  * Error template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_rssFeed_error($data)
 {
@@ -197,7 +195,7 @@ function template_sp_rssFeed_error($data)
 /**
  * Main template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_rssFeed($data)
 {

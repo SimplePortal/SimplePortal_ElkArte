@@ -4,7 +4,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -13,7 +13,7 @@
 /**
  * Gallery Block, show a gallery box with gallery items
  *
- * @param mixed[] $parameters
+ * @param array $parameters
  *		'limit' => number of gallery items to show
  *		'type' => 0 recent 1 random
  *		'direction' => 0 horizontal or 1 vertical display in the block
@@ -43,7 +43,7 @@ class Gallery_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id = 0)
@@ -94,11 +94,15 @@ class Gallery_Block extends SP_Abstract_Block
 
 		// This does exist for ElkArte, but can't be shared I'm afraid
 		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
+		{
 			$mod = 'aeva_media';
+		}
 
 		// This does exist and is available!
 		if (file_exists(SOURCEDIR . '/levgal_src/LevGal-Bootstrap.php'))
+		{
 			$mod = 'levgal';
+		}
 
 		return $mod;
 	}
@@ -121,7 +125,7 @@ class Gallery_Block extends SP_Abstract_Block
 			aeva_loadSettings();
 
 			// Just images
-			return aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC', true, array(), 'm.type = \'image\'');
+			return aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC', true, array(), 'm.type = "image"');
 		}
 
 		if ($this->data['mod'] === 'levgal')
@@ -152,7 +156,7 @@ class Gallery_Block extends SP_Abstract_Block
 /**
  * Error template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_gallery_error($data)
 {
@@ -163,7 +167,7 @@ function template_sp_gallery_error($data)
 /**
  * Main template for Levertine Block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_gallery_levgal($item, $data)
 {
@@ -187,7 +191,7 @@ function template_sp_gallery_levgal($item, $data)
 /**
  * Template for aeva block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_gallery_aeva_media($item, $data)
 {
@@ -211,7 +215,7 @@ function template_sp_gallery_aeva_media($item, $data)
 /**
  * Main wrapper template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_gallery($data)
 {

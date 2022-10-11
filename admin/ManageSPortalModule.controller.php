@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 use BBC\Codes;
@@ -36,7 +36,7 @@ class ManageSPortalModule_Controller extends Action_Controller
 	/**
 	 * Used to add the Portal entry to the Core Features list.
 	 *
-	 * @param mixed[] $core_features The core features array
+	 * @param array $core_features The core features array
 	 */
 	public static function addCoreFeature(&$core_features)
 	{
@@ -52,12 +52,10 @@ class ManageSPortalModule_Controller extends Action_Controller
 					Hooks::instance()->enableIntegration('Portal_Integrate');
 					return array('disable_sp' => '');
 				}
+
 				// Disabling
-				else
-				{
-					Hooks::instance()->disableIntegration('Portal_Integrate');
-					return array('disable_sp' => 1);
-				}
+				Hooks::instance()->disableIntegration('Portal_Integrate');
+				return array('disable_sp' => 1);
 			},
 		);
 	}
@@ -67,11 +65,11 @@ class ManageSPortalModule_Controller extends Action_Controller
 	/**
 	 * Adds [spattach] BBC code tags for use with article images.  Mostly the same as ILA [attach]
 	 *
-	 * @param mixed[] $additional_bbc
+	 * @param array $additional_bbc
 	 */
 	public static function sp_integrate_additional_bbc(&$additional_bbc)
 	{
-		global $scripturl;
+		global $scripturl, $modSettings, $txt;
 
 		// Generally we don't want to render inside of these tags ...
 		$disallow = array(
@@ -82,8 +80,43 @@ class ManageSPortalModule_Controller extends Action_Controller
 			'php' => 1,
 		);
 
+		// Disabled tags?
+		$disabledBBC = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);
+		$disabled = in_array('spattach', $disabledBBC, true);
+
 		// Add simplePortal ILA codes
 		$additional_bbc = array_merge($additional_bbc, array(
+			// Just a simple attach
+			array(
+				Codes::ATTR_TAG => 'spattach',
+				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
+				Codes::ATTR_DISABLED => $disabled,
+				Codes::ATTR_CONTENT => '$1',
+				Codes::ATTR_VALIDATE => $disabled ? null : self::validate_plain(),
+				Codes::ATTR_DISALLOW_PARENTS => $disallow,
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=portal;sa=spattach;attach=$1">(' . $txt['link'] . '-$1)</a> ',
+				Codes::ATTR_BLOCK_LEVEL => false,
+				Codes::ATTR_AUTOLINK => false,
+				Codes::ATTR_LENGTH => 8,
+			),
+			array(
+				Codes::ATTR_TAG => 'spattach',
+				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
+				Codes::ATTR_PARAM => array(
+					'type' => array(
+						Codes::PARAM_ATTR_OPTIONAL => true,
+						Codes::PARAM_ATTR_MATCH => '(thumb)',
+					),
+				),
+				Codes::ATTR_DISABLED => $disabled,
+				Codes::ATTR_CONTENT => '$1',
+				Codes::ATTR_VALIDATE => $disabled ? null : self::validate_plain(),
+				Codes::ATTR_DISALLOW_PARENTS => $disallow,
+				Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=portal;sa=spattach;attach=$1">(' . $txt['link'] . '-$1)</a> ',
+				Codes::ATTR_BLOCK_LEVEL => false,
+				Codes::ATTR_AUTOLINK => false,
+				Codes::ATTR_LENGTH => 8,
+			),
 			// Require a width with optional height/align to allow use of full image and/or ;thumb
 			array(
 				Codes::ATTR_TAG => 'spattach',
@@ -138,31 +171,19 @@ class ManageSPortalModule_Controller extends Action_Controller
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 8,
 			),
-			// Just a simple attach
-			array(
-				Codes::ATTR_TAG => 'spattach',
-				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
-				Codes::ATTR_CONTENT => '$1',
-				Codes::ATTR_VALIDATE => self::validate_plain(),
-				Codes::ATTR_DISALLOW_PARENTS => $disallow,
-				Codes::ATTR_BLOCK_LEVEL => false,
-				Codes::ATTR_AUTOLINK => false,
-				Codes::ATTR_LENGTH => 8,
-			),
 			// Just an align ?
 			array(
 				Codes::ATTR_TAG => 'spattach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
 				Codes::ATTR_PARAM => array(
+					'align' => array(
+						Codes::PARAM_ATTR_VALUE => 'float$1',
+						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
+					),
 					'type' => array(
 						Codes::PARAM_ATTR_OPTIONAL => true,
 						Codes::PARAM_ATTR_VALUE => ';$1',
 						Codes::PARAM_ATTR_MATCH => '(thumb|image)',
-					),
-					'align' => array(
-						Codes::PARAM_ATTR_OPTIONAL => true,
-						Codes::PARAM_ATTR_VALUE => 'float$1',
-						Codes::PARAM_ATTR_MATCH => '(right|left|center)',
 					),
 				),
 				Codes::ATTR_CONTENT => '<a id="link_$1" class="sp_attach" data-lightboximage="$1" data-lightboxmessage="{article}" href="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1;image"><img src="' . $scripturl . '?action=portal;sa=spattach;article={article};attach=$1{type}" alt="" class="bbc_img {align}" /></a>',
@@ -187,15 +208,13 @@ class ManageSPortalModule_Controller extends Action_Controller
 	{
 		global $modSettings;
 
-		return function ($data) use ($modSettings) {
+		return static function ($data) use ($modSettings) {
 			if (!empty($modSettings['attachmentThumbWidth']) && $data <= $modSettings['attachmentThumbWidth'])
 			{
 				return ';thumb" style="width:100%;max-width:' . $data . 'px;';
 			}
-			else
-			{
-				return '" style="width:100%;max-width:' . $data . 'px;';
-			}
+
+			return '" style="width:100%;max-width:' . $data . 'px;';
 		};
 	}
 
@@ -211,15 +230,13 @@ class ManageSPortalModule_Controller extends Action_Controller
 	{
 		global $modSettings;
 
-		return function ($data) use ($modSettings) {
+		return static function ($data) use ($modSettings) {
 			if (!empty($modSettings['attachmentThumbHeight']) && $data <= $modSettings['attachmentThumbHeight'])
 			{
 				return ';thumb" style="max-height:' . $data . 'px;';
 			}
-			else
-			{
-				return '" style="max-height:' . $data . 'px;';
-			}
+
+			return '" style="max-height:' . $data . 'px;';
 		};
 	}
 
@@ -236,7 +253,7 @@ class ManageSPortalModule_Controller extends Action_Controller
 	{
 		global $user_info, $scripturl, $context, $modSettings;
 
-		return function (&$tag, &$data) use ($user_info, $scripturl, &$context, $modSettings) {
+		return static function (&$tag, &$data) use ($user_info, $scripturl, &$context, $modSettings) {
 			$num = $data;
 			$is_image = array();
 			$preview = strpos($data, 'post_tmp_' . $user_info['id'] . '_');
@@ -287,7 +304,7 @@ class ManageSPortalModule_Controller extends Action_Controller
 	{
 		global $context;
 
-		return function (&$tag, &$data) use (&$context) {
+		return static function (&$tag, &$data) use (&$context) {
 			$article = $context['article']['id'] ?? 0;
 
 			// Not a preview, then sanitize the attach id
@@ -519,7 +536,7 @@ class ManageSPortalModule_Controller extends Action_Controller
 	 * Whos online hook, integrate_whos_online, called from who.subs
 	 * translates custom actions to allow us to show what area a user is in
 	 *
-	 * @param string $actions
+	 * @param array $actions
 	 *
 	 * @return string|array
 	 */
@@ -749,12 +766,9 @@ class ManageSPortalModule_Controller extends Action_Controller
 	{
 		global $context, $modSettings, $forum_copyright;
 
-		$fix = str_replace('{version}', SPORTAL_VERSION, '<a href="https://simpleportal.net/" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . strftime('%Y') . '</a>');
-
 		if ((ELK === 'SSI' && empty($context['standalone']))
-			|| !Template_Layers::instance()->hasLayers()
 			|| empty($modSettings['sp_portal_mode'])
-			|| strpos($tourniquet, $fix) !== false)
+			|| !Template_Layers::instance()->hasLayers())
 		{
 			return $tourniquet;
 		}
@@ -764,6 +778,18 @@ class ManageSPortalModule_Controller extends Action_Controller
 		{
 			return $tourniquet;
 		}
+
+		if (FORUM_VERSION === 'ElkArte 1.1.9')
+		{
+			$fix = str_replace('{version}', SPORTAL_VERSION, '<a href="https://github.com/SimplePortal" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . strftime('%Y') . '</a>');
+		}
+		else
+		{
+			$fix = str_replace('{version}', SPORTAL_VERSION, '<a href="https://github.com/SimplePortal" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . Util::strftime('%Y') . '</a>');
+		}
+
+		if (strpos($tourniquet, $fix) !== false)
+			return $tourniquet;
 
 		// Append our cp notice at the end of the line
 		$finds = array(
@@ -856,9 +882,11 @@ class ManageSPortalModule_Controller extends Action_Controller
 			}
 		}
 		// If we are using Search engine friendly URLs then lets do the same for page links
-		elseif (!empty($modSettings['queryless_urls']) && (empty($context['server']['is_cgi']) || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && (!empty($context['server']['is_apache']) || !empty($context['server']['is_lighttpd']) || !empty($context['server']['is_litespeed'])))
+		elseif (!empty($modSettings['queryless_urls'])
+			&& (!empty($context['server']['is_apache']) || !empty($context['server']['is_lighttpd']) || !empty($context['server']['is_litespeed']))
+			&& (empty($context['server']['is_cgi']) || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1))
 		{
-			if (defined('SID') && SID != '')
+			if (defined('SID') && SID !== '')
 			{
 				$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:page)=[^#]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
 			}
@@ -952,7 +980,6 @@ class ManageSPortalModule_Controller extends Action_Controller
 	 * - Prevents cutoff tag from bleeding into the message
 	 *
 	 * @param string $message
-	 * @param string[]|null $bbc_tags
 	 */
 	public static function sp_integrate_pre_parsebbc(&$message)
 	{

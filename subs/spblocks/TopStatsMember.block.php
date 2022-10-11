@@ -4,7 +4,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -14,7 +14,7 @@
  * Top stats block, shows the top x members who has achieved top position of various stats
  * Designed to be flexible so adding additional member stats is easy
  *
- * @param mixed[] $parameters
+ * @param array $parameters
  *        'limit' => number of top posters to show
  *        'type' => top stat to show
  *        'sort_asc' => direction to show the list
@@ -181,7 +181,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id)
@@ -369,7 +369,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 /**
  * Error template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_topStatsMember_error($data)
 {
@@ -379,7 +379,7 @@ function template_sp_topStatsMember_error($data)
 /**
  * Main template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_topStatsMember($data)
 {

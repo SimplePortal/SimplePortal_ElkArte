@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0 Beta 1
+ * @version 1.0.1
  */
 
 use BBC\ParserWrapper;
@@ -663,7 +663,11 @@ function removeArticleAttachments($attachmentQuery)
 				'attachment_list' => $attach,
 			)
 		);
+
+		return true;
 	}
+
+	return false;
 }
 
 /**
@@ -802,6 +806,7 @@ function createArticleAttachment(&$attachmentOptions)
 	// Now that we have the attach id, let's rename this and finish up.
 	$attachmentOptions['destination'] = $attachmentOptions['id_folder'] . '/' . $attachmentOptions['id'] . '_' . $attachmentOptions['file_hash'] . '.elk';
 	rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']);
+	@unlink($attachmentOptions['tmp_name'] . '_thumb');
 
 	if (empty($modSettings['attachmentThumbnails']) || (empty($attachmentOptions['width']) && empty($attachmentOptions['height'])))
 	{
@@ -1192,7 +1197,7 @@ function isArticleAttachmentImage($id_attach)
 	if ($db->num_rows($request) != 0)
 	{
 		$attachmentData = $db->fetch_assoc($request);
-		$attachmentData['is_image'] = substr($attachmentData['mime_type'], 0, 5) === 'image';
+		$attachmentData['is_image'] = strpos($attachmentData['mime_type'], 'image') === 0;
 		$attachmentData['size'] = byte_format($attachmentData['size']);
 	}
 	$db->free_result($request);

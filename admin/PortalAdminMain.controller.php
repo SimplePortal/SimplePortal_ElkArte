@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 use BBC\ParserWrapper;
@@ -173,20 +173,13 @@ class ManagePortalConfig_Controller extends Action_Controller
 			{
 				if (!empty($_POST[$pos . 'width']))
 				{
-					if (stripos($_POST[$pos . 'width'], 'px') !== false)
-					{
-						$suffix = 'px';
-					}
-					elseif (strpos($_POST[$pos . 'width'], '%') !== false)
+					$suffix = 'px';
+					if (strpos($_POST[$pos . 'width'], '%') !== false)
 					{
 						$suffix = '%';
 					}
-					else
-					{
-						$suffix = 'px';
-					}
 
-					preg_match_all('/(?:([0-9]+)|.)/i', $_POST[$pos . 'width'], $matches);
+					preg_match_all('/(?:(\d+)|.)/', $_POST[$pos . 'width'], $matches);
 
 					$number = (int) implode('', $matches[1]);
 					if (!empty($number) && $number > 0)

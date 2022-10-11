@@ -12,11 +12,12 @@
 
 /**
  * Menu Block, creates a sidebar menu block based on the system main menu
- * @todo needs updating so it knows right vs left block for the flyout
  *
- * @param mixed[] $parameters -  not used in this block
+ * @param array $parameters -  not used in this block
  * @param int $id - not used in this block
  * @param boolean $return_parameters if true returns the configuration options for the block
+ *@todo needs updating so it knows right vs left block for the flyout
+ *
  */
 class Menu_Block extends SP_Abstract_Block
 {
@@ -25,7 +26,7 @@ class Menu_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id)
@@ -45,7 +46,7 @@ class Menu_Block extends SP_Abstract_Block
 /**
  * Main template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_menu($data)
 {

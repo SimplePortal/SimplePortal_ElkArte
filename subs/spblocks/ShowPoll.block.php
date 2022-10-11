@@ -4,7 +4,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -14,7 +14,7 @@
  * Poll Block, Shows a specific poll, the most recent or a random poll
  * If user can vote, provides for voting selection
  *
- * @param mixed[] $parameters
+ * @param array $parameters
  *        'topic' => topic id of the poll
  *        'type' => 1 the most recently posted poll, 2 displays a random poll, null for specific topic
  * @param int $id - not used in this block
@@ -42,7 +42,7 @@ class Show_Poll_Block extends SP_Abstract_Block
 	 *
 	 * - Called from portal.subs as part of the sportal_load_blocks process
 	 *
-	 * @param mixed[] $parameters
+	 * @param array $parameters
 	 * @param int $id
 	 */
 	public function setup($parameters, $id)
@@ -109,7 +109,7 @@ class Show_Poll_Block extends SP_Abstract_Block
 /**
  * Error template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_showPoll_error($data)
 {
@@ -120,7 +120,7 @@ function template_sp_showPoll_error($data)
 /**
  * Main template for this block
  *
- * @param mixed[] $data
+ * @param array $data
  */
 function template_sp_showPoll($data)
 {

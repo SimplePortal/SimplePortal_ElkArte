@@ -19,7 +19,7 @@ use ElkArte\ValuesContainer;
  */
 abstract class SP_Abstract_Block
 {
-	/** @var \Database*/
+	/** @var \Database */
 	protected $_db;
 
 	/** @var array|\ElkArte\ValuesContainer */
