@@ -4,14 +4,14 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 global $db_prefix, $db_package_log;
 
-if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
+if (file_exists(__DIR__ . '/SSI.php') && !defined('ELK'))
 {
 	$_GET['debug'] = 'Blue Dream!';
 	require_once(dirname(__FILE__) . '/SSI.php');

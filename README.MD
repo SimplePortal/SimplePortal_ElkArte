@@ -19,10 +19,10 @@ All this and SimplePortal has remained Simple! SimplePortal is built for simplic
 ### Blocks
 Blocks are small display areas you can add to the portal page or to forum pages. You can use blocks to add links for your users, or to show who is online. With Simple Portal, the content part of any page can have LEFT and RIGHT blocks in left and right sidebars, and TOP and BOTTOM blocks between the sidebars above and below the central main content area.  There are also overall HEADER and FOOTER blocks that you can load with your content.
 
-There are many built in blocks available, so you can come up with a layout that suits your site.  Examples of blocks that are available are:
+There are **many** built in blocks available, so you can come up with a layout that suits your site.  Examples of blocks that are available are:
 Admin Info, Recent Attachments, Stats, Board News, Custom PHP, Custom HTML, Polls, Shoutbox, Recent Topics, User Info and many more.
 
-Users can also drag and drop the blocks to create a layout that works with their particular tastes or screens, etc.
+Users can also drag and drop the blocks to create their own page layout that works with their particular tastes or screens, etc.
 
 ### Articles
 With the article system enabled, you can easily publish them directly on the Portal, no block is necessary.  You can also show articles on any SimplePortal Page, or wherever you have blocks displayed, using an article block.
