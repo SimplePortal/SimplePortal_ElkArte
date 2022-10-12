@@ -42,7 +42,6 @@ class PortalArticles_Controller extends Action_Controller
 			'article' => array($this, 'action_sportal_article'),
 			'articles' => array($this, 'action_sportal_articles'),
 			'spattach' => array($this, 'action_sportal_attach'),
-			'ulattach' => array($this, 'action_sportal_ulattach'),
 			'rmattach' => array($this, 'action_sportal_rmattach'),
 		);
 
@@ -423,88 +422,6 @@ class PortalArticles_Controller extends Action_Controller
 		echo $body;
 
 		obExit(false);
-	}
-
-	/**
-	 * Function to upload attachments via ajax calls from the add/edit article page
-	 */
-	public function action_sportal_ulattach()
-	{
-		global $context, $txt, $modSettings;
-
-		$resp_data = array();
-		loadLanguage('Errors');
-		$context['attachments']['can']['post'] = allowedTo('post_attachment')
-			|| ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments'));
-
-		// Set up the template for a json response
-		$template_layers = Template_Layers::instance();
-		$template_layers->removeAll();
-		loadTemplate('Json');
-		$context['sub_template'] = 'send_json';
-
-		// Make sure the session is still valid
-		if (checkSession('request', '', false) !== '')
-		{
-			$context['json_data'] = array('result' => false, 'data' => $txt['session_timeout_file_upload']);
-
-			return false;
-		}
-
-		// We should have files, otherwise why are we here?
-		if (isset($_FILES['attachment']))
-		{
-			loadLanguage('Post');
-
-			$attach_errors = AttachmentErrorContext::context();
-			$attach_errors->activate();
-
-			if ($context['attachments']['can']['post'])
-			{
-				// Set it up like a post attachment
-				require_once(SUBSDIR . '/Attachments.subs.php');
-				$attachmentUploadDir = $modSettings['attachmentUploadDir'];
-				$modSettings['automanage_attachments'] = 0;
-				$modSettings['attachmentUploadDir'] = [1 => $modSettings['sp_articles_attachment_dir']];
-				processAttachments();
-				$modSettings['attachmentUploadDir'] = $attachmentUploadDir;
-			}
-
-			// Any mistakes?
-			if ($attach_errors->hasErrors())
-			{
-				$errors = $attach_errors->prepareErrors();
-				foreach ($errors as $key => $error)
-				{
-					$resp_data[] = $error;
-				}
-
-				$context['json_data'] = array('result' => false, 'data' => $resp_data);
-			}
-			// No errors, lets get the details of what we have for our response back
-			else
-			{
-				foreach ($_SESSION['temp_attachments'] as $attachID => $val)
-				{
-					// We need to grab the name anyhow
-					if (!empty($val['tmp_name']))
-					{
-						$resp_data = array(
-							'name' => $val['name'],
-							'attachid' => $val['public_attachid'],
-							'size' => $val['size']
-						);
-					}
-				}
-
-				$context['json_data'] = array('result' => true, 'data' => $resp_data);
-			}
-		}
-		// Could not find the files you claimed to have sent
-		else
-		{
-			$context['json_data'] = array('result' => false, 'data' => $txt['no_files_uploaded']);
-		}
 	}
 
 	/**

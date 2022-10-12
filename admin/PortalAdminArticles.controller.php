@@ -802,7 +802,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		$context['post_box_class'] = $context['article']['type'] !== 'bbc' ? 'sceditor-container' : 'sp-sceditor-container';
 		$context['attached'] = '';
 
-		// Bit of a cheat, so look away
+		// Bit of a cheat, so look away, but we need to use our DD handler
 		$context['js_files']['dropAttachments.js']['filename'] = str_replace('dropAttachments.js', 'spDropAttachments.js', $context['js_files']['dropAttachments.js']['filename']);
 		$context['js_files']['dropAttachments.js']['options']['basename'] = 'spDropAttachments';
 
@@ -940,7 +940,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		global $context, $modSettings, $txt;
 
 		// If they've unchecked an attachment, they may still want to attach that many more files, but don't allow more than num_allowed_attachments.
-		$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
+		$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : $modSettings['attachmentNumPerPostLimit'];
 		$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
 		$context['attachments']['total_size'] = $this->_attachments['total_size'];
 		$context['attachments']['quantity'] = $this->_attachments['quantity'];
@@ -1025,10 +1025,10 @@ class ManagePortalArticles_Controller extends Action_Controller
 			board: 0,
 			allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
 			totalSizeAllowed: ' . (empty($modSettings['attachmentPostLimit']) ? 0 : $modSettings['attachmentPostLimit'] * 1024) . ',
-			totalAttachSizeUploaded: ' . (!empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
+			totalAttachSizeUploaded: ' . $context['attachments']['total_size'] . ',
 			individualSizeAllowed: ' . (empty($modSettings['attachmentSizeLimit']) ? 0 : $modSettings['attachmentSizeLimit'] * 1024) . ',
 			numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
-			numAttachUploaded: ' . (!empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+			numAttachUploaded: ' . $context['attachments']['quantity'] . ',
 			resizeImageEnabled: ' . (!empty($modSettings['attachment_image_resize_enabled']) ? 0 : 1) . ',
 			fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>\',
 			oTxt: ({

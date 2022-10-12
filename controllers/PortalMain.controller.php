@@ -57,7 +57,6 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 			'credits' => array($this, 'action_sportal_credits'),
 			'resetlayout' => array($this, 'action_sportal_resetLayout'),
 			'userorder' => array($this, 'action_userblockorder'),
-			'ulattach' => array('controller' => 'PortalArticles_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalArticles.controller.php', 'function' => 'action_index'),
 			'spattach' => array('controller' => 'PortalArticles_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalArticles.controller.php', 'function' => 'action_index'),
 			'rmattach' => array('controller' => 'PortalArticles_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalArticles.controller.php', 'function' => 'action_index'),
 		);

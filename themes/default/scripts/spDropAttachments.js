@@ -139,7 +139,7 @@
 
 						return xhrobj;
 					},
-					url: elk_scripturl + '?action=portal;sa=ulattach;api;' + elk_session_var + '=' + elk_session_id + ';board=' + board,
+					url: elk_scripturl + '?action=attachment;sa=ulattach;api;' + elk_session_var + '=' + elk_session_id + ';board=' + board,
 					type: "POST",
 					dataType: "json",
 					contentType: false,
@@ -416,8 +416,15 @@
 				.attr('name', 'attach_del[]')
 				.attr('value', data.attachid));
 
-			var $img = $('<img />').attr('src', elk_scripturl + '?action=portal;sa=spattach;attach=' + $control.attr('id') + ';article=' + topic),
+			var $img = $('<img />'),
 				$progressbar = $control.find('.progressBar');
+
+			// tmp files are in the elk's core attachment control
+			if ($control.attr('id').includes('post_tmp'))
+				$img.attr('src', elk_scripturl + '?action=dlattach;sa=tmpattach;attach=' + $control.attr('id') + ';topic=' + topic);
+			else
+				$img.attr('src', elk_scripturl + '?action=portal;sa=spattach;attach=' + $control.attr('id') + ';article=' + topic);
+
 			$progressbar.siblings('.i-spinner').remove();
 			$progressbar.after($('<div class="postattach_thumb" />').append($img));
 			$progressbar.remove();
