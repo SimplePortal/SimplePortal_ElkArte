@@ -44,12 +44,13 @@ function template_view_articles()
 
 		// And now the article
 		echo '
+				<h4>', $article['link'], '</h4>
 				<span class="sp_article_latest">
 					', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '
 					<br />
 					', sprintf($article['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['views']), ', ', sprintf($article['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '
 				</span>
-				<h4>', $article['link'], '</h4>
+				
 			</div>
 			<div id="msg_', $id, '" class="inner sp_inner">', $article['preview'], '<a href="', $article['href'], '">...</a></div>
 			<div class="sp_article_extra clear">
@@ -107,7 +108,7 @@ function template_view_article()
 		echo '
 				</span>
 				<br />
-				<span class="floatright">';
+				<span class="sp_article_latest">';
 
 	echo '
 				', sprintf($context['article']['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $context['article']['view_count']), ', ',
