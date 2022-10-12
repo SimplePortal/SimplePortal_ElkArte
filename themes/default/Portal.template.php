@@ -42,7 +42,7 @@ function template_portal_index()
 		}
 
 		echo '
-					<span class="floatright">
+					<span class="sp_article_latest">
 						', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']);
 
 		if (!empty($article['author']['avatar']['image']))
@@ -54,7 +54,7 @@ function template_portal_index()
 		{
 			echo '
 					</span>
-					<span class="floatright">';
+					<span class="sp_article_latest">';
 		}
 
 		echo '

@@ -71,12 +71,13 @@ function template_view_category()
 		}
 
 		echo '
+				<h4>', $article['link'], '</h4>
 				<span class="sp_article_latest">
 					', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '
 					<br />
 				', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']) ,', ', sprintf($article['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
 				</span>
-				<h4>', $article['link'], '</h4>
+				
 			</div>
 			<div id="msg_', $article['id'], '" class="post inner sp_inner">';
 

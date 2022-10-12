@@ -98,7 +98,13 @@ class ManagePortalPages_Controller extends Action_Controller
 						'value' => $txt['sp_admin_pages_col_title'],
 					),
 					'data' => array(
-						'db' => 'title',
+						'sprintf' => array(
+							'format' => '<a href="?page=%1$s">%2$s</a>',
+							'params' => array(
+								'page_id' => true,
+								'title' => true
+							),
+						),
 					),
 					'sort' => array(
 						'default' => 'title',
@@ -110,12 +116,7 @@ class ManagePortalPages_Controller extends Action_Controller
 						'value' => $txt['sp_admin_pages_col_namespace'],
 					),
 					'data' => array(
-						'sprintf' => array(
-							'format' => '<a href="?page=%1$s">%1$s</a>',
-							'params' => array(
-								'page_id' => true
-							),
-						),
+						'db' => 'page_id'
 					),
 					'sort' => array(
 						'default' => 'namespace',
@@ -388,7 +389,7 @@ class ManagePortalPages_Controller extends Action_Controller
 		create_control_richedit($editorOptions);
 
 		$context['post_box_name'] = $editorOptions['id'];
-		$context['post_box_class'] = $context['article']['type'] !== 'bbc' ? 'sceditor-container' : 'sp-sceditor-container';
+		$context['post_box_class'] = $context['SPortal']['page']['type'] !== 'bbc' ? 'sceditor-container' : 'sp-sceditor-container';
 
 		if (isset($temp_editor))
 		{

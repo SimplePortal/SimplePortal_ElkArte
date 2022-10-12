@@ -254,7 +254,11 @@ table.sp_articles {
 }
 
 .sp_article_content {
-	margin: 0.25em 0;
+	margin: 0.25em 0 .5em 0;
+}
+
+.sp_article_content > .sp_article_detail.category_header {
+	border: none;
 }
 
 .sp_article_content .sp_attachment_thumb {
@@ -283,7 +287,7 @@ table.sp_articles {
 }
 
 .sp_article_latest {
-	float: right;
+	margin-left: auto;
 	padding-right: 0.5em;
 	text-align: right;
 }
@@ -294,8 +298,7 @@ table.sp_articles {
 	max-height: 40px;
 }
 
-.sp_article_detail,
-.sp_comment_detail {
+.sp_article_detail, .sp_comment_detail {
 	overflow: auto;
 }
 
@@ -303,6 +306,7 @@ table.sp_articles {
 	padding: 5px;
 	line-height: 1.1em;
 	font-size: 1.1em;
+	display: flex;
 }
 
 .sp_article_extra {
@@ -388,6 +392,8 @@ table.sp_articles {
 
 div.sp_block {
 	padding: 0 0.5em;
+	width: 100%;
+	box-sizing: border-box;
 }
 
 .sp_block_container {
@@ -531,7 +537,6 @@ body {
 
 .shoutbox_delete {
 	float: right;
-	padding-right: 3px;
 }
 
 .shoutbox_page_index {
@@ -693,6 +698,10 @@ body {
 
 #sp_view_category .sp_inner {
 	margin-top: 0;
+}
+
+#sp_view_category.forumposts {
+	border: none;
 }
 
 .sp_cat_link:link, .sp_cat_link:visited {
