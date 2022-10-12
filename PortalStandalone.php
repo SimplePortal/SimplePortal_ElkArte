@@ -4,7 +4,7 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2021 SimplePortal Team
+ * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  *
@@ -25,7 +25,7 @@
 global $sp_standalone;
 
 // Should be the full path!
-$forum_dir = 'full/path/to/forum';
+$forum_dir = '/var/www/elkarte';
 
 // Let them know the mode.
 $sp_standalone = true;

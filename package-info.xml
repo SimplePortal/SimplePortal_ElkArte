@@ -28,7 +28,7 @@
 		<require-dir name="sp_attach" destination="BOARDDIR" />
 		<database>database.php</database>
 		<code>settings.php</code>
-		<credits url="www.simpleportal.net" license="BSD 3" copyright="Simple Portal Team">SimplePortal</credits>
+		<credits url="github.com/SimplePortal" license="BSD 3" copyright="Simple Portal Team">SimplePortal</credits>
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
 
