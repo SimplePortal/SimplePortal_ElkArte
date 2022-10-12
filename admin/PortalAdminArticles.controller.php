@@ -118,7 +118,13 @@ class ManagePortalArticles_Controller extends Action_Controller
 						'value' => $txt['sp_admin_articles_col_title'],
 					),
 					'data' => array(
-						'db' => 'title',
+						'sprintf' => array(
+							'format' => '<a href="?article=%1$s">%2$s</a>',
+							'params' => array(
+								'article_id' => true,
+								'title' => true
+							),
+						),
 					),
 					'sort' => array(
 						'default' => 'title',
@@ -142,7 +148,13 @@ class ManagePortalArticles_Controller extends Action_Controller
 						'value' => $txt['sp_admin_articles_col_category'],
 					),
 					'data' => array(
-						'db' => 'category_name',
+						'sprintf' => array(
+							'format' => '<a href="?category=%1$s">%2$s</a>',
+							'params' => array(
+								'category_id' => true,
+								'category_name' => true
+							),
+						),
 					),
 					'sort' => array(
 						'default' => 'name',

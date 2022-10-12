@@ -688,6 +688,7 @@ function sp_load_articles($start, $items_per_page, $sort)
 			'href' => $scripturl . '?article=' . $row['article_namespace'],
 			'link' => '<a href="' . $scripturl . '?article=' . $row['article_namespace'] . '">' . $row['title'] . '</a>',
 			'category_name' => $row['name'],
+			'category_id' => $row['category_namespace'],
 			'author_name' => $row['author_name'],
 			'category' => array(
 				'id' => $row['id_category'],
