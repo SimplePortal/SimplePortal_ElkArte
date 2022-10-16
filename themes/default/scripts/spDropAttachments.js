@@ -59,12 +59,12 @@
 					}
 				}
 
-				allowedExtensions = (params.allowedExtensions === '') ? [] : params.allowedExtensions.toLowerCase().replace(/\s/g, '').split(',');
-				totalSizeAllowed = (params.totalSizeAllowed === '') ? null : params.totalSizeAllowed;
-				individualSizeAllowed = (params.individualSizeAllowed === '') ? null : params.individualSizeAllowed;
-				numOfAttachmentAllowed = (params.numOfAttachmentAllowed === '') ? null : params.numOfAttachmentAllowed;
-				totalAttachSizeUploaded = params.totalAttachSizeUploaded;
-				numAttachUploaded = params.numAttachUploaded;
+				allowedExtensions = params.allowedExtensions === '' ? [] : params.allowedExtensions.toLowerCase().replace(/\s/g, '').split(',');
+				totalSizeAllowed = params.totalSizeAllowed || 0;
+				individualSizeAllowed = params.individualSizeAllowed || 0;
+				numOfAttachmentAllowed = params.numOfAttachmentAllowed || 0;
+				totalAttachSizeUploaded = params.totalAttachSizeUploaded || 0;
+				numAttachUploaded = params.numAttachUploaded || 0;
 				resizeImageEnabled = params.resizeImageEnabled;
 				filesUploadedSuccessfully = [];
 				if (typeof params.topic !== 'undefined')
@@ -164,6 +164,10 @@
 						filesUploadedSuccessfully.push(data);
 						data.curFileNum = curFileNum;
 						status.onUploadSuccess(data);
+						// Correct the upload size
+						if (resizeImageEnabled && fileSize !== data.size) {
+							totalAttachSizeUploaded -= fileSize - data.size;
+						}
 					} else {
 						// The server was unable to process the file, show it as not sent
 						var errorMsgs = {},
@@ -460,6 +464,7 @@
 				extnErrorFiles = [],
 				sizeErrorFiles = [];
 
+			// These will get checked again serverside, this is just to save some time/cycles
 			for (var i = 0; i < files.length; i++) {
 				var fileExtensionCheck = /(?:\.([^.]+))?$/,
 					extension = fileExtensionCheck.exec(files[i].name)[1].toLowerCase(),
@@ -492,7 +497,7 @@
 					totalAttachSizeUploaded += fileSize;
 
 				if (totalSizeAllowed !== 0 && totalAttachSizeUploaded > totalSizeAllowed) {
-					errorMsgs.totalSizeError = oTxt.totalSizeAllowed.replace("%1$s", formatBytes(totalSizeAllowed)).replace("%2$s", formatBytes(parseInt(totalSizeAllowed - (totalAttachSizeUploaded - fileSize), 10)));
+					errorMsgs.totalSizeError = oTxt.totalSizeAllowed.replace("%1$s", formatBytes(totalSizeAllowed)).replace("%2$s", formatBytes(totalSizeAllowed - (totalAttachSizeUploaded - fileSize)));
 					errorFlag = true;
 					totalAttachSizeUploaded -= fileSize;
 				}
