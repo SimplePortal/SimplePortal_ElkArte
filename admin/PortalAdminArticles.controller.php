@@ -1041,7 +1041,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 			individualSizeAllowed: ' . (empty($modSettings['attachmentSizeLimit']) ? 0 : $modSettings['attachmentSizeLimit'] * 1024) . ',
 			numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
 			numAttachUploaded: ' . $context['attachments']['quantity'] . ',
-			resizeImageEnabled: ' . (!empty($modSettings['attachment_image_resize_enabled']) ? 0 : 1) . ',
+			resizeImageEnabled: ' . (empty($modSettings['attachment_image_resize_enabled']) ? 0 : 1) . ',
 			fileDisplayTemplate: \'<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control icon i-close"></div></div>\',
 			oTxt: ({
 				allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
