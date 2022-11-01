@@ -439,13 +439,19 @@ function sp_currentVersion()
 {
 	let oSPVersionContainer = document.getElementById("spCurrentVersion"),
 		oinstalledVersionContainer = document.getElementById("spYourVersion"),
-		sCurrentVersion = oinstalledVersionContainer.innerHTML;
+		sCurrentVersion = oinstalledVersionContainer.innerHTML,
+		spIndex = new elk_AdminIndex(),
+		spVersion = '???',
+		verCompare = new elk_ViewVersions();
 
 	$.getJSON('https://api.github.com/repos/SimplePortal/SimplePortal_ElkArte/releases', {format: "json"},
 		function (data, textStatus, jqXHR)
 		{
 			let mostRecent = {},
+				previous = {},
 				init_news = false;
+
+			spIndex.current = spIndex.normalizeVersion(sCurrentVersion);
 
 			$.each(data, function (idx, elem)
 			{
@@ -455,7 +461,19 @@ function sp_currentVersion()
 					return;
 				}
 
+				let release = spIndex.normalizeVersion(elem.tag_name),
+					sCheckVersion = elem.tag_name.indexOf('v') === 0 ? elem.tag_name.substring(1) : elem.tag_name;
+
+				sCheckVersion.replace('-', '').substring(1);
+				if (!previous.hasOwnProperty('major') || verCompare.compareVersions(sCurrentVersion, sCheckVersion))
+				{
+					// Using a preprelease? Then you may need to know a new one is out!
+					if ((elem.prerelease && adminIndex.current.prerelease) || (!elem.prerelease))
+					{
+						previous = release;
 				mostRecent = elem;
+					}
+				}
 
 				// Load announcements for this release
 				sp_setAnnouncement(init_news, elem);

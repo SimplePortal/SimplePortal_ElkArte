@@ -320,7 +320,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 		global $context, $scripturl, $txt, $user_profile;
 
 		loadTemplate('PortalAdmin');
-		loadJavascriptFile('portal.js?sp100rc1');
+		loadJavascriptFile(array('portal.js', 'admin.js'), array('defer' => true));
 
 		$context['sp_credits'] = array(
 			array(
