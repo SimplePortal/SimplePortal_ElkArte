@@ -549,7 +549,7 @@ class ManageSPortalModule_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Portal.subs.php');
 		loadLanguage('SPortal');
 
-		// This may miss if its needed for the first action ... need to improve the hook or
+		// This may miss if needed for the first action ... need to improve the hook or
 		// find another location
 		if ($modSettings['sp_portal_mode'] == 1)
 		{
@@ -779,7 +779,7 @@ class ManageSPortalModule_Controller extends Action_Controller
 			return $tourniquet;
 		}
 
-		if (FORUM_VERSION === 'ElkArte 1.1.9')
+		if (method_exists('Util', 'strftime'))
 		{
 			$fix = str_replace('{version}', SPORTAL_VERSION, '<a href="https://github.com/SimplePortal" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . Util::strftime('%Y') . '</a>');
 		}
