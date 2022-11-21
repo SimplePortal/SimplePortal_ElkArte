@@ -82,7 +82,7 @@ function template_information()
 
 	echo '
 			<hr />
-			<p>', sprintf($txt['sp-info_contribute'], 'https://simpleportal.net/index.php?page=contribute'), '</p>
+			<p>', sprintf($txt['sp-info_contribute'], 'https://github.com/SimplePortal/SimplePortal_ElkArte'), '</p>
 		</div>
 	</div>';
 }
