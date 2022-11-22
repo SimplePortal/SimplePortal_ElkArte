@@ -51,7 +51,7 @@ class Gallery_Block extends SP_Abstract_Block
 		global $txt;
 
 		$limit = empty($parameters['limit']) ? 1 : (int) $parameters['limit'];
-		$type = empty($parameters['type']) ? 0 : 1;
+		$type = empty($parameters['type']) ? 0 : (int) $parameters['type'];
 		$this->data['direction'] = empty($parameters['direction']) ? 0 : 1;
 
 		// Find what gallery is installed
@@ -92,16 +92,16 @@ class Gallery_Block extends SP_Abstract_Block
 	{
 		$mod = '';
 
-		// This does exist for ElkArte, but can't be shared I'm afraid
-		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
-		{
-			$mod = 'aeva_media';
-		}
-
 		// This does exist and is available!
 		if (file_exists(SOURCEDIR . '/levgal_src/LevGal-Bootstrap.php'))
 		{
 			$mod = 'levgal';
+		}
+
+		// This does exist for ElkArte, but can't be shared I'm afraid
+		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
+		{
+			$mod = 'aeva_media';
 		}
 
 		return $mod;
@@ -146,6 +146,14 @@ class Gallery_Block extends SP_Abstract_Block
 					$itemList = LevGal_Bootstrap::getModel('LevGal_Model_ItemList');
 					$data = $itemList->getRandomItems($limit);
 					break;
+				case 2:
+					$itemList = LevGal_Bootstrap::getModel('LevGal_Model_ItemList');
+					$data = $itemList->getLatestImages($limit);
+					break;
+				case 3:
+					$itemList = LevGal_Bootstrap::getModel('LevGal_Model_ItemList');
+					$data = $itemList->getRandomImages($limit);
+					break;
 			}
 		}
 
@@ -176,7 +184,7 @@ function template_sp_gallery_levgal($item, $data)
 	echo '
 		<a class="sp_attach_title" href="', $item['item_url'], '">', $item['item_name'], '</a>
 		<br />' . ($data['fancybox_enabled']
-			? '<a href="' . $item['item_url'] . '" rel="gallery" data-fancybox="1">'
+			? '<a href="' . $item['item_base'] . '" rel="gallery" data-fancybox="1">'
 			: '<a href="' . $item['item_url'] . '">') . '
 			<img src="', $item['thumbnail'], '" alt="', $item['item_name'], '" title="', $item['item_name'], '" /></a>
 		</a>
