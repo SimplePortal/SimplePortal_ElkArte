@@ -781,11 +781,11 @@ class ManageSPortalModule_Controller extends Action_Controller
 
 		if (method_exists('Util', 'strftime'))
 		{
-			$fix = str_replace('{version}', SPORTAL_VERSION, '<a href="https://github.com/SimplePortal" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . Util::strftime('%Y') . '</a>');
+			$fix = str_replace('{version}', SPORTAL_VERSION, '<a href="https://github.com/SimplePortal" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . Util::strftime('%Y', time()) . '</a>');
 		}
 		else
 		{
-			$fix = str_replace('{version}', SPORTAL_VERSION, '<a href="https://github.com/SimplePortal" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . strftime('%Y') . '</a>');
+			$fix = str_replace('{version}', SPORTAL_VERSION, '<a href="https://github.com/SimplePortal" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . strftime('%Y', time()) . '</a>');
 		}
 
 		if (strpos($tourniquet, $fix) !== false)
