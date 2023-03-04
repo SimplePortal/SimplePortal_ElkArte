@@ -390,6 +390,10 @@ table.sp_articles {
 	clear: both;
 }
 
+#sp_user, #sp_passwrd {
+	width: 90%;
+}
+
 div.sp_block {
 	padding: 0 0.5em;
 	width: 100%;
