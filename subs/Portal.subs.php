@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 1.0.2
  */
 
 use BBC\ParserWrapper;
@@ -58,8 +58,8 @@ function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings;
 
-	define('SPORTAL_VERSION', '1.0.1');
-	define('SPORTAL_STALE', 'sp101');
+	defined('SPORTAL_VERSION') || define('SPORTAL_VERSION', '1.0.1');
+	defined('SPORTAL_STALE') || define('SPORTAL_STALE', 'sp101');
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 	{
@@ -533,12 +533,12 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 
 	$request = $db->query('', '
 		SELECT
-			spb.id_block, spb.label, spb.type, spb.col, spb.row, spb.permissions, spb.state,
+			spb.id_block, spb.label, spb.type, spb.col, spb.`row`, spb.permissions, spb.state,
 			spb.force_view, spb.visibility, spb.styles, spp.variable, spp.value
 		FROM {db_prefix}sp_blocks AS spb
 			LEFT JOIN {db_prefix}sp_parameters AS spp ON (spp.id_block = spb.id_block)' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY spb.col, spb.row', $parameters
+		ORDER BY spb.col, spb.`row`', $parameters
 	);
 	$return = array();
 	$show_it = array();

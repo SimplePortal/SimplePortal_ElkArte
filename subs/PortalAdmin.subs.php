@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2022 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 1.0.2
  */
 
 
@@ -116,7 +116,7 @@ function fixColumnRows($column_id = null)
 
 		$db->query('', '
 			UPDATE {db_prefix}sp_blocks
-			SET row = {int:counter}
+			SET `row` = {int:counter}
 			WHERE id_block = {int:block}',
 			array(
 				'counter' => $counter,
@@ -1508,9 +1508,9 @@ function sp_update_block_row($current_row, $row, $col, $decrement = true)
 	{
 		$db->query('', '
 			UPDATE {db_prefix}sp_blocks
-			SET row = row - 1
+			SET `row` = `row` - 1
 			WHERE col = {int:col}
-				AND row > {int:start}
+				AND `row` > {int:start}
 				AND row <= {int:end}',
 			array(
 				'col' => (int) $col,
@@ -1523,10 +1523,10 @@ function sp_update_block_row($current_row, $row, $col, $decrement = true)
 	{
 		$db->query('', '
 			UPDATE {db_prefix}sp_blocks
-			SET row = row + 1
+			SET `row` = `row` + 1
 			WHERE col = {int:col}
-				AND row >= {int:start}' . (!empty($current_row) ? '
-				AND row < {int:end}' : ''),
+				AND `row` >= {int:start}' . (!empty($current_row) ? '
+				AND `row` < {int:end}' : ''),
 			array(
 				'col' => (int) $col,
 				'start' => $row,
@@ -1578,11 +1578,11 @@ function sp_block_nextrow($block_column, $block_id = 0)
 
 	$request = $db->query('', '
 		SELECT
-			row
+			`row`
 		FROM {db_prefix}sp_blocks
 		WHERE col = {int:col}' . (!empty($block_id) ? '
 			AND id_block != {int:current_id}' : '') . '
-		ORDER BY row DESC
+		ORDER BY `row` DESC
 		LIMIT 1',
 		array(
 			'col' => $block_column,
@@ -1640,7 +1640,7 @@ function sp_block_update($blockInfo)
 
 	if (!empty($blockInfo['row']))
 	{
-		$block_fields[] = "row = {int:row}";
+		$block_fields[] = "`row` = {int:row}";
 	}
 	else
 	{
@@ -1705,7 +1705,7 @@ function sp_block_get_position($block_id)
 
 	$request = $db->query('', '
 		SELECT
-			col, row
+			col, `row`
 		FROM {db_prefix}sp_blocks
 		WHERE id_block = {int:block_id}
 		LIMIT 1',
@@ -1734,7 +1734,7 @@ function sp_block_move_col($block_id, $target_side)
 
 	$db->query('', '
 		UPDATE {db_prefix}sp_blocks
-		SET col = {int:target_side}, row = {int:temp_row}
+		SET col = {int:target_side}, `row` = {int:temp_row}
 		WHERE id_block = {int:block_id}',
 		array(
 			'target_side' => $target_side,
@@ -1761,9 +1761,9 @@ function sp_blocks_move_row($block_id, $target_side, $target_row)
 	// Shift all the rows below the insertion point down one
 	$db->query('', '
 		UPDATE {db_prefix}sp_blocks
-		SET row = row + 1
+		SET `row` = `row` + 1
 		WHERE col = {int:target_side}
-			AND row >= {int:target_row}',
+			AND `row` >= {int:target_row}',
 		array(
 			'target_side' => $target_side,
 			'target_row' => $target_row,
@@ -1773,7 +1773,7 @@ function sp_blocks_move_row($block_id, $target_side, $target_row)
 	// Set the new block to the now available row position
 	$db->query('', '
 		UPDATE {db_prefix}sp_blocks
-		SET row = {int:target_row}
+		SET `row` = {int:target_row}
 		WHERE id_block = {int:block_id}',
 		array(
 			'target_row' => $target_row,
