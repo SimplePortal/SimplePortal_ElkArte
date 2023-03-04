@@ -24,14 +24,14 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	 */
 	public function pre_dispatch()
 	{
-		global $context;
+		global $context, $txt;
 
 		if (!sp_is_active())
 		{
 			redirectexit();
 		}
 
-		$context['page_title'] = $context['forum_name'];
+		$context['page_title'] = sprintf($txt['forum_index'], $context['forum_name']);
 
 		if (isset($context['page_title_html_safe']))
 		{
@@ -196,7 +196,7 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	 */
 	public function action_sportal_index()
 	{
-		global $context, $modSettings;
+		global $context, $modSettings, $scripturl;
 
 		// Showing articles on the index page?
 		if (!empty($modSettings['sp_articles_index']))
@@ -240,6 +240,8 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 		}
 
 		$context['sub_template'] = 'portal_index';
+		$context['canonical_url'] = $scripturl;
+
 		Templates::instance()->load('Portal');
 	}
 
