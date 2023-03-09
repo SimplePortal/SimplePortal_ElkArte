@@ -4,10 +4,11 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2022 SimplePortal Team
+ * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
+
 
 /**
  * Show the list of available blocks in the system
@@ -306,7 +307,7 @@ function template_block_edit()
 						<dd>
 							<select id="block_column" name="block_column">';
 
-		$block_sides = array(5 => 'Header', 1 => 'Left', 2 => 'Top', 3 => 'Bottom', 4 => 'Right', 6 => 'Footer');
+		$block_sides = array(1 => 'Left', 2 => 'Top', 3 => 'Bottom', 4 => 'Right', 5 => 'Header', 6 => 'Footer');
 		foreach ($block_sides as $id => $side)
 			echo '
 								<option value="', $id, '">', $txt['sp-position' . $side], '</option>';

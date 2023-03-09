@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2022 SimplePortal Team
+ * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 1.0.2
  */
 
 if (file_exists(__DIR__ . '/SSI.php') && !defined('ELK'))
@@ -37,7 +37,7 @@ $defaults = array(
 );
 
 $updates = array(
-	'sp_version' => '1.0.1',
+	'sp_version' => '1.0.2',
 	'front_page' => 'PortalMain_Controller',
 	'admin_features' => $modSettings['admin_features'] . ',pt'
 );
@@ -66,7 +66,7 @@ elseif (file_exists($standalone_file))
 	$current_data = file_get_contents($standalone_file);
 	if (strpos($current_data, 'full/path/to/forum') !== false)
 	{
-		$fp = fopen($standalone_file, 'w+');
+		$fp = fopen($standalone_file, 'wb+');
 		fwrite($fp, str_replace('full/path/to/forum', BOARDDIR, $current_data));
 		fclose($fp);
 	}
