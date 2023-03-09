@@ -197,7 +197,7 @@ function sp_changeState($type = null, $id = null)
 			'table' => $query['table'],
 			'column' => $query['column'],
 			'query_id' => $query['query_id'],
-			'id' => $id,
+			'id' => $query['id'],
 			'is_active' => 1,
 		)
 	);
@@ -245,7 +245,9 @@ function sp_general_load_themes()
 	);
 	$SPortal_themes = array('0' => &$txt['portalthemedefault']);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$SPortal_themes[$row['id_theme']] = $row['name'];
+	}
 	$db->free_result($request);
 
 	return $SPortal_themes;
@@ -259,7 +261,7 @@ function sp_general_load_themes()
  * @param string $show - 'normal' => will show all groups, and add a guest and regular member (Standard)
  *                       'post' => will load only post groups
  *                       'master' => will load only not postbased groups
- * @param string $contextName - where the data should stored in the $context
+ * @param string $contextName - where the data should be stored in $context
  * @param string $subContext
  *
  * @return null
@@ -304,7 +306,7 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 			$selectedGroups = explode(',', $selectedGroups);
 		}
 
-		// Remove all strings, i will only allow ids :P
+		// Remove all strings, I will only allow ids :P
 		foreach ($selectedGroups as $k => $i)
 		{
 			$selectedGroups[$k] = (int) $i;
@@ -317,7 +319,7 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 		$selectedGroups = array();
 	}
 
-	// Okay let's checkup the show function
+	// Okay let us checkup the show function
 	$show_option = array(
 		'normal' => 'id_group != 3',
 		'moderator' => 'id_group != 1 AND id_group != 3',
@@ -413,7 +415,9 @@ function sp_load_membergroups()
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		$groups[(int) $row['id_group']] = trim($row['group_name']);
+	}
 	$db->free_result($request);
 
 	return $groups;
@@ -439,7 +443,7 @@ function sp_count_categories()
 }
 
 /**
- * Loads all of the category's in the system
+ * Loads all the category's in the system
  *
  * - Returns an indexed array of the categories
  *
@@ -646,7 +650,7 @@ function sp_count_articles()
 }
 
 /**
- * Loads all of the articles in the system
+ * Loads all the articles in the system
  * Returns an indexed array of the articles
  *
  * @param int $start
@@ -723,7 +727,7 @@ function sp_load_articles($start, $items_per_page, $sort)
 }
 
 /**
- * Removes a article or group of articles by id's
+ * Removes an article or group of articles by id
  *
  * @param int[]|int $article_ids
  */
@@ -746,7 +750,7 @@ function sp_delete_articles($article_ids = array())
 		)
 	);
 
-	// Remove attachments, thumbs, etc for these articles
+	// Remove attachments, thumbs, etc. for these articles
 	foreach ($article_ids as $aid)
 	{
 		$attachmentQuery = array(
@@ -761,7 +765,7 @@ function sp_delete_articles($article_ids = array())
 /**
  * Validates that an articles id is not duplicated in a given namespace
  *
- * return true if its a duplicate or false if its unique
+ * return true if it is a duplicate or false if its unique
  *
  * @param int $article_id
  * @param string $namespace
@@ -931,7 +935,7 @@ function sp_count_pages()
 }
 
 /**
- * Loads all of the pages in the system
+ * Loads all the pages in the system
  * Returns an indexed array of the pages
  *
  * @param int $start
@@ -1004,7 +1008,7 @@ function sp_delete_pages($page_ids = array())
 }
 
 /**
- * Saves or updates an page
+ * Saves or updates a page
  *
  * - Add items as a new page is is_new is true otherwise updates and existing one
  *
@@ -1111,7 +1115,7 @@ function sp_count_shoutbox()
 }
 
 /**
- * Loads all of the shoutboxes in the system
+ * Loads all the shoutboxes in the system
  * Returns an indexed array of the shoutboxes
  *
  * @param int $start
@@ -1384,7 +1388,7 @@ function sp_count_profiles($type = 1)
 }
 
 /**
- * Loads all of the permission profiles in the system
+ * Loads all permission profiles in the system
  * Returns an indexed array of them
  *
  * @param int $start
@@ -1400,7 +1404,7 @@ function sp_load_profiles($start, $items_per_page, $sort, $type = 1)
 
 	$db = database();
 
-	// First load up all of the permission profiles names in the system
+	// First load up all the permission profiles names in the system
 	$request = $db->query('', '
 		SELECT
 			id_profile, name
@@ -1913,7 +1917,9 @@ function sp_block_template_helpers()
 	);
 	$helpers['boards'] = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$helpers['boards']['b' . $row['id_board']] = $row['name'];
+	}
 	$db->free_result($request);
 
 	// Get all the pages loaded in the system for template use
@@ -1925,7 +1931,9 @@ function sp_block_template_helpers()
 	);
 	$helpers['pages'] = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$helpers['pages']['p' . $row['id_page']] = $row['title'];
+	}
 	$db->free_result($request);
 
 	// Same for categories
@@ -1937,7 +1945,9 @@ function sp_block_template_helpers()
 	);
 	$helpers['categories'] = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$helpers['categories']['c' . $row['id_category']] = $row['name'];
+	}
 	$db->free_result($request);
 
 	// And finish up with articles
@@ -1949,7 +1959,9 @@ function sp_block_template_helpers()
 	);
 	$helpers['articles'] = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$helpers['articles']['a' . $row['id_article']] = $row['title'];
+	}
 	$db->free_result($request);
 
 	return $helpers;
