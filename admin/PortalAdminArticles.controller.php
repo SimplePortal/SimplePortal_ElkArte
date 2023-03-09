@@ -4,7 +4,7 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2022 SimplePortal Team
+ * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.1
  */
@@ -840,7 +840,7 @@ class ManagePortalArticles_Controller extends Action_Controller
 		}
 
 		$context['article']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
-		if (empty($context['article']['permission_profiles']))
+		if (empty($context['article']['style_profiles']))
 		{
 			throw new Elk_Exception('error_sp_no_style_profiles', false);
 		}
