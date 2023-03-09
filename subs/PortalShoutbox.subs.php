@@ -4,7 +4,7 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2022 SimplePortal Team
+ * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  */
@@ -12,7 +12,6 @@
 use BBC\BBCParser;
 use BBC\Codes;
 use BBC\ParserWrapper;
-
 
 /**
  * Load a shout box's parameters by ID
