@@ -437,12 +437,27 @@ function updateBlockStyleProfiles($has_style_profiles)
 		}
 		elseif (!empty($style))
 		{
+			// Try to creat a useful name
+			$temp = explode('|', $style);
+			$converted = '';
+			foreach ($temp as $item)
+			{
+				list ($key, $value) = explode('~', $item);
+				if  ($value === '' || $value === false || $value === '0')
+				{
+					continue;
+				}
+
+				$converted .= $key . '=' . $value . '|';
+			}
+			$converted = trim($converted, ' |=');
+
 			// New style, add it and get a new id.
 			$db->insert('ignore',
 				'{db_prefix}sp_profiles',
 				array('type' => 'int', 'name' => 'text', 'value' => 'text'),
 				array(
-					array(2, '$_style_' . $existingLabels[$id], $style),
+					array(2, '$_' . $converted, $style),
 				),
 				array('id_profile')
 			);
