@@ -2,7 +2,7 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2022 SimplePortal Team
+ * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.1
  */
@@ -532,11 +532,7 @@ body {
 .shoutbox_time {
 	border-bottom: 1px dashed #CCCCCC;
 	color: #777777;
-}
-
-.shoutbox_time {
 	padding-left: 5px;
-	color: #777777;
 }
 
 .shoutbox_delete {
@@ -716,8 +712,7 @@ body {
 	border: 1px solid #AFAFAF;
 	border-top: 1px solid #CFCFCF;
 	border-left: 1px solid #BFBFBF;
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FFFFFF, #E4E4E4);
+	background: #F4F4F4 linear-gradient(to bottom, #FFFFFF, #E4E4E4);
 	color: #555555;
 	box-shadow: 1px 1px 2px #E5E5E5, 0 -1px 0 #E4E4E4 inset;
 }

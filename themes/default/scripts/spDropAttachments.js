@@ -8,7 +8,7 @@
 
 /**
  * This file contains javascript associated with the drag drop of files functionality
- * while creating articles
+ * while creating articles.
  */
 
 /**

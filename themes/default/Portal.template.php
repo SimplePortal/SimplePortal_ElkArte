@@ -4,7 +4,7 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2022 SimplePortal Team
+ * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.1
  */
@@ -301,7 +301,7 @@ function template_portal_below()
 /**
  * Generic template to wrap blocks
  *
- * @param mixed[] $block
+ * @param array $block
  * @param int $side
  */
 function template_block($block, $side = -1)
@@ -344,7 +344,7 @@ function template_block($block, $side = -1)
 /**
  * Wrap a block in our default wrapper
  *
- * @param mixed[] $block
+ * @param array $block
  * @param int $side
  */
 function template_block_default($block, $side)

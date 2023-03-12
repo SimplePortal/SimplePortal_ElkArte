@@ -4,7 +4,7 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2022 SimplePortal Team
+ * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.2
  */
@@ -58,8 +58,8 @@ function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings;
 
-	defined('SPORTAL_VERSION') || define('SPORTAL_VERSION', '1.0.1');
-	defined('SPORTAL_STALE') || define('SPORTAL_STALE', 'sp101');
+	defined('SPORTAL_VERSION') || define('SPORTAL_VERSION', '1.0.2');
+	defined('SPORTAL_STALE') || define('SPORTAL_STALE', 'sp102');
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 	{
@@ -74,7 +74,7 @@ function sportal_init($standalone = false)
 	// Not running standalone then we need to load in some template information
 	if (!$standalone)
 	{
-		// Load the portal css and the default css if its not yet loaded.
+		// Load the portal css and the default css if it's not loaded.
 		loadCSSFile('portal.css', ['stale' => SPORTAL_STALE]);
 
 		// rtl css as well?
@@ -236,29 +236,27 @@ function sportal_init_headers()
 
 	// We use drag and sort blocks for the front page
 	$javascript = '';
-	if ($modSettings['sp_portal_mode'] == 1)
+	// Javascript to allow D&D ordering of the front page blocks, not for guests
+	if (($modSettings['sp_portal_mode'] == 1)
+			&& empty($_REQUEST['action']) && empty($_REQUEST['board']) && !($user_info['is_guest'] || $user_info['id'] == 0))
 	{
-		// Javascript to allow D&D ordering of the front page blocks, not for guests
-		if (empty($_REQUEST['action']) && empty($_REQUEST['board']) && !($user_info['is_guest'] || $user_info['id'] == 0))
-		{
-			$modSettings['jquery_include_ui'] = true;
-			$javascript .= '
-				// Set up our sortable call
-				$().elkSortable({
-					sa: "userblockorder",
-					error: "' . $txt['portal_order_error'] . '",
-					title: "' . $txt['portal_order_title'] . '",
-					handle: ".sp_drag_header",
-					tag: ".sp_column",
-					opacity: 0.9,
-					connect: ".sp_column",
-					containment: "#main_content_section",
-					tolerance: "pointer",
-					href: "/",
-					placeholder: "ui-state-highlight",
-					axis: "",
-				});';
-		}
+		$modSettings['jquery_include_ui'] = true;
+		$javascript .= '
+			// Set up our sortable call
+			$().elkSortable({
+				sa: "userblockorder",
+				error: "' . $txt['portal_order_error'] . '",
+				title: "' . $txt['portal_order_title'] . '",
+				handle: ".sp_drag_header",
+				tag: ".sp_column",
+				opacity: 0.9,
+				connect: ".sp_column",
+				containment: "#main_content_section",
+				tolerance: "pointer",
+				href: "/",
+				placeholder: "ui-state-highlight",
+				axis: "",
+			});';
 	}
 
 	if ($modSettings['sp_resize_images'])
@@ -321,11 +319,6 @@ function sportal_load_blocks()
 	global $context, $modSettings, $options;
 
 	$context['SPortal']['sides'] = array(
-		5 => array(
-			'id' => '5',
-			'name' => 'header',
-			'active' => true,
-		),
 		1 => array(
 			'id' => '1',
 			'name' => 'left',
@@ -345,6 +338,11 @@ function sportal_load_blocks()
 			'id' => '4',
 			'name' => 'right',
 			'active' => !empty($modSettings['showright']),
+		),
+		5 => array(
+			'id' => '5',
+			'name' => 'header',
+			'active' => true,
 		),
 		6 => array(
 			'id' => '6',
@@ -489,7 +487,7 @@ function resetMemberLayout()
 }
 
 /**
- * This function, returns all of the information about particular blocks.
+ * This function, returns all information about particular blocks.
  *
  * @param int|null $column_id
  * @param int|null $block_id
@@ -550,7 +548,8 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 			{
 				continue;
 			}
-			elseif (!isset($show_it[$row['visibility']]))
+
+			if (!isset($show_it[$row['visibility']]))
 			{
 				$show_it[$row['visibility']] = sportal_check_visibility($row['visibility']);
 
@@ -565,7 +564,9 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 		{
 			// Allow custom blocks to load txt values.
 			if (empty($txt['sp_function_' . $row['type'] . '_label']))
+			{
 				sp_instantiate_block($row['type']);
+			}
 
 			$return[$row['id_block']] = array(
 				'id' => $row['id_block'],
@@ -647,7 +648,7 @@ function sportal_process_visibility($query)
 		'action' => array('portal'),
 	);
 
-	// Set some action exceptions so they use a common root name
+	// Set some action exceptions, so they use a common root name
 	$exceptions = array(
 		'post' => array('announce', 'editpoll', 'emailuser', 'post2', 'sendtopic'),
 		'register' => array('activate', 'coppa'),
@@ -679,7 +680,7 @@ function sportal_process_visibility($query)
 		}
 	}
 
-	// Set the action to a common one, eg reminder => login
+	// Set the action to a common one, e.g. reminder => login
 	foreach ($exceptions as $key => $exception)
 	{
 		if (in_array($action, $exception))
@@ -805,10 +806,8 @@ function sportal_process_visibility($query)
 				{
 					continue;
 				}
-				else
-				{
-					return false;
-				}
+
+				return false;
 			}
 		}
 	}
@@ -818,33 +817,40 @@ function sportal_process_visibility($query)
 	{
 		return false;
 	}
-	// If we will display show the block.
-	elseif (in_array('all', $query))
+
+	if (in_array('all', $query))
 	{
 		return true;
 	}
+
+	if (($portal && in_array('portal', $query)) || ($forum && in_array('forum', $query)))
+	{
+		return true;
+	}
+
+	// If we display / show the block.
 	// If we are on portal, show portal blocks; if we are on forum, show forum blocks.
-	elseif (($portal && in_array('portal', $query)) || ($forum && in_array('forum', $query)))
+	if (!empty($action) && $action !== 'portal' && (in_array('allaction', $query) || in_array($action, $query)))
 	{
 		return true;
 	}
-	elseif (!empty($action) && $action !== 'portal' && (in_array('allaction', $query) || in_array($action, $query)))
+
+	if (!empty($board) && (in_array('allboard', $query) || in_array($board, $query)))
 	{
 		return true;
 	}
-	elseif (!empty($board) && (in_array('allboard', $query) || in_array($board, $query)))
+
+	if (!empty($page) && (in_array('allpage', $query) || in_array($page, $query)))
 	{
 		return true;
 	}
-	elseif (!empty($page) && (in_array('allpage', $query) || in_array($page, $query)))
+
+	if (!empty($category) && (in_array('allcategory', $query) || in_array($category, $query)))
 	{
 		return true;
 	}
-	elseif (!empty($category) && (in_array('allcategory', $query) || in_array($category, $query)))
-	{
-		return true;
-	}
-	elseif (!empty($article) && (in_array('allarticle', $query) || in_array($article, $query)))
+
+	if (!empty($article) && (in_array('allarticle', $query) || in_array($article, $query)))
 	{
 		return true;
 	}
@@ -858,10 +864,8 @@ function sportal_process_visibility($query)
 			{
 				continue;
 			}
-			else
-			{
-				return true;
-			}
+
+			return true;
 		}
 	}
 
@@ -874,7 +878,7 @@ function sportal_process_visibility($query)
  *
  * @param int $visibility_id
  *
- * @return mixed if to show the block or not
+ * @return bool|array if to show the block or not
  */
 function sportal_check_visibility($visibility_id)
 {
@@ -882,7 +886,7 @@ function sportal_check_visibility($visibility_id)
 
 	static $visibilities;
 
-	// Load the visibility profiles so we can put them to use on the blocks
+	// Load the visibility profiles, so we can put them to use on the blocks
 	if (!isset($visibilities))
 	{
 		$visibilities = sportal_get_profiles(null, 3);
@@ -894,7 +898,8 @@ function sportal_check_visibility($visibility_id)
 		// No id, assume its off
 		return false;
 	}
-	elseif (isset($visibilities[$visibility_id]))
+
+	if (isset($visibilities[$visibility_id]))
 	{
 		// Can we show it here, should we?
 		if ($context['browser_body_id'] === 'mobile' && empty($visibilities[$visibility_id]['mobile_view']))
@@ -904,11 +909,9 @@ function sportal_check_visibility($visibility_id)
 
 		return sportal_process_visibility($visibilities[$visibility_id]['final']);
 	}
-	else
-	{
-		// No block for you
-		return false;
-	}
+
+	// No block for you
+	return false;
 }
 
 /**
@@ -1120,10 +1123,21 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 		$name .= $randomizer;
 	}
 
-	// Build the image tag
-	return '<img src="' . $settings['sp_images_url'] . '/' . $name . '.png" alt="' . $alt . '"' . (!empty($title)
-			? ' title="' . $title . '"' : '') . (!empty($width) ? ' width="' . $width . '"' : '') . (!empty($height)
-			? ' height="' . $height . '"' : '') . (!empty($id) ? ' id="' . $id . '"' : '') . ' />';
+	// Build the image tag, with default fallback
+	if (file_exists($settings['sp_images_url'] . '/' . $name . '.png'))
+	{
+		$file_name = $settings['sp_images_url'] . '/' . $name . '.png';
+	}
+	else
+	{
+		$file_name = $settings['default_images_url'] . '/sp/' . $name . '.png';
+	}
+
+	return '<img src="' . $file_name . '" alt="' . $alt . '"' .
+		(!empty($title) ? ' title="' . $title . '"' : '') .
+		(!empty($width) ? ' width="' . $width . '"' : '') .
+		(!empty($height) ? ' height="' . $height . '"' : '') .
+		(!empty($id) ? ' id="' . $id . '"' : '') . ' />';
 }
 
 /**
@@ -1184,7 +1198,7 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 		}
 
 		$randomizer++;
-		$name = $name . $randomizer;
+		$name .= $randomizer;
 	}
 
 	// Build the attributes
@@ -1349,7 +1363,7 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 		$parameters['status'] = 1;
 	}
 
-	// Lets see what we can find
+	// Let us see what we can find
 	$request = $db->query('', '
 		SELECT
 			id_category, namespace, name, description, permissions, articles, status
@@ -1418,7 +1432,7 @@ function sportal_increase_viewcount($name, $id)
 		array(
 			'table' => $query['table'],
 			'query_id' => $query['query_id'],
-			'id' => $id,
+			'id' => $query['id'],
 		)
 	);
 
@@ -1507,7 +1521,7 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 		}
 		$db->free_result($request);
 
-		// Save this so we don't have to do it again
+		// Save this, so we don't have to do it again
 		$cache[$cache_name] = $return;
 	}
 
@@ -1515,13 +1529,13 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 }
 
 /**
- * Shortens the lenght of a string.
+ * Shortens the length of a string.
  *
  * What it does:
  * - If the string is pure html or bcc (parsed) it will properly shorten it to that many
  * characters, accounting as best it can for presentational tags etc.
- * - Will use [cutoff] tag if present as primary and passed lenght second
- * - If no shortening is defined (cutoff or lenght), it returns the full parsed string
+ * - Will use [cutoff] tag if present as primary and passed length second
+ * - If no shortening is defined (cutoff or length), it returns the full parsed string
  *
  * @param string $body
  * @param string $type
@@ -1630,8 +1644,14 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 			global $txt;
 
 			$body = trim(un_htmlspecialchars($body));
-			$body = trim($body, '<?php');
-			$body = trim($body, '?>');
+			if (strpos($body, '<?php') === 0)
+			{
+				$body = substr($body, 5);
+			}
+			if (substr($body, -2) === '?>')
+			{
+				$body = substr($body, 0, -2);
+			}
 
 			ob_start();
 			try
@@ -1854,10 +1874,8 @@ function sportal_select_style($style_id)
 	{
 		return $styles[$style_id];
 	}
-	else
-	{
-		return sportal_parse_style('explode', null, true);
-	}
+
+	return sportal_parse_style('explode', null, true);
 }
 
 /**
@@ -1915,10 +1933,8 @@ function sp_prevent_flood($type, $fatal = true)
 		{
 			throw new Elk_Exception('error_sp_flood_' . $type, false, array($time_limit));
 		}
-		else
-		{
-			return isset($txt['error_sp_flood_' . $type]) ? sprintf($txt['error_sp_flood_' . $type], $time_limit) : true;
-		}
+
+		return isset($txt['error_sp_flood_' . $type]) ? sprintf($txt['error_sp_flood_' . $type], $time_limit) : true;
 	}
 
 	return false;

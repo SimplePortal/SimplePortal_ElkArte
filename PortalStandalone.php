@@ -4,7 +4,7 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2022 SimplePortal Team
+ * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
  * @version 1.0.0
  *
@@ -48,7 +48,6 @@ if (preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $data, $match))
 		define('FORUM_VERSION', $forum_version);
 	}
 }
-
 
 // Its all about the blocks
 require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');
