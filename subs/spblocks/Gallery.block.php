@@ -186,7 +186,7 @@ function template_sp_gallery_levgal($item, $data)
 		<br />' . ($data['fancybox_enabled']
 			? '<a href="' . $item['item_base'] . '" rel="gallery" data-fancybox="1">'
 			: '<a href="' . $item['item_url'] . '">') . '
-			<img src="', $item['thumbnail'], '" alt="', $item['item_name'], '" title="', $item['item_name'], '" /></a>
+			<img src="', $item['thumbnail'], '"', $item['thumb_html'] ?? '', ' alt="', $item['item_name'], '" title="', $item['item_name'], '" /></a>
 		</a>
 		<br />
 		<div class="sp_image_topic">
