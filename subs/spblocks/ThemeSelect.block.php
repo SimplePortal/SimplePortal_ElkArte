@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.2
  */
 
 
@@ -39,7 +39,7 @@ class Theme_Select_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $user_info, $settings, $language, $txt;
+		global $user_info, $settings, $language, $txt, $modSettings;
 
 		// Going to need some help to pick themes
 		loadLanguage('Profile');
@@ -58,6 +58,8 @@ class Theme_Select_Block extends SP_Abstract_Block
 		// Load in all the themes in the system
 		$current_theme = empty($current_theme) ? -1 : $current_theme;
 		$available_themes = installedThemes();
+		$knownThemes = !empty($modSettings['knownThemes']) ? explode(',', $modSettings['knownThemes']) : array();
+		$knownThemes = array_map('intval', $knownThemes);
 
 		// Set the guest theme
 		if (!isset($available_themes[$this->_modSettings['theme_guests']]))
@@ -72,11 +74,20 @@ class Theme_Select_Block extends SP_Abstract_Block
 			$guest_theme = $this->_modSettings['theme_guests'];
 		}
 
+		// Drop any installed ones that they can not pick
+		foreach ($available_themes as $id_theme)
+		{
+			if (!in_array((int) $id_theme['id'], $knownThemes, true))
+			{
+				unset($available_themes[$id_theme['id']]);
+			}
+		}
+
 		$current_images_url = $settings['images_url'];
 
 		foreach ($available_themes as $id_theme => $theme_data)
 		{
-			if ($id_theme == 0)
+			if ($id_theme === 0)
 			{
 				continue;
 			}
