@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.2
  */
 
 use BBC\ParserWrapper;
@@ -174,35 +174,32 @@ class Shoutbox_Block extends SP_Abstract_Block
 			{
 				$this->data['smileys']['normal'] = $this->_smileys();
 			}
+			elseif (($temp = cache_get_data('shoutbox_smileys', 3600)) == null)
+			{
+				$request = $this->_db->query('', '
+					SELECT
+						code, filename, description, smiley_row, hidden
+					FROM {db_prefix}smileys
+					WHERE hidden IN ({array_int:hidden})
+					ORDER BY smiley_row, smiley_order',
+					array(
+						'hidden' => array(0, 2),
+					)
+				);
+				while ($row = $this->_db->fetch_assoc($request))
+				{
+					$row['filename'] = htmlspecialchars($row['filename']);
+					$row['description'] = htmlspecialchars($row['description']);
+					$row['code'] = htmlspecialchars($row['code']);
+					$this->data['smileys'][empty($row['hidden']) ? 'normal' : 'popup'][] = $row;
+				}
+				$this->_db->free_result($request);
+
+				cache_put_data('shoutbox_smileys', $this->data['smileys'], 3600);
+			}
 			else
 			{
-				if (($temp = cache_get_data('shoutbox_smileys', 3600)) == null)
-				{
-					$request = $this->_db->query('', '
-						SELECT
-							code, filename, description, smiley_row, hidden
-						FROM {db_prefix}smileys
-						WHERE hidden IN ({array_int:hidden})
-						ORDER BY smiley_row, smiley_order',
-						array(
-							'hidden' => array(0, 2),
-						)
-					);
-					while ($row = $this->_db->fetch_assoc($request))
-					{
-						$row['filename'] = htmlspecialchars($row['filename']);
-						$row['description'] = htmlspecialchars($row['description']);
-						$row['code'] = htmlspecialchars($row['code']);
-						$this->data['smileys'][empty($row['hidden']) ? 'normal' : 'popup'][] = $row;
-					}
-					$this->_db->free_result($request);
-
-					cache_put_data('shoutbox_smileys', $this->data['smileys'], 3600);
-				}
-				else
-				{
-					$this->data['smileys'] = $temp;
-				}
+				$this->data['smileys'] = $temp;
 			}
 
 			foreach (array_keys($this->data['smileys']) as $location)
@@ -228,7 +225,7 @@ class Shoutbox_Block extends SP_Abstract_Block
 	}
 
 	/**
-	 * Load in the avaialbe BBC codes that a shoutbox can use
+	 * Load in the available BBC codes that a shoutbox can use
 	 *
 	 * @return array
 	 */

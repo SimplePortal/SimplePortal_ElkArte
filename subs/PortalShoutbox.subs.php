@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.2
  */
 
 use BBC\BBCParser;
@@ -106,21 +106,22 @@ function sportal_get_shouts($shoutbox, $parameters)
 	$cache = !empty($parameters['cache']);
 	$can_delete = !empty($parameters['can_moderate']);
 
-	// BBC Parser just for the shoutbox
-	$parser = new BBCParser($codes = new Codes());
-
-	// We only allow a few codes in the shoutbox, so turn off others
-	foreach ($codes->getTags() as $key => $code)
-	{
-		if (!in_array($key, $bbc))
-		{
-			$codes->disable($key);
-		}
-	}
-
 	// Cached, use it first
 	if (!empty($start) || !$cache || ($shouts = cache_get_data('shoutbox_shouts-' . $shoutbox, 240)) === null)
 	{
+		// BBC Parser just for the shoutbox
+		$spParser = new BBCParser($spCodes = new Codes());
+		$spSmiley = ParserWrapper::instance()->getSmileyParser();
+
+		// We only allow a few codes in the shoutbox, so turn off others
+		foreach ($spCodes->getTags() as $key => $code)
+		{
+			if (!in_array($key, $bbc, true))
+			{
+				$spCodes->disable($key);
+			}
+		}
+
 		$request = $db->query('', '
 			SELECT
 				sh.id_shout, sh.body, sh.log_time,
@@ -145,6 +146,8 @@ function sportal_get_shouts($shoutbox, $parameters)
 		while ($row = $db->fetch_assoc($request))
 		{
 			$online_color = !empty($row['member_group_color']) ? $row['member_group_color'] : $row['post_group_color'];
+			$message = $spParser->parse($row['body']);
+			$message = $spSmiley->setEnabled(true)->parse($message);
 			$shouts[$row['id_shout']] = array(
 				'id' => $row['id_shout'],
 				'author' => array(
@@ -157,7 +160,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 					'color' => $online_color,
 				),
 				'time' => $row['log_time'],
-				'text' => $parser->enableSmileys(true)->parse($row['body'])
+				'text' => $message
 			);
 		}
 		$db->free_result($request);
@@ -166,10 +169,10 @@ function sportal_get_shouts($shoutbox, $parameters)
 		{
 			cache_put_data('shoutbox_shouts-' . $shoutbox, $shouts, 240);
 		}
-	}
 
-	// Restore BBC codes
-	unset($parser);
+		// Restore BBC codes
+		unset($spParser, $spCodes, $spSmiley);
+	}
 
 	foreach ($shouts as $shout)
 	{
