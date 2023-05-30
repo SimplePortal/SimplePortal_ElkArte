@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 1.0.2
  */
 
 
@@ -192,7 +192,7 @@ function template_view_article()
 			echo '
 			<section id="sp_comment" class="sp_content_padding">
 					<form action="', $context['article']['href'], '" method="post" accept-charset="UTF-8">
-					<textarea name="body" rows="5" cols="50" style="width: 100%;padding: 0.1em 0.2em" tabindex="', $context['tabindex']++, '">', !empty($context['article']['comment']['body']) ? $context['article']['comment']['body'] : '', '</textarea>
+					<textarea id="body" name="body" rows="5" cols="50" style="width: 100%;padding: 0.1em 0.2em" tabindex="', $context['tabindex']++, '">', !empty($context['article']['comment']['body']) ? $context['article']['comment']['body'] : '', '</textarea>
 					<div class="submitbutton">
 						<input type="submit" name="submit" value="', !empty($context['article']['comment']) ? $txt['sp_modify'] : $txt['sp_submit'], '" class="right_submit" />
 						<input type="hidden" name="comment" value="', !empty($context['article']['comment']['id']) ? $context['article']['comment']['id'] : 0, '" />
@@ -200,6 +200,17 @@ function template_view_article()
 					</div>
 				</form>
 			</section>';
+
+			// If adding a comment, set them in the textarea
+			if (isset($_GET['sa']) && $_GET['sa'] === 'write')
+			{
+				addInlineJavascript('
+				setTimeout(function() {
+					let textarea = document.getElementById("body");
+					textarea.focus();
+					textarea.select();
+				}, 1);', true);
+			}
 		}
 
 		echo '
