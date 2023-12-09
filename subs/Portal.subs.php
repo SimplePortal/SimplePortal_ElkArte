@@ -33,7 +33,7 @@ function sp_is_active()
 	}
 
 	// Need to determine if we are even active
-	if ((!empty($modSettings['sp_disableMobile']) && $context['browser_body_id'] === 'mobile') && empty($_GET['page']) && empty($_GET['article'])
+	if (((!empty($modSettings['sp_disableMobile']) && $context['browser_body_id'] === 'mobile') && empty($_GET['page']) && empty($_GET['article']))
 		|| !empty($settings['disable_sp'])
 		|| !empty($modSettings['disable_sp'])
 		|| empty($modSettings['sp_portal_mode'])
@@ -51,7 +51,7 @@ function sp_is_active()
 /**
  * Initializes the portal, outputs all the blocks as needed
  *
- * @param boolean $standalone
+ * @param bool $standalone
  * @throws Elk_Exception
  */
 function sportal_init($standalone = false)
@@ -1211,7 +1211,7 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
  *
  * @param string $action implode or explode
  * @param string $setting string of style options joined on name~value|name~value
- * @param boolean $process
+ * @param bool $process
  *
  * @return array()
  */
@@ -1324,8 +1324,8 @@ function sportal_parse_style($action, $setting = '', $process = false)
  * Loads a category by id, or category's by namespace
  *
  * @param int|string|null $category_id
- * @param boolean $active
- * @param boolean $allowed
+ * @param bool $active
+ * @param bool $allowed
  * @param string $sort
  *
  * @return array()
@@ -1444,8 +1444,8 @@ function sportal_increase_viewcount($name, $id)
  * Load a page by ID
  *
  * @param int|null $page_id
- * @param boolean $active
- * @param boolean $allowed
+ * @param bool $active
+ * @param bool $allowed
  * @param string $sort
  *
  * @return array
@@ -1880,7 +1880,7 @@ function sportal_select_style($style_id)
  * - Currently only used by the shoutboxes and article comments
  *
  * @param string $type
- * @param boolean $fatal
+ * @param bool $fatal
  *
  * @return boolean
  */

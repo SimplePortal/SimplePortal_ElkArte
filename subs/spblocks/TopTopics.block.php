@@ -17,7 +17,7 @@
  *        'limit' => number of posts to show
  *        'type' => 0 replies or 1 views
  * @param int $id - not used in this block
- * @param boolean $return_parameters if true returns the configuration options for the block
+ * @param bool $return_parameters if true returns the configuration options for the block
  */
 class Top_Topics_Block extends SP_Abstract_Block
 {

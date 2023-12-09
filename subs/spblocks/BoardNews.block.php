@@ -23,7 +23,7 @@ use BBC\ParserWrapper;
  *			'per_page' => number of posts per page to show
  *			'attachment' => Show the first attachment as "blog" image
  * @param int $id - not used in this block
- * @param boolean $return_parameters if true returns the configuration options for the block
+ * @param bool $return_parameters if true returns the configuration options for the block
  */
 class Board_News_Block extends SP_Abstract_Block
 {

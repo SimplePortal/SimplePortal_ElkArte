@@ -20,7 +20,7 @@
  *        'disableDownloads' => don't show a download link
  *        'disableLink' => don't show a link to the post
  * @param int $id - not used in this block
- * @param boolean $return_parameters if true returns the configuration options for the block
+ * @param bool $return_parameters if true returns the configuration options for the block
  */
 class Attachment_Image_Block extends SP_Abstract_Block
 {

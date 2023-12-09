@@ -54,8 +54,8 @@ function sportal_get_article_views_comments($id)
  * Loads an article by id, or articles by namespace
  *
  * @param int|string|null $article_id id of an article or string for the articles in a namespace
- * @param boolean $active true to only return items that are active
- * @param boolean $allowed true to check permission access to the item
+ * @param bool $active true to only return items that are active
+ * @param bool $allowed true to check permission access to the item
  * @param string $sort string passed to the order by parameter
  * @param int|null $category_id id of the category
  * @param int|null $limit limit the number of results

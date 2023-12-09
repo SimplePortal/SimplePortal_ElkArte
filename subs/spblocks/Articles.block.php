@@ -23,7 +23,7 @@
  * 		'attachment' => Show the first attachment as "blog" image *if* no ILA tags found
  *
  * @param int $id - not used in this block
- * @param boolean $return_parameters if true returns the configuration options for the block
+ * @param bool $return_parameters if true returns the configuration options for the block
  */
 class Articles_Block extends SP_Abstract_Block
 {
