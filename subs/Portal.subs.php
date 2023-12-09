@@ -52,7 +52,7 @@ function sp_is_active()
  * Initializes the portal, outputs all the blocks as needed
  *
  * @param boolean $standalone
- * @throws \Elk_Exception
+ * @throws Elk_Exception
  */
 function sportal_init($standalone = false)
 {
@@ -353,6 +353,7 @@ function sportal_load_blocks()
 
 	// Get the blocks in the system
 	$blocks = getBlockInfo(null, null, true, true, true);
+	$context['SPortal']['blocks'] = [];
 
 	// If the member has arranged the blocks, display them like that
 	if (!empty($options['sp_block_layout']))
@@ -1870,12 +1871,7 @@ function sportal_select_style($style_id)
 		$styles = sportal_get_profiles(null, 2);
 	}
 
-	if (isset($styles[$style_id]))
-	{
-		return $styles[$style_id];
-	}
-
-	return sportal_parse_style('explode', null, true);
+	return $styles[$style_id] ?? sportal_parse_style('explode', null, true);
 }
 
 /**
