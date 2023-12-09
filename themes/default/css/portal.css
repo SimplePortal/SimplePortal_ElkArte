@@ -1073,7 +1073,7 @@ dl.sp_form img,
 	width: 16px;
 	height: 16px;
 	border: 0;
-	background: url(../images/buttons/delete.png) no-repeat scroll left center transparent;
+	background: url(../images/sp/delete.png) no-repeat scroll left center transparent;
 	cursor: pointer;
 }
 

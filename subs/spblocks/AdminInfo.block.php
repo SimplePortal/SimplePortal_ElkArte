@@ -16,7 +16,7 @@ use ElkArte\Errors\Log;
  *
  * @param array $parameters not used in this block
  * @param int $id - not used in this block
- * @param boolean $return_parameters if true returns the configuration options for the block
+ * @param bool $return_parameters if true returns the configuration options for the block
  */
 class Admin_Info_Block extends SP_Abstract_Block
 {

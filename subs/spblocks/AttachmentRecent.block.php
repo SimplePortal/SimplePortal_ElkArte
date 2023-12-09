@@ -16,7 +16,7 @@
  * @param array $parameters
  *		'limit' => Board(s) to select posts from
  * @param int $id - not used in this block
- * @param boolean $return_parameters if true returns the configuration options for the block
+ * @param bool $return_parameters if true returns the configuration options for the block
  */
 class Attachment_Recent_Block extends SP_Abstract_Block
 {

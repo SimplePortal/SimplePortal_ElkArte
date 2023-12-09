@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 1.0.2
  */
 
 use BBC\Codes;
@@ -850,7 +850,7 @@ class ManageSPortalModule_Controller extends Action_Controller
 				'title' => empty($txt['sp-forum']) ? 'Forum' : $txt['sp-forum'],
 				'data-icon' => 'i-spgroup',
 				'href' => $sportal_url,
-				'show' => in_array($modSettings['sp_portal_mode'], array(1, 3)) && empty($context['disable_sp']),
+				'show' => empty($context['disable_sp']),
 				'sub_buttons' => array(),
 			),
 		), 'after');

@@ -17,8 +17,8 @@ use BBC\ParserWrapper;
  * Load a shout box's parameters by ID
  *
  * @param int|null $shoutbox_id
- * @param boolean $active
- * @param boolean $allowed
+ * @param bool $active
+ * @param bool $allowed
  *
  * @return array
  */

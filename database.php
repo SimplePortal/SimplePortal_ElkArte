@@ -437,7 +437,7 @@ function updateBlockStyleProfiles($has_style_profiles)
 		}
 		elseif (!empty($style))
 		{
-			// Try to creat a useful name
+			// Try to create a useful name
 			$temp = explode('|', $style);
 			$converted = '';
 			foreach ($temp as $item)

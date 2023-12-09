@@ -15,7 +15,7 @@
  *
  * @param array $parameters -  not used in this block
  * @param int $id - not used in this block
- * @param boolean $return_parameters if true returns the configuration options for the block
+ * @param bool $return_parameters if true returns the configuration options for the block
  *@todo needs updating so it knows right vs left block for the flyout
  *
  */

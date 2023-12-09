@@ -18,7 +18,7 @@
  *        'topic' => topic id of the poll
  *        'type' => 1 the most recently posted poll, 2 displays a random poll, null for specific topic
  * @param int $id - not used in this block
- * @param boolean $return_parameters if true returns the configuration options for the block
+ * @param bool $return_parameters if true returns the configuration options for the block
  */
 class Show_Poll_Block extends SP_Abstract_Block
 {

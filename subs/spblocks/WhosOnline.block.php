@@ -13,7 +13,7 @@
 /**
  * Who's online block, shows count of users online names
  *
- * @param boolean $return_parameters if true returns the configuration options for the block
+ * @param bool $return_parameters if true returns the configuration options for the block
  */
 class Whos_Online_Block extends SP_Abstract_Block
 {

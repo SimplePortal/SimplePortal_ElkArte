@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.2
  */
 
 
@@ -398,14 +398,14 @@ function template_block_select_type()
 	// For every block type defined in the system
 	foreach($context['SPortal']['block_types'] as $index => $type)
 	{
-		$this_block = isset($context['SPortal']['block_inuse'][$type['function']]) ? $context['SPortal']['block_inuse'][$type['function']] : false;
+		$this_block = $context['SPortal']['block_inuse'][$type['function']] ?? false;
 		$this_title = !empty($this_block) ? sprintf($txt['sp-adminBlockInuse'], $context['location'][$this_block['column']]) . ': ' . (!empty($this_block['state']) ? '(' . $txt['sp-blocksActive'] . ')' : '') : '';
 
 		echo '
 				<li class="content">
 					<input type="radio" name="selected_type[]" id="block_', $type['function'], '" value="', $type['function'], '" class="input_radio" />
-					<strong><label ', (!empty($this_block) ? 'class="sp_block_active" ' : ''), 'for="block_', $type['function'], '" title="', $this_title, '">', isset($txt['sp_function_' . $type['function'] . '_label']) ? $txt['sp_function_' . $type['function'] . '_label'] : $type['function'], '</label></strong>
-					<p class="smalltext">', isset($txt['sp_function_' . $type['function'] . '_desc']) ? $txt['sp_function_' . $type['function'] . '_desc'] : $txt['not_applicable'], '</p>
+					<strong><label ', (!empty($this_block) ? 'class="sp_block_active" ' : ''), 'for="block_', $type['function'], '" title="', $this_title, '">', $txt['sp_function_' . $type['function'] . '_label'] ?? $type['function'], '</label></strong>
+					<p class="smalltext">', $txt['sp_function_' . $type['function'] . '_desc'] ?? $txt['not_applicable'], '</p>
 				</li>';
 	}
 

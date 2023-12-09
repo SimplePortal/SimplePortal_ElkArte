@@ -18,7 +18,7 @@ use BBC\PreparseCode;
  * @param array $parameters
  *        'shoutbox' => list of shoutboxes to choose from
  * @param int $id - not used in this block
- * @param boolean $return_parameters if true returns the configuration options for the block
+ * @param bool $return_parameters if true returns the configuration options for the block
  */
 class Shoutbox_Block extends SP_Abstract_Block
 {

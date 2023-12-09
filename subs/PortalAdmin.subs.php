@@ -68,7 +68,7 @@ function getFunctionInfo($function = null)
 			'function' => str_replace('_Block', '', $class),
 			'custom_label' => $class::blockName(),
 			'custom_desc' => $class::blockDescription(),
-			'standard_label' => isset($txt['sp_function_' . str_replace('_Block', '', $class) . '_label']) ? $txt['sp_function_' . str_replace('_Block', '', $class) . '_label'] : str_replace('_Block', '', $class)
+			'standard_label' => $txt['sp_function_' . str_replace('_Block', '', $class) . '_label'] ?? str_replace('_Block', '', $class)
 		);
 	}
 
@@ -527,7 +527,7 @@ function sp_check_duplicate_category($id, $namespace = '')
  * If adding a new one, will return the id of the new category
  *
  * @param array $data field name to value for use in query
- * @param boolean $is_new
+ * @param bool $is_new
  *
  * @return int
  */
@@ -802,8 +802,8 @@ function sp_duplicate_articles($article_id, $namespace)
  * - add items as a new article is is_new is true otherwise updates and existing one
  *
  * @param array $article_info array of fields details to save/update
- * @param boolean $is_new true for new insertion, false to update
- * @param boolean $update_counts true to update category counts
+ * @param bool $is_new true for new insertion, false to update
+ * @param bool $update_counts true to update category counts
  *
  * @return int
  */
@@ -1013,7 +1013,7 @@ function sp_delete_pages($page_ids = array())
  * - Add items as a new page is is_new is true otherwise updates and existing one
  *
  * @param array $page_info array of fields details to save/update
- * @param boolean $is_new true for new insertion, false to update
+ * @param bool $is_new true for new insertion, false to update
  *
  * @return int
  */
@@ -1500,7 +1500,7 @@ function sp_delete_profiles($remove_ids = array())
  * @param int $current_row
  * @param int $row
  * @param int $col
- * @param boolean $decrement
+ * @param bool $decrement
  *
  * @return null
  */

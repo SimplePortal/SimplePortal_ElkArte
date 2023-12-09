@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 1.0.2
  */
 
 use BBC\ParserWrapper;
@@ -317,17 +317,113 @@ class PortalArticles_Controller extends Action_Controller
 		list ($real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $width, $height) = $attachment;
 		$filename = $modSettings['sp_articles_attachment_dir'] . '/' . $id_attach . '_' . $file_hash . '.elk';
 
-		// This is done to clear any output that was made before now.
+		require_once(SUBSDIR . '/Attachments.subs.php');
+		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
+		$use_compression = $this->useCompression($mime_type);
+		$disposition = !isset($_GET['image']) ? 'attachment' : 'inline';
+		$do_cache = (!isset($_GET['image']) && getValidMimeImageType($file_ext) !== '') === false;
+
+		// Make sure the mime type warrants an inline display.
+		if (isset($_GET['image']) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
+		{
+			unset($_GET['image']);
+			$mime_type = '';
+		}
+		// Does this have a mime type?
+		elseif (empty($mime_type) || !(isset($_GET['image']) || getValidMimeImageType($file_ext) === ''))
+		{
+			$mime_type = '';
+			unset($_GET['image']);
+		}
+
+		$this->send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache);
+		$this->send_file($filename, $mime_type);
+
+		obExit(false);
+	}
+
+	/**
+	 * Sends the requested file to the user.  If the file is compressible e.g.
+	 * has a mine type of text/??? may compress the file prior to sending.
+	 *
+	 * @param string $filename
+	 * @param string $mime_type
+	 */
+	public function send_file($filename, $mime_type)
+	{
+		$body = file_get_contents($filename);
+		$use_compression = $this->useCompression($mime_type);
+		$length = filesize($filename);
+
+		// If we can/should compress this file
+		if ($use_compression && strlen($body) > 250)
+		{
+			$body = gzencode($body, 2);
+			$length = strlen($body);
+			header('Content-Encoding: gzip');
+			header('Vary: Accept-Encoding');
+		}
+
+		// Someone is getting a present
+		if (!empty($length))
+		{
+			header('Content-Length: ' . $length);
+		}
+
+		// Forcibly end any output buffering going on.
 		while (ob_get_level() > 0)
 		{
 			@ob_end_clean();
 		}
 
-		ob_start();
-		header('Content-Encoding: none');
+		echo $body;
+	}
+
+	/**
+	 * If the mime type benefits from compression e.g. text/xyz and gzencode is
+	 * available and the user agent accepts gzip, then return true, else false
+	 *
+	 * @param string $mime_type
+	 * @return bool if we should compress the file
+	 */
+	public function useCompression($mime_type)
+	{
+		global $modSettings;
+
+		// Support is available on the server
+		if (!function_exists('gzencode') || empty($modSettings['enableCompressedOutput']))
+		{
+			return false;
+		}
+
+		// Not compressible, or not supported / requested by client
+		if (!preg_match('~^(?:text/|application/(?:json|xml|rss\+xml)$)~i', $mime_type)
+			|| (!isset($_SERVER['HTTP_ACCEPT_ENCODING']) || strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === false))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Takes care of sending out the most common headers.
+	 *
+	 * @param string $filename Full path+file name of the file in the filesystem
+	 * @param string $eTag ETag cache validator
+	 * @param string $mime_type The mime-type of the file
+	 * @param bool $use_compression If use gzip compression - Deprecated since 1.1.9
+	 * @param string $disposition The value of the Content-Disposition header
+	 * @param string $real_filename The original name of the file
+	 * @param bool $do_cache If send the a max-age header or not
+	 * @param bool $check_filename When false, any check on $filename is skipped
+	 */
+	public function send_headers($filename, $eTag, $mime_type, $use_compression, $disposition, $real_filename, $do_cache, $check_filename = true)
+	{
+		global $txt;
 
 		// No point in a nicer message, because this is supposed to be an attachment anyway...
-		if (!file_exists($filename))
+		if ($check_filename === true && !file_exists($filename))
 		{
 			loadLanguage('Errors');
 
@@ -338,90 +434,68 @@ class PortalArticles_Controller extends Action_Controller
 			die('404 - ' . $txt['attachment_not_found']);
 		}
 
-		// If it hasn't been modified since the last time this attachment was retrieved,
-		// there's no need to display it again.
+		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
 		if (!empty($_SERVER['HTTP_IF_MODIFIED_SINCE']))
 		{
 			list ($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
-			if (strtotime($modified_since) >= filemtime($filename))
+			if ($check_filename === false || strtotime($modified_since) >= filemtime($filename))
 			{
 				@ob_end_clean();
 
 				// Answer the question - no, it hasn't been modified ;).
 				header('HTTP/1.1 304 Not Modified');
+				exit;
 			}
-
-			exit(0);
 		}
 
 		// Check whether the ETag was sent back, and cache based on that...
-		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
 		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
 		{
 			@ob_end_clean();
 
 			header('HTTP/1.1 304 Not Modified');
-			exit(0);
+			exit;
 		}
 
 		// Send the attachment headers.
-		header('Content-Transfer-Encoding: binary');
 		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
-		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($filename)) . ' GMT');
+		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $check_filename === true ? filemtime($filename) : time() - 525600 * 60) . ' GMT');
 		header('Accept-Ranges: bytes');
 		header('Connection: close');
 		header('ETag: ' . $eTag);
 
-		// Make sure the mime type warrants an inline display.
-		if (isset($_GET['image']) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
+		if (!empty($mime_type) && strpos($mime_type, 'image/') === 0)
 		{
-			unset($_GET['image']);
-		}
-		// Does this have a mime type?
-		elseif (!empty($mime_type) && (isset($_GET['image']) || !in_array($file_ext, array('jpg', 'gif', 'jpeg', 'x-ms-bmp', 'png', 'psd', 'tiff', 'iff'))))
-		{
-			header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
+			header('Content-Type: ' . $mime_type);
 		}
 		else
 		{
 			header('Content-Type: application/octet-stream');
 		}
 
-		$disposition = !isset($_GET['image']) ? 'attachment' : 'inline';
-		$fileName = str_replace('"', '', $filename);
+		// Different browsers like different standards...
+		$filename = str_replace('"', '', $real_filename);
 
 		// Send as UTF-8 if the name requires that
 		$altName = '';
-		if (preg_match('~[\x80-\xFF]~', $fileName))
-		{
-			$altName = "; filename*=UTF-8''" . rawurlencode($fileName);
-		}
-		header('Content-Disposition: ' . $disposition . '; filename="' . $fileName . '"' . $altName);
+		if (preg_match('~[\x80-\xFF]~', $filename))
+			$altName = "; filename*=UTF-8''" . rawurlencode($filename);
+
+		header('Content-Disposition: ' . $disposition . '; filename="' . $filename . '"' . $altName);
 
 		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
-		if (!isset($_GET['image']) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff', 'webp')))
+		if ($do_cache === true)
+		{
+			header('Cache-Control: max-age=' . (525600 * 60) . ', private');
+		}
+		else
 		{
 			header('Pragma: no-cache');
 			header('Cache-Control: no-cache');
 		}
-		else
-		{
-			header('Cache-Control: max-age=' . (525600 * 60) . ', private');
-		}
-
-		if (empty($modSettings['enableCompressedOutput']) || filesize($filename) > 4194304)
-		{
-			header('Content-Length: ' . filesize($filename));
-		}
 
 		// Try to buy some time...
-		@set_time_limit(600);
-
-		$body = file_get_contents($filename);
-		header('Content-Length: ', strlen($body));
-		echo $body;
-
-		obExit(false);
+		detectServer()->setTimeLimit(600);
 	}
 
 	/**

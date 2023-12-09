@@ -312,7 +312,7 @@ class ManagePortalConfig_Controller extends Action_Controller
 	/**
 	 * Our about page etc.
 	 *
-	 * @param boolean $in_admin
+	 * @param bool $in_admin
 	 * @throws Elk_Exception
 	 */
 	public function action_information($in_admin = true)
