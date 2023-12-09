@@ -68,7 +68,7 @@ function getFunctionInfo($function = null)
 			'function' => str_replace('_Block', '', $class),
 			'custom_label' => $class::blockName(),
 			'custom_desc' => $class::blockDescription(),
-			'standard_label' => isset($txt['sp_function_' . str_replace('_Block', '', $class) . '_label']) ? $txt['sp_function_' . str_replace('_Block', '', $class) . '_label'] : str_replace('_Block', '', $class)
+			'standard_label' => $txt['sp_function_' . str_replace('_Block', '', $class) . '_label'] ?? str_replace('_Block', '', $class)
 		);
 	}
 
