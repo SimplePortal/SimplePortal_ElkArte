@@ -4,7 +4,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 1.0.2
  */
 
 /** global: editor, start_state */
@@ -471,7 +471,7 @@ function sp_currentVersion()
 					if ((elem.prerelease && adminIndex.current.prerelease) || (!elem.prerelease))
 					{
 						previous = release;
-				mostRecent = elem;
+						mostRecent = elem;
 					}
 				}
 
@@ -502,7 +502,22 @@ function sp_setAnnouncement(init_news, announcement)
 	var oElem = document.getElementById('spAnnouncements'),
 		sMessages = init_news ? oElem.innerHTML : '',
 		sAnnouncementTemplate = '<dl>%content%</dl>',
-		sAnnouncementMessageTemplate = '<dt><a href="%href%">%subject%</a> :: %time%</dt><dd>%message%</dd>';
+		sAnnouncementMessageTemplate = '<dt><a href="%href%">%subject%</a> :: %time%</dt><dd>%message%</dd><hr />';
+
+	announcement.body = announcement.body.replace('\r\n\r\n', '\n');
+
+	// Some markup to html conversion
+	let re = new RegExp('^#{1,4}(.*)$', 'ugm');
+	announcement.body = announcement.body.replace(re, '<strong>$1</strong>');
+
+	re = new RegExp('\\*\\*(.*)\\*\\*', 'ug');
+	announcement.body = announcement.body.replace(re, '<strong>$1</strong>');
+
+	re = new RegExp('^ {0,1}\\* (.*)$', 'ugm');
+	announcement.body = announcement.body.replace(re, '&#x2022; $1');
+
+	re = new RegExp('^ {0,1}- (.*)$', 'ugm');
+	announcement.body = announcement.body.replace(re, '&#x2022; $1');
 
 	var sMessage = sAnnouncementMessageTemplate.replace('%href%', announcement.html_url).replace('%subject%', announcement.name).replace('%time%', announcement.published_at.replace(/[TZ]/g, ' ')).replace('%message%', announcement.body).replace(/\n/g, '<br />').replace(/\r/g, '');
 
