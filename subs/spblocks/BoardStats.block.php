@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 1.0.2
  */
 
 
@@ -54,8 +54,9 @@ class Board_Stats_Block extends SP_Abstract_Block
 		loadLanguage('Stats');
 
 		// Basic totals are easy
-		$this->data['totals'] = ssi_boardStats('array');
-		$this->data['totals']['mostOnline'] = $this->_modSettings['mostOnline'];
+		$stats = ssi_boardStats('array');
+		$this->data['totals'] = $stats === false ? [] : $stats;
+		$this->data['totals'] += array('mostOnline' => empty($this->_modSettings['mostOnline']) ? 0 : $this->_modSettings['mostOnline']);
 
 		// Get the averages from the activity log, its the most recent snapshot
 		if ($this->data['averages'])
