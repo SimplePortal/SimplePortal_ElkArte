@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 1.0.2
  */
 
 use BBC\PreparseCode;
@@ -588,11 +588,13 @@ class ManagePortalArticles_Controller extends Action_Controller
 		{
 			list($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForArticle($this->_is_aid);
 
-			$attachmentUploadDir = $modSettings['attachmentUploadDir'];
+			// A little razzle-dazzle to point the system to the article attachment directory
+			$attachmentUploadDirSave = $modSettings['attachmentUploadDir'];
 			$modSettings['automanage_attachments'] = 0;
+			$modSettings['currentAttachmentUploadDir'] = 1;
 			$modSettings['attachmentUploadDir'] = [1 => $modSettings['sp_articles_attachment_dir']];
 			processAttachments();
-			$modSettings['attachmentUploadDir'] = $attachmentUploadDir;
+			$modSettings['attachmentUploadDir'] = $attachmentUploadDirSave;
 		}
 	}
 
