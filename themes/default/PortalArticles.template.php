@@ -220,7 +220,10 @@ function template_view_article()
 	echo '
 	</article>';
 
+	if (empty($context['preview']))
+	{
 	template_article_schema_script();
+	}
 
 	if (!empty($context['using_relative_time']))
 		addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
