@@ -6,12 +6,11 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 use BBC\ParserWrapper;
 use BBC\PreparseCode;
-use ElkArte\Errors\AttachmentErrorContext;
 
 /**
  * Article controller.
@@ -317,6 +316,13 @@ class PortalArticles_Controller extends Action_Controller
 		list ($real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $width, $height) = $attachment;
 		$filename = $modSettings['sp_articles_attachment_dir'] . '/' . $id_attach . '_' . $file_hash . '.elk';
 
+		// No file, generate a bland its missing image
+		if (!file_exists($filename))
+		{
+			$this->sp_no_attach();
+			obExit(false);
+		}
+
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
 		$use_compression = $this->useCompression($mime_type);
@@ -585,5 +591,34 @@ class PortalArticles_Controller extends Action_Controller
 			loadLanguage('Errors');
 			$context['json_data'] = array('result' => false, 'data' => $txt['attachment_not_found']);
 		}
+	}
+
+	/**
+	 * Generates a language image based on text for display.
+	 *
+	 * @param null|string $text
+	 * @throws \Elk_Exception
+	 */
+	public function sp_no_attach($text = null)
+	{
+		global $txt;
+
+		require_once(SUBSDIR . '/Graphics.subs.php');
+		if ($text === null)
+		{
+			loadLanguage('Errors');
+			$text = $txt['attachment_not_found'];
+		}
+
+		$this->send_headers('no_image', 'no_image', 'image/png', false, 'inline', 'no_image.png', true, false);
+
+		$img = generateTextImage($text, 200);
+
+		if ($img === false)
+		{
+			throw new Elk_Exception('no_access', false);
+		}
+
+		echo $img;
 	}
 }
