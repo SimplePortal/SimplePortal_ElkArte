@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 use BBC\ParserWrapper;
@@ -58,8 +58,8 @@ function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings;
 
-	defined('SPORTAL_VERSION') || define('SPORTAL_VERSION', '1.0.2');
-	defined('SPORTAL_STALE') || define('SPORTAL_STALE', 'sp102');
+	defined('SPORTAL_VERSION') || define('SPORTAL_VERSION', '1.0.3');
+	defined('SPORTAL_STALE') || define('SPORTAL_STALE', 'sp103');
 
 	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 	{
@@ -137,13 +137,17 @@ function sportal_init($standalone = false)
 		{
 			$modSettings['sp_portal_mode'] = 0;
 		}
+		else
+		{
+			$modSettings['sp_portal_mode'] = (int) $modSettings['sp_portal_mode'];
+		}
 
 		if (empty($modSettings['sp_standalone_url']))
 		{
 			$modSettings['sp_standalone_url'] = '';
 		}
 
-		if ($modSettings['sp_portal_mode'] == 3)
+		if ($modSettings['sp_portal_mode'] === 3)
 		{
 			$context += array(
 				'portal_url' => $modSettings['sp_standalone_url'],
@@ -157,7 +161,7 @@ function sportal_init($standalone = false)
 			);
 		}
 
-		if ($modSettings['sp_portal_mode'] == 1)
+		if ($modSettings['sp_portal_mode'] === 1)
 		{
 			$context['linktree'][0] = array(
 				'url' => $scripturl . '?action=forum',
@@ -165,7 +169,7 @@ function sportal_init($standalone = false)
 			);
 		}
 
-		if (!empty($context['linktree']) && $modSettings['sp_portal_mode'] == 1)
+		if (!empty($context['linktree']) && $modSettings['sp_portal_mode'] === 1)
 		{
 			foreach ($context['linktree'] as $key => $tree)
 			{
@@ -234,11 +238,14 @@ function sportal_init_headers()
 	// Load up some javascript!
 	loadJavascriptFile('portal.js', ['stale' => SPORTAL_STALE]);
 
-	// We use drag and sort blocks for the front page
+	// Load in any optional javascript
 	$javascript = '';
+
 	// Javascript to allow D&D ordering of the front page blocks, not for guests
-	if (($modSettings['sp_portal_mode'] == 1)
-			&& empty($_REQUEST['action']) && empty($_REQUEST['board']) && !($user_info['is_guest'] || $user_info['id'] == 0))
+	if (empty($modSettings['sp_disableUserArrange'])
+		&& (int) $modSettings['sp_portal_mode'] === 1
+		&& empty($_REQUEST['action']) && empty($_REQUEST['board'])
+		&& !($user_info['is_guest'] || (int) $user_info['id'] === 0))
 	{
 		$modSettings['jquery_include_ui'] = true;
 		$javascript .= '
@@ -356,7 +363,7 @@ function sportal_load_blocks()
 	$context['SPortal']['blocks'] = [];
 
 	// If the member has arranged the blocks, display them like that
-	if (!empty($options['sp_block_layout']))
+	if (empty($modSettings['sp_disableUserArrange']) && !empty($options['sp_block_layout']))
 	{
 		$layout = @unserialize($options['sp_block_layout'], ['allowed_classes' => false]);
 
