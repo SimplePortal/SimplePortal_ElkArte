@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 use BBC\Codes;
@@ -825,11 +825,12 @@ class ManageSPortalModule_Controller extends Action_Controller
 		loadLanguage('SPortal');
 
 		// Set the right portalurl based on what integration mode the portal is using
-		if ($modSettings['sp_portal_mode'] == 1 && empty($context['disable_sp']))
+		$modSettings['sp_portal_mode'] = (int) $modSettings['sp_portal_mode'];
+		if ($modSettings['sp_portal_mode'] === 1 && empty($context['disable_sp']))
 		{
 			$sportal_url = $scripturl . '?action=forum';
 		}
-		elseif ($modSettings['sp_portal_mode'] == 3 && empty($context['disable_sp']))
+		elseif ($modSettings['sp_portal_mode'] === 3 && empty($context['disable_sp']))
 		{
 			$buttons['home']['href'] = $modSettings['sp_standalone_url'];
 			$sportal_url = $modSettings['sp_standalone_url'];
@@ -852,6 +853,7 @@ class ManageSPortalModule_Controller extends Action_Controller
 				'href' => $sportal_url,
 				'show' => empty($context['disable_sp']),
 				'sub_buttons' => array(),
+				'action_hook' => true,
 			),
 		), 'after');
 	}
@@ -929,11 +931,11 @@ class ManageSPortalModule_Controller extends Action_Controller
 		// If it is home, it may be something else
 		if ($current_action === 'home')
 		{
-			$current_action = $modSettings['sp_portal_mode'] == 3 && empty($context['standalone']) && empty($context['disable_sp'])
+			$current_action = (int) $modSettings['sp_portal_mode'] === 3 && empty($context['standalone']) && empty($context['disable_sp'])
 				? 'forum' : 'home';
 		}
 
-		if (empty($context['disable_sp']) && ((isset($_GET['board']) || isset($_GET['topic']) || in_array($context['current_action'], array('unread', 'unreadreplies', 'collapse', 'recent', 'stats', 'who'))) && in_array($modSettings['sp_portal_mode'], array(1, 3))))
+		if (empty($context['disable_sp']) && ((isset($_GET['board']) || isset($_GET['topic']) || in_array($context['current_action'], array('unread', 'unreadreplies', 'collapse', 'recent', 'stats', 'who'))) && in_array((int) $modSettings['sp_portal_mode'], array(1, 3), true)))
 		{
 			$current_action = 'forum';
 		}

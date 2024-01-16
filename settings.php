@@ -37,7 +37,7 @@ $defaults = array(
 );
 
 $updates = array(
-	'sp_version' => '1.0.2',
+	'sp_version' => '1.0.3',
 	'front_page' => 'PortalMain_Controller',
 	'admin_features' => $modSettings['admin_features'] . ',pt'
 );

@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2023 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 1.0.3
  */
 
 use BBC\ParserWrapper;
@@ -143,6 +143,8 @@ class ManagePortalConfig_Controller extends Action_Controller
 			array('check', 'sp_disable_side_collapse'),
 			array('check', 'sp_resize_images'),
 			array('check', 'sp_disableMobile'),
+			array('check', 'sp_disableUserArrange'),
+
 		);
 
 		$this->_generalSettingsForm->setConfigVars($config_vars);

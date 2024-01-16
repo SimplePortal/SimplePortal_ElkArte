@@ -30,6 +30,7 @@ $txt['sp_disableMobile'] = 'Disable on mobile devices';
 $txt['sp_disable_random_bullets'] = 'Disable Colored Bullets on Blocks';
 $txt['sp_disable_php_validation'] = 'Disable PHP Validation';
 $txt['sp_disable_php_validation_desc'] = 'Recommended value: Off';
+$txt['sp_disableUserArrange'] = 'Disable user block arrangement';
 
 $txt['sp_disable_side_collapse'] = 'Disable Side Collapsing';
 $txt['portaltheme'] = 'Portal Theme';
