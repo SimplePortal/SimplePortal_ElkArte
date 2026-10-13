@@ -149,7 +149,6 @@ $txt['error_sp_no_shop_found'] = 'Non ci sono funzionalità Shop installate..';
 $txt['error_sp_no_arcade_found'] = 'Non ci sono funzionalità Arcade installate.';
 $txt['error_sp_no_stats_found'] = 'Nessuna statistica trovata.';
 $txt['error_sp_no_permission_profiles'] = 'Non ci sono profili di permessi disponibili.';
-$txt['error_sp_no_permission_profiles'] = 'Non ci sono profili di permessi disponibili.';//There are no permission profiles available
 $txt['error_sp_no_style_profiles'] = 'Non ci sono profili di stili disponibili.';
 $txt['error_sp_no_visibility_profiles'] = 'Non ci sono profili di visibilità disponibili.';
 $txt['error_sp_no_pages'] = 'Non ci sono pagine disponibili.';
@@ -159,9 +158,6 @@ $txt['error_sp_no_comments'] = 'Non ci sono ancora dei commenti su questo artico
 $txt['error_sp_no_profiles'] = 'Non è stato ancora aggiunto nessun profilo.';
 $txt['error_sp_no_custom_menus'] = 'Non è stato ancora aggiunto nessun menu personalizzato.';
 $txt['error_sp_no_menu_items'] = 'Non è stata ancora aggiunta nessuna voce di menu.';
-$txt['error_sp_no_profiles'] = 'Non ci sono profili disponibili!'; //There are no profiles added yet!
-$txt['error_sp_no_custom_menus'] = 'Non ci sono menu personalizzati dispobibili!'; //There are no custom menus added yet!
-$txt['error_sp_no_menu_items'] = 'Non ci sono voci di menu disponibili!'; //There are no menu items added yet!
 $txt['error_sp_cannot_comment_modify'] = 'Non hai i permessi per modificare questo commento.';
 $txt['error_sp_cannot_comment_delete'] = 'Non hai i permessi per eimuovere questo commento.';
 $txt['error_sp_menu_not_found'] = 'Il menu richiesto non è stato trovato.';
@@ -176,7 +172,6 @@ $txt['error_sp_cannot_shoutbox_moderate'] = 'Non hai il permesso per moderare lo
 $txt['error_sp_no_block'] = 'Non ci sono blocchi creati ancora.';
 $txt['error_sp_flood_spsbp'] = 'Il tuo ultimo shot è di meno di %1$d secondi fa. Riprova più tardi.';
 $txt['error_sp_id_empty'] = 'Spiacenti, è stato indicato un tipo non valido.';
-$txt['error_sp_id_empty'] = 'Sorry, an invalid type was supplied.'; // questa non la so
 
 // Portal arrangement
 $txt['portal_order_title'] = 'Errore nell\'ordinamento dei blocchi';
